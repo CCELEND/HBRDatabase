@@ -18,4 +18,4 @@ pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-pytho
 
 运行 HBRDatabaseGUI.py 即可
 
-![Image text](https://github.com/CCELEND/HBRDatabase/tree/main/show/show.png)
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show.png)
