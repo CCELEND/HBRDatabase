@@ -1,0 +1,28 @@
+
+{
+    "记忆碎片":{
+        "path":"./持有物/道具/ThumbnailMemoryCrystalSmall.webp", 
+        "description":"用于修复记忆的素材",
+        "price":"", 
+        "location":"棱镜战"
+    },
+    "雪绒花":{
+        "path":"./持有物/道具/ThumbnailEdelweiss.webp", 
+        "description":"解锁档案活动的奖章内容所需的道具", 
+        "price":"300 活动奖章", 
+        "location":"兑换所"
+    },
+    "体力石":{
+        "path":"./持有物/道具/ThumbnailLifeStone.webp", 
+        "description":"可以回复1点体力的道具", 
+        "price":"", 
+        "location":""
+    },
+    "主题点数":{
+        "path":"./持有物/道具/ThumbnailThemePoint.webp", 
+        "description":"可购买背景主题的道具", 
+        "price":"", 
+        "location":"恒星扫荡战线"
+    }
+
+} 

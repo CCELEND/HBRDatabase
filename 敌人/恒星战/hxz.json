@@ -1,0 +1,22 @@
+
+{
+
+"灾厄主宰&疫病载体#1":
+{
+    "img_path":"./敌人/恒星战/灾厄主宰&疫病载体#1/hxz1.png",
+    "img_path_enemy":"./敌人/恒星战/灾厄主宰&疫病载体#1/DimensionBattleCentralTop_002.webp",
+    "logo_path":"./敌人/恒星战/灾厄主宰&疫病载体#1/DimensionBattleCentralTop_002.ico",
+    "name":"灾厄主宰&疫病载体#1",
+    "guide_path":"./敌人/恒星战/灾厄主宰&疫病载体#1/1.jpg"
+},
+
+"宣告终焉的邂逅#2":
+{
+    "img_path":"./敌人/恒星战/宣告终焉的邂逅#2/hxz2.png",
+    "img_path_enemy":"./敌人/恒星战/宣告终焉的邂逅#2/DimensionBattleCentralTop_003.webp",
+    "logo_path":"./敌人/恒星战/宣告终焉的邂逅#2/DimensionBattleCentralTop_003.ico",
+    "name":"宣告终焉的邂逅#2",
+    "guide_path":"./敌人/恒星战/宣告终焉的邂逅#2/2.jpg"
+}
+
+}

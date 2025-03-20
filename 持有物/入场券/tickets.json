@@ -1,0 +1,34 @@
+
+{
+    "棱镜战入场券":{
+        "path":"./持有物/入场券/ThumbnailPrismTicket.webp", 
+        "description":"用于记忆之庭棱镜战的入场道具",
+        "price":"", 
+        "location":"高分挑战累计"
+    },
+    "废域入场券":{
+        "path":"./持有物/入场券/ThumbnailExpTicket.webp", 
+        "description":"用于记忆之庭废域的入场道具", 
+        "price":"", 
+        "location":"高分挑战累计"
+    },
+    "活动废域入场券":{
+        "path":"./持有物/入场券/ThumbnailEXPEventTicket.webp", 
+        "description":"用于记忆之庭废域的入场道具", 
+        "price":"", 
+        "location":"活动棱镜战"
+    },
+    "光球BOSS入场券":{
+        "path":"./持有物/入场券/ThumbnailGateBossTicket.webp", 
+        "description":"用于记忆之庭光球BOSS的入场道具", 
+        "price":"10高级奖章", 
+        "location":"高级奖章兑换所\n高分挑战200,000"
+    },
+    "异时层入场券":{
+        "path":"./持有物/入场券/ThumbnailStoryHardModeTicket.webp", 
+        "description":"用于异时层的入场道具", 
+        "price":"", 
+        "location":"异时层"
+    }
+
+} 

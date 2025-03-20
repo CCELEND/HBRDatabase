@@ -1,0 +1,238 @@
+{
+    "壳石":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv1.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"", 
+        "location":"竞技场\n探险\n主线剧情"
+    },
+    "脉冲风星云溶液（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv2_Slash.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GGP", 
+        "location":"竞技场\n探险\n主线剧情\n商店（记忆之庭）"
+    },
+    "脉冲风星云溶液（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv2_Stab.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GP", 
+        "location":"竞技场\n探险\n主线剧情\n商店（记忆之庭）"
+    },
+    "脉冲风星云溶液（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv2_Strike.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GGP", 
+        "location":"竞技场\n探险\n主线剧情\n商店（记忆之庭）"
+    },
+    "脉冲风星云溶液":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv2_Event.webp",
+        "description":"可通过兑换所获得的风格强化素材",
+        "price":"50 活动奖章", 
+        "location":"兑换所"
+    },
+
+    "星辰之沙（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv3_Slash.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GGP", 
+        "location":"竞技场（中级等级3）\n竞技场（高级等级3）\n棱镜战[幻影]深渊重锤\n商店（记忆之庭）"
+    },
+    "星辰之沙（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv3_Stab.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GGP", 
+        "location":"竞技场（中级等级3）\n竞技场（高级等级3）\n棱镜战[幻影]针嘴鸟\n商店（记忆之庭）"
+    },
+    "星辰之沙（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv3_Strike.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"1 GGP", 
+        "location":"竞技场（中级等级3）\n竞技场（高级等级3）\n棱镜战[幻影]钻石眼魔\n商店（记忆之庭）"
+    },
+    "星辰之沙":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv3_Event.webp",
+        "description":"可通过兑换所获得的风格强化素材",
+        "price":"100 活动奖章", 
+        "location":"兑换所"
+    },
+
+    "融极矿（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv4_Slash.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"2 GGP", 
+        "location":"棱镜战（等级2之后）[幻影]深渊重锤\n商店（记忆之庭）"
+    },
+    "融极矿（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv4_Stab.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"2 GGP", 
+        "location":"棱镜战（等级2之后）[幻影]针嘴鸟\n商店（记忆之庭）"
+    },
+    "融极矿（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv4_Strike.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"2 GGP", 
+        "location":"棱镜战（等级2之后）[幻影]钻石眼魔\n商店（记忆之庭）"
+    },
+    "融极矿":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv4_Event.webp",
+        "description":"可通过兑换所获得的风格强化素材",
+        "price":"250 活动奖章", 
+        "location":"兑换所"
+    },
+
+
+    "新星原水（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv5_Slash.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"4 GGP", 
+        "location":"棱镜战（等级5之后）[幻影]深渊重锤\n商店（记忆之庭）"
+    },
+    "新星原水（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv5_Stab.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"4 GGP", 
+        "location":"棱镜战（等级5之后）[幻影]针嘴鸟\n商店（记忆之庭）"
+    },
+    "新星原水（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv5_Strike.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"4 GGP", 
+        "location":"棱镜战（等级5之后）[幻影]钻石眼魔\n商店（记忆之庭）"
+    },
+
+
+    "史瓦西之核（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv6_Slash.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"6 GGP", 
+        "location":"棱镜战（等级8之后）[幻影]深渊重锤\n商店（记忆之庭）"
+    },
+    "史瓦西之核（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv6_Stab.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"6 GGP", 
+        "location":"棱镜战（等级8之后）[幻影]针嘴鸟\n商店（记忆之庭）"
+    },
+    "史瓦西之核（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv6_Strike.webp",
+        "description":"可从星癌体身上获得的风格强化素材",
+        "price":"6 GGP", 
+        "location":"棱镜战（等级8之后）[幻影]钻石眼魔\n商店（记忆之庭）"
+    },
+
+    "努德斯特伦结晶":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv7_Light.webp",
+        "description":"可从星癌体身上获得的风格强化素材\n技能通用化的道具",
+        "price":"", 
+        "location":"异时层\n高分挑战120,000"
+    },
+
+    "宝珠（斩属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Slash.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（突属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Stab.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（打属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Strike.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（火属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Fire.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（冰属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Ice.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（雷属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Thunder.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（光属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Light.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+    "宝珠（暗属性）":{
+        "path":"./持有物/强化素材/ThumbnailHoju_Dark.webp",
+        "description":"可在宝珠迷宫获得的风格强化素材",
+        "price":"", 
+        "location":"宝珠迷宫"
+    },
+
+    "破晓之铃":{
+        "path":"./持有物/强化素材/Reincarnation01.webp",
+        "description":"用于转生角色的道具",
+        "price":"250 活动奖章", 
+        "location":"兑换所\n高分挑战1,500"
+    },
+    "黄昏之铃":{
+        "path":"./持有物/强化素材/Reincarnation02.webp",
+        "description":"用于转生角色的道具",
+        "price":"250 活动奖章", 
+        "location":"兑换所\n高分挑战2,000"
+    },
+    "薄暮之铃":{
+        "path":"./持有物/强化素材/Reincarnation03.webp",
+        "description":"用于转生角色的道具",
+        "price":"250 活动奖章", 
+        "location":"兑换所\n高分挑战3,000"
+    },
+    "奇迹之器":{
+        "path":"./持有物/强化素材/MiracleVessel.webp",
+        "description":"使角色退还转生的道具\n转生倒流可使转生次数下降1\n并回到之前的状态",
+        "price":"300 活动奖章", 
+        "location":"兑换所"
+    },
+    "奇迹之铃":{
+        "path":"./持有物/强化素材/MiracleBell.webp",
+        "description":"可保持等级转生的道具",
+        "price":"", 
+        "location":"转生倒流"
+    },
+
+    "暗物质":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_SkillEvolution.webp",
+        "description":"可在时钟塔获得的EX技能进化素材",
+        "price":"", 
+        "location":"时钟塔"
+    },
+
+    "悠久的瑞香":{
+        "path":"./持有物/强化素材/EternalDaphne.webp",
+        "description":"用于将风格进行才能开花的道具",
+        "price":"200 高级奖章", 
+        "location":"异时层\n高级奖章兑换所"
+    },
+
+    "技能指南":{
+        "path":"./持有物/强化素材/ThumbnailSkillLevelUpItem.webp",
+        "description":"提升角色技能等级的道具",
+        "price":"400 活动奖章\n40 GGP", 
+        "location":"兑换所\n异时层\n商店（记忆之庭）\n高分挑战160,000、300,000"
+    },
+
+    "梦之泪":{
+        "path":"./持有物/强化素材/ThumbnailStoryHardModeItem.webp",
+        "description":"用于异时层状态值增幅的道具",
+        "price":"", 
+        "location":"棱镜战\n宝石棱镜战\n活动棱镜战"
+    }
+
+}

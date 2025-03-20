@@ -1,0 +1,106 @@
+
+{
+
+"死亡蛞蝓Ω":
+{
+    "img_path":"./敌人/异时层/死亡蛞蝓Ω/死亡蛞蝓Ω-img.png",
+    "logo_path":"./敌人/异时层/死亡蛞蝓Ω/死亡蛞蝓Ω.ico",
+    "name":"死亡蛞蝓Ω",
+    "en":"hard_deathslug",
+    "nicknames":["死亡蛞蝓","蛞蝓"],
+    "description":"",
+    "guide_path":"./敌人/异时层/死亡蛞蝓Ω/死亡蛞蝓Ω.png"
+},
+
+"畸旋钻Ω":
+{
+    "img_path":"./敌人/异时层/畸旋钻Ω/畸旋钻Ω-img.png",
+    "logo_path":"./敌人/异时层/畸旋钻Ω/畸旋钻Ω.ico",
+    "name":"畸旋钻Ω",
+    "en":"hard_rotarymole",
+    "nicknames":["畸旋钻"],
+    "description":"",
+    "guide_path":"./敌人/异时层/畸旋钻Ω/畸旋钻Ω.png"
+},
+
+"猩红之主Ω":
+{
+    "img_path":"./敌人/异时层/猩红之主Ω/猩红之主Ω-img.png",
+    "logo_path":"./敌人/异时层/猩红之主Ω/猩红之主Ω.ico",
+    "name":"猩红之主Ω",
+    "en":"hard_redcrimson",
+    "nicknames":["红狗","猩红之主"],
+    "description":"",
+    "guide_path":"./敌人/异时层/猩红之主Ω/猩红之主Ω.png"
+},
+
+"感应触须Ω":
+{
+    "img_path":"./敌人/异时层/感应触须Ω/感应触须Ω-img.png",
+    "logo_path":"./敌人/异时层/感应触须Ω/感应触须Ω.ico",
+    "name":"感应触须Ω",
+    "en":"hard_feeler",
+    "nicknames":["感应触须","小触须"],
+    "description":"",
+    "guide_path":"./敌人/异时层/感应触须Ω/感应触须Ω.jpeg"
+},
+
+"覆地之手Ω":
+{
+    "img_path":"./敌人/异时层/覆地之手Ω/覆地之手Ω-img.png",
+    "logo_path":"./敌人/异时层/覆地之手Ω/覆地之手Ω.ico",
+    "name":"覆地之手Ω",
+    "en":"hard_flathand",
+    "nicknames":["手子","手子哥","覆地之手"],
+    "description":"",
+    "guide_path":"./敌人/异时层/覆地之手Ω/覆地之手Ω.png"
+},
+
+"终极触须Ω":
+{
+    "img_path":"./敌人/异时层/终极触须Ω/终极触须Ω-img.png",
+    "logo_path":"./敌人/异时层/终极触须Ω/终极触须Ω.ico",
+    "name":"终极触须Ω",
+    "en":"hard_ultimatefeeler",
+    "nicknames":["终极触须","大触须"],
+    "description":"",
+    "guide_path":"./敌人/异时层/终极触须Ω/终极触须Ω.png"
+},
+
+"终极之手Ω":
+{
+    "img_path":"./敌人/异时层/终极之手Ω/终极之手Ω-img.png",
+    "logo_path":"./敌人/异时层/终极之手Ω/终极之手Ω.ico",
+    "name":"终极之手Ω",
+    "en":"hard_ultimatehand3rd",
+    "nicknames":["终极之手"],
+    "description":"",
+    "guide_path":"./敌人/异时层/终极之手Ω/终极之手Ω.png"
+},
+
+"沙漠鞭虫Ω":
+{
+    "img_path":"./敌人/异时层/沙漠鞭虫Ω/沙漠鞭虫Ω-img.png",
+    "logo_path":"./敌人/异时层/沙漠鞭虫Ω/沙漠鞭虫Ω.ico",
+    "name":"沙漠鞭虫Ω",
+    "en":"hard_desertdendron",
+    "nicknames":["沙虫","沙漠鞭虫"],
+    "description":"",
+    "guide_path":"./敌人/异时层/沙漠鞭虫Ω/沙漠鞭虫Ω.png"
+},
+
+"亡骨之翎Ω":
+{
+    "img_path":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω-img.png",
+    "logo_path":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.ico",
+    "name":"亡骨之翎Ω",
+    "en":"hard_skullfeather",
+    "nicknames":["骨龙","骨翎"],
+    "description":"",
+    "guide_path":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.png"
+}
+
+
+
+
+}

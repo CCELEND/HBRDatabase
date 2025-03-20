@@ -1,0 +1,112 @@
+import sys
+import os
+import tkinter as tk
+from PIL import Image, ImageTk
+
+from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
+from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
+from canvas_events import ImageViewerWithScrollbar
+from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from scrollbar_frame_win import ScrollbarFrameWin
+
+from tools import load_json
+from 高分挑战.gftz_info import gftzs, get_all_gftz_obj
+
+gftzs_json = {}
+# 加载资源文件
+def load_resources():
+    global gftzs_json
+    if gftzs_json:
+        return
+    gftzs_json = load_json("./敌人/高分挑战/gftz.json")
+
+# 绑定高分挑战 canvas 的事件
+def bind_gftz_canvas(parent_frame, gftz, x, y):
+
+    if "攻略" in gftz.name:
+        photo = get_photo(gftz.img_path, (90, 90))
+        canvas = create_canvas_with_image(parent_frame, 
+            photo, 130, 130, 20, 20, x, y)
+    else:
+        photo = get_photo(gftz.img_path, (128, 72))
+        canvas = create_canvas_with_image(parent_frame, 
+            photo, 130, 130, 1, 29, x, y)
+    mouse_bind_canvas_events(canvas)
+
+    if gftz.guide_path:
+        bind_canvas_events(canvas, 
+            creat_gftz_win, parent_frame=parent_frame, 
+            gftz=gftz)
+
+open_gftz_wins = {}
+#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
+def gftz_win_closing(parent_frame):
+
+    open_gftz_win = parent_frame.title()
+    while open_gftz_win in open_gftz_wins:
+        del open_gftz_wins[open_gftz_win]
+
+    parent_frame.destroy()  # 销毁窗口
+
+def creat_gftz_win(event, parent_frame, gftz):
+
+    # 重复打开时，窗口置顶并直接返回
+    if gftz.name in open_gftz_wins:
+        # 判断窗口是否存在
+        if open_gftz_wins[gftz.name].winfo_exists():
+            set_window_top(open_gftz_wins[gftz.name])
+            return "break"
+        del open_gftz_wins[gftz.name]
+
+    if "攻略" in gftz.name:
+        gftz_win_frame = creat_Toplevel(parent_frame, gftz.name, 600, 840, 440, 50)
+    else:
+        gftz_win_frame = creat_Toplevel(parent_frame, gftz.name, 1280, 720, 440, 50)
+    set_window_icon(gftz_win_frame, gftz.logo_path)
+    open_gftz_wins[gftz.name] = gftz_win_frame
+
+    # 创建 ImageViewerWithScrollbar 实例
+    gftz_image_viewer = ImageViewerWithScrollbar(gftz_win_frame, 1280, 720, gftz.guide_path)
+
+    # 绑定鼠标点击事件到父窗口，点击置顶
+    gftz_win_frame.bind("<Button-1>", lambda event: set_window_top(gftz_win_frame))
+    # 窗口关闭时清理
+    gftz_win_frame.protocol("WM_DELETE_WINDOW", lambda: gftz_win_closing(gftz_win_frame))
+
+    return "break"  # 阻止事件冒泡
+
+
+# 加载图片并显示的函数
+def show_gftz_enemys(scrollbar_frame_obj):
+
+    load_resources()
+
+    get_all_gftz_obj(gftzs_json)
+
+    global gftzs
+
+    # 清除之前的组件
+    scrollbar_frame_obj.destroy_components()
+
+    column_count = 0
+    for i, gftz_name in enumerate(gftzs):
+        # 高分挑战敌人对象
+        gftz = gftzs[gftz_name]
+
+        gftz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
+        bind_gftz_canvas(gftz_frame, gftz, 0, 0)
+
+        # 计算行和列的位置
+        row = i // 5  # 每5个换行
+        column = i % 5  # 列位置
+        gftz_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")  # 设置间距
+        gftz_frame.grid_rowconfigure(0, weight=1)
+        gftz_frame.grid_columnconfigure(0, weight=1)
+
+        column_count += 1  # 更新列计数器
+        if column_count == 5:  # 如果已经到达第5列，重置列计数器并增加行
+            column_count = 0
+
+
+    scrollbar_frame_obj.update_canvas()
+    return "break"  # 阻止事件冒泡

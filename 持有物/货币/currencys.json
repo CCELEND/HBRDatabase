@@ -1,0 +1,16 @@
+
+{
+    "GP":{
+        "path":"./持有物/货币/ThumbnailGP.webp", 
+        "description":"GP是购买装备和锻造装备的必要货币\n10 活动奖章=>1,000 GP",
+        "price":"", 
+        "location":""
+    },
+    "公正币/正义币":{
+        "path":"./持有物/货币/ThumbnailJustice.webp", 
+        "description":"公正币/正义币是第四章下篇可用的一种新货币\n可以用于购买芯片、唱片、鱼饵等", 
+        "price":"", 
+        "location":"主线剧情 第四章 下篇"
+    }
+
+} 

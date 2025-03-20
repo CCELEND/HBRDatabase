@@ -1,0 +1,77 @@
+
+{
+
+    "必得S或以上探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailSGachaTicket.webp"
+    },
+    "高级10连探索券":{
+        "path":"./持有物/扭蛋材料/Thumbnailmonthly20SSTicket.webp"
+    },
+
+    "10连探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailmonthlyPack10Ticket.webp"
+    },
+    "10连探索券2":{
+        "path":"./持有物/扭蛋材料/ThumbnailScoutGachaTicket_02.webp"
+    },
+    "即将开幕10连探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailScoutGachaTicket_story.webp"
+    },
+    "10连探索券3":{
+        "path":"./持有物/扭蛋材料/ThumbnailRegularGachaTicket.webp"
+    },
+    "10连探索券4":{
+        "path":"./持有物/扭蛋材料/ThumbnailmonthlyPackTicket.webp"
+    },
+    "10连探索券5":{
+        "path":"./持有物/扭蛋材料/ThumbnailScoutGachaTicket.webp"
+    },
+    "特别10连探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailScoreGachaTicket_02.png"
+    },
+    "特别10连探索券2":{
+        "path":"./持有物/扭蛋材料/ThumbnailScoreGachaTicket.webp"
+    },
+
+
+    "自选SS风格探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailSelectTicket.webp"
+    },
+    "必得SS风格探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailSSGachaTicket.webp"
+    },
+
+
+    "联动纪念10连探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailmonthlyPack10Ticket_AB.webp"
+    },
+
+    "联动纪念必得SS探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailSSgachaCPTicket_AB.webp"
+    },
+    "必得SS探索券":{
+        "path":"./持有物/扭蛋材料/ThumbnailSSgachaCPTicket.webp"
+    },
+    "HalfAnniversaryTicket":{
+        "path":"./持有物/扭蛋材料/ThumbnailHalfAnniversaryTicket.webp"
+    },
+    "NightmareGachaCPTicket":{
+        "path":"./持有物/扭蛋材料/ThumbnailNightmareGachaCPTicket.webp"
+    },
+    "100thAnniversaryTicket":{
+        "path":"./持有物/扭蛋材料/Thumbnail100thAnniversaryTicket.webp"
+    },
+
+
+    "高级必得SS探索券碎片":{
+        "path":"./持有物/扭蛋材料/ThumbnailmonthlySSTicket.webp"
+    },
+    "必得SS探索券碎片":{
+        "path":"./持有物/扭蛋材料/ThumbnailHighScoreSSGachaTicket.webp"
+    },
+    "SSCoupon":{
+        "path":"./持有物/扭蛋材料/ThumbnailSSCoupon.webp"
+    }
+
+
+} 

@@ -1,0 +1,159 @@
+{
+    "火":{
+        "path":"./战斗系统/属性/Fire.webp",
+        "name":"火",
+        "en":"Fire",
+        "description":"火元素属性"
+    },
+    "火斩":{
+        "path":"./战斗系统/属性/Slash_Fire.webp",
+        "name":"火斩",
+        "en":"Slash_Fire",
+        "description":"火元素斩武器属性"
+    },
+    "火突":{
+        "path":"./战斗系统/属性/Stab_Fire.webp",
+        "name":"火突",
+        "en":"Stab_Fire",
+        "description":"火元素突武器属性"
+    },
+    "火打":{
+        "path":"./战斗系统/属性/Strike_Fire.webp",
+        "name":"火打",
+        "en":"Strike_Fire",
+        "description":"火元素打武器属性"
+    },
+
+    "冰":{
+        "path":"./战斗系统/属性/Ice.webp",
+        "name":"冰",
+        "en":"Ice",
+        "description":"冰元素属性"
+        
+    },
+    "冰斩":{
+        "path":"./战斗系统/属性/Slash_Ice.webp",
+        "name":"冰斩",
+        "en":"Slash_Ice",
+        "description":"冰元素斩武器属性"
+        
+    },
+    "冰突":{
+        "path":"./战斗系统/属性/Stab_Ice.webp",
+        "name":"冰突",
+        "en":"Stab_Ice",
+        "description":"冰元素突武器属性"
+        
+    },
+    "冰打":{
+        "path":"./战斗系统/属性/Strike_Ice.webp",
+        "name":"冰打",
+        "en":"Strike_Ice",
+        "description":"冰元素打武器属性"
+        
+    },
+
+    "雷":{
+        "path":"./战斗系统/属性/Thunder.webp",
+        "name":"雷",
+        "en":"Thunder",
+        "description":"雷元素属性"
+    },
+    "雷斩":{
+        "path":"./战斗系统/属性/Slash_Thunder.webp",
+        "name":"雷斩",
+        "en":"Slash_Thunder",
+        "description":"雷元素斩武器属性"
+    },
+    "雷突":{
+        "path":"./战斗系统/属性/Stab_Thunder.webp",
+        "name":"雷突",
+        "en":"Stab_Thunder",
+        "description":"雷元素突武器属性"
+    },
+    "雷打":{
+        "path":"./战斗系统/属性/Strike_Thunder.webp",
+        "name":"雷打",
+        "en":"Strike_Thunder",
+        "description":"雷元素打武器属性"
+    },
+
+    "光":{
+        "path":"./战斗系统/属性/Light.webp",
+        "name":"光",
+        "en":"Light",
+        "description":"光元素属性"
+    },
+    "光斩":{
+        "path":"./战斗系统/属性/Slash_Light.webp",
+        "name":"光斩",
+        "en":"Slash_Light",
+        "description":"光元素斩武器属性"
+    },
+    "光突":{
+        "path":"./战斗系统/属性/Stab_Light.webp",
+        "name":"光突",
+        "en":"Stab_Light",
+        "description":"光元素突武器属性"
+    },
+    "光打":{
+        "path":"./战斗系统/属性/Strike_Light.webp",
+        "name":"光打",
+        "en":"Strike_Light",
+        "description":"光元素打武器属性"
+    },
+
+    "暗":{
+        "path":"./战斗系统/属性/Dark.webp",
+        "name":"暗",
+        "en":"Dark",
+        "description":"暗元素属性"
+    },
+    "暗斩":{
+        "path":"./战斗系统/属性/Slash_Dark.webp",
+        "name":"暗斩",
+        "en":"Slash_Dark",
+        "description":"暗元素斩武器属性"
+    },
+    "暗突":{
+        "path":"./战斗系统/属性/Stab_Dark.webp",
+        "name":"暗突",
+        "en":"Stab_Dark",
+        "description":"暗元素突武器属性"
+    },
+    "暗打":{
+        "path":"./战斗系统/属性/Strike_Dark.webp",
+        "name":"暗打",
+        "en":"Strike_Dark",
+        "description":"暗元素打武器属性"
+    },
+
+    "无":{
+        "path":"./战斗系统/属性/Nonelement.webp",
+        "name":"无",
+        "en":"Nonelement",
+        "description":"无属性"
+    },
+
+    "斩":{
+        "path":"./战斗系统/属性/Slash.webp",
+        "name":"斩",
+        "en":"Slash",
+        "description":"斩武器属性"
+    },
+
+    "突":{
+        "path":"./战斗系统/属性/Stab.webp",
+        "name":"突",
+        "en":"Stab",
+        "description":"突武器属性"
+    },
+    
+    "打":{
+        "path":"./战斗系统/属性/Strike.webp",
+        "name":"打",
+        "en":"Strike",
+        "description":"打武器属性"
+    }
+
+}

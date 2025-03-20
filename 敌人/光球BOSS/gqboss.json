@@ -1,0 +1,52 @@
+
+{
+
+"异度监测之眼R":
+{
+    "img_path":"./敌人/光球BOSS/异度监测之眼R/异度监测之眼R.png",
+    "logo_path":"./敌人/光球BOSS/异度监测之眼R/异度监测之眼R.ico",
+    "name":"异度监测之眼R",
+    "guide_path":"./敌人/光球BOSS/异度监测之眼R/ydjczyR.png"
+},
+
+"异度监测之眼B":
+{
+    "img_path":"./敌人/光球BOSS/异度监测之眼B/异度监测之眼B.png",
+    "logo_path":"./敌人/光球BOSS/异度监测之眼B/异度监测之眼B.ico",
+    "name":"异度监测之眼B",
+    "guide_path":"./敌人/光球BOSS/异度监测之眼B/ydjczyB.png"
+},
+
+"异度监测之眼Y":
+{
+    "img_path":"./敌人/光球BOSS/异度监测之眼Y/异度监测之眼Y.png",
+    "logo_path":"./敌人/光球BOSS/异度监测之眼Y/异度监测之眼Y.ico",
+    "name":"异度监测之眼Y",
+    "guide_path":"./敌人/光球BOSS/异度监测之眼Y/ydjczyY.png"
+},
+
+"异度监测之眼W":
+{
+    "img_path":"./敌人/光球BOSS/异度监测之眼W/异度监测之眼W.png",
+    "logo_path":"./敌人/光球BOSS/异度监测之眼W/异度监测之眼W.ico",
+    "name":"异度监测之眼W",
+    "guide_path":"./敌人/光球BOSS/异度监测之眼W/ydjczyW.png"
+},
+
+"异度监测之眼P":
+{
+    "img_path":"./敌人/光球BOSS/异度监测之眼P/异度监测之眼P.png",
+    "logo_path":"./敌人/光球BOSS/异度监测之眼P/异度监测之眼P.ico",
+    "name":"异度监测之眼P",
+    "guide_path":"./敌人/光球BOSS/异度监测之眼P/ydjczyP.png"
+},
+
+"恶之左肌&正之右肌·空无R":
+{
+    "img_path":"./敌人/光球BOSS/恶之左肌&正之右肌·空无R/恶之左肌&正之右肌·空无R.png",
+    "logo_path":"./敌人/光球BOSS/恶之左肌&正之右肌·空无R/恶之左肌&正之右肌·空无R.ico",
+    "name":"恶之左肌&正之右肌·空无R",
+    "guide_path":"./敌人/光球BOSS/恶之左肌&正之右肌·空无R/ezzj&zzyj·kwR.png"
+}
+
+}

@@ -1,0 +1,40 @@
+
+{
+    "兑换所奖章1":{
+        "path":"./持有物/活动奖章/ThumbnailEventMedal_01.webp", 
+        "description":"可在剧情活动兑换所中使用的奖章",
+        "price":"", 
+        "location":"任务\n活动棱镜战\n活动废域"
+    },
+    "兑换所奖章2":{
+        "path":"./持有物/活动奖章/ThumbnailEventMedal_02.webp", 
+        "description":"可在剧情活动兑换所中使用的奖章",
+        "price":"", 
+        "location":"任务\n活动棱镜战\n活动废域"
+    },
+    "兑换所奖章3":{
+        "path":"./持有物/活动奖章/ThumbnailEventMedal_03.webp", 
+        "description":"可在剧情活动兑换所中使用的奖章",
+        "price":"", 
+        "location":"任务\n活动棱镜战\n活动废域"
+    },
+    "兑换所奖章4":{
+        "path":"./持有物/活动奖章/ThumbnailEventMedal_04.webp", 
+        "description":"可在剧情活动兑换所中使用的奖章",
+        "price":"", 
+        "location":"任务\n活动棱镜战\n活动废域"
+    },
+    "兑换所奖章5":{
+        "path":"./持有物/活动奖章/ThumbnailEventMedal_05.webp", 
+        "description":"可在剧情活动兑换所中使用的奖章",
+        "price":"", 
+        "location":"任务\n活动棱镜战\n活动废域"
+    },
+    "高级奖章":{
+        "path":"./持有物/活动奖章/ThumbnailPremierMedal.webp", 
+        "description":"可在高级奖章兑换所中使用的奖章", 
+        "price":"", 
+        "location":"异时层"
+    }
+
+} 

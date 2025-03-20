@@ -1,0 +1,247 @@
+
+{
+    "人工芯片（灵巧）":{
+        "path":"./持有物/芯片/SeraphArtifactChip1.webp",
+        "description":"提升 DP攻击能力\n灵巧 +9",
+        "price":"", 
+        "location":"探险（主线剧情 第四章 下篇 day5\n主线剧情 第五章 上篇）",
+        "rarity":"5"
+    },
+    "人工芯片（力量）":{
+        "path":"./持有物/芯片/SeraphArtifactChip1.webp",
+        "description":"提升 HP攻击能力\n力量 +9",
+        "price":"", 
+        "location":"探险（主线剧情 第四章 下篇 day3\n主线剧情 第五章 上篇）",
+        "rarity":"5"
+    },
+
+    "回复芯片Ⅴ":{
+        "path":"./持有物/芯片/SeraphChip5.webp",
+        "description":"提升 回复能力\n智慧 +7",
+        "price":"3,000 Justice", 
+        "location":"杂货店（主线剧情 第四章 下篇 day5）",
+        "rarity":"5"
+    },
+    "耐久芯片Ⅴ":{
+        "path":"./持有物/芯片/SeraphChip5.webp",
+        "description":"提升 防御能力\n体力、精神 +5",
+        "price":"3,000 Justice", 
+        "location":"杂货店（主线剧情 第四章 下篇 day5）",
+        "rarity":"5"
+    },
+    "攻击芯片Ⅴ":{
+        "path":"./持有物/芯片/SeraphChip5.webp",
+        "description":"提升 攻击能力\n力量、灵巧 +5",
+        "price":"3,000 Justice", 
+        "location":"杂货店（主线剧情 第四章 下篇 day5）",
+        "rarity":"5"
+    },
+
+    "DP攻击芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"提升 DP攻击能力\n灵巧 +6",
+        "price":"7,300 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day5）",
+        "rarity":"4"
+    },
+    "HP攻击芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"提升 HP攻击能力\n力量 +6",
+        "price":"7,300 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day5）",
+        "rarity":"4"
+    },
+    "回复芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"提升 回复能力\n智慧 +6",
+        "price":"7,300 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day5）",
+        "rarity":"4"
+    },
+    "偏导护盾芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"提升 偏导护盾能力\nDP +100",
+        "price":"7,100 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day1）",
+        "rarity":"4"
+    },
+    "治愈芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"为提升治愈能力设计而成\nDP +50、智慧 +4",
+        "price":"7,100 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day1）",
+        "rarity":"4"
+    },
+    "耐久芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"提升 防御能力\n体力 +4、精神 +3",
+        "price":"7,100 GP", 
+        "location":"商店（主线剧情 第四章 上篇 day1）",
+        "rarity":"4"
+    },
+    "暴击芯片Ⅳ":{
+        "path":"./持有物/芯片/SeraphChip4.webp",
+        "description":"更容易出现暴击\n暴击率 +0.6%",
+        "price":"1,100 GP", 
+        "location":"商店（主线剧情 第三章 day19）",
+        "rarity":"4"
+    },
+
+    "DP攻击芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 DP攻击能力\n灵巧 +5",
+        "price":"3,000 GP", 
+        "location":"商店（主线剧情 第三章 day19）",
+        "rarity":"3"
+    },
+    "HP攻击芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 HP攻击能力\n力量 +5",
+        "price":"3,000 GP", 
+        "location":"商店（主线剧情 第三章 day19）",
+        "rarity":"3"
+    },
+    "回复芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 回复能力\n智慧 +5",
+        "price":"3,000 GP", 
+        "location":"商店（主线剧情 第三章 day10）",
+        "rarity":"3"
+    },
+    "偏导护盾芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 偏导护盾能力\nDP +50",
+        "price":"3,000 GP", 
+        "location":"商店（主线剧情 第三章 day10）",
+        "rarity":"3"
+    },
+    "治愈芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"为提升治愈能力设计而成\nDP +30、智慧 +3",
+        "price":"2,500 GP", 
+        "location":"商店（主线剧情 第三章 day3）",
+        "rarity":"3"
+    },
+    "耐久芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 防御能力\n体力、精神 +3",
+        "price":"2,500 GP", 
+        "location":"商店（主线剧情 第三章 day3）",
+        "rarity":"3"
+    },
+    "攻击芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"提升 攻击能力\n力量、灵巧 +3",
+        "price":"2,500 GP", 
+        "location":"商店（主线剧情 第三章 day3）",
+        "rarity":"3"
+    },
+    "暴击芯片Ⅲ":{
+        "path":"./持有物/芯片/SeraphChip3.webp",
+        "description":"更容易出现暴击\n暴击率 +0.4%",
+        "price":"2,100 GP", 
+        "location":"商店（主线剧情 第二章 day18）",
+        "rarity":"3"
+    },
+
+    "DP攻击芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 DP攻击能力\n灵巧 +4",
+        "price":"1,800 GP", 
+        "location":"商店（主线剧情 第二章 day18）",
+        "rarity":"2"
+    },
+    "HP攻击芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 HP攻击能力\n力量 +4",
+        "price":"1,800 GP", 
+        "location":"商店（主线剧情 第二章 day18）",
+        "rarity":"2"
+    },
+    "回复芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 回复能力\n智慧 +4",
+        "price":"1,800 GP", 
+        "location":"商店（主线剧情 第二章 day11）",
+        "rarity":"2"
+    },
+    "偏导护盾芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 偏导护盾能力\nDP +40",
+        "price":"1,800 GP", 
+        "location":"商店（主线剧情 第二章 day11）",
+        "rarity":"2"
+    },
+    "治愈芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"为提升治愈能力设计而成\nDP +20、智慧 +2",
+        "price":"1,200 GP", 
+        "location":"商店（主线剧情 第二章 day2）",
+        "rarity":"2"
+    },
+    "耐久芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 防御能力\n体力、精神 +2",
+        "price":"1,200 GP", 
+        "location":"商店（主线剧情 第二章 day2）",
+        "rarity":"2"
+    },
+    "攻击芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"提升 攻击能力\n力量、灵巧 +2",
+        "price":"1,200 GP", 
+        "location":"商店（主线剧情 第二章 day2）",
+        "rarity":"2"
+    },
+    "暴击芯片Ⅱ":{
+        "path":"./持有物/芯片/SeraphChip2.webp",
+        "description":"更容易出现暴击\n暴击率 +0.2%",
+        "price":"180 GP", 
+        "location":"商店（主线剧情 第一章 day7）",
+        "rarity":"2"
+    },
+
+    "DP攻击芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"提升 DP攻击能力\n灵巧 +2",
+        "price":"80 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    },
+    "HP攻击芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"提升 HP攻击能力\n力量 +2",
+        "price":"80 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    },
+    "偏导护盾芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"提升 偏导护盾能力\nDP +20",
+        "price":"70 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    },
+    "治愈芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"为提升治愈能力设计而成\nDP +10、智慧 +1",
+        "price":"20 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    },
+    "耐久芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"提升 防御能力\n体力、精神 +1",
+        "price":"20 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    },
+    "攻击芯片Ⅰ":{
+        "path":"./持有物/芯片/SeraphChip1.webp",
+        "description":"提升 攻击能力\n力量、灵巧 +1",
+        "price":"20 GP", 
+        "location":"商店（主线剧情 第一章 day4）",
+        "rarity":"1"
+    }
+
+}

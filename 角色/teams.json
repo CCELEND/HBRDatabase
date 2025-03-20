@@ -1,0 +1,371 @@
+
+{
+
+"31A":
+{
+    "logo_path":"./角色/31A/31a.ico",
+    "name":"31A",
+    "description":"Beat Down, Rise Up War does not determine who is right. Only who is left.",
+    
+    "roles":
+    {
+        "茅森月歌":{
+            "id":"10011",
+            "en":"RKayamori",
+            "path":"./角色/31A/RKayamori"
+        },
+        "和泉由希":{
+            "id":"10012",
+            "en":"YIzumi",
+            "path":"./角色/31A/YIzumi"         
+        },
+        "逢川惠":{
+            "id":"10013",
+            "en":"MAikawa",
+            "path":"./角色/31A/MAikawa"         
+        },
+        "东城司":{
+            "id":"10014",
+            "en":"TTojo",
+            "path":"./角色/31A/TTojo"         
+        },
+        "朝仓可怜":{
+            "id":"10015",
+            "en":"Karen",
+            "path":"./角色/31A/Karen"         
+        },
+        "国见玉":{
+            "id":"10016",
+            "en":"TKunimi",
+            "path":"./角色/31A/TKunimi"         
+        }
+
+    }
+},
+
+"31B":
+{
+    "logo_path":"./角色/31B/31b.ico",
+    "name":"31B",
+    "description":"Love and Peace Death is not the end of life, but the completion of life.",
+    
+    "roles":
+    {
+        "苍井绘里香":{
+            "id":"10021",
+            "en":"EAoi",
+            "path":"./角色/31B/EAoi"
+        },
+        "水濑莓":{
+            "id":"10022",
+            "en":"IMinase",
+            "path":"./角色/31B/IMinase"
+        },
+        "水濑李":{
+            "id":"10023",
+            "en":"SMinase",
+            "path":"./角色/31B/SMinase"
+        },
+        "樋口圣华":{
+            "id":"10024",
+            "en":"SHiguchi",
+            "path":"./角色/31B/SHiguchi"         
+        },
+        "柊木梢":{
+            "id":"10025",
+            "en":"KHiiragi",
+            "path":"./角色/31B/KHiiragi"             
+        },
+        "白虎":{
+            "id":"10026",
+            "en":"Byakko",
+            "path":"./角色/31B/Byakko"             
+        }
+
+    }
+},
+
+"31C":
+{
+    "logo_path":"./角色/31C/31c.ico",
+    "name":"31C",
+    "description":"Failure Is Not an Option All's right with the world.",
+    
+    "roles":
+    {
+        "山胁·冯·伊瓦尔":{
+            "id":"10031",
+            "en":"BIYamawaki",
+            "path":"./角色/31C/BIYamawaki"
+        },
+
+        "樱庭星罗":{
+            "id":"10032",
+            "en":"SSakuraba",
+            "path":"./角色/31C/SSakuraba"
+        },
+
+        "天音巫呼":{
+            "id":"10033",
+            "en":"MTenne",
+            "path":"./角色/31C/MTenne"
+        },
+
+        "丰后弥生":{
+            "id":"10034",
+            "en":"YBungo",
+            "path":"./角色/31C/YBungo"
+        },
+
+        "神崎阿迪尔海德":{
+            "id":"10035",
+            "en":"AKanzaki",
+            "path":"./角色/31C/AKanzaki"
+        },
+
+        "佐月麻里":{
+            "id":"10036",
+            "en":"MSatsuki",
+            "path":"./角色/31C/MSatsuki"
+        }
+
+    }
+},
+
+"30G":
+{
+    "logo_path":"./角色/30G/30g.ico",
+    "name":"30G",
+    "description":"Faith Keep your eyes on the stars, but your feet on the ground.",
+    
+    "roles":
+    {
+        "白河由依奈":{
+            "id":"10041",
+            "en":"YShirakawa",
+            "path":"./角色/30G/YShirakawa"
+        },
+        "月城最中":{
+            "id":"10042",
+            "en":"MTsukishiro",
+            "path":"./角色/30G/MTsukishiro"
+        },
+        "桐生美也":{
+            "id":"10043",
+            "en":"MKiryu",
+            "path":"./角色/30G/MKiryu"
+        },
+        "菅原千惠":{
+            "id":"10044",
+            "en":"CSugahara",
+            "path":"./角色/30G/CSugahara"
+        },
+        "小笠原绯雨":{
+            "id":"10045",
+            "en":"HOgasawara",
+            "path":"./角色/30G/HOgasawara"
+        },
+        "藏里见":{
+            "id":"10046",
+            "en":"SKura",
+            "path":"./角色/30G/SKura"
+        }
+
+    }
+},
+
+"31D":
+{
+    "logo_path":"./角色/31D/31d.ico",
+    "name":"31D",
+    "description":"Fly High! Try to be a rainbow in someone's cloud.",
+    
+    "roles":
+    {
+        "二阶堂三乡":{
+            "id":"10051",
+            "en":"MNikaido",
+            "path":"./角色/31D/MNikaido"
+        },
+        "石井色叶":{
+            "id":"10052",
+            "en":"IIshii",
+            "path":"./角色/31D/IIshii"
+        },
+        "命吹雪":{
+            "id":"10053",
+            "en":"FMikoto",
+            "path":"./角色/31D/FMikoto"
+        },
+        "室伏理沙":{
+            "id":"10054",
+            "en":"RMurohushi",
+            "path":"./角色/31D/RMurohushi"
+        },
+        "伊达朱里":{
+            "id":"10055",
+            "en":"ADate",
+            "path":"./角色/31D/ADate"
+        },
+        "瑞原蓝娜":{
+            "id":"10056",
+            "en":"AMizuhara",
+            "path":"./角色/31D/AMizuhara"
+        }
+
+    }
+},
+
+"31E":
+{
+    "logo_path":"./角色/31E/31e.ico",
+    "name":"31E",
+    "description":"Get it together! Tomorrow's just another day.",
+    
+    "roles":
+    {
+        "大岛一干子":{
+            "id":"10061",
+            "en":"IcOhshima",
+            "path":"./角色/31E/IcOhshima"
+        },
+        "大岛二以奈":{
+            "id":"10062",
+            "en":"NiOhshima",
+            "path":"./角色/31E/NiOhshima"
+        },
+        "大岛三野里":{
+            "id":"10063",
+            "en":"MiOhshima",
+            "path":"./角色/31E/MiOhshima"
+        },
+        "大岛四叶草":{
+            "id":"10064",
+            "en":"YoOhshima",
+            "path":"./角色/31E/YoOhshima"
+        },
+        "大岛五十铃":{
+            "id":"10065",
+            "en":"IrOhshima",
+            "path":"./角色/31E/IrOhshima"
+        },
+        "大岛六宇亚":{
+            "id":"10066",
+            "en":"MuOhshima",
+            "path":"./角色/31E/MuOhshima"
+        }  
+    }
+},
+
+"31F":
+{
+    "logo_path":"./角色/31F/31f.ico",
+    "name":"31F",
+    "description":"We Live Better Courage is like love; it must have hope for nourishment.",
+    
+    "roles":
+    {
+        "柳美音":{
+            "id":"10071",
+            "en":"MYanagi",
+            "path":"./角色/31F/MYanagi"
+        },
+        "丸山奏多":{
+            "id":"10072",
+            "en":"KMaruyama",
+            "path":"./角色/31F/KMaruyama"
+        },
+        "华村诗纪":{
+            "id":"10073",
+            "en":"SHanamura",
+            "path":"./角色/31F/SHanamura"
+        },
+        "松冈千吕馏":{
+            "id":"10074",
+            "en":"CMatsuoka",
+            "path":"./角色/31F/CMatsuoka"
+        },
+        "夏目祈":{
+            "id":"10075",
+            "en":"INatsume",
+            "path":"./角色/31F/INatsume"
+        },
+        "黑泽真希":{
+            "id":"10076",
+            "en":"MKurosawa",
+            "path":"./角色/31F/MKurosawa"
+        }
+        
+    }
+},
+
+"31X":
+{
+    "logo_path":"./角色/31X/31x.ico",
+    "name":"31X",
+    "description":"Excelsior! Ungluicklich das Land, das Helden notig hat.",
+    
+    "roles":
+    {
+        "卡罗尔·利帕":{
+            "id":"10081",
+            "en":"CReaper",
+            "path":"./角色/31X/CReaper"
+        },
+        "李映夏":{
+            "id":"10082",
+            "en":"LShanhua",
+            "path":"./角色/31X/LShanhua"
+        },
+        "艾琳·雷德梅茵":{
+            "id":"10083",
+            "en":"IRedmayne",
+            "path":"./角色/31X/IRedmayne"
+        },
+        "芙莉缇卡·巴拉克里希兰":{
+            "id":"10084",
+            "en":"VBalakrishnan",
+            "path":"./角色/31X/VBalakrishnan"
+        },
+        "玛利亚·德·安洁莉斯":{
+            "id":"10085",
+            "en":"MdAngelis",
+            "path":"./角色/31X/MdAngelis"
+        },
+        "夏洛塔·斯科波夫斯卡娅":{
+            "id":"10086",
+            "en":"CSkopovskaya",
+            "path":"./角色/31X/CSkopovskaya"
+        }
+        
+    }
+},
+
+"Angel Beats!":
+{
+    "logo_path":"./角色/Angel Beats!/angelbeats.ico",
+    "name":"Angel Beats!",
+    "description":"Angel Beats! Rebels against the god.",
+    
+    "roles":
+    {
+        "立华奏":{
+            "id":"10201",
+            "en":"AliceA",
+            "path":"./角色/Angel Beats!/AliceA"
+        },
+        "仲村百合":{
+            "id":"10202",
+            "en":"AliceB",
+            "path":"./角色/Angel Beats!/AliceB"
+        },
+        "入江美雪":{
+            "id":"10203",
+            "en":"AliceC",
+            "path":"./角色/Angel Beats!/AliceC"
+        }
+        
+    }
+}
+
+}

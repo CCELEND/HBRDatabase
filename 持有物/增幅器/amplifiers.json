@@ -1,0 +1,145 @@
+
+{
+    "空蝉":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"提高战斗稳定性的新世代增幅器\n体力、精神 +60 / 其他性能 +35\n芯片装备栏1",
+        "price":"1,250,000 GP", 
+        "location":"商店（主线剧情 第四章 下篇 序章）"
+    },
+    "阳炎":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"牺牲扩张性从而换得灵巧的大幅提升\n灵巧 +79 / 体力、精神 +36 / 其他性能 +29\n芯片装备栏0", 
+        "price":"840,000 GP", 
+        "location":"商店（主线剧情 第四章 下篇 序章）"
+    },
+
+    "诺伊曼之帆":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"大脑高速运转，用回复和强化来改变战况吧\n智慧 +42 / 其他性能 +35\n芯片装备栏4", 
+        "price":"410,000 GP", 
+        "location":"商店（主线剧情 第四章 day1）"
+    },
+    "十二水坝":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"大幅强化防御，完成守护友方的使命吧\n体力、精神 +40 / 其他性能 +35\n芯片装备栏4", 
+        "price":"430,000 GP", 
+        "location":"商店（主线剧情 第四章 day1）"
+    },
+    "空中感知":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"急剧强化灵巧，打出猛烈的DP攻击吧\n灵巧 +40 / 其他性能 +36\n芯片装备栏4", 
+        "price":"420,000 GP", 
+        "location":"商店（主线剧情 第四章 day1）"
+    },
+    "无畏舰":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"大幅提升力量，不断打出强力的HP攻击吧\n力量 +40 / 其他性能 +36\n芯片装备栏4", 
+        "price":"420,000 GP", 
+        "location":"商店（主线剧情 第四章 day1）"
+    },
+
+    "村正":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"牺牲扩张性从而换得力量的大幅提升\n力量 +57 / 其他性能 +19\n芯片装备栏0", 
+        "price":"280,000 GP", 
+        "location":"商店（主线剧情 第三章 day19）"
+    },
+    "全盛":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"通过灵活的思维来维护同伴的安全\n智慧 +33 / 其他性能 +29\n芯片装备栏4", 
+        "price":"185,000 GP", 
+        "location":"商店（主线剧情 第三章 day19）\n探险（主线剧情 第三章）"
+    },
+    "永续":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"给与你保护友方的不屈意志\n体力、精神 +31 / 其他性能 +29\n芯片装备栏4", 
+        "price":"185,000 GP", 
+        "location":"商店（主线剧情 第三章 day19）\n探险（主线剧情 第三章）"
+    },
+
+    "蜘蛛奇迹":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"用DP攻击让敌方动弹不得吧\n灵巧 +29 / 其他性能 +24\n芯片装备栏4", 
+        "price":"125,000 GP", 
+        "location":"商店（主线剧情 第三章 day10）\n探险（主线剧情 第三章）"
+    },
+    "粉碎":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"用HP攻击大肆发泄吧\n力量 +29 / 其他性能 +24\n芯片装备栏4", 
+        "price":"125,000 GP", 
+        "location":"商店（主线剧情 第三章 day10）\n探险（主线剧情 第三章）"
+    },
+
+    "倾注":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"近乎全能很有安全感的增幅器\n全能力 +23\n芯片装备栏4", 
+        "price":"90,000 GP", 
+        "location":"商店（主线剧情 第二章、第三章 day3）\n探险（主线剧情 第三章）"
+    },
+
+    "蓝色之环":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"提升回复力与友方突破险境吧\n智慧 +25 / 其他性能 +22\n芯片装备栏3", 
+        "price":"45,000 GP", 
+        "location":"商店（主线剧情 第二章 day18）\n探险（主线剧情 第二章）"
+    },
+    "信仰之杖":{
+        "path":"./持有物/增幅器/SeraphBooster3.webp", 
+        "description":"为保护后方挺身而出吧\n体力、精神 +24 / 其他性能 +21\n芯片装备栏3", 
+        "price":"45,000 GP", 
+        "location":"商店（主线剧情 第二章 day18）\n探险（主线剧情 第二章）"
+    },
+
+    "蝴蝶":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"用DP攻击歼灭敌方\n灵巧 +21 / 其他性能 +18\n芯片装备栏3", 
+        "price":"13,000 GP", 
+        "location":"商店（主线剧情 第二章 day11）\n探险（主线剧情 第二章）"
+    },
+    "战牙":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"用HP攻击击败敌方!\n力量 +21 / 其他性能 +18\n芯片装备栏3", 
+        "price":"13,000 GP", 
+        "location":"商店（主线剧情 第二章 day11）\n讨伐任务（第二章）"
+    },
+
+    "控制器":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"泛用性高很有安心感的增幅器\n全能力 +16\n芯片装备栏3", 
+        "price":"4,800 GP", 
+        "location":"商店（主线剧情 第二章 day2）\n探险（主线剧情 第二章）"
+    },
+
+    "群蜂":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"想用DP攻击扰乱敌方的话非它莫属\n灵巧 +18 / 其他性能 +12\n芯片装备栏2", 
+        "price":"1,500 GP", 
+        "location":"商店（主线剧情 第一章 day7）"
+    },
+    "战吼":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"想用HP攻击击败敌方的话非它莫属\n力量 +18 / 其他性能 +12\n芯片装备栏2", 
+        "price":"1,500 GP", 
+        "location":"商店（主线剧情 第一章 day7）"
+    },
+    "天使":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"为治疗友方的天使提供帮助\n智慧 +18 / 其他性能 +12\n芯片装备栏2", 
+        "price":"1,300 GP", 
+        "location":"商店（主线剧情 第一章 day7）"
+    },
+    "高墙":{
+        "path":"./持有物/增幅器/SeraphBooster2.webp", 
+        "description":"给予为同伴挺身而出的你\n体力、精神 +15 / 其他性能 +12\n芯片装备栏2", 
+        "price":"480 GP", 
+        "location":"商店（主线剧情 第一章 day7）"
+    },
+
+    "第一阶段":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"在最初阶段值得推荐的增幅器\n全能力 +8\n芯片装备栏1", 
+        "price":"100 GP", 
+        "location":"商店（主线剧情 第一章 day4）"
+    }
+
+} 
