@@ -88,7 +88,7 @@ def show_attribute(scrollbar_frame_obj):
         # 计算行和列的位置
         attribute_row = attribute_num // 4  # 每4个换行
         attribute_column = attribute_num % 4  # 列位置
-        attribute_frame.grid(row=attribute_row, column=attribute_column, padx=10, pady=(0,5), sticky="nsew") #
+        attribute_frame.grid(row=attribute_row, column=attribute_column, padx=(10,0), pady=(0,5), sticky="nsew") #
         attribute_column_count += 1  # 更新列计数器
         if attribute_column_count == 4:  # 如果已经到达第4列，重置列计数器并增加行
             attribute_column_count = 0

@@ -24,8 +24,10 @@ from 芯片.chips_win import show_chips
 from 碎片.fragments_win import show_fragments
 
 sys.path.append(os.path.abspath("./战斗系统"))
-from 属性.attributes_win import show_attribute
+from 基础.jc_win import creat_jc_win
 from 乘区.cq_win import creat_cq_win
+from 武器.weapons_win import show_weapon
+from 属性.attributes_win import show_attribute
 from 状态.status_win import show_statu
 
 sys.path.append(os.path.abspath("./敌人"))
@@ -122,11 +124,11 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 战斗系统菜单
     battle_info_menu = tk.Menu(menu_bar, tearoff=0)
-    for info in ["武器"]:
-        create_menu_item(battle_info_menu, info, update_output, info)
 
-    create_menu_item(battle_info_menu, "属性", show_attribute, scrollbar_frame_obj)
+    create_menu_item(battle_info_menu, "基础", creat_jc_win, parent_frame)
     create_menu_item(battle_info_menu, "乘区", creat_cq_win, parent_frame)
+    create_menu_item(battle_info_menu, "武器", show_weapon, scrollbar_frame_obj)
+    create_menu_item(battle_info_menu, "属性", show_attribute, scrollbar_frame_obj)
     create_menu_item(battle_info_menu, "效果、状态", show_statu, scrollbar_frame_obj)
     
     menu_bar.add_cascade(label="⚔战斗系统", menu=battle_info_menu)
