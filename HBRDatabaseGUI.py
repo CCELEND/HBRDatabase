@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import json
 
 from canvas_events import ArtworkDisplayerHeight2
-from window import set_window_expand, set_window_icon, creat_window, set_window_top
+from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json
 
@@ -155,10 +155,11 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     parent_frame.config(menu=menu_bar)
 
 
+bg = []
 if __name__ == "__main__":
 
     # 创建主窗口
-    root = creat_window("HBRDatabase", 1160, 725, 440, 50)
+    root = creat_window("HBRDatabase", 1160, 725, 440, 50)#1160
     set_window_icon(root, "./favicon.ico")
     set_window_expand(root, rowspan=1, columnspan=6)
 
@@ -169,8 +170,11 @@ if __name__ == "__main__":
     # 创建菜单
     create_menu(root, scrollbar_frame_obj)
 
-    # 显示猫猫头
-    displayer = ArtworkDisplayerHeight2(scrollbar_frame_obj.scrollable_frame, 
-        "./角色/KamiSama.webp", 400)
+    # # 显示猫猫头
+    # displayer = ArtworkDisplayerHeight2(scrollbar_frame_obj.scrollable_frame, 
+    #     "./角色/KamiSama.webp", 400)
+
+    bg_photo = set_bg_opacity(root, 1253, 705, "vbg_hbr.png", "70%")
+    bg.append([bg_photo])
 
     root.mainloop()

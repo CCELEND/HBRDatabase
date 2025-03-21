@@ -166,5 +166,24 @@ def edit_text(text_widget, data):
         text_widget.insert(tk.END, data)
 
 
+def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity):
+    # 加载背景图片
+    bg_image = Image.open(bg_path)
+    bg_image = bg_image.resize((parent_width, parent_height), Image.LANCZOS)
 
+    # 将透明度百分比转换为灰度值（0-255）
+    opacity_percentage = int(opacity.strip('%')) / 100
+    gray_value = int(opacity_percentage * 255)
 
+    # 生成一个透明度遮罩层
+    mask = Image.new('L', bg_image.size, gray_value)  # 'L' 表示灰度图
+    bg_image.putalpha(mask)
+
+    # 将图片转换为Tkinter可用的格式
+    bg_photo = ImageTk.PhotoImage(bg_image)
+    
+    # 将图片设置为背景
+    bg_label = tk.Label(parent_frame, image=bg_photo)
+    bg_label.place(relwidth=1, relheight=1)
+
+    return bg_photo
