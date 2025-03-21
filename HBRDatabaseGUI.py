@@ -124,15 +124,21 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 战斗系统菜单
     battle_info_menu = tk.Menu(menu_bar, tearoff=0)
-
-    create_menu_item(battle_info_menu, "基础", creat_jc_win, parent_frame)
-    create_menu_item(battle_info_menu, "乘区", creat_cq_win, parent_frame)
-    create_menu_item(battle_info_menu, "武器", show_weapon, scrollbar_frame_obj)
-    create_menu_item(battle_info_menu, "属性", show_attribute, scrollbar_frame_obj)
-    create_menu_item(battle_info_menu, "效果、状态", show_statu, scrollbar_frame_obj)
-    
+    # 定义菜单项的名称和对应的回调函数
+    menu_battle_infos = [
+        ("基础", creat_jc_win),
+        ("乘区", creat_cq_win),
+        ("武器", show_weapon),
+        ("属性", show_attribute),
+        ("效果、状态", show_statu)  
+    ]
+    # 循环创建菜单项
+    for battle_info_name, callback in menu_battle_infos:
+        if battle_info_name in ['基础','乘区']:
+            create_menu_item(battle_info_menu, battle_info_name, callback, parent_frame)
+        else:
+            create_menu_item(battle_info_menu, battle_info_name, callback, scrollbar_frame_obj)
     menu_bar.add_cascade(label="⚔战斗系统", menu=battle_info_menu)
-
 
     # 搜索菜单
     menu_bar.add_command(label="🔍搜索", 
