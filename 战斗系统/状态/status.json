@@ -2,7 +2,7 @@
     "回复EP":{
         "name":"回复EP",
         "path":"./战斗系统/状态/HealEp.webp",
-        "effect":"EP回复","description":"EP增加",
+        "effect":"回复EP","description":"EP增加",
         "stack":"-",
         "type":"回复",
         "series":"回复EP" 
@@ -625,6 +625,22 @@
         "name":"雷抗性下降",
         "path":"./战斗系统/状态/ThunderResistDown.webp",
         "effect":"","description":"降低敌方雷属性抗性",
+        "stack":"2",
+        "type":"减益",
+        "series":"抗性" 
+    },
+    "光抗性清除":{
+        "name":"光抗性清除",
+        "path":"./战斗系统/状态/LightResistDownOverwrite.webp",
+        "effect":"","description":"消除敌方光属性抗性（不叠加）",
+        "stack":"-",
+        "type":"减益",
+        "series":"抗性" 
+    },
+    "光抗性下降":{
+        "name":"光抗性下降",
+        "path":"./战斗系统/状态/LightResistDown.webp",
+        "effect":"","description":"降低敌方光属性抗性",
         "stack":"2",
         "type":"减益",
         "series":"抗性" 

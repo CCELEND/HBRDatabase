@@ -102,6 +102,12 @@ def replace_dp_sp(text):
     text = re.sub(r'(SP回复|SP恢复|恢复SP|回复SP)', '回复SP', text)
     return text
 
+def replace_od_up(text):
+    # 替换与 OD 相关的词为：OD
+    text = re.sub(r'(超频条|超频|OD条|OD)', 'OD条', text)
+    text = re.sub(r'(增加OD条|OD条增加|OD条上升)', 'OD条上升', text)
+    return text
+
 # 关键词处理
 def keyword_processing(key_word_str):
     if not key_word_str:
@@ -109,18 +115,18 @@ def keyword_processing(key_word_str):
 
     key_word_str = key_word_str.upper()
     key_word_str = replace_dp_sp(key_word_str)
+    key_word_str = replace_od_up(key_word_str)
 
     # 定义替换字典
     replacement_dict = {
         "减防": "防御下降","降防": "防御下降","降攻": "攻击下降","加防": "防御上升","加攻": "攻击上升",
-        "超频": "OD",
-        "TOKEN": "信念","象征":"信念",
+        "TOKEN": "信念","象征": "信念",
         "大范围": "全体","群体": "全体","AOE":"全体",
-        "场":"强化领域",
-        "追加回合":"额外回合",
-        "暴伤":"暴击伤害",
-        "TAMA":"玉","AOI":"苍井",
-        "大连击":"连击数上升（大）","小连击":"连击数上升（小）",
+        "场": "强化领域",
+        "追加回合": "额外回合",
+        "暴伤": "暴击伤害",
+        "TAMA": "玉","AOI": "苍井",
+        "大连击": "连击数上升（大）","小连击": "连击数上升（小）",
         "封印":"禁锢"
     }
 
