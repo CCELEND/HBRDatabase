@@ -565,7 +565,7 @@ class ImageViewerWithScrollbar:
         self.v_scrollbar.destroy()  # 销毁滚动条
 
 
-# 显示图片，根据宽度调整，加入滚动条
+# 显示动图，根据宽度调整，加入滚动条
 class VideoPlayerWithScrollbar:
     def __init__(self, parent_frame, parent_width, parent_height, video_path):
         self.parent_frame = parent_frame
@@ -726,3 +726,132 @@ class VideoPlayerWithScrollbar:
         self.v_scrollbar.destroy()  # 销毁滚动条
         # 释放视频资源
         self.cap.release()
+
+
+# 显示图片，根据宽度调整，加入滚动条，可调节透明
+class ImageViewerWithScrollbarOpacity:
+    def __init__(self, parent_frame, parent_width, parent_height, image_path, opacity):
+        # 初始化
+        self.parent_frame = parent_frame
+        self.parent_width = parent_width
+        self.parent_height = parent_height
+        self.image_path = image_path
+
+        # 将透明度百分比转换为灰度值（0-255）
+        opacity_percentage = int(opacity.strip('%')) / 100
+        self.gray_value = int(opacity_percentage * 255)
+
+        # 打开图片
+        self.image = Image.open(self.image_path)
+        self.original_width, self.original_height = self.image.size
+
+        # 将图片转换为 Tkinter 可用的格式
+        self.tk_image = ImageTk.PhotoImage(self.image)
+
+        # 创建 Canvas
+        self.canvas = tk.Canvas(self.parent_frame, width=self.parent_width, height=self.parent_height)
+        self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # 在 Canvas 上显示图片
+        self.image_id = self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
+
+        # 设置 Canvas 的滚动区域
+        self.canvas.config(scrollregion=(0, 0, self.original_width, self.original_height))
+
+        # 创建垂直滚动条
+        self.v_scrollbar = tk.Scrollbar(self.parent_frame, orient=tk.VERTICAL, command=self.canvas.yview)
+        self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # 绑定 Canvas 和滚动条
+        self.canvas.config(yscrollcommand=self.v_scrollbar.set)
+
+        # 保持图片引用，避免被垃圾回收
+        self.canvas.image = self.tk_image
+
+        # 记录上一次的窗口大小
+        self.last_width = parent_width
+        self.last_height = parent_height
+
+        # 绑定窗口大小变化事件（防抖处理）
+        self.resize_timeout = None
+        self.parent_frame.bind("<Configure>", self.on_resize)
+
+        # 绑定鼠标滚轮事件
+        self.bind_mouse_wheel_events()
+
+        # 初始化大小
+        self.resize_image()
+
+    # 防抖处理窗口大小变化事件
+    def on_resize(self, event):
+        # 过滤异常值（例如窗口最小化时的宽度和高度）
+        if event.width < 50 or event.height < 50:
+            return
+
+        # 检查窗口大小是否真的发生了变化
+        if event.width != self.last_width or event.height != self.last_height:
+            self.last_width = event.width
+            self.last_height = event.height
+
+            # 防抖处理
+            if self.resize_timeout:
+                self.parent_frame.after_cancel(self.resize_timeout)
+            self.resize_timeout = self.parent_frame.after(200, self.resize_image)
+
+    # 调整图片大小以适应父窗口宽度，并保持宽高比
+    def resize_image(self):
+        # 获取当前父容器的宽度（减去滚动条的宽度）
+        scrollbar_width = self.v_scrollbar.winfo_width()
+        new_width = self.parent_frame.winfo_width() - scrollbar_width
+
+        # 如果滚动条未显示，宽度不需要减去滚动条宽度
+        if not self.v_scrollbar.winfo_ismapped():
+            new_width = self.parent_frame.winfo_width()
+
+        # 计算新的高度，保持宽高比
+        new_height = int(self.original_height * (new_width / self.original_width))
+
+        # 调整图片大小
+        resized_image = self.image.resize((new_width, new_height), Image.LANCZOS)
+
+        # 生成一个透明度遮罩层
+        mask = Image.new('L', resized_image.size, self.gray_value)  # 'L' 表示灰度图
+        resized_image.putalpha(mask)
+
+        self.resized_tk_image = ImageTk.PhotoImage(resized_image)
+
+        # 更新 Canvas 上的图片
+        self.canvas.itemconfig(self.image_id, image=self.resized_tk_image)
+        self.canvas.image = self.resized_tk_image  # 保持引用，避免被垃圾回收
+
+        # 设置 Canvas 的滚动区域
+        self.canvas.config(scrollregion=(0, 0, new_width, new_height))
+
+    # 处理鼠标滚轮事件
+    def on_mouse_wheel(self, event):
+        if platform.system() == "Windows":
+            self.canvas.yview_scroll(-1 * (event.delta // 120), "units")  # Windows 的滚轮事件
+        elif platform.system() == "Darwin":  # macOS
+            self.canvas.yview_scroll(-1 * event.delta, "units")
+        else:  # Linux
+            if event.num == 4:
+                self.canvas.yview_scroll(-1, "units")
+            elif event.num == 5:
+                self.canvas.yview_scroll(1, "units")
+
+    # 绑定鼠标滚轮事件到 Canvas
+    def bind_mouse_wheel_events(self):
+        if platform.system() == "Windows":
+            self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
+        elif platform.system() == "Darwin":  # macOS
+            self.canvas.bind("<MouseWheel>", self.on_mouse_wheel)
+        else:  # Linux
+            self.canvas.bind("<Button-4>", self.on_mouse_wheel)
+            self.canvas.bind("<Button-5>", self.on_mouse_wheel)
+
+    # 手动释放资源
+    def destroy(self):
+        self.canvas.delete("all")  # 删除 Canvas 上的所有内容
+        self.canvas.image = None  # 释放图片引用
+        self.canvas.destroy()  # 销毁 Canvas
+        self.v_scrollbar.destroy()  # 销毁滚动条
