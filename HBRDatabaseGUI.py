@@ -170,7 +170,7 @@ if __name__ == "__main__":
     # 创建菜单
     create_menu(root, scrollbar_frame_obj)
 
-    bg_photo = set_bg_opacity(root, 1253, 705, "vbg_hbr.png", "70%")
+    bg_photo = set_bg_opacity(root, 1253, 705, "vbg_hbr.png", "75%")
     bg.append([bg_photo])
 
     root.mainloop()
