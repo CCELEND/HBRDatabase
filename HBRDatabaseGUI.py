@@ -4,7 +4,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import json
 
-from canvas_events import ArtworkDisplayerHeight2, ImageViewerWithScrollbarOpacity
+from canvas_events import ArtworkDisplayerHeight2, ImageViewerWithScrollbar, ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json
@@ -162,15 +162,17 @@ if __name__ == "__main__":
     root = creat_window("HBRDatabase", 1160, 725, 440, 50)#1160
     set_window_icon(root, "./favicon.ico")
     set_window_expand(root, rowspan=1, columnspan=6)
+    root.update()
 
     # 绑定鼠标点击事件到父窗口，点击置顶
     root.bind("<Button-1>", lambda event: set_window_top(root))
 
     scrollbar_frame_obj = ScrollbarFrameWin(root, columnspan=6)
+    scrollbar_frame_obj.scrollable_frame.grid_rowconfigure(0, weight=1)
     # 创建菜单
     create_menu(root, scrollbar_frame_obj)
 
-    bg_photo = set_bg_opacity(root, 1253, 705, "vbg_hbr.png", "75%")
-    bg.append([bg_photo])
+    ArtworkDisplayerHeight(scrollbar_frame_obj.scrollable_frame,
+        "vbg_hbr.png", 717, 0, "70%")
 
     root.mainloop()

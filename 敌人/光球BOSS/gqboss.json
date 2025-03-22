@@ -47,6 +47,14 @@
     "logo_path":"./敌人/光球BOSS/恶之左肌&正之右肌·空无R/恶之左肌&正之右肌·空无R.ico",
     "name":"恶之左肌&正之右肌·空无R",
     "guide_path":"./敌人/光球BOSS/恶之左肌&正之右肌·空无R/ezzj&zzyj·kwR.png"
+},
+
+"阿蒙之门B":
+{
+    "img_path":"./敌人/光球BOSS/阿蒙之门B/阿蒙之门B.png",
+    "logo_path":"./敌人/光球BOSS/阿蒙之门B/阿蒙之门B.ico",
+    "name":"阿蒙之门B",
+    "guide_path":"./敌人/光球BOSS/阿蒙之门B/amzmB.png"   
 }
 
 }

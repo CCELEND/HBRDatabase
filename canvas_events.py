@@ -138,11 +138,15 @@ class AutoResizeBackgroundNOAspectRatio:
 
 # 限定高度，保持宽高比不变，默认留白70
 class ArtworkDisplayerHeight:
-    def __init__(self, parent_frame, artwork_path, target_height, padding=70):
+    def __init__(self, parent_frame, artwork_path, target_height, padding=70, opacity="100%"):
         self.padding = padding  # 留白大小
         self.parent_frame = parent_frame
         self.artwork_path = artwork_path
         self.target_height = target_height  # 传入的目标高度
+
+        # 将透明度百分比转换为灰度值（0-255）
+        opacity_percentage = int(opacity.strip('%')) / 100
+        self.gray_value = int(opacity_percentage * 255)
 
         # 加载图片并调整大小
         self.load_and_resize_image()
@@ -172,6 +176,10 @@ class ArtworkDisplayerHeight:
         self.resized_image = self.original_image.resize(
             (self.target_width, self.target_height), Image.LANCZOS
         )
+
+        # 生成一个透明度遮罩层
+        mask = Image.new('L', self.resized_image.size, self.gray_value)  # 'L' 表示灰度图
+        self.resized_image.putalpha(mask)
 
         # 将图片转换为 Tkinter 可用的格式
         self.tk_image = ImageTk.PhotoImage(self.resized_image)
