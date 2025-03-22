@@ -262,9 +262,9 @@ def show_style(scrollbar_frame_obj, style):
             hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
                 f"宝珠（{style.weapon_attribute}属性）"]['path']
 
-        hoju_photo = get_photo(hoju_img_path, (60, 60))
+        hoju_photo = get_photo(hoju_img_path, (66, 66))
         hoju_canvas = create_canvas_with_image(growth_ability_frame, 
-            hoju_photo, 60, 60, 0, 0, 0, 0, padx=20)
+            hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
         text = style.growth_ability.description
         growth_ability_lab = tk.Label(growth_ability_frame, text=text, 
             justify="left", font=("Monospace", 10, "bold"))

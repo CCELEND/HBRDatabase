@@ -10,6 +10,7 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json
 
 sys.path.append(os.path.abspath("./持有物"))
+from 饰品.jewelrys_win import show_jewelrys_type
 from 奖杯勋章.trophy_medals_win import show_trophy_medals
 from 道具.props_win import show_props
 from 饰品材料.jewelry_materials_win import show_jewelry_materials
@@ -78,14 +79,14 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 物品材料菜单
     items_menu = tk.Menu(menu_bar, tearoff=0)
     item_commands = [
-        "主线道具", "活动道具",
-        "饰品"
+        "主线道具", "活动道具"
     ]
     for item in item_commands:
         create_menu_item(items_menu, item, update_output, item)
 
     # 定义菜单项的名称和对应的回调函数
     menu_items = [
+        ("饰品", show_jewelrys_type),
         ("道具", show_props),
         ("饰品材料", show_jewelry_materials),
         ("活动奖章", show_medals),

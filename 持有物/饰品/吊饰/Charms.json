@@ -1,0 +1,56 @@
+{
+	"力量吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Power1.webp",
+		"name":"力量吊饰",
+		"en":"Charm_Power",
+		"type":"吊饰",
+		"description":"肌肉好像会变得有力量\n（+0 +1 +2 +3 +4）\n力量 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+
+	"灵巧吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Dexterity1.webp",
+		"name":"灵巧吊饰",
+		"en":"Charm_Dexterity",
+		"type":"吊饰",
+		"description":"指尖好像会变得灵巧\n（+0 +1 +2 +3 +4）\n灵巧 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+
+	"体力吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Toughness1.webp",
+		"name":"体力吊饰",
+		"en":"Charm_Toughness",
+		"type":"吊饰",
+		"description":"身体好像会变得健康\n（+0 +1 +2 +3 +4）\n体力 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+
+	"精神吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Spirit1.webp",
+		"name":"精神吊饰",
+		"en":"Charm_Spirit",
+		"type":"吊饰",
+		"description":"内心好像会平静下来\n（+0 +1 +2 +3 +4）\n精神 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+	
+	"智慧吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Wisdom1.webp",
+		"name":"智慧吊饰",
+		"en":"Charm_Wisdom",
+		"type":"吊饰",
+		"description":"考试成绩好像会变好\n（+0 +1 +2 +3 +4）\n智慧 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+	
+	"运气吊饰":{
+		"path":"./持有物/饰品/吊饰/Charm_Luck1.webp",
+		"name":"运气吊饰",
+		"en":"Charm_Luck",
+		"type":"吊饰",
+		"description":"似乎会有什么好事发生\n（+0 +1 +2 +3 +4）\n运气 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	}
+
+}

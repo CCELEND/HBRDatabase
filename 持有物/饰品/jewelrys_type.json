@@ -1,0 +1,60 @@
+{
+	"吊饰":{
+		"path":"./持有物/饰品/吊饰",
+		"resource":"./持有物/饰品/吊饰/Charms.json",
+		"name":"吊饰",
+		"en":"Charm",
+		"logo_path":"./持有物/饰品/吊饰/Charm.ico","img_path":"./持有物/饰品/吊饰/Charm.png"
+	},
+
+	"耳坠":{
+		"path":"./持有物/饰品/耳坠",
+		"resource":"./持有物/饰品/耳坠/Earrings.json",
+		"name":"耳坠",
+		"en":"Earrings",
+		"logo_path":"./持有物/饰品/耳坠/Earrings.ico","img_path":"./持有物/饰品/耳坠/Earrings.png"
+	},
+
+	"光球":{
+		"path":"./持有物/饰品/光球",
+		"resource":"./持有物/饰品/光球/Orbs.json",
+		"name":"光球",
+		"en":"Orb",
+		"logo_path":"./持有物/饰品/光球/Orb.ico","img_path":"./持有物/饰品/光球/Orb.png"
+	},
+
+	"戒指":{
+		"path":"./持有物/饰品/戒指",
+		"resource":"./持有物/饰品/戒指/Rings.json",
+		"name":"戒指",
+		"en":"Ring",
+		"logo_path":"./持有物/饰品/戒指/Ring.ico","img_path":"./持有物/饰品/戒指/Ring.png"
+
+	},
+
+	"手环":{
+		"path":"./持有物/饰品/手环",
+		"resource":"./持有物/饰品/手环/Bracelets.json",
+		"name":"手环",
+		"en":"Bracelet",
+		"logo_path":"./持有物/饰品/手环/Bracelet.ico","img_path":"./持有物/饰品/手环/Bracelet.png"
+	},
+
+	"项链":{
+		"path":"./持有物/饰品/项链",
+		"resource":"./持有物/饰品/项链/Necklaces.json",
+		"name":"项链",
+		"en":"Necklace",
+		"logo_path":"./持有物/饰品/项链/Necklace.ico","img_path":"./持有物/饰品/项链/Necklace.png"
+
+	},
+
+	"专武":{
+		"path":"./持有物/饰品/专武",
+		"resource":"./持有物/饰品/专武/Souls.json",
+		"name":"专武",
+		"en":"Soul",
+		"logo_path":"./持有物/饰品/专武/Soul.ico","img_path":"./持有物/饰品/专武/Soul.png"
+
+	}
+}

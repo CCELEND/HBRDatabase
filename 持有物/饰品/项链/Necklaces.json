@@ -1,0 +1,11 @@
+{
+	"项链":{
+		"path":"./持有物/饰品/吊饰/Charm_Power1.webp",
+		"name":"力量吊饰",
+		"en":"Charm_Power",
+		"type":"吊饰",
+		"description":"肌肉好像会变得有力量\n（+0 +1 +2 +3 +4）\n力量 +6 +9 +12 +14 +15",
+		"rarity":"3","location":"炼金"
+	},
+
+}

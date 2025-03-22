@@ -1,1 +1,10 @@
-=
+{
+	"专武":{
+		"path":"./持有物/饰品/专武/Soul.webp",
+		"name":"专武",
+		"en":"Soul",
+		"type":"专武",
+		"description":"风格的全能力 +5",
+		"rarity":"5","location":"商店（记忆之庭）\n活动兑换所"
+	}
+}
