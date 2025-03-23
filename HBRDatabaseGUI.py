@@ -86,8 +86,8 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 定义菜单项的名称和对应的回调函数
     menu_items = [
-        ("饰品", show_jewelrys_type),
         ("道具", show_props),
+        ("饰品", show_jewelrys_type),
         ("饰品材料", show_jewelry_materials),
         ("活动奖章", show_medals),
         ("奖杯勋章", show_trophy_medals),

@@ -45,7 +45,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         inner_frame.grid(row=0, column=0, columnspan=6, sticky="nsew")
         inner_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         inner_frame.grid_columnconfigure(0, weight=1)  # Canvas 列
-        inner_frame.grid_columnconfigure(1, weight=3)  # 右侧信息列，权重更大以填充更多空间
+        inner_frame.grid_columnconfigure(1, weight=4)  # 右侧信息列，权重更大以填充更多空间
         
         # 获取 jewelry 图对象
         jewelry_photo = get_photo(jewelry.path, jewelry_size)
@@ -64,9 +64,9 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         info_frame.grid(row=0, column=1, sticky="nsew")
         # 让 info_frame 内部组件垂直居中 3 1 3
         info_frame.grid_rowconfigure(0, weight=1) # 确保行填充
-        info_frame.grid_columnconfigure(0, weight=3, minsize=300)  # 描述列
-        info_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 稀有度列
-        info_frame.grid_columnconfigure(2, weight=3, minsize=300)  # 位置列
+        info_frame.grid_columnconfigure(0, weight=4, minsize=450)  # 描述列
+        info_frame.grid_columnconfigure(1, weight=1, minsize=150)  # 稀有度列
+        info_frame.grid_columnconfigure(2, weight=2, minsize=200)  # 位置列
         
         # 右侧 Label（放文字描述）
         # 控制多行文本的对齐方式（仅影响 wraplength 设定的换行文本）justify="left"
@@ -79,7 +79,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         rarity_label.grid(row=0, column=1, sticky="nsew")
 
         # 右侧 Label（放获取位置）
-        location_label = tk.Label(info_frame, text=jewelry.location, justify="left", anchor="w")
+        location_label = tk.Label(info_frame, text=jewelry.location, justify="left", anchor="w") #, anchor="e"
         location_label.grid(row=0, column=2, sticky="nsew")
 
     scrollbar_frame_obj.update_canvas()

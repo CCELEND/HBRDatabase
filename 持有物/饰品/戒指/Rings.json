@@ -1,0 +1,155 @@
+{
+
+	"炎之戒指":{
+		"path":"./持有物/饰品/戒指/Ring_High1_fire_w1.webp",
+		"name":"炎之戒指",
+		"en":"Ring_High1_fire_w1",
+		"type":"戒指",
+		"description":"自身火属性技能攻击力\n+4% +5% +6% +8% +10%\n力量、灵巧 +37",
+		"rarity":"6","location":"炎之回廊"
+	},
+	"冰之戒指":{
+		"path":"./持有物/饰品/戒指/Ring_High1_ice_w1.webp",
+		"name":"冰之戒指",
+		"en":"Ring_High1_ice_w1",
+		"type":"戒指",
+		"description":"自身冰属性技能攻击力\n+4% +5% +6% +8% +10%\n力量、灵巧 +37",
+		"rarity":"6","location":"冰之回廊"
+	},
+	"雷之戒指":{
+		"path":"./持有物/饰品/戒指/Ring_High1_thunder_w1.webp",
+		"name":"雷之戒指",
+		"en":"Ring_High1_thunder_w1",
+		"type":"戒指",
+		"description":"自身雷属性技能攻击力\n+4% +5% +6% +8% +10%\n力量、灵巧 +37",
+		"rarity":"6","location":"雷之回廊"
+	},
+	"光之戒指":{
+		"path":"./持有物/饰品/戒指/Ring_High1_light_w1.webp",
+		"name":"光之戒指",
+		"en":"Ring_High1_light_w1",
+		"type":"戒指",
+		"description":"自身光属性技能攻击力\n+4% +5% +6% +8% +10%\n力量、灵巧 +37",
+		"rarity":"6","location":"光之回廊"
+	},
+	"暗之戒指":{
+		"path":"./持有物/饰品/戒指/Ring_High1_dark_w1.webp",
+		"name":"暗之戒指",
+		"en":"Ring_High1_dark_w1",
+		"type":"戒指",
+		"description":"自身暗属性技能攻击力\n+4% +5% +6% +8% +10%\n力量、灵巧 +37",
+		"rarity":"6","location":"暗之回廊"
+	},
+
+	"神秘戒指":{
+		"path":"./持有物/饰品/戒指/RingHighw5.webp",
+		"name":"神秘戒指",
+		"en":"RingHighw5",
+		"type":"戒指",
+		"description":"专门为DP攻击而设计的戒指\n力量 +11、灵巧 +49",
+		"rarity":"5","location":"棱镜战：等级9\n棱镜战：等级10"
+	},
+	"奥义戒指":{
+		"path":"./持有物/饰品/戒指/RingHighw4.webp",
+		"name":"奥义戒指",
+		"en":"RingHighw4",
+		"type":"戒指",
+		"description":"专门为HP攻击而设计的戒指\n力量 +49、灵巧 +11",
+		"rarity":"5","location":"棱镜战：等级9\n棱镜战：等级10"
+	},
+
+	"游侠戒指":{
+		"path":"./持有物/饰品/戒指/RingHighw3.webp",
+		"name":"游侠戒指",
+		"en":"RingHighw3",
+		"type":"戒指",
+		"description":"为DP攻击而设计的戒指\n力量 +20、灵巧 +29",
+		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
+	},
+	"战士戒指":{
+		"path":"./持有物/饰品/戒指/RingHighw2.webp",
+		"name":"战士戒指",
+		"en":"RingHighw2",
+		"type":"戒指",
+		"description":"为HP攻击而设计的戒指\n力量 +29、灵巧 +20",
+		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
+	},
+	"密银戒指":{
+		"path":"./持有物/饰品/戒指/RingHigh1.webp",
+		"name":"密银戒指",
+		"en":"RingHighw1",
+		"type":"戒指",
+		"description":"提升攻击能力\n力量、灵巧 +24",
+		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
+	},
+
+	"狙击手戒指":{
+		"path":"./持有物/饰品/戒指/RingMediumw1.webp",
+		"name":"狙击手戒指",
+		"en":"RingMediumw1",
+		"type":"戒指",
+		"description":"为DP攻击而设计的戒指\n力量 +16、灵巧 +23",
+		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
+	},
+	"斗士戒指":{
+		"path":"./持有物/饰品/戒指/RingMediumw3.webp",
+		"name":"斗士戒指",
+		"en":"RingMediumw3",
+		"type":"戒指",
+		"description":"为HP攻击而设计的戒指\n力量 +23、灵巧 +16",
+		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
+	},
+	"白金戒指":{
+		"path":"./持有物/饰品/戒指/RingMediumw4.webp",
+		"name":"白金戒指",
+		"en":"RingMediumw4",
+		"type":"戒指",
+		"description":"提升攻击能力\n力量、灵巧 +19",
+		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
+	},
+
+	"技巧戒指":{
+		"path":"./持有物/饰品/戒指/RingMedium3.webp",
+		"name":"技巧戒指",
+		"en":"RingMedium3",
+		"type":"戒指",
+		"description":"为DP攻击而设计的戒指\n力量 +13、灵巧 +18",
+		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
+	},
+	"能量戒指":{
+		"path":"./持有物/饰品/戒指/RingMedium2.webp",
+		"name":"能量戒指",
+		"en":"RingMedium2",
+		"type":"戒指",
+		"description":"为HP攻击而设计的戒指\n力量 +18、灵巧 +13",
+		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
+	},
+	"激情戒指":{
+		"path":"./持有物/饰品/戒指/RingMedium1.webp",
+		"name":"激情戒指",
+		"en":"RingMedium1",
+		"type":"戒指",
+		"description":"提升攻击能力\n力量、灵巧 +15",
+		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
+	},
+
+
+	"精致戒指":{
+		"path":"./持有物/饰品/戒指/Ringloww2.webp",
+		"name":"精致戒指",
+		"en":"Ringloww2",
+		"type":"戒指",
+		"description":"提升攻击能力\n力量、灵巧 +12",
+		"rarity":"1","location":"棱镜战：等级1"
+	},
+	"光面戒指":{
+		"path":"./持有物/饰品/戒指/Ringlow1.webp",
+		"name":"光面戒指",
+		"en":"Ringlow1",
+		"type":"戒指",
+		"description":"提升攻击能力\n力量、灵巧 +8",
+		"rarity":"1","location":"棱镜战：等级1"
+	}
+
+
+}

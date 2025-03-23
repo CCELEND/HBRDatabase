@@ -5,7 +5,7 @@
 		"en":"Charm_Power",
 		"type":"吊饰",
 		"description":"肌肉好像会变得有力量\n（+0 +1 +2 +3 +4）\n力量 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 红宝石\n100,000 GP"
 	},
 
 	"灵巧吊饰":{
@@ -14,7 +14,7 @@
 		"en":"Charm_Dexterity",
 		"type":"吊饰",
 		"description":"指尖好像会变得灵巧\n（+0 +1 +2 +3 +4）\n灵巧 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 蓝宝石\n100,000 GP"
 	},
 
 	"体力吊饰":{
@@ -23,7 +23,7 @@
 		"en":"Charm_Toughness",
 		"type":"吊饰",
 		"description":"身体好像会变得健康\n（+0 +1 +2 +3 +4）\n体力 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 黄玉\n100,000 GP"
 	},
 
 	"精神吊饰":{
@@ -32,7 +32,7 @@
 		"en":"Charm_Spirit",
 		"type":"吊饰",
 		"description":"内心好像会平静下来\n（+0 +1 +2 +3 +4）\n精神 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 珍珠\n100,000 GP"
 	},
 	
 	"智慧吊饰":{
@@ -41,7 +41,7 @@
 		"en":"Charm_Wisdom",
 		"type":"吊饰",
 		"description":"考试成绩好像会变好\n（+0 +1 +2 +3 +4）\n智慧 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 缟玛瑙\n100,000 GP"
 	},
 	
 	"运气吊饰":{
@@ -50,7 +50,7 @@
 		"en":"Charm_Luck",
 		"type":"吊饰",
 		"description":"似乎会有什么好事发生\n（+0 +1 +2 +3 +4）\n运气 +6 +9 +12 +14 +15",
-		"rarity":"3","location":"炼金"
+		"rarity":"3","location":"炼金\n5 亚历山大石、7 钻石\n100,000 GP"
 	}
 
 }
