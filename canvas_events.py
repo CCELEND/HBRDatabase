@@ -177,9 +177,10 @@ class ArtworkDisplayerHeight:
             (self.target_width, self.target_height), Image.LANCZOS
         )
 
-        # 生成一个透明度遮罩层
-        mask = Image.new('L', self.resized_image.size, self.gray_value)  # 'L' 表示灰度图
-        self.resized_image.putalpha(mask)
+        if self.gray_value != 255:
+            # 生成一个透明度遮罩层
+            mask = Image.new('L', self.resized_image.size, self.gray_value)  # 'L' 表示灰度图
+            self.resized_image.putalpha(mask)
 
         # 将图片转换为 Tkinter 可用的格式
         self.tk_image = ImageTk.PhotoImage(self.resized_image)
@@ -193,6 +194,7 @@ class ArtworkDisplayerHeight:
         # 在 Canvas 上显示图片
         self.canvas.create_image(x_offset, 0, anchor=tk.NW, image=self.tk_image)
         self.canvas.image = self.tk_image  # 保持引用，避免被垃圾回收
+
 
 # webp 静态图显示
 class ArtworkDisplayer:
