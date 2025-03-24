@@ -2,16 +2,16 @@
 
 ### 最新的 python3
 
-### opencv-python、Pillow
+### opencv-python、Pillow、requests
 
 ```sh
-pip install opencv-python Pillow
+pip install opencv-python Pillow requests
 ```
 
 镜像加速（建议使用）
 
 ```sh
-pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow
+pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests
 ```
 
 ### 使用
