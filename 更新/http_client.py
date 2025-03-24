@@ -8,6 +8,8 @@ import base64
 import requests
 from tkinter import messagebox
 
+from urllib.parse import quote
+
 from tools import creat_directory, confirm_restart
         
 # 将文件哈希值字典发送到服务器
@@ -26,8 +28,11 @@ def download_files_from_server(server_url, files_to_download):
             file = file_name
             creat_directory(file_name)
 
+            # 编码特殊字符
+            encoded_name = quote(file_name)
             # 服务器响应
-            response = requests.get(f"{server_url}/download/{file_name}")
+            response = requests.get(f"{server_url}/download/{encoded_name}")
+
             if response.content.startswith(b'{"error"'):
                 err_info = response.content.decode('utf-8')
                 err_flag = True
