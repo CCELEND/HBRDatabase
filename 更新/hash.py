@@ -4,6 +4,44 @@ import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 
+"""
+比较两个哈希字典，返回差异字典
+:param dict1: 第一个哈希字典
+:param dict2: 第二个哈希字典
+:return: 差异字典，包含新增、删除和修改的键
+"""
+def compare_hashes(dict1, dict2):
+
+    diff_dict = {
+        'added': {},   # 新增的键
+        'deleted': {}, # 删除的键
+        'modified': {} # 修改的键
+    }
+
+    # 获取所有键的集合
+    keys1 = set(dict1.keys())
+    keys2 = set(dict2.keys())
+
+    # 查找新增的键
+    added_keys = keys2 - keys1
+    for key in added_keys:
+        diff_dict['added'][key] = dict2[key]
+
+    # 查找删除的键
+    deleted_keys = keys1 - keys2
+    for key in deleted_keys:
+        diff_dict['deleted'][key] = dict1[key]
+
+    # 查找修改的键
+    common_keys = keys1 & keys2
+    for key in common_keys:
+        if dict1[key] != dict2[key]:
+            diff_dict['modified'][key] = {
+                'old_value': dict1[key],
+                'new_value': dict2[key]
+            }
+
+    return diff_dict
 
 # 保存为 json 文件
 def save_hashes_to_json(file_hashes, json_file_path):

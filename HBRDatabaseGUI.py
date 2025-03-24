@@ -49,6 +49,7 @@ from team_info import get_all_team_obj
 
 sys.path.append(os.path.abspath("./更新"))
 from update_processing import update_data
+from http_update_processing import http_update_data
 
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
@@ -147,7 +148,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 更新数据菜单
     menu_bar.add_command(label="📲更新", 
-        command=lambda: update_data())
+        command=lambda: http_update_data())
 
     # 关于菜单
     menu_bar.add_command(label="🏷️关于", 
