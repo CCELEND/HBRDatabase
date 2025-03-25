@@ -2,6 +2,9 @@ import sys
 import os
 import tkinter as tk
 from PIL import Image, ImageTk
+import threading
+import time
+from typing import Dict, Any
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
@@ -77,6 +80,107 @@ def creat_gftz_win(event, parent_frame, gftz):
 
 
 # 加载图片并显示的函数
+# def show_gftz_enemys(scrollbar_frame_obj):
+
+#     load_resources()
+
+#     get_all_gftz_obj(gftzs_json)
+
+#     global gftzs
+
+#     # 清除之前的组件
+#     scrollbar_frame_obj.destroy_components()
+
+#     column_count = 0
+#     for i, gftz_name in enumerate(gftzs):
+#         # 高分挑战敌人对象
+#         gftz = gftzs[gftz_name]
+
+#         gftz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
+#         bind_gftz_canvas(gftz_frame, gftz, 0, 0)
+
+#         # 计算行和列的位置
+#         row = i // 5  # 每5个换行
+#         column = i % 5  # 列位置
+#         gftz_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")  # 设置间距
+#         gftz_frame.grid_rowconfigure(0, weight=1)
+#         gftz_frame.grid_columnconfigure(0, weight=1)
+
+#         column_count += 1  # 更新列计数器
+#         if column_count == 5:  # 如果已经到达第5列，重置列计数器并增加行
+#             column_count = 0
+
+
+#     scrollbar_frame_obj.update_canvas()
+#     return "break"  # 阻止事件冒泡
+
+
+
+
+class GFTZCreator:
+    def __init__(self, scrollbar_frame_obj, gftzs: Dict[str, Any]):
+        self.scrollable_frame = scrollbar_frame_obj.scrollable_frame
+        self.scrollbar_frame_obj = scrollbar_frame_obj
+        self.gftzs = gftzs
+        self.lock = threading.Lock()
+        self.current_row = 0
+        self.created_count = 0
+        self.total_gftzs = len(gftzs)
+        
+    def create_gftz_frames(self, thread_id):
+        while self.created_count < self.total_gftzs:
+            with self.lock:
+                if self.created_count >= self.total_gftzs:
+                    break
+                
+                # 每个线程创建5个框架
+                for _ in range(5):
+                    if self.created_count >= self.total_gftzs:
+                        break
+                        
+                    # 获取当前要处理的高分挑战
+                    gftz_name = list(self.gftzs.keys())[self.created_count]
+                    gftz = self.gftzs[gftz_name]
+                    
+                    # 创建框架
+                    gftz_frame = tk.LabelFrame(self.scrollable_frame, text=gftz_name)
+                    bind_gftz_canvas(gftz_frame, gftz, 0, 0)
+                    
+                    # 计算位置
+                    column = self.created_count % 5
+                    gftz_frame.grid(row=self.current_row, column=column, 
+                                   padx=(10, 0), pady=(0, 5), sticky="nesw")
+                    gftz_frame.grid_rowconfigure(0, weight=1)
+                    gftz_frame.grid_columnconfigure(0, weight=1)
+                    
+                    self.created_count += 1
+                    
+                    # 每5个框架换行
+                    if self.created_count % 5 == 0:
+                        self.current_row += 1
+                
+                self.scrollbar_frame_obj.update_canvas()
+            
+            # 短暂休眠，让另一个线程有机会执行
+            time.sleep(0.05)
+
+def create_gftz_interface(scrollbar_frame_obj, gftzs):
+
+    creator = GFTZCreator(scrollbar_frame_obj, gftzs)
+    
+    # 创建两个线程
+    thread1 = threading.Thread(target=creator.create_gftz_frames, args=(1,))
+    thread2 = threading.Thread(target=creator.create_gftz_frames, args=(2,))
+    
+    # 启动线程
+    thread1.start()
+    thread2.start()
+    
+    # 不需要join线程，因为Tkinter主循环会持续运行
+    # 线程会在完成工作后自动结束
+
+
+# 加载图片并显示的函数
 def show_gftz_enemys(scrollbar_frame_obj):
 
     load_resources()
@@ -88,25 +192,11 @@ def show_gftz_enemys(scrollbar_frame_obj):
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
 
-    column_count = 0
-    for i, gftz_name in enumerate(gftzs):
-        # 高分挑战敌人对象
-        gftz = gftzs[gftz_name]
+    create_gftz_interface(scrollbar_frame_obj, gftzs)
 
-        gftz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
-        bind_gftz_canvas(gftz_frame, gftz, 0, 0)
-
-        # 计算行和列的位置
-        row = i // 5  # 每5个换行
-        column = i % 5  # 列位置
-        gftz_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")  # 设置间距
-        gftz_frame.grid_rowconfigure(0, weight=1)
-        gftz_frame.grid_columnconfigure(0, weight=1)
-
-        column_count += 1  # 更新列计数器
-        if column_count == 5:  # 如果已经到达第5列，重置列计数器并增加行
-            column_count = 0
-
-
-    scrollbar_frame_obj.update_canvas()
+    # scrollbar_frame_obj.update_canvas()
     return "break"  # 阻止事件冒泡
+
+
+
+
