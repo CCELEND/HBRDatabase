@@ -18,6 +18,12 @@
         "price":"", 
         "location":""
     },
+    "晶石":{
+        "path":"./持有物/道具/ThumbnailHC.webp", 
+        "description":"用于扭蛋或者回复体力", 
+        "price":"", 
+        "location":""
+    },
     "主题点数":{
         "path":"./持有物/道具/ThumbnailThemePoint.webp", 
         "description":"可购买背景主题的道具", 
