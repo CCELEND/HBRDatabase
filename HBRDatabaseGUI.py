@@ -32,6 +32,7 @@ from 属性.attributes_win import show_attribute
 from 状态.status_win import show_statu
 
 sys.path.append(os.path.abspath("./敌人"))
+from 主线.zx_win import show_zx_enemys
 from 光球BOSS.gqboss_win import show_gqboss_enemys
 from 时之修炼场.szxlc_win import show_szxlc_enemys
 from 棱镜战.ljz_win import show_ljz_enemys
@@ -109,11 +110,12 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 敌人菜单
     enemies_menu = tk.Menu(menu_bar, tearoff=0)
     enemies_commands = [
-        "主线", "活动棱镜战", "时钟塔", "废域"
+        "活动棱镜战", "时钟塔", "废域"
     ]
     for enemy in enemies_commands:
         create_menu_item(enemies_menu, enemy, update_output, enemy)
 
+    create_menu_item(enemies_menu, "主线", show_zx_enemys, scrollbar_frame_obj)
     create_menu_item(enemies_menu, "光球BOSS", show_gqboss_enemys, scrollbar_frame_obj)
     create_menu_item(enemies_menu, "时之修炼场", show_szxlc_enemys, scrollbar_frame_obj)
     create_menu_item(enemies_menu, "棱镜战", show_ljz_enemys, scrollbar_frame_obj)
