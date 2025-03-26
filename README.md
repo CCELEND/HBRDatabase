@@ -1,6 +1,6 @@
 ## 安装依赖
 
-### 最新的 python3
+### python3.8 以上
 
 ### opencv-python、Pillow、requests
 
