@@ -70,24 +70,24 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 角色菜单 菜单不可分离
     team_menu = tk.Menu(menu_bar, tearoff=0)
-    team_commands = [
+    team_names = [
         "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X", "Angel Beats!"
     ]
-    for team_name in team_commands:
+    for team_name in team_names:
         create_menu_item(team_menu, team_name, 
             creat_team_win, parent_frame, team_name)
     menu_bar.add_cascade(label="👤角色", menu=team_menu)
 
     # 物品材料菜单
-    items_menu = tk.Menu(menu_bar, tearoff=0)
-    item_commands = [
+    item_menu = tk.Menu(menu_bar, tearoff=0)
+    item_names = [
         "主线道具", "活动道具"
     ]
-    for item in item_commands:
-        create_menu_item(items_menu, item, update_output, item)
+    for item_name in item_names:
+        create_menu_item(item_menu, item_name, update_output, item_name)
 
     # 定义菜单项的名称和对应的回调函数
-    menu_items = [
+    menu_item_calls = [
         ("道具", show_props),
         ("饰品", show_jewelrys_type),
         ("饰品材料", show_jewelry_materials),
@@ -103,33 +103,37 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("货币", show_currencys)  
     ]
     # 循环创建菜单项
-    for item_name, callback in menu_items:
-        create_menu_item(items_menu, item_name, callback, scrollbar_frame_obj)
-    menu_bar.add_cascade(label="📜持有物", menu=items_menu)
+    for item_call_name, callback in menu_item_calls:
+        create_menu_item(item_menu, item_call_name, callback, scrollbar_frame_obj)
+    menu_bar.add_cascade(label="📜持有物", menu=item_menu)
 
     # 敌人菜单
-    enemies_menu = tk.Menu(menu_bar, tearoff=0)
-    enemies_commands = [
+    enemy_menu = tk.Menu(menu_bar, tearoff=0)
+    enemy_names = [
         "活动棱镜战", "时钟塔", "废域"
     ]
-    for enemy in enemies_commands:
-        create_menu_item(enemies_menu, enemy, update_output, enemy)
+    for enemy_name in enemy_names:
+        create_menu_item(enemy_menu, enemy_name, update_output, enemy_name)
 
-    create_menu_item(enemies_menu, "主线", show_zx_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "光球BOSS", show_gqboss_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "时之修炼场", show_szxlc_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "棱镜战", show_ljz_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "宝石棱镜战", show_bsljz_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "恒星扫荡战线", show_hxz_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "高分挑战", show_gftz_enemys, scrollbar_frame_obj)
-    create_menu_item(enemies_menu, "异时层", show_ysc_enemys, scrollbar_frame_obj)
-    menu_bar.add_cascade(label="🪬敌人", menu=enemies_menu)
+    menu_enemy_calls = [
+        ("主线", show_zx_enemys),
+        ("光球BOSS", show_gqboss_enemys),
+        ("时之修炼场", show_szxlc_enemys),
+        ("棱镜战", show_ljz_enemys),
+        ("宝石棱镜战", show_bsljz_enemys),
+        ("恒星扫荡战线", show_hxz_enemys),
+        ("高分挑战", show_gftz_enemys),
+        ("异时层", show_ysc_enemys),
+    ]
+    # 循环创建菜单项
+    for enemy_call_name, callback in menu_enemy_calls:
+        create_menu_item(enemy_menu, enemy_call_name, callback, scrollbar_frame_obj)
+    menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
     
-
     # 战斗系统菜单
-    battle_info_menu = tk.Menu(menu_bar, tearoff=0)
+    battle_menu = tk.Menu(menu_bar, tearoff=0)
     # 定义菜单项的名称和对应的回调函数
-    menu_battle_infos = [
+    menu_battle_calls = [
         ("基础", creat_jc_win),
         ("乘区", creat_cq_win),
         ("武器", show_weapon),
@@ -137,12 +141,12 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("效果、状态", show_statu)  
     ]
     # 循环创建菜单项
-    for battle_info_name, callback in menu_battle_infos:
-        if battle_info_name in ['基础','乘区']:
-            create_menu_item(battle_info_menu, battle_info_name, callback, parent_frame)
+    for battle_call_name, callback in menu_battle_calls:
+        if battle_call_name in ['基础','乘区']:
+            create_menu_item(battle_menu, battle_call_name, callback, parent_frame)
         else:
-            create_menu_item(battle_info_menu, battle_info_name, callback, scrollbar_frame_obj)
-    menu_bar.add_cascade(label="⚔战斗系统", menu=battle_info_menu)
+            create_menu_item(battle_menu, battle_call_name, callback, scrollbar_frame_obj)
+    menu_bar.add_cascade(label="⚔战斗系统", menu=battle_menu)
 
     # 搜索菜单
     menu_bar.add_command(label="🔍搜索", 

@@ -18,7 +18,7 @@ def creat_select_frame(label_content, options, selected_values,
 
     # 创建标签
     label_frame = tk.LabelFrame(parent_frame, text=label_content)
-    label_frame.grid(row=row, column=column, padx=5, pady=(0,5), sticky="nesw")
+    label_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")
 
     # 创建 Frame 用于容纳水平排列的多选按钮
     check_frame = tk.Frame(label_frame)
@@ -81,7 +81,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         # 计算行和列的位置
         row = i // 6  # 每6个换行
         column = i % 6  # 列位置
-        style_frame.grid(row=row, column=column, padx=5, sticky="nesw")  # 设置间距
+        style_frame.grid(row=row, column=column, padx=(10,0), sticky="nesw")  # 设置间距
         style_frame.grid_rowconfigure(0, weight=1)
         style_frame.grid_columnconfigure(0, weight=1)
 
@@ -121,7 +121,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
     role_search_frame = tk.LabelFrame(search_win_frame, text="角色、风格")
-    role_search_frame.grid(row=0, column=0, columnspan=2, padx=5, sticky="nsew")
+    role_search_frame.grid(row=0, column=0, columnspan=2, padx=10, sticky="nsew")
 
     rarity_options = [
         "ALL", "A", "S", "SS"
@@ -186,7 +186,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 关键词输入框
     key_word_text = scrolledtext.ScrolledText(search_win_frame, 
         wrap=tk.WORD, height=3)
-    key_word_text.grid(row=2, column=0, columnspan=2, padx=5, pady=0, sticky="nsew")
+    key_word_text.grid(row=2, column=0, columnspan=2, padx=10, pady=0, sticky="nsew")
     # 绑定鼠标右键点击事件到上下文菜单
     key_word_text.bind("<Button-3>", 
         lambda event, tw=key_word_text: show_context_menu(event, tw))
