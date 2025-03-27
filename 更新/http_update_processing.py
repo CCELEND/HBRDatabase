@@ -3,8 +3,13 @@ from hash import calculate_file_hashes, save_hashes_to_json
 from tkinter import messagebox
 
 from http_client import send_hashes_to_server, download_files_from_server
+import http_client
 
 def http_update_data():
+
+    if http_client.is_updating:
+        return
+        
     current_file_hashes = calculate_file_hashes("./")
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"

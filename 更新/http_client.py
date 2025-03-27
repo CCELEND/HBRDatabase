@@ -15,6 +15,8 @@ from urllib.parse import quote
 
 from window import set_window_icon
 from tools import creat_directory, confirm_restart
+
+is_updating = False
         
 # 将文件哈希值字典发送到服务器
 def send_hashes_to_server(server_url, client_file_hashes):
@@ -23,19 +25,22 @@ def send_hashes_to_server(server_url, client_file_hashes):
     return response.json()
 
 def download_files_with_progress(files_to_download, server_url):
+
+    global is_updating
     # 创建进度窗口
     progress_window = tk.Toplevel()
     progress_window.title("更新")
+    progress_window.geometry("600x166")
     set_window_icon(progress_window, "./更新/net.ico")
     
     # 进度条
     progress = ttk.Progressbar(progress_window, orient="horizontal", 
-                             length=300, mode="determinate")
+                             length=500, mode="determinate")
     progress.pack(pady=20, padx=20)
     
     # 状态标签
     status_var = tk.StringVar()
-    status_var.set("准备下载...")
+    status_var.set("正在下载更新资源...")
     status_label = tk.Label(progress_window, textvariable=status_var)
     status_label.pack()
     
@@ -51,16 +56,17 @@ def download_files_with_progress(files_to_download, server_url):
     file_label = tk.Label(progress_window, textvariable=file_var)
     file_label.pack(pady=10)
     
-    # 错误标签
-    error_var = tk.StringVar()
-    error_label = tk.Label(progress_window, textvariable=error_var, fg="red")
-    error_label.pack()
+    # # 错误标签
+    # error_var = tk.StringVar()
+    # error_label = tk.Label(progress_window, textvariable=error_var, fg="red")
+    # error_label.pack()
     
 
     def check_completion():
         if progress['value'] < progress['maximum']:
             progress_window.after(100, check_completion)
         else:
+            is_updating = False
             status_var.set("更新完成！")
             confirm_restart("更新完成")
     
@@ -70,7 +76,7 @@ def download_files_with_progress(files_to_download, server_url):
         
         for i, file_name in enumerate(files_to_download):
             try:
-                file_var.set(f"更新：'{file_name}' ({i+1}/{total_files})")
+                file_var.set(f"下载更新：'{file_name}' ({i+1}/{total_files})")
                 progress_window.update()
                 
                 # 创建目录
@@ -87,7 +93,9 @@ def download_files_with_progress(files_to_download, server_url):
                     # 检查是否是错误响应
                     if response.status_code != 200:
                         err_info = response.json()
-                        error_var.set(f"错误: {err_info.get('error', '未知错误')}")
+                        # error_var.set(f"错误: {err_info.get('error', '未知错误')}")
+                        messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
+                        is_updating = False
                         break
                     
                     total_size = int(response.headers.get('content-length', 0))
@@ -109,7 +117,9 @@ def download_files_with_progress(files_to_download, server_url):
                                     progress_window.update()
             
             except Exception as e:
-                error_var.set(f"下载 '{file_name}' 失败: {str(e)}")
+                # error_var.set(f"下载 '{file_name}' 失败\n{str(e)}")
+                messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
+                is_updating = False
                 break
             else:
                 # 完成一个文件，增加进度
@@ -127,33 +137,36 @@ def download_files_with_progress(files_to_download, server_url):
 # 从服务器下载文件
 def download_files_from_server(server_url, files_to_download):
     if files_to_download:
-        err_flag = False
-        err_info = ""
-        file = ""
+        global is_updating
+        is_updating = True
         download_files_with_progress(files_to_download, server_url)
-    #     for file_name in files_to_download:
-    #         file = file_name
-    #         creat_directory(file_name)
 
-    #         # 编码特殊字符
-    #         encoded_name = quote(file_name)
-    #         # 服务器响应
-    #         response = requests.get(f"{server_url}/download/{encoded_name}")
+        # err_flag = False
+        # err_info = ""
+        # file = ""
+        # for file_name in files_to_download:
+        #     file = file_name
+        #     creat_directory(file_name)
 
-    #         if response.content.startswith(b'{"error"'):
-    #             err_info = response.content.decode('utf-8')
-    #             err_flag = True
-    #             break
+        #     # 编码特殊字符
+        #     encoded_name = quote(file_name)
+        #     # 服务器响应
+        #     response = requests.get(f"{server_url}/download/{encoded_name}")
 
-    #         # 保存文件
-    #         with open(file_name, 'wb') as f:
-    #             f.write(response.content)
-    #         print(f"更新：'{file_name}'")
+        #     if response.content.startswith(b'{"error"'):
+        #         err_info = response.content.decode('utf-8')
+        #         err_flag = True
+        #         break
 
-    #     if err_flag:
-    #         messagebox.showerror("错误", f"文件 '{file}' 下载失败\n请重试 {err_info}")
-    #     else:
-    #         confirm_restart("更新完成")
+        #     # 保存文件
+        #     with open(file_name, 'wb') as f:
+        #         f.write(response.content)
+        #     print(f"更新：'{file_name}'")
+
+        # if err_flag:
+        #     messagebox.showerror("错误", f"文件 '{file}' 下载失败\n请重试 {err_info}")
+        # else:
+        #     confirm_restart("更新完成")
     else:
         messagebox.showinfo("提示", "已是最新版本")
         
