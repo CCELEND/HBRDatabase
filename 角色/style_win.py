@@ -3,7 +3,7 @@ import os
 import tkinter as tk
 from PIL import Image, ImageTk
 
-from canvas_events import get_photo, create_canvas_with_image, VideoPlayer, ArtworkDisplayer
+from canvas_events import get_photo, create_canvas_with_image, VideoPlayer, ArtworkDisplayer, ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
@@ -365,11 +365,16 @@ def creat_style_skill_win(event, parent_frame, team, style):
 def creat_style_right_menu(event, parent_frame, team, style):
     
     right_click_menu = tk.Menu(parent_frame, tearoff=0)
+
     right_click_menu.add_command(label="动画", 
         command=lambda: show_style_animation(parent_frame, team, style))
 
     right_click_menu.add_command(label="静态图", 
         command=lambda: show_style_artwork(parent_frame, team, style))
+
+    right_click_menu.add_command(label="静态图3D", 
+        command=lambda: show_style_artwork_3d(parent_frame, team, style))
+
     right_click_menu.post(event.x_root, event.y_root)
 
 
@@ -427,6 +432,37 @@ def show_style_artwork(parent_frame, team, style):
         # 窗口关闭时清理
         style_artwork_win_frame.protocol("WM_DELETE_WINDOW", 
             lambda: (displayer.destroy(), style_win_closing(style_artwork_win_frame)))
+
+    else:
+        return
+
+
+# 显示风格3d静态图
+def show_style_artwork_3d(parent_frame, team, style):
+
+    artwork_3d_path = style.path.replace("_Thumbnail", "_3d")
+    artwork_3d_path = artwork_3d_path[:-4] + "png"
+
+    if os.path.exists(artwork_3d_path):
+
+        open_style_win = get_style_win_name(style) + "-artwork-3d"
+        # 重复打开时，窗口置顶并直接返回
+        if open_style_win in open_style_wins:
+            # 判断窗口是否存在
+            if open_style_wins[open_style_win].winfo_exists():
+                set_window_top(open_style_wins[open_style_win])
+                return "break"
+            del open_style_wins[open_style_win]
+
+        style_artwork_3d_win_frame = creat_Toplevel(parent_frame, open_style_win)
+        set_window_icon(style_artwork_3d_win_frame, team.logo_path)
+        open_style_wins[open_style_win] = style_artwork_3d_win_frame
+
+        displayer = ArtworkDisplayerHeight(style_artwork_3d_win_frame, artwork_3d_path, 710, 0)
+
+        # 窗口关闭时清理
+        style_artwork_3d_win_frame.protocol("WM_DELETE_WINDOW", 
+            lambda: (style_win_closing(style_artwork_3d_win_frame)))
 
     else:
         return
