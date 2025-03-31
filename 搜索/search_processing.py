@@ -6,6 +6,7 @@ from tools import list_val_in_another, is_parentstring, output_string
 
 sys.path.append(os.path.abspath("./角色"))
 from style_info import style_categories, SkillEffect
+import role_info
 import team_info
 
 # 选中处理
@@ -31,7 +32,7 @@ def on_select(check_vars, options, last, selected_values, all_index=0):
                       if check_var.get() and i != all_index]
 
 # 检查风格是否符合筛选条件
-def filter_judge(filter_dict, keyword_list, style):
+def filter_judge(filter_dict, keyword_list, role, style):
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"
 
     if (not filter_dict.get('队伍') or style.team_name in filter_dict['队伍']) and \
@@ -39,6 +40,9 @@ def filter_judge(filter_dict, keyword_list, style):
        (not filter_dict.get('职能') or style.career in filter_dict['职能']) and \
        (not filter_dict.get('武器属性') or style.weapon_attribute in filter_dict['武器属性']) and \
        (not filter_dict.get('元素属性') or element_attribute in filter_dict['元素属性']):
+
+        if not keyword_list or list_val_in_another(role.nicknames, keyword_list):
+            return True
 
         # if not keyword_list or list_val_in_another(keyword_list, style.nicknames):
         if not keyword_list or list_val_in_another(style.nicknames, keyword_list):
@@ -88,7 +92,7 @@ def get_filtered_styles(filter_dict, keyword_list):
         for role in team.roles:
             # 遍历角色中的风格
             for style in role.SSstyles + role.Sstyles + role.Astyles:
-                if (filter_judge(filter_dict, keyword_list, style)):
+                if (filter_judge(filter_dict, keyword_list, role, style)):
                     filtered_styles.append(style)
 
     return filtered_styles
@@ -125,7 +129,6 @@ def keyword_processing(key_word_str):
         "场": "强化领域",
         "追加回合": "额外回合",
         "暴伤": "暴击伤害",
-        "TAMA": "玉","AOI": "苍井",
         "大连击": "连击数上升（大）","小连击": "连击数上升（小）",
         "封印": "禁锢",
         "破盾免疫": "击破保护"

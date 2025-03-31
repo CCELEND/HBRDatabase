@@ -60,7 +60,16 @@ def get_styles(role_path, style_rarity):
         return []
     return [get_style_obj(style_dir) for style_dir in get_dir_values_list(styles_dir)]
 
+
+# 角色对象字典 键：角色名，值：角色对象
+all_roles = {}
+
 def creat_role_obj(role_path):
+
+    role_json = load_json(role_path + "/role.json")
+    role_name = role_json['name']
+    if role_name in all_roles:
+        return all_roles[role_name]
 
     # 通过 JSON 资源文件加载必要风格信息 Astyles.json、Sstyles.json、SSstyles.json
     # 生成各稀有度风格对象列表
@@ -69,7 +78,7 @@ def creat_role_obj(role_path):
     SSstyles = get_styles(role_path, "SS")
 
     # 生成 role 角色对象
-    role_json = load_json(role_path + "/role.json")
     role = creat_role(role_json, Astyles, Sstyles, SSstyles)
+    all_roles[role_name] = role
 
     return role
