@@ -12,12 +12,14 @@ from tools import load_json, output_string, is_parentstring
 from style_info import SkillEffect
 
 import 强化素材.strengthen_materials_win
+import 职业.careers_info
 import 属性.attributes_info
 import 状态.status_info
 
 # 加载资源文件
 def load_resources():
     强化素材.strengthen_materials_win.load_resources()
+    职业.careers_info.get_all_career_obj()
     状态.status_info.get_all_statu_obj()
     属性.attributes_info.get_all_attribute_obj()
 
@@ -77,9 +79,18 @@ def show_style(scrollbar_frame_obj, style):
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
 
+    # 职业
+    career = 职业.careers_info.careers[style.career]
+    career_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
+    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    career_frame.grid_rowconfigure(0, weight=1)
+    career_photo = get_photo(career.path, (200, 40))
+    career_canvas = create_canvas_with_image(career_frame, 
+        career_photo, 240, 40, 20, 0, 0, 0)
+
     # 主动技能
     active_skill_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="主动技能")
-    active_skill_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    active_skill_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
     for col_index in range(4):
@@ -194,7 +205,7 @@ def show_style(scrollbar_frame_obj, style):
 
     # 被动技能
     passive_skill_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="天赋/被动技能")
-    passive_skill_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    passive_skill_frame.grid(row=2, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     passive_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 passive_skill_frame 的每一列权重
     for col_index in range(4):
@@ -249,7 +260,7 @@ def show_style(scrollbar_frame_obj, style):
 
         # 宝珠强化
         growth_ability_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="强化")
-        growth_ability_frame.grid(row=2, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+        growth_ability_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
         growth_ability_frame.grid_rowconfigure(0, weight=1)
         growth_ability_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
         growth_ability_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 描述列
@@ -269,9 +280,9 @@ def show_style(scrollbar_frame_obj, style):
         growth_ability_lab = tk.Label(growth_ability_frame, text=text, 
             justify="left", font=("Monospace", 10, "bold"))
         growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
-        growth_status_row = 3
+        growth_status_row = 4
     else:
-        growth_status_row = 2
+        growth_status_row = 3
 
     # 成长状态
     growth_status_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="成长状态")

@@ -1000,7 +1000,15 @@
         "stack":"-",
         "type":"其他",
         "series":"无法换位"         
-    }    
+    },
+    "扣除SP":{
+        "name":"扣除SP",
+        "path":"./战斗系统/状态/DamageSp.webp",
+        "effect":"SP下降","description":"SP下降",
+        "stack":"-",
+        "type":"其他",
+        "series":"扣除SP"         
+    }      
 
 
 }

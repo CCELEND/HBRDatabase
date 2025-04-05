@@ -1,0 +1,59 @@
+{
+    "攻击者":{
+        "name":"攻击者","en":"ATTACKER",
+        "path":"./战斗系统/职业/ATTACKER.png",
+        "description":"攻击者擅长通过HP偏向技能对敌人HP造成伤害"
+    },
+
+    "破盾者":{
+        "name":"破盾者","en":"BREAKER",
+        "path":"./战斗系统/职业/BREAKER.png",
+        "description":"破盾者擅长通过DP偏向技能对敌人DP造成伤害"
+    },
+
+    "减益者":{
+        "name":"减益者","en":"DEBUFFER",
+        "path":"./战斗系统/职业/DEBUFFER.png",
+        "description":"减益者可以对敌人造成减益"
+    },
+    
+    "增益者":{
+        "name":"增益者","en":"BUFFER",
+        "path":"./战斗系统/职业/BUFFER.png",
+        "description":"增益者擅长对友方施加增益效果"
+    },
+
+    "破坏者":{
+        "name":"破坏者","en":"BLASTER",
+        "path":"./战斗系统/职业/BLASTER.png",
+        "description":"破坏者擅长快速增加破坏率"
+    },
+
+    "治疗者":{
+        "name":"治疗者","en":"HEALER",
+        "path":"./战斗系统/职业/HEALER.png",
+        "description":"治疗者擅长为友方回复DP\n一旦DP被破坏，只能通过少数技能来恢复"
+    },
+
+    "防御者":{
+        "name":"防御者","en":"DEFENDER",
+        "path":"./战斗系统/职业/DEFENDER.png",
+        "description":"防御者擅长吸引敌方攻击\n或者使用自我治疗和增强防御的技能来增强友方防御力"
+    },
+
+    "上将":{
+        "name":"上将","en":"ADMIRAL",
+        "path":"./战斗系统/职业/ADMIRAL.png",
+        "description":"上将的风格具有被称为“指挥行动”的独特行动，而不是普通攻击\n并且具有其他角色所没有的特征\n例如，只能将一名上将编入一个队伍"
+    },
+
+    "骑士":{
+        "name":"骑士","en":"RIDER",
+        "path":"./战斗系统/职业/RIDER.png",
+        "description":"骑士拥有EP的特殊计量表\n必须消耗EP才能发动EX技能\n每回合减少自身以外的所有友军DP，换取+1EP\n（目前是七濑七海的职业）"
+    }
+
+
+
+
+}

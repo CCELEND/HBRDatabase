@@ -27,6 +27,7 @@ from 碎片.fragments_win import show_fragments
 sys.path.append(os.path.abspath("./战斗系统"))
 from 基础.jc_win import creat_jc_win
 from 乘区.cq_win import creat_cq_win
+from 职业.careers_win import show_career
 from 武器.weapons_win import show_weapon
 from 属性.attributes_win import show_attribute
 from 状态.status_win import show_statu
@@ -136,6 +137,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     menu_battle_calls = [
         ("基础", creat_jc_win),
         ("乘区", creat_cq_win),
+        ("职业", show_career),
         ("武器", show_weapon),
         ("属性", show_attribute),
         ("效果、状态", show_statu)  
