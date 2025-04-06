@@ -72,6 +72,8 @@ def filter_judge(filter_dict, keyword_list, role, style):
                                 if (is_parentstring(skill.target+"攻击", keyword_list)) or \
                                    (is_parentstring(skill.biased, keyword_list)):
                                     return True
+                        if is_parentstring(active_skill.description, keyword_list):
+                            return True
                 if select_skill == "被动技能":
                     for passive_skill in style.passive_skills:
                         if is_parentstring(passive_skill.name, keyword_list):
@@ -115,6 +117,13 @@ def replace_od_up(text):
     text = re.sub(r'(增加OD条|OD条增加|OD条上升)', 'OD条上升', text)
     return text
 
+def replace_zone(text):
+    # 替换与场地相关的词为：强化领域
+    text = re.sub(r'(场地|场|强化领域|领域)', '强化领域', text)
+    text = re.sub(r'(大强化领域)', '强化领域（大）', text)
+    text = re.sub(r'(小强化领域)', '强化领域（小）', text)
+    return text
+
 # 关键词处理
 def keyword_processing(key_word_str):
     if not key_word_str:
@@ -123,13 +132,13 @@ def keyword_processing(key_word_str):
     key_word_str = key_word_str.upper()
     key_word_str = replace_dp_sp(key_word_str)
     key_word_str = replace_od_up(key_word_str)
+    key_word_str = replace_zone(key_word_str)
 
     # 定义替换字典
     replacement_dict = {
         "减防": "防御下降","降防": "防御下降","降攻": "攻击下降","加防": "防御上升","加攻": "攻击上升",
         "TOKEN": "信念","象征": "信念",
         "大范围": "全体","群体": "全体","AOE": "全体",
-        "场": "强化领域",
         "追加回合": "额外回合",
         "暴伤": "暴击伤害",
         "大连击": "连击数上升（大）","小连击": "连击数上升（小）",
