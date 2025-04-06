@@ -51,6 +51,9 @@ def filter_judge(filter_dict, keyword_list, role, style):
         if not keyword_list or is_parentstring(style.role_name, keyword_list):
             return True
 
+        if not keyword_list or is_parentstring(style.name, keyword_list):
+            return True
+
         if keyword_list:
             for select_skill in filter_dict['技能']:
                 if select_skill == "主动技能":
