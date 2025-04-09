@@ -2,7 +2,7 @@
 
 ### python3.8 以上
 
-### opencv-python、Pillow、requests
+### opencv-python、Pillow、requests、pygame
 
 ```sh
 pip install opencv-python Pillow requests pygame
