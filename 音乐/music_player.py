@@ -11,7 +11,8 @@ ost_name = ""
 
 OST = {
     "OST1": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol1",
-    "OST2": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2"
+    "OST2": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2",
+    "麻枝准_やなぎなぎ":"麻枝准_やなぎなぎ"
 }
 
 

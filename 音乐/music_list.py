@@ -68,7 +68,7 @@ class ExpandableList:
             if parent_item:  # 确保有父节点
                 parent_text = self.tree.item(parent_item, "text")
                 OST, disc_name = parent_text.split()
-                file_name = item_text + ".mp3"
+                file_name = item_text #+ ".mp3"
                 file_path_ost = music_player.OST[OST] + "/" + disc_name + "/" + file_name
                 # print(f"文件名: {file_name}, OST目录: {file_path_ost}")
                 music_handle(file_path_ost)
