@@ -75,13 +75,13 @@ def calculate_file_hashes(directory):
             # 使用相对路径作为键，格式为 "./目录名/子目录/文件名"
             key = os.path.join('.', os.path.relpath(filepath, start=os.path.dirname(directory)))
 
-            # 跳过不需要的文件
-            if "__pycache__" in key or "local_file_hash.json" in key:
-                continue
-
             # 将反斜杠替换为正斜杠
             if '\\' in key:
                 key = key.replace('\\', '/')
+
+            # 跳过不需要的文件
+            if "__pycache__" in key or "音乐/下载" in key:
+                continue
 
             # 将任务添加到任务列表
             file_tasks.append((filepath, key))

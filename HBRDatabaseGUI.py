@@ -53,6 +53,9 @@ sys.path.append(os.path.abspath("./更新"))
 from update_processing import update_data
 from http_update_processing import http_update_data
 
+sys.path.append(os.path.abspath("./音乐"))
+from music_win import creat_music_win
+
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
 
@@ -153,6 +156,10 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 搜索菜单
     menu_bar.add_command(label="🔍搜索", 
         command=lambda: creat_search_win(parent_frame, scrollbar_frame_obj))
+
+    # 音乐菜单
+    menu_bar.add_command(label="🎧音乐", 
+        command=lambda: creat_music_win())
 
     # 更新数据菜单
     menu_bar.add_command(label="📲更新", 
