@@ -5,13 +5,13 @@
 ### opencv-python、Pillow、requests
 
 ```sh
-pip install opencv-python Pillow requests
+pip install opencv-python Pillow requests pygame
 ```
 
 镜像加速（建议使用）
 
 ```sh
-pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests
+pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests pygame
 ```
 
 ## 使用
