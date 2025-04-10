@@ -75,7 +75,7 @@ def music_handle(all_albun_name, disc_name, file_name):
         create_canvas_with_image(music_player.play_info_frame, photo, 500, 300, 61, 0, 0, 0, padx=10, pady=0)
     else:
         photo=get_photo(album_cover_path, (300,300))
-        create_canvas_with_image(music_player.play_info_frame, photo, 500, 300, 61, 0, 0, 0, padx=10, pady=0)
+        create_canvas_with_image(music_player.play_info_frame, photo, 500, 300, 79, 0, 0, 0, padx=10, pady=0)
 
 
     file_path_album = all_albun_name + "/" + disc_name + "/" + file_name
