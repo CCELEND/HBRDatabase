@@ -48,16 +48,16 @@ def creat_music_win():
     categories = load_json("./音乐/music.json")
     ListApp = ExpandableList(music_win_frame, categories, 0, 0)
 
-    play_info_frame = ttk.Frame(music_win_frame)
-    play_info_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
-    play_info_frame.grid_rowconfigure(0, weight=1, minsize=300)
-    play_info_frame.grid_rowconfigure(1, weight=1, minsize=200)
-    play_info_frame.grid_columnconfigure(0, weight=1)
+    music_player.play_info_frame = ttk.Frame(music_win_frame)
+    music_player.play_info_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+    music_player.play_info_frame.grid_rowconfigure(0, weight=1, minsize=300)
+    music_player.play_info_frame.grid_rowconfigure(1, weight=1, minsize=200)
+    music_player.play_info_frame.grid_columnconfigure(0, weight=1)
 
-    photo=get_photo("./音乐/OST1.jpg", (336,300))
-    create_canvas_with_image(play_info_frame, photo, 500, 300, 61, 0, 0, 0, padx=10, pady=0)
+    # photo=get_photo("./音乐/OST1.jpg", (336,300))
+    # create_canvas_with_image(music_player.play_info_frame, photo, 500, 300, 61, 0, 0, 0, padx=10, pady=0)
 
-    music_player.PlayerApp = FLACPlayerApp(play_info_frame, 1, 0)
+    music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
 
     # music_win_frame.resizable(False, False)
     # 设置最大尺寸和最小尺寸相同，以阻止最大化

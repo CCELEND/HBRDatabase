@@ -6,12 +6,14 @@ import pygame
 import time
 from threading import Thread
 
+play_info_frame = None
 PlayerApp = None
 ost_name = ""
 
-OST = {
+music_dir = {
     "OST1": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol1",
     "OST2": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2",
+    "Love_Song_from_the_Water":"Love_Song_from_the_Water",
     "麻枝准_やなぎなぎ":"麻枝准_やなぎなぎ"
 }
 

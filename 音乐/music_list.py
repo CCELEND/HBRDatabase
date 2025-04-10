@@ -53,7 +53,7 @@ class ExpandableList:
     # 处理双击事件
     def on_double_click(self, event):
         item = self.tree.focus()
-        item_text = self.tree.item(item, "text")
+        file_name = self.tree.item(item, "text")
         
         # 检查是否是分类节点（有子节点）
         if self.tree.get_children(item):
@@ -67,10 +67,11 @@ class ExpandableList:
             parent_item = self.tree.parent(item)
             if parent_item:  # 确保有父节点
                 parent_text = self.tree.item(parent_item, "text")
-                OST, disc_name = parent_text.split()
-                file_name = item_text #+ ".mp3"
-                file_path_ost = music_player.OST[OST] + "/" + disc_name + "/" + file_name
-                # print(f"文件名: {file_name}, OST目录: {file_path_ost}")
-                music_handle(file_path_ost)
+                album_name, disc_name = parent_text.split()
+                all_albun_name = music_player.music_dir[album_name]
+
+                # file_path_album = all_albun_name + "/" + disc_name + "/" + file_name
+                # music_handle(all_albun_name, file_path_album)
+                music_handle(all_albun_name, disc_name, file_name)
             else:
-                print(f"文件名: {item_text}, 没有父节点")
+                print(f"文件名: {file_name}, 没有父节点")

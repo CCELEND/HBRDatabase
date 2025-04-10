@@ -80,7 +80,7 @@ def calculate_file_hashes(directory):
                 key = key.replace('\\', '/')
 
             # 跳过不需要的文件
-            if "__pycache__" in key or "音乐/下载" in key:
+            if "__pycache__" in key or ".mp3" in key or ".flac" in key:
                 continue
 
             # 将任务添加到任务列表
