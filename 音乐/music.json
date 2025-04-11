@@ -11,6 +11,17 @@
 
     "OST1 Disc6": ["01.Burn My Soul -instrumental-.mp3", "02.Dance!Dance!Dance !-instrumental-.mp3", "03.Pain in Rain -instrumental-.mp3", "04.オーバーキル -instrumental-.mp3", "05.過眠症 -instrumental-.mp3", "06.War Alive～時にはやぶれかぶれに～ -instrumental-.mp3", "07.Judgement day -instrumental-.mp3", "08.終末のヒーロー -instrumental-.mp3", "09.Muramasa Blade! -instrumental-.mp3", "10.ありふれたBattleSong～いつも戦闘は面倒だ～ -instrumental-.mp3","11.Goodbye Innocense -instrumental-.mp3"],
 
+    "OST2 Disc1": ["01.Sailing Ship -departure ver.-.mp3", "02.習志野 -noon-.mp3", "03.習志野 -night-.mp3", "04.夏気球 -sunshine ver.-.mp3", "05.Let's Justice!.mp3", "06.潮風とおにぎり.mp3", "07.知らない小道.mp3", "08.Going!.mp3", "09.セラフ放送.mp3", "10.一日千秋 -noon-.mp3", "11.一日千秋 -night-.mp3", "12.ランタン飛ばし.mp3", "13.Dear R. Heinlein -summerlight ver.-.mp3", "14.Dear R. Heinlein -telescope ver.-.mp3"],
+
+    "OST2 Disc2": ["01.大海を駆る者たち.mp3", "02.Main Computer.mp3", "03.オールド・ニュータウン.mp3", "04.砂海の旅人 -浅層-.mp3", "05.砂海の旅人 -深層-.mp3", "06.Desert Cave -浅層-.mp3", "07.Desert Cave -深層-.mp3", "08.オアシスの仲直り.mp3", "09.美容院かと思ったらカフェだった.mp3", "10.Crystal Palace.mp3","11.十死一生.mp3", "12.疾風怒濤.mp3", "13.澱みの覇者.mp3", "14.黒猫と王の冠.mp3","15.恒星掃戦線.mp3"],
+
+    "OST2 Disc3": ["01.Thank you for playing -today is ok ver.-.mp3", "02.悪の組織のクリスマス.mp3", "03.Arts.mp3", "04.牡丹.mp3", "05.ふたりだけの宇宙.mp3", "06.After You Sleep -ambient ver.-.mp3", "07.Seraph Entertainment.mp3", "08.燻る紫煙.mp3", "09.Offshore Wind.mp3", "10.スプラッシュウェーブ.mp3","11.花鳥風月.mp3", "12.雲外鏡.mp3", "13.恋心 -sleeping ver.-.mp3", "14.恋心 -Rest in Peace-.mp3"],
+
+    "OST2 Disc4": ["01.壊れたねじまき.mp3", "02.窓辺の戯れ.mp3", "03.Jasmine.mp3", "04.霧の中のお茶会.mp3", "05.白桜の湯宿.mp3", "06.湯煙横丁.mp3", "07.私立☆セラフィム学園.mp3", "08.クリームソーダビーム.mp3", "09.Burn My Soul -She is Idol ver.-.mp3", "10.放課後のメロディ -She is Idol ver.-.mp3","11.Dance! Dance! Dance! -She is Idol ver.-.mp3", "12.Muramasa Blade! -She is Idol ver.-.mp3", "13.Goodbye Innocence -She is Idol ver.-.mp3", "14.White Spell -She is Idol ver.-.mp3","15.After You Sleep -She is Idol ver.-.mp3"],
+
+    "OST2 Disc5": ["01.春眠旅団 -instrumental-.mp3", "02.Heartbreak Syndrome -instrumental-.mp3", "03.死にゆく季節でぼくは -instrumental-.mp3", "04.Long Long Spell -instrumental-.mp3", "05.Popcorn N' Roses -instrumental-.mp3", "06.Thank you for playing ～あなたに出会えてよかった～ -instrumental-.mp3", "07.How's everything -instrumental-.mp3", "08.Autumn Howl -instrumental-.mp3", "09.放課後のメロディ -instrumental-.mp3", "10.World We Changed -instrumental-.mp3","11.起死廻生 -instrumental-.mp3","12.さよならの速度 -instrumental-.mp3", "13.シガチョコ -instrumental-.mp3", "14.Arch of Light -instrumental-.mp3"],
+
+
     "Love_Song_from_the_Water Disc1": ["01.Before I Rise.mp3", "02.Burn My Universe.mp3", "03.Everlasting Night.mp3", "04.星の墓標.mp3","05.Indigo in Blue.mp3", "06.Sad Creature.mp3", "07.夏気球.mp3", "08.Particle Effect.mp3","09.銀河旅団.mp3", "10.インドラ.mp3", "11.Light Years.mp3", "12.きみの横顔.mp3","13.White Spell.mp3"],
     
     "麻枝准_やなぎなぎ Disc1": ["14.幻想都市.flac", "15.死にゆく季節のきみへ.flac", "16.シヴァ.flac", "17.Bougainvillea.flac", "18.Sailing Ship (Broken Ver.).flac", "19.くそ暑い日の誓い.flac", "20.ディベートソルジャー.flac", "21.ワルキューレの叙事詩.flac", "22.Welcome to the Front Line!.flac", "23.忘れられた線路.flac", "24.Asian Soul.flac", "25.さよならアーリーサマー.flac", "26.Goodnight Seven Seas.flac","39.オールトの雲.flac"]
