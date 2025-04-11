@@ -49,11 +49,14 @@ album_cover_paths={
     "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2":"./音乐/下载/HEAVEN_BURNS_RED_Original_Sound_Track_Vol2/HEAVEN_BURNS_RED_Original_Sound_Track_Vol2.jpg",
     "Love_Song_from_the_Water":"./音乐/下载/Love_Song_from_the_Water/Love_Song_from_the_Water.jpg",
     "麻枝准_やなぎなぎ":"./音乐/下载/麻枝准_やなぎなぎ/",
+    "She_is_Legend":"./音乐/下载/She_is_Legend/"
 
 }
 def get_album_cover_path(all_albun_name, file_name):
     if all_albun_name == "麻枝准_やなぎなぎ":
         return album_cover_paths["麻枝准_やなぎなぎ"] + file_name.replace("flac", "jpg")
+    elif all_albun_name == "She_is_Legend":
+        return album_cover_paths["She_is_Legend"] + file_name.replace("flac", "jpg")
     else:
         return album_cover_paths[all_albun_name]
 
