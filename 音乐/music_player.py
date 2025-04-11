@@ -39,6 +39,8 @@ class FLACPlayerApp:
         self.seek_time = 0  # 寻找的时间点
         self.position_selected = False  # 标记是否通过进度条选择了位置
 
+        self.loop_enabled = False
+
         # 创建UI
         self.create_widgets()
 
@@ -96,6 +98,10 @@ class FLACPlayerApp:
         self.stop_btn = tk.Button(control_frame, text="停止⏹︎", command=self.stop, state=tk.DISABLED)
         self.stop_btn.pack(side=tk.LEFT, padx=5)
 
+        #添加循环按钮
+        self.loop_btn = tk.Button(control_frame, text="循环◻", command=self.toggle_loop, state=tk.DISABLED)
+        self.loop_btn.pack(side=tk.LEFT, padx=5)
+
         # 音量控制
         volume_frame = tk.Frame(self.frame)
         volume_frame.pack()
@@ -125,6 +131,7 @@ class FLACPlayerApp:
             self.play_btn.config(state=tk.NORMAL)
             self.pause_btn.config(state=tk.NORMAL)
             self.stop_btn.config(state=tk.NORMAL)
+            self.loop_btn.config(state=tk.NORMAL)
 
             # 获取音频长度
             sound = pygame.mixer.Sound(file_path)
@@ -142,9 +149,20 @@ class FLACPlayerApp:
         except Exception as e:
             messagebox.showerror("错误", f"无法加载文件: {e}")
 
+
+    # 循环切换方法
+    def toggle_loop(self):
+        self.loop_enabled = not self.loop_enabled
+        self.loop_btn.config(text="循环🔁" if self.loop_enabled else "循环◻")
+
     # 播放音频
     def play(self):
         if self.current_file:
+            # 循环播放时强制重置起点（针对单曲循环场景）
+            if self.loop_enabled and self.current_position >= self.duration:
+                self.current_position = 0  # 重置播放位置
+                self.seek_time = time.time()  # 重置时间基准
+
             if self.paused:
                 # 从暂停状态恢复播放
                 pygame.mixer.music.unpause()
@@ -178,9 +196,13 @@ class FLACPlayerApp:
                 self.playing = True
                 self.start_progress_update()
 
-            self.play_btn.config(state=tk.DISABLED)
-            self.pause_btn.config(state=tk.NORMAL)
-            self.stop_btn.config(state=tk.NORMAL)
+            # 使用 after(0) 确保 UI 更新在主线程执行
+            self.frame.after(0, lambda: (
+                self.play_btn.config(state=tk.DISABLED),
+                self.pause_btn.config(state=tk.NORMAL),
+                self.stop_btn.config(state=tk.NORMAL)
+            ))
+
 
     # 精确同步进度条和时间显示
     def sync_progress_and_time(self):
@@ -236,12 +258,14 @@ class FLACPlayerApp:
         if not self.playing or self.seeking:
             return self.current_position
 
-        # 计算实际位置 = 寻找位置 + 从寻找后经过的时间
-        elapsed_since_seek = time.time() - self.seek_time
-        actual_pos = self.current_position + elapsed_since_seek
+        # 循环时强制以最新seek_time计算（修复时间累加错误）
+        if self.loop_enabled and self.current_position >= self.duration:
+            self.current_position = 0
+            self.seek_time = time.time()
 
-        # 确保不超过总时长
-        return min(actual_pos, self.duration)
+        elapsed_since_seek = time.time() - self.seek_time
+        return min(self.current_position + elapsed_since_seek, self.duration)
+
 
     # 更新进度条和时间显示
     def update_progress(self):
@@ -249,10 +273,19 @@ class FLACPlayerApp:
             if not self.seeking and not self.paused:  # 只有在非拖动和非暂停状态下更新
                 current_pos = self.get_current_pos()
 
-                # 检查是否播放结束
-                if current_pos >= self.duration:
-                    self.frame.after(0, self.stop)  # 使用after确保在主线程中调用
-                    break
+                # 播放结束处理（区分循环/非循环）
+                if current_pos >= self.duration - 0.5:  # 允许0.5秒误差
+                    if self.loop_enabled:
+                        # 重置播放起点并重启进度线程
+                        self.frame.after(0, lambda: (
+                            self.stop(),
+                            self.current_position,  # 强制刷新变量
+                            self.play(),  # 调用play触发重置
+                            self.start_progress_update()  # 重启进度更新线程
+                        ))
+                    else:
+                        self.frame.after(0, self.stop)
+                    return  # 退出当前线程，避免重复计算
 
                 progress_percent = (current_pos / self.duration) * 100
                 progress_percent = max(0, min(100, progress_percent))
