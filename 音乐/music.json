@@ -21,12 +21,17 @@
 
     "OST2 Disc5": ["01.春眠旅団 -instrumental-.mp3", "02.Heartbreak Syndrome -instrumental-.mp3", "03.死にゆく季節でぼくは -instrumental-.mp3", "04.Long Long Spell -instrumental-.mp3", "05.Popcorn N' Roses -instrumental-.mp3", "06.Thank you for playing ～あなたに出会えてよかった～ -instrumental-.mp3", "07.How's everything -instrumental-.mp3", "08.Autumn Howl -instrumental-.mp3", "09.放課後のメロディ -instrumental-.mp3", "10.World We Changed -instrumental-.mp3","11.起死廻生 -instrumental-.mp3","12.さよならの速度 -instrumental-.mp3", "13.シガチョコ -instrumental-.mp3", "14.Arch of Light -instrumental-.mp3"],
 
-
     "Love_Song_from_the_Water Disc1": ["01.Before I Rise.mp3", "02.Burn My Universe.mp3", "03.Everlasting Night.mp3", "04.星の墓標.mp3","05.Indigo in Blue.mp3", "06.Sad Creature.mp3", "07.夏気球.mp3", "08.Particle Effect.mp3","09.銀河旅団.mp3", "10.インドラ.mp3", "11.Light Years.mp3", "12.きみの横顔.mp3","13.White Spell.mp3"],
     
     "麻枝准_やなぎなぎ Disc1": ["14.幻想都市.flac", "15.死にゆく季節のきみへ.flac", "16.シヴァ.flac", "17.Bougainvillea.flac", "18.Sailing Ship (Broken Ver.).flac", "19.くそ暑い日の誓い.flac", "20.ディベートソルジャー.flac", "21.ワルキューレの叙事詩.flac", "22.Welcome to the Front Line!.flac", "23.忘れられた線路.flac", "24.Asian Soul.flac", "25.さよならアーリーサマー.flac", "26.Goodnight Seven Seas.flac","27.オールトの雲.flac"],
 
     "麻枝准_やなぎなぎ Disc2": ["01.Everlasting Night (Echoing Remix).flac", "02.Indigo in Blue (Uniform Remix).flac", "03.星の墓標 (Atlas Remix).flac", "04.Particle Effect (Aspire Remix).flac", "05.銀河旅団 (Trip To The Galaxy Remix).flac", "06.幻想都市 (Urban Mirage Remix).flac", "07.きみの横顔 (Pathos Remix).flac", "08.インドラ (Superstorm Remix).flac", "09.シヴァ (Glacier Remix).flac", "10.Burn My Universe (Ablaze Remix).flac", "11.Sad Creature (Luminous Remix).flac", "12.死にゆく季節のきみへ (Mement Remix).flac", "13.Goodnight Seven Seas (Cliff Remix).flac"],
 
-    "She_is_Legend Disc1": ["01.贅沢な感情.flac"]
+    "She_is_Legend Disc1": ["01.Burn My Soul.flac","02.Dance! Dance! Dance! (Single Version).flac", "03.ありふれたBattle Song～いつも戦闘は面倒だ～.flac", "04.Pain in Rain.flac", "05.オーバーキル.flac", "06.War Alive～時にはやぶれかぶれに～.flac", "07.Goodbye Innocence.flac", "08.Before I Rise (Acoustic Ver_).flac", "09.贅沢な感情.flac", "10.終末のヒーロー.flac", "11.Judgement Day.flac", "12.過眠症.flac", "13.Muramasa Blade!.flac"],
+
+    "She_is_Legend Disc2": ["01.Arch of Light (Single Version).flac", "02.Crow Song (SiL Ver_) (Single Version).flac", "03.シガチョコ (Single Version).flac", "04.放課後のメロディ.flac", "05.起死廻生.flac", "06.Autumn Howl.flac", "07.Heartbreak Syndrome.flac", "08.さよならの速度.flac", "09.Popcorn N' Roses.flac", "10.Thank you for playing～あなたに出会えてよかった～.flac", "11.How's everything.flac","12.Long Long Spell.flac","13.死にゆく季節でぼくは.flac"],
+
+    "She_is_Legend Disc3": ["01.Alchemy (SiL Ver_).flac", "02.春眠旅団.flac","03.陽のさす向こうへ.flac","04.闇夜のKomachi Vampire.flac","05.ガラス越しのスペクタクル.flac","06.Dear R_ Heinlein.flac","07.ヤになって閉ざしたハート.flac","08.美しい花咲く丘で.flac","09.Come on baby!.flac","10.Kone Kone Day By Day (AB! Ver_).flac"],
+
+    "She_is_Legend Disc4": ["01.Moon Day Real Escape.flac", "02.白の呪文.flac", "03.Perfect Goodbye.flac", "04.本能寺、ドレスコードで。.flac", "05.Melancholic Blue.flac"]
 }
