@@ -100,7 +100,7 @@ def show_team(scrollbar_frame_obj, team):
 
         # 创建 LabelFrame
         frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=role.name)
-        frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+        frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
         # 配置网格布局的权重
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_rowconfigure(1, weight=1)
