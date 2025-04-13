@@ -1,6 +1,8 @@
-import tkinter as tk
+
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 import os
-from tkinter import ttk, filedialog, messagebox
+from tkinter import filedialog, messagebox
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 import time
@@ -32,7 +34,7 @@ class FLACPlayerApp:
         self.current_file = None
         self.paused = False
         self.playing = False
-        self.volume = 0.7
+        self.volume = 0.5
         self.duration = 0
         self.seeking = False  # 是否正在拖动进度条
         self.current_position = 0  # 当前播放位置
@@ -49,24 +51,26 @@ class FLACPlayerApp:
         self.update_thread = None
         self.running = True
 
+        self.volume_thread = None
+
         # 窗口关闭时清理资源
         # self.frame.protocol("WM_DELETE_WINDOW", self.on_close)
 
     # 创建界面控件
     def create_widgets(self):
 
-        file_frame = tk.Frame(self.frame)
-        file_frame.pack(pady=(0, 5), fill=tk.X)
-        self.file_label = tk.Label(file_frame, text="未选择文件", width=40, anchor='w')
-        self.file_label.pack(side=tk.LEFT, padx=5)
+        file_frame = ttk.Frame(self.frame)
+        file_frame.pack(pady=(0, 5), fill=ttk.X)
+        self.file_label = ttk.Label(file_frame, text="未选择文件", width=40, anchor='w')
+        self.file_label.pack(side=ttk.LEFT, padx=5)
 
         # 进度条 - 使用Canvas实现更精确的点击跳转
-        self.progress_frame = tk.Frame(self.frame)
-        self.progress_frame.pack(pady=10, fill=tk.X, padx=20)
+        self.progress_frame = ttk.Frame(self.frame)
+        self.progress_frame.pack(pady=10, fill=ttk.X, padx=20)
 
         # 实际进度显示
-        self.progress_canvas = tk.Canvas(self.progress_frame, height=20)
-        self.progress_canvas.pack(fill=tk.X)
+        self.progress_canvas = ttk.Canvas(self.progress_frame, height=20)
+        self.progress_canvas.pack(fill=ttk.X)
         self.progress_canvas.update()
         width = self.progress_canvas.winfo_width()
 
@@ -81,36 +85,36 @@ class FLACPlayerApp:
         self.progress_canvas.bind("<ButtonRelease-1>", self.on_progress_release)
 
         # 时间显示
-        self.time_var = tk.StringVar()
+        self.time_var = ttk.StringVar()
         self.time_var.set("00:00 / 00:00")
-        time_label = tk.Label(self.frame, textvariable=self.time_var)
+        time_label = ttk.Label(self.frame, textvariable=self.time_var)
         time_label.pack()
 
         # 控制按钮
-        control_frame = tk.Frame(self.frame)
+        control_frame = ttk.Frame(self.frame)
         control_frame.pack(pady=10)
 
-        self.play_btn = tk.Button(control_frame, text="播放▶", command=self.play, state=tk.DISABLED)
-        self.play_btn.pack(side=tk.LEFT, padx=5)
+        self.play_btn = ttk.Button(control_frame, text="播放▶", command=self.play, state=ttk.DISABLED)
+        self.play_btn.pack(side=ttk.LEFT, padx=5)
 
-        self.pause_btn = tk.Button(control_frame, text="暂停⏸︎", command=self.pause, state=tk.DISABLED)
-        self.pause_btn.pack(side=tk.LEFT, padx=5)
+        self.pause_btn = ttk.Button(control_frame, text="暂停⏸︎", command=self.pause, state=ttk.DISABLED)
+        self.pause_btn.pack(side=ttk.LEFT, padx=5)
 
-        self.stop_btn = tk.Button(control_frame, text="停止⏹︎", command=self.stop, state=tk.DISABLED)
-        self.stop_btn.pack(side=tk.LEFT, padx=5)
+        self.stop_btn = ttk.Button(control_frame, text="停止⏹︎", command=self.stop, state=ttk.DISABLED)
+        self.stop_btn.pack(side=ttk.LEFT, padx=5)
 
         #添加循环按钮
-        self.loop_btn = tk.Button(control_frame, text="循环◻", command=self.toggle_loop, state=tk.DISABLED)
-        self.loop_btn.pack(side=tk.LEFT, padx=5)
+        self.loop_btn = ttk.Button(control_frame, text="循环◻", command=self.toggle_loop, state=ttk.DISABLED)
+        self.loop_btn.pack(side=ttk.LEFT, padx=5)
 
         # 音量控制
-        volume_frame = tk.Frame(self.frame)
+        volume_frame = ttk.Frame(self.frame)
         volume_frame.pack()
-        tk.Label(volume_frame, text="音量🔉").pack(side=tk.LEFT)
-        self.volume_scale = tk.Scale(volume_frame, from_=0, to=100, orient=tk.HORIZONTAL,
+        ttk.Label(volume_frame, text="音量🔉").pack(side=ttk.LEFT)
+        self.volume_scale = ttk.Scale(volume_frame, from_=0, to=100, orient=ttk.HORIZONTAL,
                                      command=self.set_volume)
         self.volume_scale.set(50)  # 默认音量设为50%
-        self.volume_scale.pack(side=tk.LEFT)
+        self.volume_scale.pack(side=ttk.LEFT)
 
     # 选择音频文件
     def select_file(self):
@@ -129,10 +133,10 @@ class FLACPlayerApp:
             pygame.mixer.music.load(file_path)
             self.current_file = file_path
             self.file_label.config(text=os.path.basename(file_path))
-            self.play_btn.config(state=tk.NORMAL)
-            self.pause_btn.config(state=tk.NORMAL)
-            self.stop_btn.config(state=tk.NORMAL)
-            self.loop_btn.config(state=tk.NORMAL)
+            self.play_btn.config(state=ttk.NORMAL)
+            # self.pause_btn.config(state=ttk.NORMAL)
+            # self.stop_btn.config(state=ttk.NORMAL)
+            self.loop_btn.config(state=ttk.NORMAL)
 
             # 获取音频长度
             sound = pygame.mixer.Sound(file_path)
@@ -159,6 +163,8 @@ class FLACPlayerApp:
     # 播放音频
     def play(self):
         if self.current_file:
+            self.start_progress_volume("up")
+            time.sleep(0.5)
             # 循环播放时强制重置起点（针对单曲循环场景）
             if self.loop_enabled and self.current_position >= self.duration:
                 self.current_position = 0  # 重置播放位置
@@ -199,9 +205,9 @@ class FLACPlayerApp:
 
             # 使用 after(0) 确保 UI 更新在主线程执行
             self.frame.after(0, lambda: (
-                self.play_btn.config(state=tk.DISABLED),
-                self.pause_btn.config(state=tk.NORMAL),
-                self.stop_btn.config(state=tk.NORMAL)
+                self.play_btn.config(state=ttk.DISABLED),
+                self.pause_btn.config(state=ttk.NORMAL),
+                self.stop_btn.config(state=ttk.NORMAL)
             ))
 
 
@@ -215,19 +221,23 @@ class FLACPlayerApp:
     # 暂停播放
     def pause(self):
         if self.playing and not self.paused:
+            self.start_progress_volume("down")
+            time.sleep(0.5)
             pygame.mixer.music.pause()
             self.paused = True
             # 保存当前位置
             self.current_position = self.get_current_pos()
             self.seek_time = time.time()  # 更新seek_time
-            self.play_btn.config(state=tk.NORMAL)
-            self.pause_btn.config(state=tk.DISABLED)
+            self.play_btn.config(state=ttk.NORMAL)
+            self.pause_btn.config(state=ttk.DISABLED)
 
     # 停止播放
     def stop(self):
         self.running = False
+        self.start_progress_volume("down")
+        time.sleep(0.5)
         pygame.mixer.music.stop()
-        time.sleep(0.2)
+        # time.sleep(0.2)
         self.playing = False
         self.paused = False
         self.current_position = 0
@@ -238,14 +248,14 @@ class FLACPlayerApp:
         self.frame.after(0, lambda: (
             self.update_progress_display(0),
             self.update_time_display(0, self.duration),
-            self.play_btn.config(state=tk.NORMAL),
-            self.pause_btn.config(state=tk.DISABLED),
-            self.stop_btn.config(state=tk.DISABLED)
+            self.play_btn.config(state=ttk.NORMAL),
+            self.pause_btn.config(state=ttk.DISABLED),
+            self.stop_btn.config(state=ttk.DISABLED)
         ))
 
     # 设置音量
     def set_volume(self, val):
-        self.volume = int(val) / 100
+        self.volume = int(float(val)) / 100
         pygame.mixer.music.set_volume(self.volume)
 
     # 启动进度更新线程
@@ -294,11 +304,12 @@ class FLACPlayerApp:
                 progress_percent = (current_pos / self.duration) * 100
                 progress_percent = max(0, min(100, progress_percent))
 
-                # 使用after确保在主线程中更新UI
-                self.frame.after(0, lambda p=progress_percent, pos=current_pos: (
-                    self.update_progress_display(p),
-                    self.update_time_display(pos, self.duration)
-                ))
+                if self.running:
+                    # 使用after确保在主线程中更新UI
+                    self.frame.after(0, lambda p=progress_percent, pos=current_pos: (
+                        self.update_progress_display(p),
+                        self.update_time_display(pos, self.duration)
+                    ))
 
             time.sleep(0.1)
 
@@ -385,4 +396,26 @@ class FLACPlayerApp:
         self.running = False
         pygame.mixer.music.stop()
         pygame.mixer.quit()
+
+    def gradient_volume_up(self):
+        val = 0
+        step = 10
+        for i in range(5):
+            val += step
+            pygame.mixer.music.set_volume(val/100)
+            time.sleep(0.1)
+    def gradient_volume_down(self):
+        val = 50
+        step = 10
+        for i in range(5):
+            val -= step
+            pygame.mixer.music.set_volume(val/100)
+            time.sleep(0.1)
+    # 启动音量更新线程
+    def start_progress_volume(self, operate):
+        if operate == "up":
+            self.volume_thread = Thread(target=self.gradient_volume_up, daemon=True)
+        else:
+            self.volume_thread = Thread(target=self.gradient_volume_down, daemon=True)
+        self.volume_thread.start()
 

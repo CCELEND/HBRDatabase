@@ -4,6 +4,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 import json
+import tkinter
 
 from canvas_events import ArtworkDisplayerHeight2, ImageViewerWithScrollbar, ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity, set_global_bg
@@ -71,7 +72,14 @@ def create_menu_item(menu, label, command, *args):
 # 创建菜单栏
 def create_menu(parent_frame, scrollbar_frame_obj):
     
+    # 创建自定义菜单样式
+    style = ttk.Style()
+    style.configure(
+        "Custom.TMenubutton",  # 控制菜单按钮样式
+        background="#f0f0f0"  # 背景色
+    )
     menu_bar = ttk.Menu(parent_frame)
+
 
     # 角色菜单 菜单不可分离
     team_menu = ttk.Menu(menu_bar, tearoff=0)
