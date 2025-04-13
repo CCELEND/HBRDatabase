@@ -54,9 +54,6 @@ def creat_music_win():
     music_player.play_info_frame.grid_rowconfigure(1, weight=1, minsize=200)
     music_player.play_info_frame.grid_columnconfigure(0, weight=1)
 
-    # photo=get_photo("./音乐/OST1.jpg", (336,300))
-    # create_canvas_with_image(music_player.play_info_frame, photo, 500, 300, 61, 0, 0, 0, padx=10, pady=0)
-
     music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
 
     # music_win_frame.resizable(False, False)
@@ -69,4 +66,3 @@ def creat_music_win():
     # 窗口关闭时清理
     music_win_frame.protocol("WM_DELETE_WINDOW", lambda: music_win_closing(music_win_frame))
 
-    # music_win_frame.mainloop()

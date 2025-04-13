@@ -2,16 +2,16 @@
 
 ### python3.8 以上
 
-### opencv-python、Pillow、requests、pygame
+### opencv-python、Pillow、requests、pygame、ttkbootstrap
 
 ```sh
-pip install opencv-python Pillow requests pygame
+pip install opencv-python Pillow requests pygame ttkbootstrap
 ```
 
 镜像加速（建议使用）
 
 ```sh
-pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests pygame
+pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests pygame ttkbootstrap
 ```
 
 ## 使用

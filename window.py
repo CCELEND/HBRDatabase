@@ -4,19 +4,31 @@ from PIL import Image, ImageTk
 from tkinter import scrolledtext, Menu, messagebox
 import ctypes
 
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
+def set_global_bg(parent_frame, bg="#f0f0f0"):
+    # 获取当前主题的颜色配置
+    current_theme = parent_frame.style.theme_use()
+    colors = parent_frame.style.colors
+    # 修改背景色
+    colors.bg = bg  # 修改主题的全局背景色
+    colors.selectfg = bg
+    colors.inputbg = bg
 
 # 创建一个新窗口 主窗口
 def creat_window(title, 
     wide=None, high=None, x=None, y=None):
+    new_window = ttk.Window(title=title, size=(wide, high), position=(x,y))
 
-    new_window = tk.Tk()
-    new_window.title(title)
-    # 设置新窗口的大小
-    if wide and high:
-        if x and y:
-            new_window.geometry(f"{wide}x{high}+{x}+{y}")  
-        else:
-            new_window.geometry(f"{wide}x{high}")
+    # new_window = tk.Tk()
+    # new_window.title(title)
+    # # 设置新窗口的大小
+    # if wide and high:
+    #     if x and y:
+    #         new_window.geometry(f"{wide}x{high}+{x}+{y}")  
+    #     else:
+    #         new_window.geometry(f"{wide}x{high}")
 
     return new_window   
 

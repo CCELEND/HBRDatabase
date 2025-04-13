@@ -1,6 +1,6 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
 from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
 from tkinter import scrolledtext, Menu, messagebox
 
@@ -11,17 +11,20 @@ import team_info
 
 from search_processing import on_select, get_filtered_styles, keyword_processing
 
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+
 
 # 创建选项的 frame
 def creat_select_frame(label_content, options, selected_values,
     parent_frame, row, column):
 
     # 创建标签
-    label_frame = tk.LabelFrame(parent_frame, text=label_content)
+    label_frame = ttk.LabelFrame(parent_frame, text=label_content)
     label_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")
 
     # 创建 Frame 用于容纳水平排列的多选按钮
-    check_frame = tk.Frame(label_frame)
+    check_frame = ttk.Frame(label_frame)
     check_frame.grid(row=0, column=0, padx=5, sticky="nsw")
 
     # 存储每个 Checkbutton 的 BooleanVar
@@ -30,21 +33,29 @@ def creat_select_frame(label_content, options, selected_values,
     # 初始化 last 列表，记录上一次的状态
     last = [False] * len(options)
 
+    # 定义自定义样式（背景色 + 字体颜色）
+    style = ttk.Style()
+    style.configure(
+        "Custom.TCheckbutton",  # 自定义样式名
+        background="#f0f0f0",   # 背景颜色（浅灰色）
+        foreground="#333333",   # 文字颜色（深灰色）
+    )
     # 创建多选按钮并使用 grid 布局
     column_count = 0  # 初始化列计数器
     for i, value in enumerate(options):
-        check_var = tk.BooleanVar()  # 每个选项使用独立的 BooleanVar
-        check_button = tk.Checkbutton(
+        check_var = ttk.BooleanVar()  # 每个选项使用独立的 BooleanVar
+        check_button = ttk.Checkbutton(
             check_frame,  # 将多选按钮放在 check_frame 中
             text=value,
             variable=check_var,  # 绑定 BooleanVar
+            style="Custom.TCheckbutton",
             command=lambda: on_select(check_vars, options, last, selected_values)
         )
 
         # 计算行和列的位置
         row = i // 4  # 每四个按钮换行
         column = i % 4  # 列位置
-        check_button.grid(row=row, column=column, padx=5, sticky="nsw")  # 设置间距
+        check_button.grid(row=row, column=column, padx=5, pady=5, sticky="nsw")  # 设置间距
 
         check_vars.append(check_var)
         column_count += 1  # 更新列计数器
@@ -59,7 +70,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 
     set_window_top(search_win_frame)
     # 获取关键词
-    key_word_str = key_word_text.get("1.0", tk.END)
+    key_word_str = key_word_text.get("1.0", ttk.END)
     key_word_str = key_word_str.strip()
 
     # 关键词处理
@@ -75,7 +86,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     for i, style in enumerate(filtered_styles):
         team = team_info.teams[style.team_name]
 
-        style_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.name)
+        style_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.name)
         bind_style_canvas(style_frame, team, style, 0, 0)
 
         # 计算行和列的位置
@@ -120,7 +131,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
-    role_search_frame = tk.LabelFrame(search_win_frame, text="角色、风格")
+    role_search_frame = ttk.LabelFrame(search_win_frame, text="角色、风格")
     role_search_frame.grid(row=0, column=0, columnspan=2, padx=10, sticky="nsew")
 
     rarity_options = [
@@ -181,11 +192,11 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
 
 
     # 关键词标签
-    key_word_label = tk.Label(search_win_frame, text="关键词")
-    key_word_label.grid(row=1, column=0, padx=5, pady=0, sticky="w")
+    key_word_label = ttk.Label(search_win_frame, text="关键词")
+    key_word_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
     # 关键词输入框
     key_word_text = scrolledtext.ScrolledText(search_win_frame, 
-        wrap=tk.WORD, height=3)
+        wrap=ttk.WORD, height=3)
     key_word_text.grid(row=2, column=0, columnspan=2, padx=10, pady=0, sticky="nsew")
     # 绑定鼠标右键点击事件到上下文菜单
     key_word_text.bind("<Button-3>", 
@@ -200,11 +211,11 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     selected_values_dir["技能"] = skill_selected_values
 
     # 创建搜索按钮
-    search_button = tk.Button(search_win_frame, 
-        width=20, text="搜索", 
+    search_button = ttk.Button(search_win_frame, 
+        width=20, text="搜索", bootstyle="light",
         command=lambda: show_search(scrollbar_frame_obj, search_win_frame,
             key_word_text, selected_values_dir))
-    search_button.grid(row=3, column=0, columnspan=2, padx=5,pady=10)
+    search_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
 
 
     open_search_wins["搜索"] = search_win_frame

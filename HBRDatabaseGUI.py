@@ -5,7 +5,7 @@ from PIL import Image, ImageTk
 import json
 
 from canvas_events import ArtworkDisplayerHeight2, ImageViewerWithScrollbar, ArtworkDisplayerHeight
-from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity
+from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json
 
@@ -176,7 +176,8 @@ bg = []
 if __name__ == "__main__":
 
     # 创建主窗口
-    root = creat_window("HBRDatabase", 1160, 725, 440, 50)#1160
+    root = creat_window("HBRDatabase", 1160, 717, 440, 50)#1160
+    set_global_bg(root)
     set_window_icon(root, "./favicon.ico")
     set_window_expand(root, rowspan=1, columnspan=6)
     root.update()

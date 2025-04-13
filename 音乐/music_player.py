@@ -225,7 +225,9 @@ class FLACPlayerApp:
 
     # 停止播放
     def stop(self):
+        self.running = False
         pygame.mixer.music.stop()
+        time.sleep(0.2)
         self.playing = False
         self.paused = False
         self.current_position = 0
@@ -251,6 +253,7 @@ class FLACPlayerApp:
         if self.update_thread and self.update_thread.is_alive():
             return
 
+        self.running = True
         self.update_thread = Thread(target=self.update_progress, daemon=True)
         self.update_thread.start()
 

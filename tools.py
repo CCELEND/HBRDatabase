@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from tkinter import messagebox
 import json
 import subprocess
+import importlib
 
 # 弹出确认框，询问用户是否重启
 def confirm_restart(info):

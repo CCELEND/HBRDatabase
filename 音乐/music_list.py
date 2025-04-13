@@ -1,77 +1,127 @@
 import sys
 import os
+import importlib
+import subprocess
 
 import tkinter as tk
+from tkinter import scrolledtext, Menu, messagebox
 from PIL import Image, ImageTk
 import json
-import tkinter as tk
-from tkinter import scrolledtext, Menu, messagebox
-from tkinter import ttk
+# from tkinter import ttk
 
 import music_player
 from music_handle_processing import music_handle
 
+currently_selected = ""
+
+try:
+    import ttkbootstrap as ttk
+    from ttkbootstrap.constants import *
+except:
+    print("[*] ttkbootstrap 未安装，正在尝试自动安装...")
+    pip_args = [
+        sys.executable, "-m", "pip", "install",
+        "ttkbootstrap",
+        "-i", "https://pypi.tuna.tsinghua.edu.cn/simple",  # 清华镜像
+        "--trusted-host", "pypi.tuna.tsinghua.edu.cn"      # 避免 SSL 错误
+    ]
+    subprocess.check_call(pip_args)
+    import ttkbootstrap as ttk
+    from ttkbootstrap.constants import *
+
 class ExpandableList:
     def __init__(self, parent_frame, categories, row, column):
         # 创建主框架
-        self.frame = ttk.Frame(parent_frame)
-        self.frame.grid(row=row, column=column, padx=10, pady=10, sticky="nsew")
+        self.frame = ttk.Frame(parent_frame, padding=(5, 5))
+        self.frame.grid(row=row, column=column, padx=5, pady=5, sticky="nsew")
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
-        
-        # 创建Treeview组件
+
+        # 配置Treeview样式
+        style = ttk.Style()
+        self.style_name = "ExpandableList.Treeview"
+        style.configure(self.style_name,
+                        font=('微软雅黑', 10, 'normal'),
+                        rowheight=22)
+        style.map(self.style_name,
+                  background=[('selected', '#0078D7')],
+                  foreground=[('selected', 'white')])
+
+        # 创建Treeview
         self.tree = ttk.Treeview(
             self.frame,
+            style=self.style_name,  # 应用自定义样式
             selectmode="browse",
-            height=15,
-            show="tree"
+            height=10,  # 优化可见行数
+            show="tree",
         )
-        self.tree.grid(row=0, column=0, sticky="nsew")
-        
-        # 添加滚动条
-        scrollbar = ttk.Scrollbar(self.frame, command=self.tree.yview)
-        scrollbar.grid(row=0, column=1, sticky="ns")
+        self.tree.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
 
-        # 配置滚动条
+        # 滚动条样式
+        style.configure(
+            "Custom.Vertical.TScrollbar",  # 垂直滚动条样式
+            background="#f0f0f0",          # 滚动条背景色
+            troughcolor="#f0f0f0",         # 滚动槽颜色
+            gripcount=0                    # 移除默认的条纹效果
+        )
+        scrollbar = ttk.Scrollbar(self.frame, command=self.tree.yview, style="Custom.Vertical.TScrollbar")
+        scrollbar.grid(row=0, column=1, sticky="ns", padx=(0, 2), pady=2)
         self.tree.configure(yscrollcommand=scrollbar.set)
-        
-        # 绑定双击事件
+
+        # 增强交互反馈
         self.tree.bind("<Double-1>", self.on_double_click)
-        
-        # 添加分类数据
+        self.tree.bind("<Enter>", lambda e: self.tree.config(cursor="hand2"))
+        self.tree.bind("<Leave>", lambda e: self.tree.config(cursor="arrow"))
+
+        # 初始化数据
         self.add_categories(categories)
-    
-    # 添加分类和选项数据
+
     def add_categories(self, categories):
         for category, items in categories.items():
-            # 添加分类节点
-            parent = self.tree.insert("", "end", text=category, open=False)
-            # 添加该分类下的选项
-            for item in items:
-                self.tree.insert(parent, "end", text=item)
-    
-    # 处理双击事件
+            parent = self.tree.insert("", "end",
+                                      text=category,
+                                      open=False,
+                                      tags=('category',))
+            for idx, item in enumerate(items, 1):
+                self.tree.insert(parent, "end",
+                                 text=item,
+                                 tags=('item', f'item-{idx}'))
+        self.tree.tag_configure('category', font=('微软雅黑', 10, 'bold'))  # 分类加粗
+
     def on_double_click(self, event):
-        item = self.tree.focus()
-        file_name = self.tree.item(item, "text")
-        
-        # 检查是否是分类节点（有子节点）
-        if self.tree.get_children(item):
-            # 切换展开/折叠状态
+        item = self.tree.selection()[0]
+        global currently_selected
+
+        # 节点类型判断（通过tags识别）
+        if 'category' in self.tree.item(item, 'tags'):
             if self.tree.item(item, "open"):
                 self.tree.item(item, open=False)
+                self.tree.after(100, lambda: self.tree.yview_moveto(0))  # 折叠后滚动到顶
             else:
                 self.tree.item(item, open=True)
         else:
-            # 获取父节点
-            parent_item = self.tree.parent(item)
-            if parent_item:  # 确保有父节点
-                parent_text = self.tree.item(parent_item, "text")
-                album_name, disc_name = parent_text.split()
-                all_albun_name = music_player.music_dir[album_name]
+            # 处理文件选择
+            file_name = self.tree.item(item, "text")
+            if file_name == currently_selected:
+                return
 
-                # file_path_album = all_albun_name + "/" + disc_name + "/" + file_name
-                # music_handle(all_albun_name, file_path_album)
-                music_handle(all_albun_name, disc_name, file_name)
+            parent_item = self.tree.parent(item)
+            if parent_item:
+                parent_text = self.tree.item(parent_item, "text")
+                try:
+                    album_name, disc_name = parent_text.split(maxsplit=1)
+                    all_album_name = music_player.music_dir[album_name]
+
+                    currently_selected = file_name
+                    music_handle(all_album_name, disc_name, file_name)
+
+                    # 选中效果增强（闪烁提示）
+                    self.tree.selection_set(item)
+                    self.tree.after(200, lambda: self.tree.selection_remove(item))
+                    self.tree.after(400, lambda: self.tree.selection_set(item))
+                except Exception as e:
+                    print(f"节点解析错误: {str(e)}")
             else:
-                print(f"文件名: {file_name}, 没有父节点")
+                print(f"未找到父节点: {file_name}")
+
+
