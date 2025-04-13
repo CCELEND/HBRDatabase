@@ -100,7 +100,7 @@ def show_style(scrollbar_frame_obj, style):
     # 主动技能列表
     for i, active_skill in enumerate(style.active_skills):
         row_frame = ttk.LabelFrame(active_skill_frame, text=active_skill.name)
-        row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+        row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew") #5
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重
         for col_index in range(4):
@@ -108,7 +108,7 @@ def show_style(scrollbar_frame_obj, style):
 
         # 描述 frame
         desc_frame = ttk.Frame(row_frame)
-        desc_frame.grid(row=0, column=0, columnspan=4, sticky="nsew")
+        desc_frame.grid(row=0, column=0, columnspan=4, pady=(0,5), sticky="nsew")
         desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 desc_frame 设置列权重 4:1:1
         desc_frame.grid_columnconfigure(0, weight=4, minsize=400)
@@ -147,7 +147,7 @@ def show_style(scrollbar_frame_obj, style):
 
             # 技能效果 frame
             effect_frame = ttk.Frame(row_frame)
-            effect_frame.grid(row=j+1, column=0, columnspan=4, sticky="nsew")
+            effect_frame.grid(row=j+1, column=0, columnspan=4, pady=(0,5), sticky="nsew")
             effect_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
             # 为 effect_frame 设置列权重 1:6
             effect_frame.grid_columnconfigure(0, weight=1, minsize=100)  # Canvas 列
@@ -215,7 +215,7 @@ def show_style(scrollbar_frame_obj, style):
     for i, passive_skill in enumerate(style.passive_skills):
         # 使用 LabelFrame 作为每一行的容器
         row_frame = ttk.LabelFrame(passive_skill_frame, text="[Auto]"+passive_skill.name)
-        row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+        row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重
         for col_index in range(4):
@@ -223,7 +223,7 @@ def show_style(scrollbar_frame_obj, style):
 
         # 描述 frame
         desc_frame = ttk.Frame(row_frame)
-        desc_frame.grid(row=0, column=0, columnspan=4, sticky="nsew")
+        desc_frame.grid(row=0, column=0, columnspan=4, pady=(0,5), sticky="nsew")
         desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 desc_frame 设置列权重 4:1
         desc_frame.grid_columnconfigure(0, weight=4)
@@ -241,7 +241,7 @@ def show_style(scrollbar_frame_obj, style):
 
         # 技能效果 frame
         effect_frame = ttk.Frame(row_frame)
-        effect_frame.grid(row=1, column=0, columnspan=4, sticky="nsew")
+        effect_frame.grid(row=1, column=0, columnspan=4, pady=(0,5),sticky="nsew")
         effect_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 effect_frame 设置列权重 1:6
         effect_frame.grid_columnconfigure(0, weight=1, minsize=100)  # Canvas 列

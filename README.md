@@ -4,15 +4,7 @@
 
 ### opencv-python、Pillow、requests、pygame、ttkbootstrap
 
-```sh
-pip install opencv-python Pillow requests pygame ttkbootstrap
-```
-
-镜像加速（建议使用）
-
-```sh
-pip install -i https://mirrors.tuna.tsinghua.edu.cn/pypi/web/simple opencv-python pillow requests pygame ttkbootstrap
-```
+运行 install_module.py 安装依赖模块
 
 ## 使用
 
