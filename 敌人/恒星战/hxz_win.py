@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -83,7 +85,7 @@ def show_hxz_enemys(scrollbar_frame_obj):
         # 恒星战敌人对象
         hxz = hxzs[hxz_name]
 
-        hxz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=hxz_name)
+        hxz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=hxz_name)
         photo = get_photo(hxz.img_path, (128, 72))
         canvas = create_canvas_with_image(hxz_frame, 
             photo, 130, 130, 1, 29, 0, 0)

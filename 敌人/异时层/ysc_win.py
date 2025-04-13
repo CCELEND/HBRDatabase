@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -82,7 +84,7 @@ def show_ysc_enemys(scrollbar_frame_obj):
         # 异时层敌人对象
         ysc = yscs[ysc_name]
 
-        ysc_enemy_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=ysc_name)
+        ysc_enemy_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=ysc_name)
         bind_ysc_enemy_canvas(ysc_enemy_frame, ysc, 0, 0)
 
         # 计算行和列的位置

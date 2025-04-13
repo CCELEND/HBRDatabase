@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -53,7 +55,7 @@ def creat_statu_win(event, parent_frame, statu):
     set_window_icon_webp(statu_win_frame, statu.path)
     open_statu_wins[statu.name] = statu_win_frame
 
-    statu_frame = tk.LabelFrame(statu_win_frame, text=statu.name)
+    statu_frame = ttk.LabelFrame(statu_win_frame, text=statu.name)
     statu_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 statu_frame 的布局
     statu_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
@@ -64,10 +66,10 @@ def creat_statu_win(event, parent_frame, statu):
         info = statu.effect
     else:
         info = statu.description
-    info_label = tk.Label(statu_frame, text=info, justify="left")
+    info_label = ttk.Label(statu_frame, text=info, anchor="center")
     info_label.grid(row=0, column=0, sticky="nsew")
 
-    stack_label = tk.Label(statu_frame, text=statu.stack, justify="left")
+    stack_label = ttk.Label(statu_frame, text=statu.stack, anchor="center")
     stack_label.grid(row=0, column=1, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
@@ -88,13 +90,13 @@ def show_statu(scrollbar_frame_obj):
 
     for type_num, type in enumerate(状态.status_info.statu_categories):
         # 状态类型
-        type_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=type+"类型状态")
+        type_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=type+"类型状态")
         type_frame.grid(row=type_num, column=0, columnspan=6, padx=10, pady=(0,5), sticky="nsew") #
 
         series_column_count = 0
         for series_num, series in enumerate(状态.status_info.statu_categories[type]):
             # 所属系列
-            series_frame = tk.LabelFrame(type_frame, text=series)
+            series_frame = ttk.LabelFrame(type_frame, text=series)
             series_frame.grid(row=series_num, column=0, padx=(5,0), pady=(0,5), sticky="nesw")  # 设置间距
 
             statu_column_count = 0
@@ -106,7 +108,7 @@ def show_statu(scrollbar_frame_obj):
                 if len(状态.status_info.statu_categories[type][series]) == 1:
                     bind_statu_canvas(series_frame, statu, 0, 0)
                 else:
-                    statu_frame = tk.LabelFrame(series_frame, text=statu_name)
+                    statu_frame = ttk.LabelFrame(series_frame, text=statu_name)
                     bind_statu_canvas(statu_frame, statu, 0, 0)
 
                     if type in ['增益', '减益']:

@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -88,7 +90,7 @@ def show_gqboss_enemys(scrollbar_frame_obj):
         # 光球BOSS敌人对象
         gqboss = gqbosss[gqboss_name]
 
-        gqboss_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gqboss_name)
+        gqboss_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gqboss_name)
         bind_gqboss_canvas(gqboss_frame, gqboss, 0, 0)
 
         # 计算行和列的位置

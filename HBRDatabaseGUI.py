@@ -1,6 +1,7 @@
 import sys
 import os
-import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 import json
 
@@ -70,10 +71,10 @@ def create_menu_item(menu, label, command, *args):
 # 创建菜单栏
 def create_menu(parent_frame, scrollbar_frame_obj):
     
-    menu_bar = tk.Menu(parent_frame)
+    menu_bar = ttk.Menu(parent_frame)
 
     # 角色菜单 菜单不可分离
-    team_menu = tk.Menu(menu_bar, tearoff=0)
+    team_menu = ttk.Menu(menu_bar, tearoff=0)
     team_names = [
         "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X", "Angel Beats!"
     ]
@@ -83,7 +84,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     menu_bar.add_cascade(label="👤角色", menu=team_menu)
 
     # 物品材料菜单
-    item_menu = tk.Menu(menu_bar, tearoff=0)
+    item_menu = ttk.Menu(menu_bar, tearoff=0)
     item_names = [
         "主线道具", "活动道具"
     ]
@@ -112,7 +113,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     menu_bar.add_cascade(label="📜持有物", menu=item_menu)
 
     # 敌人菜单
-    enemy_menu = tk.Menu(menu_bar, tearoff=0)
+    enemy_menu = ttk.Menu(menu_bar, tearoff=0)
     enemy_names = [
         "活动棱镜战", "时钟塔", "废域"
     ]
@@ -135,7 +136,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
     
     # 战斗系统菜单
-    battle_menu = tk.Menu(menu_bar, tearoff=0)
+    battle_menu = ttk.Menu(menu_bar, tearoff=0)
     # 定义菜单项的名称和对应的回调函数
     menu_battle_calls = [
         ("基础", creat_jc_win),

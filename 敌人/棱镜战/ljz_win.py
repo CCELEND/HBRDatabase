@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -86,7 +88,7 @@ def show_ljz_enemys(scrollbar_frame_obj):
         # 棱镜战敌人对象
         ljz = ljzs[ljz_name]
 
-        ljz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=ljz_name)
+        ljz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=ljz_name)
         bind_ljz_canvas(ljz_frame, ljz, 0, 0)
 
         # 计算行和列的位置

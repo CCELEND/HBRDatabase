@@ -1,7 +1,8 @@
 import sys
 import os
-import tkinter as tk
 from PIL import Image, ImageTk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
@@ -15,7 +16,7 @@ from style_win import creat_style_skill_win, creat_style_right_menu
 # 创建右键菜单
 def creat_role_right_menu(event, parent_frame, role, team):
     
-    right_click_menu = tk.Menu(parent_frame, tearoff=0)
+    right_click_menu = ttk.Menu(parent_frame, tearoff=0)
     right_click_menu.add_command(label="全身画", 
         command=lambda: show_role_full_img(parent_frame, role, team))
     
@@ -57,7 +58,7 @@ def show_rarity(frame, role, team, row=2):
 
     if role.Astyles:
         # 创建 RarityAframe 并设置 row
-        RarityAframe = tk.Frame(frame)
+        RarityAframe = ttk.Frame(frame)
         RarityAframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
         photoRarityA = get_photo("./角色/IconRarityA.webp", (130, 130))
         canvasRarityA = create_canvas_with_image(RarityAframe, 
@@ -69,7 +70,7 @@ def show_rarity(frame, role, team, row=2):
 
     if role.Sstyles:
         # 创建 RaritySframe 并设置 row
-        RaritySframe = tk.Frame(frame)
+        RaritySframe = ttk.Frame(frame)
         RaritySframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
         photoRarityS = get_photo("./角色/IconRarityS.webp", (130, 130))
         canvasRarityS = create_canvas_with_image(RaritySframe, 
@@ -81,7 +82,7 @@ def show_rarity(frame, role, team, row=2):
 
     if role.SSstyles:
         # 创建 RaritySSframe 并设置 row
-        RaritySSframe = tk.Frame(frame)
+        RaritySSframe = ttk.Frame(frame)
         RaritySSframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
         photoRaritySS = get_photo("./角色/IconRaritySS.webp", (130, 130))
         canvasRaritySS = create_canvas_with_image(RaritySSframe, 
@@ -98,7 +99,7 @@ def show_team(scrollbar_frame_obj, team):
     for i, role in enumerate(team.roles):
 
         # 创建 LabelFrame
-        frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=role.name)
+        frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=role.name)
         frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
         # 配置网格布局的权重
         frame.grid_rowconfigure(0, weight=1)
@@ -106,7 +107,7 @@ def show_team(scrollbar_frame_obj, team):
         frame.grid_columnconfigure(0, weight=1)
 
         # 创建 desc_frame 并设置 rowspan=2，占据两行
-        desc_frame = tk.Frame(frame)
+        desc_frame = ttk.Frame(frame)
         desc_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10, sticky="nsew") 
         desc_frame.grid_rowconfigure(0, weight=1)  
         desc_frame.grid_columnconfigure(0, weight=1, minsize=200)
@@ -125,7 +126,7 @@ def show_team(scrollbar_frame_obj, team):
 
         # 角色描述
         # 设置了标签的字体为 Monospace 大小为 10，加粗
-        label = tk.Label(desc_frame, text=role.description, justify="left", font=("Monospace", 10, "bold"))
+        label = ttk.Label(desc_frame, text=role.description, justify="left", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
 
         show_rarity(frame, role, team)

@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -47,7 +49,7 @@ def show_capsuletoys(scrollbar_frame_obj):
         # 获取 item 图对象
         item_photo = get_photo(capsuletoys_json[capsuletoy_name]["path"], item_size)
 
-        capsuletoy_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=capsuletoy_name)
+        capsuletoy_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=capsuletoy_name)
 
         # Canvas
         canvas = create_canvas_with_image(capsuletoy_frame, base_photo, 

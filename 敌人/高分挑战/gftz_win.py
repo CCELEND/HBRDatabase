@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 import threading
 import time
@@ -96,7 +98,7 @@ def creat_gftz_win(event, parent_frame, gftz):
 #         # 高分挑战敌人对象
 #         gftz = gftzs[gftz_name]
 
-#         gftz_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
+#         gftz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
 #         bind_gftz_canvas(gftz_frame, gftz, 0, 0)
 
 #         # 计算行和列的位置
@@ -143,7 +145,7 @@ class GFTZCreator:
                     gftz = self.gftzs[gftz_name]
                     
                     # 创建框架
-                    gftz_frame = tk.LabelFrame(self.scrollable_frame, text=gftz_name)
+                    gftz_frame = ttk.LabelFrame(self.scrollable_frame, text=gftz_name)
                     bind_gftz_canvas(gftz_frame, gftz, 0, 0)
                     
                     # 计算位置

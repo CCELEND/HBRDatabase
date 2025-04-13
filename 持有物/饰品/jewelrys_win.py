@@ -1,6 +1,8 @@
 import sys
 import os
 import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -36,12 +38,12 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         jewelry = jewelrys[jewelry_name]
 
         # 使用 LabelFrame 作为每一行的容器
-        row_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry.name, padx=10, pady=5)
+        row_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry.name)
         row_frame.grid(row=i, column=0, columnspan=6, padx=10, pady=(0,5), sticky="nsew")
         row_frame.grid_columnconfigure(0, weight=1)  # 让 inner_frame 适应 row_frame
      
         # 创建 inner_frame 让 Canvas 和 Label 并排
-        inner_frame = tk.Frame(row_frame)
+        inner_frame = ttk.Frame(row_frame)
         inner_frame.grid(row=0, column=0, columnspan=6, sticky="nsew")
         inner_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         inner_frame.grid_columnconfigure(0, weight=1)  # Canvas 列
@@ -60,7 +62,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         row_canvas.create_image(17, 17, anchor="nw", image=jewelry_photo)
 
         # 右侧信息 Frame（放描述和价格和获取地点）
-        info_frame = tk.Frame(inner_frame)
+        info_frame = ttk.Frame(inner_frame)
         info_frame.grid(row=0, column=1, sticky="nsew")
         # 让 info_frame 内部组件垂直居中 3 1 3
         info_frame.grid_rowconfigure(0, weight=1) # 确保行填充
@@ -71,15 +73,15 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         # 右侧 Label（放文字描述）
         # 控制多行文本的对齐方式（仅影响 wraplength 设定的换行文本）justify="left"
         # 控制整个 Label 内的文本对齐方式（w 代表靠左对齐）anchor="w"
-        desc_label = tk.Label(info_frame, text=jewelry.description, justify="left", anchor="w")
+        desc_label = ttk.Label(info_frame, text=jewelry.description, justify="left", anchor="w")
         desc_label.grid(row=0, column=0, sticky="nsew")
 
         # 右侧 Label（放稀有度）right fg="red"背景色
-        rarity_label = tk.Label(info_frame, text=int(jewelry.rarity)*"★", justify="left", anchor="w")
+        rarity_label = ttk.Label(info_frame, text=int(jewelry.rarity)*"★", justify="left", anchor="w")
         rarity_label.grid(row=0, column=1, sticky="nsew")
 
         # 右侧 Label（放获取位置）
-        location_label = tk.Label(info_frame, text=jewelry.location, justify="left", anchor="w") #, anchor="e"
+        location_label = ttk.Label(info_frame, text=jewelry.location, justify="left", anchor="w") #, anchor="e"
         location_label.grid(row=0, column=2, sticky="nsew")
 
     scrollbar_frame_obj.update_canvas()
@@ -155,7 +157,7 @@ def show_jewelrys_type(scrollbar_frame_obj):
         jewelry_type_json = 饰品.jewelrys_info.jewelrys_type_json[jewelry_type_name]
 
         # 饰品类型
-        jewelry_type_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry_type_name)
+        jewelry_type_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry_type_name)
         bind_jewelry_type_canvas(jewelry_type_frame, jewelry_type_json, 0, 0)
 
         # 计算行和列的位置

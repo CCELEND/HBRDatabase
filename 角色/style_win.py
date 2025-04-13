@@ -1,7 +1,8 @@
 import sys
 import os
-import tkinter as tk
 from PIL import Image, ImageTk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image, VideoPlayer, ArtworkDisplayer, ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
@@ -81,7 +82,7 @@ def show_style(scrollbar_frame_obj, style):
 
     # 职业
     career = 职业.careers_info.careers[style.career]
-    career_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
+    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
     career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     career_frame.grid_rowconfigure(0, weight=1)
     career_photo = get_photo(career.path, (200, 40))
@@ -89,7 +90,7 @@ def show_style(scrollbar_frame_obj, style):
         career_photo, 240, 40, 20, 0, 0, 0)
 
     # 主动技能
-    active_skill_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="主动技能")
+    active_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="主动技能")
     active_skill_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
@@ -98,7 +99,7 @@ def show_style(scrollbar_frame_obj, style):
 
     # 主动技能列表
     for i, active_skill in enumerate(style.active_skills):
-        row_frame = tk.LabelFrame(active_skill_frame, text=active_skill.name, padx=5, pady=5)
+        row_frame = ttk.LabelFrame(active_skill_frame, text=active_skill.name)
         row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重
@@ -106,7 +107,7 @@ def show_style(scrollbar_frame_obj, style):
             row_frame.grid_columnconfigure(col_index, weight=1)
 
         # 描述 frame
-        desc_frame = tk.Frame(row_frame)
+        desc_frame = ttk.Frame(row_frame)
         desc_frame.grid(row=0, column=0, columnspan=4, sticky="nsew")
         desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 desc_frame 设置列权重 4:1:1
@@ -115,7 +116,7 @@ def show_style(scrollbar_frame_obj, style):
         desc_frame.grid_columnconfigure(2, weight=1, minsize=100)
 
         # 技能描述
-        desc_lab = tk.Label(desc_frame, text=active_skill.description, 
+        desc_lab = ttk.Label(desc_frame, text=active_skill.description, 
             justify="left", font=("Monospace", 10, "bold"))
         desc_lab.grid(row=0, column=0, sticky="nsw", padx=5, pady=0)
 
@@ -123,7 +124,7 @@ def show_style(scrollbar_frame_obj, style):
         text = ""
         for level_req in active_skill.level_reqs:
             text += "Lv" + level_req + " "
-        level_req_lab = tk.Label(desc_frame, text=text, 
+        level_req_lab = ttk.Label(desc_frame, text=text, 
             justify="left", font=("Monospace", 10, "bold"))
         level_req_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
 
@@ -132,7 +133,7 @@ def show_style(scrollbar_frame_obj, style):
             text = "SP" + active_skill.sp_cost + '\n' + active_skill.max_uses
         else:
             text = "SP" + active_skill.sp_cost + '\n' + "∞"
-        sp_use_lab = tk.Label(desc_frame, text=text, 
+        sp_use_lab = ttk.Label(desc_frame, text=text, 
             justify="right", font=("Monospace", 10, "bold"))
         sp_use_lab.grid(row=0, column=2, sticky="nse", padx=5, pady=5)
 
@@ -145,7 +146,7 @@ def show_style(scrollbar_frame_obj, style):
                 )
 
             # 技能效果 frame
-            effect_frame = tk.Frame(row_frame)
+            effect_frame = ttk.Frame(row_frame)
             effect_frame.grid(row=j+1, column=0, columnspan=4, sticky="nsew")
             effect_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
             # 为 effect_frame 设置列权重 1:6
@@ -199,12 +200,12 @@ def show_style(scrollbar_frame_obj, style):
                 if skill.destructive_multiplier:
                     text += "破坏倍率：" + skill.destructive_multiplier
 
-            desc_lab = tk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+            desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
             desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
 
     # 被动技能
-    passive_skill_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="天赋/被动技能")
+    passive_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="天赋/被动技能")
     passive_skill_frame.grid(row=2, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     passive_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 passive_skill_frame 的每一列权重
@@ -213,7 +214,7 @@ def show_style(scrollbar_frame_obj, style):
 
     for i, passive_skill in enumerate(style.passive_skills):
         # 使用 LabelFrame 作为每一行的容器
-        row_frame = tk.LabelFrame(passive_skill_frame, text="[Auto]"+passive_skill.name, padx=5, pady=5)
+        row_frame = ttk.LabelFrame(passive_skill_frame, text="[Auto]"+passive_skill.name)
         row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重
@@ -221,7 +222,7 @@ def show_style(scrollbar_frame_obj, style):
             row_frame.grid_columnconfigure(col_index, weight=1)
 
         # 描述 frame
-        desc_frame = tk.Frame(row_frame)
+        desc_frame = ttk.Frame(row_frame)
         desc_frame.grid(row=0, column=0, columnspan=4, sticky="nsew")
         desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 desc_frame 设置列权重 4:1
@@ -229,17 +230,17 @@ def show_style(scrollbar_frame_obj, style):
         desc_frame.grid_columnconfigure(1, weight=1)
 
         # 技能描述
-        desc_lab = tk.Label(desc_frame, text=passive_skill.description, 
+        desc_lab = ttk.Label(desc_frame, text=passive_skill.description, 
             justify="left", font=("Monospace", 10, "bold"))
         desc_lab.grid(row=0, column=0, sticky="nsw", padx=5, pady=5)
 
         # 突破数
-        lb_lab = tk.Label(desc_frame, text="LB"+passive_skill.LB, 
+        lb_lab = ttk.Label(desc_frame, text="LB"+passive_skill.LB, 
             justify="left", font=("Monospace", 10, "bold"))
         lb_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
 
         # 技能效果 frame
-        effect_frame = tk.Frame(row_frame)
+        effect_frame = ttk.Frame(row_frame)
         effect_frame.grid(row=1, column=0, columnspan=4, sticky="nsew")
         effect_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         # 为 effect_frame 设置列权重 1:6
@@ -253,13 +254,13 @@ def show_style(scrollbar_frame_obj, style):
 
         text = skill_effect_text(passive_skill)
 
-        effect_lab = tk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+        effect_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
         effect_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
 
     if style.growth_ability:
 
         # 宝珠强化
-        growth_ability_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="强化")
+        growth_ability_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="强化")
         growth_ability_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
         growth_ability_frame.grid_rowconfigure(0, weight=1)
         growth_ability_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
@@ -277,7 +278,7 @@ def show_style(scrollbar_frame_obj, style):
         hoju_canvas = create_canvas_with_image(growth_ability_frame, 
             hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
         text = style.growth_ability.description
-        growth_ability_lab = tk.Label(growth_ability_frame, text=text, 
+        growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
             justify="left", font=("Monospace", 10, "bold"))
         growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
         growth_status_row = 4
@@ -285,9 +286,9 @@ def show_style(scrollbar_frame_obj, style):
         growth_status_row = 3
 
     # 成长状态
-    growth_status_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="成长状态")
+    growth_status_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="成长状态")
     growth_status_frame.grid(row=growth_status_row, column=0, 
-        columnspan=4, padx=10, pady=5, sticky="nsew")
+        columnspan=4, padx=10, pady=(5,10), sticky="nsew")
     growth_status_frame.grid_rowconfigure(0, weight=1)
     growth_status_frame.grid_columnconfigure(0, weight=1)
     growth_status_frame.grid_columnconfigure(1, weight=1)
@@ -297,7 +298,7 @@ def show_style(scrollbar_frame_obj, style):
     text += "力量" + f"{style.status_growth['力量']}\n".rjust(10)
     text += "体力" + f"{style.status_growth['体力']}\n".rjust(10)
     text += "智慧" + f"{style.status_growth['智慧']}".rjust(9)
-    growth_status_lab = tk.Label(growth_status_frame, text=text, 
+    growth_status_lab = ttk.Label(growth_status_frame, text=text, 
         justify="right", font=("Monospace", 10, "bold"))
     growth_status_lab.grid(row=0, column=0, sticky="sw", padx=20, pady=5)
 
@@ -305,7 +306,7 @@ def show_style(scrollbar_frame_obj, style):
     text += "精神" + f"{style.status_growth['精神']}\n".rjust(10)
     text += "运气" + f"{style.status_growth['运气']}".rjust(9)
 
-    growth_status_lab1 = tk.Label(growth_status_frame, text=text, 
+    growth_status_lab1 = ttk.Label(growth_status_frame, text=text, 
         justify="right", font=("Monospace", 10, "bold"))
     growth_status_lab1.grid(row=0, column=1, sticky="sw", padx=20, pady=5)
 
@@ -375,7 +376,7 @@ def creat_style_skill_win(event, parent_frame, team, style):
 # 创建右键菜单
 def creat_style_right_menu(event, parent_frame, team, style):
     
-    right_click_menu = tk.Menu(parent_frame, tearoff=0)
+    right_click_menu = ttk.Menu(parent_frame, tearoff=0)
 
     right_click_menu.add_command(label="动画", 
         command=lambda: show_style_animation(parent_frame, team, style))
@@ -407,11 +408,11 @@ def show_style_animation(parent_frame, team, style):
                 return "break"
             del open_style_wins[open_style_win]
 
-        style_animation_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 772)
+        style_animation_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 768)
         set_window_icon(style_animation_win_frame, team.logo_path)
         open_style_wins[open_style_win] = style_animation_win_frame
 
-        player = VideoPlayerWithScrollbar(style_animation_win_frame, 1366, 772, animation_path)
+        player = VideoPlayerWithScrollbar(style_animation_win_frame, 1366, 768, animation_path)
 
         # 窗口关闭时清理
         style_animation_win_frame.protocol("WM_DELETE_WINDOW", 
@@ -434,11 +435,11 @@ def show_style_artwork(parent_frame, team, style):
                 return "break"
             del open_style_wins[open_style_win]
 
-        style_artwork_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 773)
+        style_artwork_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 769)
         set_window_icon(style_artwork_win_frame, team.logo_path)
         open_style_wins[open_style_win] = style_artwork_win_frame
 
-        displayer = ImageViewerWithScrollbar(style_artwork_win_frame, 1366, 773, artwork_path)
+        displayer = ImageViewerWithScrollbar(style_artwork_win_frame, 1366, 769, artwork_path)
 
         # 窗口关闭时清理
         style_artwork_win_frame.protocol("WM_DELETE_WINDOW", 

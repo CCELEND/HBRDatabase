@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -52,17 +54,17 @@ def creat_weapon_win(event, parent_frame, weapon):
     set_window_icon_webp(weapon_win_frame, weapon.path)
     open_weapon_wins[weapon.name] = weapon_win_frame
 
-    weapon_frame = tk.LabelFrame(weapon_win_frame, text=weapon.name)
+    weapon_frame = ttk.LabelFrame(weapon_win_frame, text=weapon.name)
     weapon_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 weapon_frame 的布局
     weapon_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     weapon_frame.grid_columnconfigure(0, weight=3)  # 描述列
     weapon_frame.grid_columnconfigure(1, weight=1)  # hit
 
-    desc_label = tk.Label(weapon_frame, text=weapon.description, justify="left")
+    desc_label = ttk.Label(weapon_frame, text=weapon.description, anchor="center")
     desc_label.grid(row=0, column=0, sticky="nsew")
 
-    hit_label = tk.Label(weapon_frame, text=weapon.hit, justify="left")
+    hit_label = ttk.Label(weapon_frame, text=weapon.hit, anchor="center")
     hit_label.grid(row=0, column=1, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
@@ -86,7 +88,7 @@ def show_weapon(scrollbar_frame_obj):
         weapon = 武器.weapons_info.weapons[weapon_name]
 
         # 武器
-        weapon_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=weapon_name)
+        weapon_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=weapon_name)
         bind_weapon_canvas(weapon_frame, weapon, 0, 0)
 
         # 计算行和列的位置

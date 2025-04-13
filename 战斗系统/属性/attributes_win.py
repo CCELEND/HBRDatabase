@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -52,13 +54,13 @@ def creat_attribute_win(event, parent_frame, attribute):
     set_window_icon_webp(attribute_win_frame, attribute.path)
     open_attribute_wins[attribute.name] = attribute_win_frame
 
-    attribute_frame = tk.LabelFrame(attribute_win_frame, text=attribute.name)
+    attribute_frame = ttk.LabelFrame(attribute_win_frame, text=attribute.name)
     attribute_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 attribute_frame 的布局
     attribute_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     attribute_frame.grid_columnconfigure(0, weight=1)  # 描述列
 
-    info_label = tk.Label(attribute_frame, text=attribute.description, justify="left")
+    info_label = ttk.Label(attribute_frame, text=attribute.description, anchor="center")
     info_label.grid(row=0, column=0, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
@@ -82,7 +84,7 @@ def show_attribute(scrollbar_frame_obj):
         attribute = 属性.attributes_info.attributes[attribute_name]
 
         # 属性
-        attribute_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=attribute_name)
+        attribute_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=attribute_name)
         bind_attribute_canvas(attribute_frame, attribute, 0, 0)
 
         # 计算行和列的位置

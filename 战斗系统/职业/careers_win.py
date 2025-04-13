@@ -1,6 +1,8 @@
 import sys
 import os
-import tkinter as tk
+# import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
@@ -52,13 +54,13 @@ def creat_career_win(event, parent_frame, career):
     set_window_icon_webp(career_win_frame, career.path)
     open_career_wins[career.name] = career_win_frame
 
-    career_frame = tk.LabelFrame(career_win_frame, text=career.name)
+    career_frame = ttk.LabelFrame(career_win_frame, text=career.name)
     career_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 career_frame 的布局
     career_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     career_frame.grid_columnconfigure(0, weight=1)  # 描述列
 
-    desc_label = tk.Label(career_frame, text=career.description, justify="left")
+    desc_label = ttk.Label(career_frame, text=career.description, anchor="center")
     desc_label.grid(row=0, column=0, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
@@ -82,7 +84,7 @@ def show_career(scrollbar_frame_obj):
         career = 职业.careers_info.careers[career_name]
 
         # 职业
-        career_frame = tk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=career_name)
+        career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=career_name)
         bind_career_canvas(career_frame, career, 0, 0)
 
         # 计算行和列的位置
