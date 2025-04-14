@@ -2,7 +2,7 @@
 
 ### python3.8 以上
 
-### opencv-python、Pillow、requests、pygame、ttkbootstrap
+### opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl
 
 运行 install_module.py 安装依赖模块
 
