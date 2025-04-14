@@ -58,17 +58,6 @@ def cut_text(event, text_widget):
     except ttk.TclError:
         pass
 
-# 右键菜单
-def show_context_menu(event, text_widget):
-    # 创建上下文菜单
-    context_menu = Menu(text_widget, tearoff=0)
-    context_menu.add_command(label="复制", command=lambda e=event: copy_text(e, text_widget))
-    context_menu.add_command(label="粘贴", command=lambda e=event: paste_text(e, text_widget))
-    context_menu.add_command(label="剪切", command=lambda e=event: cut_text(e, text_widget))
-    # 在鼠标右键点击的位置显示菜单
-    context_menu.tk_popup(event.x_ct_win_frame, event.y_ct_win_frame)
-    context_menu.grab_release()
-
 def clear_entries():
     index_wash_entries.clear()
     index_equipments.clear()
