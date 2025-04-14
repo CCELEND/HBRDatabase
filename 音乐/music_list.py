@@ -29,6 +29,7 @@ except:
     import ttkbootstrap as ttk
     from ttkbootstrap.constants import *
 
+
 class ExpandableList:
     def __init__(self, parent_frame, categories, row, column):
         # 创建主框架
@@ -76,6 +77,10 @@ class ExpandableList:
         # 初始化数据
         self.add_categories(categories)
 
+        # 当前选中项和父节点
+        self.currently_selected_item = None
+        self.currently_selected_parent = None
+
     def add_categories(self, categories):
         for category, items in categories.items():
             parent = self.tree.insert("", "end",
@@ -87,10 +92,19 @@ class ExpandableList:
                                  text=item,
                                  tags=('item', f'item-{idx}'))
         self.tree.tag_configure('category', font=('微软雅黑', 10, 'bold'))  # 分类加粗
+        self.tree.tag_configure('selected', background='#99C771', foreground='black')  # 子项选中样式
+        self.tree.tag_configure('parent-selected', background='#9BCD34', foreground='black')  # 父节点选中样式
 
     def on_double_click(self, event):
         item = self.tree.selection()[0]
-        global currently_selected
+
+        # 清除之前的选中项高亮
+        if self.currently_selected_item:
+            self.tree.item(self.currently_selected_item, tags=('item',))  # 移除子节点选中样式
+
+        # 清除之前的父节点高亮
+        if self.currently_selected_parent:
+            self.tree.item(self.currently_selected_parent, tags=('category',))  # 恢复父节点默认样式
 
         # 节点类型判断（通过tags识别）
         if 'category' in self.tree.item(item, 'tags'):
@@ -102,7 +116,7 @@ class ExpandableList:
         else:
             # 处理文件选择
             file_name = self.tree.item(item, "text")
-            if file_name == currently_selected:
+            if file_name == self.currently_selected_item:
                 return
 
             parent_item = self.tree.parent(item)
@@ -112,16 +126,16 @@ class ExpandableList:
                     album_name, disc_name = parent_text.split(maxsplit=1)
                     all_album_name = music_player.music_dir[album_name]
 
-                    currently_selected = file_name
-                    music_handle(all_album_name, disc_name, file_name)
+                    # 更新当前选中项
+                    self.currently_selected_item = item
+                    self.tree.item(item, tags=('item', 'selected'))  # 添加子节点选中样式
 
-                    # 选中效果增强（闪烁提示）
-                    self.tree.selection_set(item)
-                    self.tree.after(200, lambda: self.tree.selection_remove(item))
-                    self.tree.after(400, lambda: self.tree.selection_set(item))
+                    # 更新当前父节点
+                    self.currently_selected_parent = parent_item
+                    self.tree.item(parent_item, tags=('category', 'parent-selected'))  # 添加父节点选中样式
+
+                    music_handle(all_album_name, disc_name, file_name)
                 except Exception as e:
                     print(f"节点解析错误: {str(e)}")
             else:
                 print(f"未找到父节点: {file_name}")
-
-
