@@ -58,6 +58,9 @@ from http_update_processing import http_update_data
 sys.path.append(os.path.abspath("./音乐"))
 from music_win import creat_music_win
 
+sys.path.append(os.path.abspath("./工具"))
+from GetEntriesGUILocal.get_entries_win import creat_ct_win
+
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
 
@@ -169,6 +172,11 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 音乐菜单
     menu_bar.add_command(label="🎧音乐", 
         command=lambda: creat_music_win())
+
+    # 工具菜单
+    tool_menu = ttk.Menu(menu_bar, tearoff=0)
+    create_menu_item(tool_menu, "词条获取", creat_ct_win)
+    menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
     # 更新数据菜单
     menu_bar.add_command(label="📲更新", 
