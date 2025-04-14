@@ -4,14 +4,28 @@
         "path":"./持有物/芯片/SeraphArtifactChip1.webp",
         "description":"提升 DP攻击能力\n灵巧 +9",
         "price":"", 
-        "location":"探险（主线剧情 第四章 下篇 day5\n主线剧情 第五章 上篇）",
+        "location":"探险（主线剧情 第四章 下篇 day5\n主线剧情 第五章 上篇 day7）",
         "rarity":"5"
     },
     "人工芯片（力量）":{
         "path":"./持有物/芯片/SeraphArtifactChip1.webp",
         "description":"提升 HP攻击能力\n力量 +9",
         "price":"", 
-        "location":"探险（主线剧情 第四章 下篇 day3\n主线剧情 第五章 上篇）",
+        "location":"探险（主线剧情 第四章 下篇 day3\n主线剧情 第五章 上篇 day14）",
+        "rarity":"5"
+    },
+    "人工芯片（智慧）":{
+        "path":"./持有物/芯片/SeraphArtifactChip1.webp",
+        "description":"提升 回复能力\n智慧 +9",
+        "price":"", 
+        "location":"探险（主线剧情 第五章 上篇\nday2、day7、day12）",
+        "rarity":"5"
+    },
+    "人工芯片（体力）":{
+        "path":"./持有物/芯片/SeraphArtifactChip1.webp",
+        "description":"提升 体力能力\n体力 +9",
+        "price":"", 
+        "location":"探险（主线剧情 第五章 上篇\nday5、day10、day14）",
         "rarity":"5"
     },
 
