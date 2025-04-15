@@ -280,7 +280,7 @@ def show_style(scrollbar_frame_obj, style):
         text = style.growth_ability.description
         growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
             justify="left", font=("Monospace", 10, "bold"))
-        growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
+        growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
         growth_status_row = 4
     else:
         growth_status_row = 3
