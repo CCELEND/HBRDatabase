@@ -127,7 +127,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 获取全部队伍对象
     get_all_team_obj()
 
-    search_win_frame = creat_Toplevel(parent_frame, "搜索")
+    search_win_frame = creat_Toplevel("搜索", 715, 485)
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
@@ -217,6 +217,9 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
             key_word_text, selected_values_dir))
     search_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
 
+
+    search_win_frame.maxsize(715, 485)
+    search_win_frame.minsize(715, 485)
 
     open_search_wins["搜索"] = search_win_frame
     # 绑定鼠标点击事件到父窗口，点击置顶

@@ -56,9 +56,9 @@ def creat_gqboss_win(event, parent_frame, gqboss):
         del open_gqboss_wins[gqboss.name]
 
     if "攻略" in gqboss.name:
-        gqboss_win_frame = creat_Toplevel(parent_frame, gqboss.name, 600, 840, 440, 50)
+        gqboss_win_frame = creat_Toplevel(gqboss.name, 600, 840, 440, 50)
     else:
-        gqboss_win_frame = creat_Toplevel(parent_frame, gqboss.name, 600, 840, 440, 50)
+        gqboss_win_frame = creat_Toplevel(gqboss.name, 600, 840, 440, 50)
     set_window_icon(gqboss_win_frame, gqboss.logo_path)
     open_gqboss_wins[gqboss.name] = gqboss_win_frame
 

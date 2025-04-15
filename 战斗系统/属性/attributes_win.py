@@ -46,7 +46,7 @@ def creat_attribute_win(event, parent_frame, attribute):
         del open_attribute_wins[attribute.name]
 
 
-    attribute_win_frame = creat_Toplevel(parent_frame, attribute.name, 540, 200, 440, 50)
+    attribute_win_frame = creat_Toplevel(attribute.name, 540, 200, 440, 50)
     # 配置 attribute_win_frame 的布局
     attribute_win_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     attribute_win_frame.grid_columnconfigure(0, weight=1)  # 列

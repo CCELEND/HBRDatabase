@@ -21,32 +21,22 @@ def creat_window(title,
     wide=None, high=None, x=None, y=None):
     new_window = ttk.Window(title=title, size=(wide, high), position=(x,y))
 
-    # new_window = tk.Tk()
-    # new_window.title(title)
-    # # 设置新窗口的大小
-    # if wide and high:
-    #     if x and y:
-    #         new_window.geometry(f"{wide}x{high}+{x}+{y}")  
-    #     else:
-    #         new_window.geometry(f"{wide}x{high}")
-
     return new_window   
 
 # 创建一个新窗口 子窗口
-def creat_Toplevel(parent_frame, title, 
+def creat_Toplevel(title, 
     wide=None, high=None, x=None, y=None):
 
-    new_window = tk.Toplevel(parent_frame)
-    new_window.title(title)
     # 设置新窗口的大小
     if wide and high:
         if x and y:
-            new_window.geometry(f"{wide}x{high}+{x}+{y}")  
+            new_window = ttk.Toplevel(title=title, size=(wide, high), position=(x,y))
         else:
-            new_window.geometry(f"{wide}x{high}")
+            new_window = ttk.Toplevel(title=title, size=(wide, high))
+    else:
+        new_window = ttk.Toplevel(title=title)
 
     return new_window
-
 
 # 配置窗口的行和列的伸展
 def set_window_expand(frame, rowspan=1, columnspan=1):

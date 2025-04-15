@@ -64,9 +64,9 @@ def creat_gftz_win(event, parent_frame, gftz):
         del open_gftz_wins[gftz.name]
 
     if "攻略" in gftz.name:
-        gftz_win_frame = creat_Toplevel(parent_frame, gftz.name, 600, 840, 440, 50)
+        gftz_win_frame = creat_Toplevel(gftz.name, 600, 840, 440, 50)
     else:
-        gftz_win_frame = creat_Toplevel(parent_frame, gftz.name, 1280, 720, 440, 50)
+        gftz_win_frame = creat_Toplevel(gftz.name, 1280, 720, 440, 50)
     set_window_icon(gftz_win_frame, gftz.logo_path)
     open_gftz_wins[gftz.name] = gftz_win_frame
 

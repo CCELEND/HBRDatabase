@@ -123,7 +123,7 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
 
     jewelrys = get_jewelrys_obj(jewelry_type_json)
 
-    jewelry_win_frame = creat_Toplevel(parent_frame, jewelry_win_name, 1040, 800, 440, 50)
+    jewelry_win_frame = creat_Toplevel(jewelry_win_name, 1040, 800, 440, 50)
     # 配置 jewelry_win_frame 的布局
     logo_path = jewelry_type_json['logo_path']
     set_window_icon(jewelry_win_frame, logo_path)

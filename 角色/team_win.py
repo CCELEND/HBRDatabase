@@ -24,7 +24,7 @@ def creat_role_right_menu(event, parent_frame, role, team):
 
 # 显示全身画
 def show_role_full_img(parent_frame, role, team):
-    role_full_img_frame = creat_Toplevel(parent_frame, role.name)
+    role_full_img_frame = creat_Toplevel(role.name)
     set_window_icon(role_full_img_frame, team.logo_path)
 
     role_full_path = role.img_path.replace("Profile", "")
@@ -34,7 +34,7 @@ def show_role_full_img(parent_frame, role, team):
 
 # 显示缩略图
 def show_role_img(event, parent_frame, role, team):
-    role_img_frame = creat_Toplevel(parent_frame, role.name, 444, 508, 600, 200)
+    role_img_frame = creat_Toplevel(role.name, 444, 508, 600, 200)
     set_window_icon(role_img_frame, team.logo_path)
 
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
@@ -159,7 +159,7 @@ def creat_team_win(parent_frame, team_name):
     # 通过队伍名获取队伍对象
     team = get_team_obj(team_name)
 
-    team_win_frame = creat_Toplevel(parent_frame, team_name, 1130, 880, 440, 50)
+    team_win_frame = creat_Toplevel(team_name, 1130, 880, 440, 50)
     set_window_icon(team_win_frame, team.logo_path)
     set_window_expand(team_win_frame, rowspan=1, columnspan=2)
     scrollbar_frame_obj = ScrollbarFrameWin(team_win_frame, columnspan=2)

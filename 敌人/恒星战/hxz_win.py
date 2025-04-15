@@ -46,9 +46,9 @@ def creat_hxz_win(event, parent_frame, hxz):
         del open_hxz_wins[hxz.name]
 
     if "攻略" in hxz.name:
-        hxz_win_frame = creat_Toplevel(parent_frame, hxz.name, 600, 840, 440, 50)
+        hxz_win_frame = creat_Toplevel(hxz.name, 600, 840, 440, 50)
     else:
-        hxz_win_frame = creat_Toplevel(parent_frame, hxz.name, 1280, 720, 440, 50)
+        hxz_win_frame = creat_Toplevel(hxz.name, 1280, 720, 440, 50)
     set_window_icon(hxz_win_frame, hxz.logo_path)
     open_hxz_wins[hxz.name] = hxz_win_frame
 

@@ -56,7 +56,7 @@ def creat_zx_win(event, parent_frame, zx):
         del open_zx_wins[zx.name]
 
 
-    zx_win_frame = creat_Toplevel(parent_frame, zx.name, 600, 840, 440, 50)
+    zx_win_frame = creat_Toplevel(zx.name, 600, 840, 440, 50)
     set_window_icon(zx_win_frame, zx.logo_path)
     open_zx_wins[zx.name] = zx_win_frame
 

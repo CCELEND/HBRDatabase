@@ -8,7 +8,7 @@ import math
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity, set_global_bg
+from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top, set_bg_opacity, set_global_bg
 from window import copy_text, paste_text, cut_text, show_context_menu, clear_text, edit_text
 
 maximum_damage_limit_text = None
@@ -94,13 +94,11 @@ def creat_dsc_win():
 	if '伤害分计算' in open_dsc_wins:
 		# 判断窗口是否存在
 		if open_dsc_wins['伤害分计算'].winfo_exists():
-			et_window_top(open_dsc_wins['伤害分计算'])
+			set_window_top(open_dsc_wins['伤害分计算'])
 			return "break"
 		del open_dsc_wins['伤害分计算']
 
-	dsc_win_frame = ttk.Toplevel()
-	dsc_win_frame.title("伤害分计算")
-	dsc_win_frame.geometry("550x400")
+	dsc_win_frame = creat_Toplevel("伤害分计算", 550, 400)
 	set_window_icon(dsc_win_frame, "./工具/DamageScoreCal/dsc.ico")
 
 	# 配置主窗口的列和行的伸展
@@ -179,7 +177,7 @@ def creat_dsc_win():
 		command=lambda: clear_text(input_text, maximum_damage_limit_text, output_text))
 	clear_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
-	open_dsc_wins['词条获取'] = dsc_win_frame
+	open_dsc_wins['伤害分计算'] = dsc_win_frame
 	# 绑定鼠标点击事件到父窗口，点击置顶
 	dsc_win_frame.bind("<Button-1>", lambda event: set_window_top(dsc_win_frame))
 	# 窗口关闭时清理

@@ -25,7 +25,7 @@ def creat_about_win(parent_frame):
         set_window_top(open_about_wins["关于 HBRDatabase"])
         return
 
-    about_win_frame = creat_Toplevel(parent_frame, "关于 HBRDatabase", 730, 540)
+    about_win_frame = creat_Toplevel("关于 HBRDatabase", 730, 540)
     set_window_icon(about_win_frame, "./关于/KamiSama.ico")
     set_window_expand(about_win_frame, rowspan=3, columnspan=2)
 

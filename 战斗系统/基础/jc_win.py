@@ -32,7 +32,7 @@ def creat_jc_win(parent_frame):
             return "break"
         del open_jc_wins['基础']
 
-    jc_win_frame = creat_Toplevel(parent_frame, '基础', 600, 840, 440, 50)
+    jc_win_frame = creat_Toplevel('基础', 600, 840, 440, 50)
     set_window_icon(jc_win_frame, jc_logo_path)
     open_jc_wins['基础'] = jc_win_frame
 

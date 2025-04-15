@@ -19,7 +19,7 @@ import datetime
 import threading
 from collections import OrderedDict
 
-from window import set_window_expand, set_window_icon, show_context_menu, set_window_top
+from window import set_window_expand, set_window_icon, show_context_menu, set_window_top, creat_Toplevel
 from 工具.GetEntriesGUILocal.proc import parallel_process_indexes
 
 index_wash_entries = {}
@@ -310,9 +310,7 @@ def creat_ct_win():
             return "break"
         del open_ct_wins['词条获取']
 
-    ct_win_frame = ttk.Toplevel()
-    ct_win_frame.title("词条获取")
-    ct_win_frame.geometry("700x405")
+    ct_win_frame = creat_Toplevel("词条获取", 700, 405)
     set_window_icon(ct_win_frame, "./工具/GetEntriesGUILocal/entries.ico")
 
     # 配置主窗口的列和行的伸展

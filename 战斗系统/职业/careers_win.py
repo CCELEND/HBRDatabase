@@ -46,7 +46,7 @@ def creat_career_win(event, parent_frame, career):
         del open_career_wins[career.name]
 
 
-    career_win_frame = creat_Toplevel(parent_frame, career.name, 540, 200, 440, 50)
+    career_win_frame = creat_Toplevel(career.name, 540, 200, 440, 50)
     # 配置 career_win_frame 的布局
     career_win_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     career_win_frame.grid_columnconfigure(0, weight=1)  # 列

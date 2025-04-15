@@ -47,7 +47,7 @@ def creat_statu_win(event, parent_frame, statu):
         del open_statu_wins[statu.name]
 
 
-    statu_win_frame = creat_Toplevel(parent_frame, statu.name, 540, 200, 440, 50)
+    statu_win_frame = creat_Toplevel(statu.name, 540, 200, 440, 50)
     # 配置 statu_win_frame 的布局
     statu_win_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     statu_win_frame.grid_columnconfigure(0, weight=1)  # 列

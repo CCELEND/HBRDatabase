@@ -52,7 +52,7 @@ def creat_ysc_enemy_win(event, parent_frame, ysc):
             return "break"
         del open_ysc_wins[ysc.name]
         
-    ysc_win_frame = creat_Toplevel(parent_frame, ysc.name, 600, 840, 440, 50)
+    ysc_win_frame = creat_Toplevel(ysc.name, 600, 840, 440, 50)
     set_window_icon(ysc_win_frame, ysc.logo_path)
     open_ysc_wins[ysc.name] = ysc_win_frame
 

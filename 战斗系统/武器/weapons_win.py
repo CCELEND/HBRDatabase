@@ -46,7 +46,7 @@ def creat_weapon_win(event, parent_frame, weapon):
         del open_weapon_wins[weapon.name]
 
 
-    weapon_win_frame = creat_Toplevel(parent_frame, weapon.name, 540, 200, 440, 50)
+    weapon_win_frame = creat_Toplevel(weapon.name, 540, 200, 440, 50)
     # 配置 weapon_win_frame 的布局
     weapon_win_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     weapon_win_frame.grid_columnconfigure(0, weight=1)  # 列

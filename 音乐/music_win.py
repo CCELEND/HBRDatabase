@@ -3,12 +3,11 @@ import sys
 import os
 import tkinter as tk
 
-import tkinter as tk
 from tkinter import scrolledtext, Menu, messagebox
 from tkinter import ttk
 
 from canvas_events import get_photo, create_canvas_with_image
-from window import set_window_expand, set_window_icon, show_context_menu, set_window_top
+from window import set_window_expand, set_window_icon, show_context_menu, set_window_top, creat_Toplevel
 from tools import load_json
 
 from music_list import ExpandableList
@@ -36,9 +35,7 @@ def creat_music_win():
             return "break"
         del open_music_wins["音乐"]
 
-    music_win_frame = tk.Toplevel()
-    music_win_frame.title("音乐")
-    music_win_frame.geometry("850x575")
+    music_win_frame = creat_Toplevel("音乐", 850, 575)
     set_window_icon(music_win_frame, "./音乐/Sound.ico")
 
     music_win_frame.grid_rowconfigure(0, weight=1)

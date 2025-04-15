@@ -357,7 +357,7 @@ def creat_style_skill_win(event, parent_frame, team, style):
             return "break"
         del open_style_wins[open_style_win]
 
-    style_win_frame = creat_Toplevel(parent_frame, open_style_win, 812, 880, 440, 50) #780
+    style_win_frame = creat_Toplevel(open_style_win, 812, 880, 440, 50) #780
     set_window_icon(style_win_frame, team.logo_path)
     set_window_expand(style_win_frame, rowspan=1, columnspan=2)
     scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2)
@@ -408,7 +408,7 @@ def show_style_animation(parent_frame, team, style):
                 return "break"
             del open_style_wins[open_style_win]
 
-        style_animation_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 768)
+        style_animation_win_frame = creat_Toplevel(open_style_win, 1366, 768)
         set_window_icon(style_animation_win_frame, team.logo_path)
         open_style_wins[open_style_win] = style_animation_win_frame
 
@@ -435,7 +435,7 @@ def show_style_artwork(parent_frame, team, style):
                 return "break"
             del open_style_wins[open_style_win]
 
-        style_artwork_win_frame = creat_Toplevel(parent_frame, open_style_win, 1366, 769)
+        style_artwork_win_frame = creat_Toplevel(open_style_win, 1366, 769)
         set_window_icon(style_artwork_win_frame, team.logo_path)
         open_style_wins[open_style_win] = style_artwork_win_frame
 
@@ -466,7 +466,7 @@ def show_style_artwork_3d(parent_frame, team, style):
                 return "break"
             del open_style_wins[open_style_win]
 
-        style_artwork_3d_win_frame = creat_Toplevel(parent_frame, open_style_win)
+        style_artwork_3d_win_frame = creat_Toplevel(open_style_win)
         set_window_icon(style_artwork_3d_win_frame, team.logo_path)
         open_style_wins[open_style_win] = style_artwork_3d_win_frame
 
