@@ -39,12 +39,11 @@ def filter_judge(filter_dict, keyword_list, role, style):
        (not filter_dict.get('稀有度') or style.rarity in filter_dict['稀有度']) and \
        (not filter_dict.get('职能') or style.career in filter_dict['职能']) and \
        (not filter_dict.get('武器属性') or style.weapon_attribute in filter_dict['武器属性']) and \
-       (not filter_dict.get('元素属性') or element_attribute in filter_dict['元素属性']):
+       (not filter_dict.get('元素属性') or is_parentstring(element_attribute, filter_dict['元素属性'])):
 
         if not keyword_list or list_val_in_another(role.nicknames, keyword_list):
             return True
 
-        # if not keyword_list or list_val_in_another(keyword_list, style.nicknames):
         if not keyword_list or list_val_in_another(style.nicknames, keyword_list):
             return True
 

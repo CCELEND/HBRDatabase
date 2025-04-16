@@ -268,19 +268,42 @@ def show_style(scrollbar_frame_obj, style):
 
         # 判断元素属性
         if style.element_attribute:
-            hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
-                f"宝珠（{style.element_attribute}属性）"]['path']
+            if len(style.element_attribute) == 1:
+                hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+                    f"宝珠（{style.element_attribute}属性）"]['path']
+            else:
+                hoju_img_path0 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+                    f"宝珠（{style.element_attribute[0]}属性）"]['path']
+                hoju_img_path1 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+                    f"宝珠（{style.element_attribute[1]}属性）"]['path']
         else:
             hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
                 f"宝珠（{style.weapon_attribute}属性）"]['path']
 
-        hoju_photo = get_photo(hoju_img_path, (66, 66))
-        hoju_canvas = create_canvas_with_image(growth_ability_frame, 
-            hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
-        text = style.growth_ability.description
-        growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
-            justify="left", font=("Monospace", 10, "bold"))
-        growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
+        if len(style.element_attribute) == 2:
+            growth_ability_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 图片列
+            growth_ability_frame.grid_columnconfigure(2, weight=5, minsize=500)  # 描述列
+
+            hoju_photo0 = get_photo(hoju_img_path0, (66, 66))
+            hoju_canvas0 = create_canvas_with_image(growth_ability_frame, 
+                hoju_photo0, 66, 66, 0, 0, 0, 0, padx=20)
+            hoju_photo1 = get_photo(hoju_img_path1, (66, 66))
+            hoju_canvas1 = create_canvas_with_image(growth_ability_frame, 
+                hoju_photo1, 66, 66, 0, 0, 0, 1, padx=20)
+
+            text = style.growth_ability.description
+            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
+                justify="left", font=("Monospace", 10, "bold"))
+            growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=5, pady=5)
+        else:
+            hoju_photo = get_photo(hoju_img_path, (66, 66))
+            hoju_canvas = create_canvas_with_image(growth_ability_frame, 
+                hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
+            text = style.growth_ability.description
+            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
+                justify="left", font=("Monospace", 10, "bold"))
+            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
+
         growth_status_row = 4
     else:
         growth_status_row = 3
