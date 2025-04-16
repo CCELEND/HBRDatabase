@@ -22,10 +22,30 @@ def creat_role_right_menu(event, parent_frame, role, team):
     
     right_click_menu.post(event.x_root, event.y_root)
 
+
+# 已打开的角色窗口字典，键：角色名，值：窗口句柄
+open_role_wins = {}
+#关闭窗口时，清除角色窗口字典中的句柄，并销毁窗口
+def role_win_closing(parent_frame):
+
+    open_role_win = parent_frame.title()
+    while open_role_win in open_role_wins:
+        del open_role_wins[open_role_win]
+
+    parent_frame.destroy()  # 销毁窗口
+
 # 显示全身画
 def show_role_full_img(parent_frame, role, team):
-    role_full_img_frame = creat_Toplevel(role.name)
+
+    open_role_win = role.name+"-full"
+    # 重复打开时，窗口置顶并直接返回
+    if open_role_win in open_role_wins:
+        set_window_top(open_role_wins[open_role_win])
+        return "break"
+
+    role_full_img_frame = creat_Toplevel(open_role_win)
     set_window_icon(role_full_img_frame, team.logo_path)
+    open_role_wins[open_role_win] = role_full_img_frame
 
     role_full_path = role.img_path.replace("Profile", "")
     displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840)
@@ -34,8 +54,16 @@ def show_role_full_img(parent_frame, role, team):
 
 # 显示缩略图
 def show_role_img(event, parent_frame, role, team):
-    role_img_frame = creat_Toplevel(role.name, 444, 508, 600, 200)
+
+    open_role_win = role.name
+    # 重复打开时，窗口置顶并直接返回
+    if open_role_win in open_role_wins:
+        set_window_top(open_role_wins[open_role_win])
+        return "break"
+
+    role_img_frame = creat_Toplevel(open_role_win, 444, 508, 600, 200)
     set_window_icon(role_img_frame, team.logo_path)
+    open_role_wins[open_role_win] = role_img_frame
 
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
 
