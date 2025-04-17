@@ -134,10 +134,8 @@ class FLACPlayerApp:
             pygame.mixer.music.load(file_path)
             self.current_file = file_path
             self.file_label.config(text=os.path.basename(file_path))
-            self.play_btn.config(state=ttk.NORMAL)
-            # self.pause_btn.config(state=ttk.NORMAL)
-            # self.stop_btn.config(state=ttk.NORMAL)
-            self.loop_btn.config(state=ttk.NORMAL)
+            # self.play_btn.config(state=ttk.NORMAL)
+            # self.loop_btn.config(state=ttk.NORMAL)
 
             # 获取音频长度
             sound = pygame.mixer.Sound(file_path)
@@ -147,8 +145,12 @@ class FLACPlayerApp:
             self.position_selected = False
 
             # 重置进度条和时间
-            self.update_time_display(0, self.duration)
-            self.update_progress_display(0)
+            self.frame.after(0, lambda: (
+                self.update_progress_display(0),
+                self.update_time_display(0, self.duration),
+                self.play_btn.config(state=ttk.NORMAL),
+                self.loop_btn.config(state=ttk.NORMAL)
+            ))
 
             self.frame.update_idletasks()  # 强制更新UI
 
