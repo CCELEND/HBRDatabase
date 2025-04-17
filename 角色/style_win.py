@@ -30,6 +30,18 @@ def get_strength_min_max(strength):
     strength_min_max = strength.replace(',', '').split(' ~ ')
     return strength_min_max
 
+# [] 返回不同等级技能强度最大值 最小值 列表形式 [min, max]
+def get_lv_strength_min_max(strength_min_max, lv):
+    strength_min_base = float(strength_min_max[0])
+    strength_max_base = float(strength_min_max[1])
+
+    step_len_min = strength_min_base / 20
+    step_len_max = strength_min_base / 10
+    lv_strength_min = int(step_len_min * (lv - 1) + strength_min_base)
+    lv_strength_max = int(step_len_max * (lv - 1) + strength_max_base)
+    return [lv_strength_min, lv_strength_max]
+
+
 # 技能 hit 伤害分布：0.1×2，0.25×2，0.3×1
 def get_hit_damage_str(hit_damage):
     # 统计每个数值出现的次数
@@ -280,7 +292,15 @@ def show_style(scrollbar_frame_obj, style):
             hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
                 f"宝珠（{style.weapon_attribute}属性）"]['path']
 
-        if len(style.element_attribute) == 2:
+        if not style.element_attribute or len(style.element_attribute) == 1:
+            hoju_photo = get_photo(hoju_img_path, (66, 66))
+            hoju_canvas = create_canvas_with_image(growth_ability_frame, 
+                hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
+            text = style.growth_ability.description
+            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
+                justify="left", font=("Monospace", 10, "bold"))
+            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
+        else:
             growth_ability_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 图片列
             growth_ability_frame.grid_columnconfigure(2, weight=5, minsize=500)  # 描述列
 
@@ -295,14 +315,6 @@ def show_style(scrollbar_frame_obj, style):
             growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
                 justify="left", font=("Monospace", 10, "bold"))
             growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=5, pady=5)
-        else:
-            hoju_photo = get_photo(hoju_img_path, (66, 66))
-            hoju_canvas = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
-            text = style.growth_ability.description
-            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
-                justify="left", font=("Monospace", 10, "bold"))
-            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
 
         growth_status_row = 4
     else:
