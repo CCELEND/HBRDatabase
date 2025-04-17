@@ -18,6 +18,7 @@ music_dir = {
     "Love_Song_from_the_Water":"Love_Song_from_the_Water",
     "麻枝准_やなぎなぎ":"麻枝准_やなぎなぎ",
     "She_is_Legend":"She_is_Legend",
+    "Inst_Test_Examples":"Inst_Test_Examples"
 }
 
 
