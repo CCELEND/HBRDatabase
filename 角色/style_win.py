@@ -26,33 +26,24 @@ def load_resources():
     状态.status_info.get_all_statu_obj()
     属性.attributes_info.get_all_attribute_obj()
 
-
 def extract_skill_numbers(text):
-    # 1. 提取 "技能强度：" 和 "，属性倍率" 之间的内容
-    strength_match = re.search(r"技能强度：(.*?)，属性倍率", text)
-    if not strength_match:
-        return []
-    
-    # 2. 提取所有数字并转为整数
-    numbers = [
-        int(num.replace(",", ""))
-        for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_match.group(1))
-    ]
-    return numbers
+    # 添加 re.DOTALL 以匹配换行符
+    strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
+    # 提取所有数字并转为整数
+    return [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
+
 def write_numbers_back(text, modified_numbers):
-    # 分割原字符串
-    parts = re.split(r"(技能强度：.*?，属性倍率)", text)
+    # 使用 re.DOTALL 分割原字符串
+    parts = re.split(r"(技能强度：.*?，属性倍率)", text, flags=re.DOTALL)
     
-    # 替换数字部分
     strength_text = parts[1]
     numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
     
-    # 用新数字替换旧数字（保留原始格式的逗号）
+    # 替换数字（保留原始格式的逗号）
     for i, num in enumerate(numbers_with_commas):
-        new_num = "{:,}".format(modified_numbers[i])  # 添加千位分隔符
+        new_num = "{:,}".format(modified_numbers[i]) # 添加千位分隔符
         strength_text = strength_text.replace(num, new_num, 1)  # 只替换第一次出现
     
-    # 重新组合字符串
     parts[1] = strength_text
     return "".join(parts)
 
