@@ -15,6 +15,7 @@ def set_global_bg(parent_frame, bg="#f0f0f0"):
     colors.bg = bg  # 修改主题的全局背景色
     colors.selectfg = bg
     colors.inputbg = bg
+    colors.light = bg
 
 # 创建一个新窗口 主窗口
 def creat_window(title, 

@@ -3,12 +3,14 @@ import os
 from PIL import Image, ImageTk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+from functools import partial
+import re
 
 from canvas_events import get_photo, create_canvas_with_image, VideoPlayer, ArtworkDisplayer, ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import load_json, output_string, is_parentstring
+from tools import load_json, output_string, is_parentstring, int_to_comma_str
 
 from style_info import SkillEffect
 
@@ -25,10 +27,39 @@ def load_resources():
     属性.attributes_info.get_all_attribute_obj()
 
 
+def extract_skill_numbers(text):
+    # 1. 提取 "技能强度：" 和 "，属性倍率" 之间的内容
+    strength_match = re.search(r"技能强度：(.*?)，属性倍率", text)
+    if not strength_match:
+        return []
+    
+    # 2. 提取所有数字并转为整数
+    numbers = [
+        int(num.replace(",", ""))
+        for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_match.group(1))
+    ]
+    return numbers
+def write_numbers_back(text, modified_numbers):
+    # 分割原字符串
+    parts = re.split(r"(技能强度：.*?，属性倍率)", text)
+    
+    # 替换数字部分
+    strength_text = parts[1]
+    numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
+    
+    # 用新数字替换旧数字（保留原始格式的逗号）
+    for i, num in enumerate(numbers_with_commas):
+        new_num = "{:,}".format(modified_numbers[i])  # 添加千位分隔符
+        strength_text = strength_text.replace(num, new_num, 1)  # 只替换第一次出现
+    
+    # 重新组合字符串
+    parts[1] = strength_text
+    return "".join(parts)
+
 # [] 返回技能强度最大值 最小值 列表形式 [min, max]
 def get_strength_min_max(strength):
-    strength_min_max = strength.replace(',', '').split(' ~ ')
-    return strength_min_max
+    strength_min_max_str = strength.replace(',', '').split(' ~ ')
+    return [int(strength_min_max[0]), int(strength_min_max[1])]
 
 # [] 返回不同等级技能强度最大值 最小值 列表形式 [min, max]
 def get_lv_strength_min_max(strength_min_max, lv):
@@ -87,6 +118,25 @@ def skill_effect_text(skill):
 
     return text
 
+# 绑定事件：当选项改变时触发，优先使用 event.widget 获取事件来源的控件
+def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
+    # last_text = desc_lab["text"]
+    lv_select = event.widget.get()
+    lv = int(lv_select.replace("Skill Lv.",""))
+
+    original_numbers = extract_skill_numbers(lv1_skill_strength)
+    if len(original_numbers) == 2:
+        new_original_numbers = get_lv_strength_min_max(original_numbers, lv)
+        new_text = write_numbers_back(lv1_skill_strength, new_original_numbers)
+    else:
+        new_original_numbers0 = get_lv_strength_min_max(original_numbers[:2], lv)
+        new_original_numbers1 = get_lv_strength_min_max(original_numbers[2:], lv)
+        new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1)
+
+    # desc_lab.config(text=lv)
+    desc_lab["text"] = new_text
+    # print(new_text)
+
 def show_style(scrollbar_frame_obj, style):
 
     # 清除之前的组件
@@ -100,6 +150,17 @@ def show_style(scrollbar_frame_obj, style):
     career_photo = get_photo(career.path, (200, 40))
     career_canvas = create_canvas_with_image(career_frame, 
         career_photo, 240, 40, 20, 0, 0, 0)
+
+    skill_options = ["Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill Lv.5", "Skill Lv.6", "Skill Lv.7", "Skill Lv.8", "Skill Lv.9", "Skill Lv.10"]
+    attack_combos = {}
+    # 创建自定义样式
+    style_tc = ttk.Style()
+    # 定义自定义样式
+    style_tc.configure(
+        "Custom.TCombobox",  # 样式名格式：自定义名.控件类型
+        background="#f0f0f0",  # 背景色
+        fieldbackground="#f0f0f0",  # 输入框背景色
+    )
 
     # 主动技能
     active_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="主动技能")
@@ -212,9 +273,26 @@ def show_style(scrollbar_frame_obj, style):
                 if skill.destructive_multiplier:
                     text += "破坏倍率：" + skill.destructive_multiplier
 
-            desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
-            desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
+            # desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+            # desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
+            if "技能强度" in text:
+                desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+                desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
+
+                attack_combo = ttk.Combobox(effect_frame, values=skill_options, style="Custom.TCombobox")
+                attack_combo.grid(row=1, column=1, sticky="nsw", padx=5, pady=0)
+                attack_combo.configure(state="readonly")
+                attack_combos[active_skill.name] = attack_combo
+                attack_combo.set("Skill Lv.1")
+                # 不要使用 lambda，在 lambda 函数中直接使用 attack_combo 会导致闭包延迟绑定
+                attack_combo.bind(
+                    "<<ComboboxSelected>>", 
+                    partial(on_attack_combo_select, desc_lab=desc_lab, lv1_skill_strength=text)
+                )
+            else:
+                desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+                desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
     # 被动技能
     passive_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="天赋/被动技能")

@@ -5,6 +5,7 @@ from tkinter import messagebox
 import json
 import subprocess
 import importlib
+import re
 
 # 弹出确认框，询问用户是否重启
 def confirm_restart(info):
@@ -17,10 +18,25 @@ def restart_program():
     python = sys.executable  # 获取当前 Python 解释器的路径
     os.execv(python, [python] + sys.argv)  # 重启程序
 
+# 匹配带逗号的数字范围
+def extract_number_range(text):
+    match = re.search(r"(\d{1,3}(?:,\d{3})*) ~ (\d{1,3}(?:,\d{3})*)", text)
+    if match:
+        min_val, max_val = match.groups()
+        # 移除逗号并转为整数
+        min_num = int(min_val.replace(",", ""))
+        max_num = int(max_val.replace(",", ""))
+        return min_num, max_num
+    return None
+
 # int 10,000 转换 10000
 def comma_str_to_int(number_string):
     number = int(number_string.replace(',', ''))
     return number
+
+# 10000 转换为 10,000
+def int_to_comma_str(number):
+    number_string = "{:,}".format(number)
 
 # 判断空文件
 def is_file_empty(file_path):
