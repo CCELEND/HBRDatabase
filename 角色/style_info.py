@@ -117,13 +117,15 @@ class ActiveSkill:
     def __init__(self, name = None, description = None, 
         sp_cost = None, max_uses = None, 
         effects = None, 
-        level_reqs = None):
+        level_reqs = None, level_max="10"):
         self.name = name
         self.description = description      # 技能描述
         self.sp_cost = sp_cost              # SP 消耗
         self.max_uses = max_uses            # 使用次数 None：无限
         self.effects = effects              # 技能效果列表 []
         self.level_reqs = level_reqs        # 等级需求列表 []
+
+        self.level_max = level_max          # 最大等级
         
 # 被动技能
 class PassiveSkill:
@@ -287,11 +289,20 @@ def create_style(data):
 
             effects.append(effect_obj)
 
-        # 主动技能对象
-        ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-            effects,
-            active_skill_list[2]
-        )
+        if len(active_skill_list) == 4:
+            level_max = active_skill_list[3]
+            # 主动技能对象
+            ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                effects,
+                active_skill_list[2],
+                level_max
+            )
+        else:
+            # 主动技能对象
+            ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                effects,
+                active_skill_list[2]
+            )
 
         activeskills.append(ActiveSkill_obj)
 
