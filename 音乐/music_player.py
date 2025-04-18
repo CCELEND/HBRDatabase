@@ -78,8 +78,9 @@ class FLACPlayerApp:
         # 进度条背景
         self.progress_bg = self.progress_canvas.create_rectangle(0, 0, width, 20, fill='lightgray', outline='lightgray')
         # 进度条前景
-        self.progress_fg = self.progress_canvas.create_rectangle(0, 0, 0, 20, fill='blue', outline='blue')
-
+        # self.progress_fg = self.progress_canvas.create_rectangle(0, 0, 0, 20, fill='blue', outline='blue')
+        self.progress_fg = self.progress_canvas.create_rectangle(0, 0, 0, 20, fill='#858585', outline='#858585')
+        
         # 绑定点击事件
         self.progress_canvas.bind("<Button-1>", self.on_progress_click)
         self.progress_canvas.bind("<B1-Motion>", self.on_progress_drag)

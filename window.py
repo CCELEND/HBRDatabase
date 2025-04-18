@@ -13,6 +13,7 @@ def set_global_bg(parent_frame, bg="#f0f0f0"):
     colors = parent_frame.style.colors
     # 修改背景色
     colors.primary = "#858585"
+    # colors.primary = "#bfbfbf"
     colors.bg = bg  # 修改主题的全局背景色
     colors.selectfg = bg
     colors.inputbg = bg
