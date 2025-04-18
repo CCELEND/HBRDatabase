@@ -66,12 +66,12 @@ def creat_gftz_win(event, parent_frame, gftz):
     if "攻略" in gftz.name:
         gftz_win_frame = creat_Toplevel(gftz.name, 600, 840, 440, 50)
     else:
-        gftz_win_frame = creat_Toplevel(gftz.name, 1280, 720, 440, 50)
+        gftz_win_frame = creat_Toplevel(gftz.name, 1280, 715, 440, 50)
     set_window_icon(gftz_win_frame, gftz.logo_path)
     open_gftz_wins[gftz.name] = gftz_win_frame
 
     # 创建 ImageViewerWithScrollbar 实例
-    gftz_image_viewer = ImageViewerWithScrollbar(gftz_win_frame, 1280, 720, gftz.guide_path)
+    gftz_image_viewer = ImageViewerWithScrollbar(gftz_win_frame, 1280, 715, gftz.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
     gftz_win_frame.bind("<Button-1>", lambda event: set_window_top(gftz_win_frame))

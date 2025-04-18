@@ -45,8 +45,8 @@ class ExpandableList:
                         font=('微软雅黑', 10, 'normal'),
                         rowheight=22)
         style.map(self.style_name,
-                  background=[('selected', '#0078D7')],
-                  foreground=[('selected', 'white')])
+                  background=[('selected', '#d3d3d3')],
+                  foreground=[('selected', 'black')])
 
         # 创建Treeview
         self.tree = ttk.Treeview(
@@ -92,8 +92,8 @@ class ExpandableList:
                                  text=item,
                                  tags=('item', f'item-{idx}'))
         self.tree.tag_configure('category', font=('微软雅黑', 10, 'bold'))  # 分类加粗
-        self.tree.tag_configure('selected', background='#99C771', foreground='black')  # 子项选中样式
-        self.tree.tag_configure('parent-selected', background='#9BCD34', foreground='black')  # 父节点选中样式
+        self.tree.tag_configure('selected', background='#bfbfbf', foreground='black')  # 子项选中样式
+        self.tree.tag_configure('parent-selected', background='#858585', foreground='white')  # 父节点选中样式
 
     def on_double_click(self, event):
         item = self.tree.selection()[0]
