@@ -4,12 +4,13 @@ from functools import partial
 import re
 import math
 
+# 提取范围值列表
 def extract_skill_numbers(text):
     # 添加 re.DOTALL 以匹配换行符
     strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
     # 提取所有数字并转为整数
     return [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
-
+# 回写字符串
 def write_numbers_back(text, modified_numbers):
     # 使用 re.DOTALL 分割原字符串
     parts = re.split(r"(技能强度：.*?，属性倍率)", text, flags=re.DOTALL)
@@ -29,7 +30,11 @@ def heal_extract_skill_numbers(text):
     # 添加 re.DOTALL 以匹配换行符
     strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
     # 提取所有数字并转为整数
-    return [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
+    result = [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
+    n = len(result)
+    effective_range = n if n % 2 == 0 else n - 1
+    
+    return result[:effective_range]
 
 def heal_write_numbers_back(text, modified_numbers):
     # 使用 re.DOTALL 分割原字符串
@@ -37,9 +42,11 @@ def heal_write_numbers_back(text, modified_numbers):
     
     strength_text = parts[1]
     numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
+    n = len(numbers_with_commas)
+    effective_range = n if n % 2 == 0 else n - 1
     
     # 替换数字（保留原始格式的逗号）
-    for i, num in enumerate(numbers_with_commas):
+    for i, num in enumerate(numbers_with_commas[:effective_range]):
         new_num = "{:,}".format(modified_numbers[i]) # 添加千位分隔符
         strength_text = strength_text.replace(num, new_num, 1)  # 只替换第一次出现
     
@@ -117,20 +124,20 @@ def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
 # 绑定事件：当选项改变时触发，优先使用 event.widget 获取事件来源的控件
 def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
 
-    try:
-        last_text = desc_lab["text"]
-        lv_select = event.widget.get()
-        lv = int(lv_select.replace("Skill Lv.",""))
+    # try:
+    last_text = desc_lab["text"]
+    lv_select = event.widget.get()
+    lv = int(lv_select.replace("Skill Lv.",""))
 
-        original_numbers = heal_extract_skill_numbers(lv1_skill_strength)
-        if len(original_numbers) == 2:
-            new_original_numbers = get_lv_heal_min_max(original_numbers, lv)
-            new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers)
-        else:
-            new_original_numbers0 = get_lv_heal_min_max(original_numbers[:2], lv)
-            new_original_numbers1 = get_lv_heal_min_max(original_numbers[2:], lv)
-            new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1)
+    original_numbers = heal_extract_skill_numbers(lv1_skill_strength)
+    if len(original_numbers) == 2:
+        new_original_numbers = get_lv_heal_min_max(original_numbers, lv)
+        new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers)
+    else:
+        new_original_numbers0 = get_lv_heal_min_max(original_numbers[:2], lv)
+        new_original_numbers1 = get_lv_heal_min_max(original_numbers[2:], lv)
+        new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1)
 
-        desc_lab["text"] = new_text
-    except:
-        return
+    desc_lab["text"] = new_text
+    # except:
+    #     return
