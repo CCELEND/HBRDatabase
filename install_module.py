@@ -7,7 +7,7 @@ from tkinter import messagebox
 try:
     pip_args = [
         sys.executable, "-m", "pip", "install",
-        "ttkbootstrap", "opencv-python", "pillow", "requests", "pygame", "numpy", "pandas", "openpyxl",
+        "ttkbootstrap", "opencv-python", "pillow", "requests", "pygame", "numpy", "pandas", "openpyxl", "selenium", "webdriver-manager"
         "-i", "https://pypi.tuna.tsinghua.edu.cn/simple",  # 清华镜像
         "--trusted-host", "pypi.tuna.tsinghua.edu.cn"      # 避免 SSL 错误
     ]

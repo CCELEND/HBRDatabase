@@ -61,6 +61,7 @@ from music_win import creat_music_win
 sys.path.append(os.path.abspath("./工具"))
 from GetEntriesGUILocal.get_entries_win import creat_ct_win
 from DamageScoreCal.damage_score_cal_win import creat_dsc_win
+from HBRbrochure.HBRbrochure import get_hbr_brochure
 
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
@@ -178,6 +179,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     tool_menu = ttk.Menu(menu_bar, tearoff=0)
     create_menu_item(tool_menu, "词条获取", creat_ct_win)
     create_menu_item(tool_menu, "伤害分计算", creat_dsc_win)
+    create_menu_item(tool_menu, "风格图鉴获取", get_hbr_brochure)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
     # 更新数据菜单

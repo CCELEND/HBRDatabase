@@ -32,7 +32,9 @@
 	RandomMainAbility_seed=  
 	RandomMainAbility_index=  
 控制获取数据数，修改 DataCount，这里默认是获取300条数据  
-	DataCount=300
+	DataCount=300  
+风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴  
+	需要安装最新版本的 chrome 浏览器
 
 ### 音乐
 
