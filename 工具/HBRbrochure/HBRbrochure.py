@@ -23,13 +23,14 @@ def list_newline(you_list, how_projects_newline):
         print(", ".join(map(str, you_list[i:i+how_projects_newline])))
 
 def dir_newline(you_dir, how_projects_newline):
+    line_count = how_projects_newline - 1
     # 初始化计数器
     count = 0
     # 遍历字典的项
     for key, value in you_dir.items():
         # 输出键值对，格式为 "key: value"
         print(f"{key}: {value}", 
-            end = ", " if count % how_projects_newline != 2 else "\n")
+            end = ", " if count % how_projects_newline != line_count else "\n")
         count += 1
 
     # 如果最后一行不足 how_projects_newline 项，需要手动换行
