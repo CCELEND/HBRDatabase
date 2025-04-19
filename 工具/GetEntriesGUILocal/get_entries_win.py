@@ -351,22 +351,22 @@ def creat_ct_win():
 
 
     # 洗孔词条按钮
-    get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="light",
+    get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
         width=20, text="获取洗孔词条", command=lambda: get_index_wash_entries())
     get_index_equipments_button.grid(row=0, column=0, padx=(0,10), pady=(10,0))
     # 装备词条按钮
-    get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="light",
+    get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
         width=20, text="获取装备词条", command=lambda: get_index_equipments())
     get_index_equipments_button.grid(row=1, column=0, padx=(0,10), pady=(10,0))
 
 
     # 创建清空按钮
-    clear_button = ttk.Button(buttons_frame, bootstyle="light",
+    clear_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
         width=20, text="清空", command=lambda: clear_text(output_text))
     clear_button.grid(row=2, column=0, padx=(0,10), pady=(10,0))
 
     # 创建保存 Excel 文件按钮
-    save_file_button = ttk.Button(buttons_frame, bootstyle="light",
+    save_file_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
         width=20, text="保存为 Excel 文件", command=save_to_file)
     save_file_button.grid(row=3, column=0, padx=(0,10), pady=(10,0))
 

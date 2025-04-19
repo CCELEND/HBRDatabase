@@ -144,11 +144,11 @@ def creat_dsc_win():
 		lambda event, tw=maximum_damage_limit_text: show_context_menu(event, tw))
 
 	#按钮
-	damage_value_button = ttk.Button(input_frame, bootstyle="light",
+	damage_value_button = ttk.Button(input_frame, bootstyle="primary-outline",
 		width=20, text="伤害奖励->伤害值", command=damage_value)
 	damage_value_button.grid(row=4, column=0, padx=0, pady=(10,0))
 	#按钮
-	damage_reward_button = ttk.Button(input_frame, bootstyle="light",
+	damage_reward_button = ttk.Button(input_frame, bootstyle="primary-outline",
 		width=20, text="伤害值->伤害奖励", command=damage_reward)
 	damage_reward_button.grid(row=4, column=1, padx=0, pady=(10,0))
 
@@ -172,7 +172,7 @@ def creat_dsc_win():
 	output_text.bind("<Button-3>", lambda event, tw=output_text: show_context_menu(event, tw))
 
 	# 创建清空按钮
-	clear_button = ttk.Button(dsc_win_frame, bootstyle="light",
+	clear_button = ttk.Button(dsc_win_frame, bootstyle="primary-outline",
 		width=20, text="清空", 
 		command=lambda: clear_text(input_text, maximum_damage_limit_text, output_text))
 	clear_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)

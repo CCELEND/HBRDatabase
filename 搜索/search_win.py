@@ -212,7 +212,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
 
     # 创建搜索按钮
     search_button = ttk.Button(search_win_frame, 
-        width=20, text="搜索", bootstyle="light",
+        width=20, text="搜索", bootstyle="primary-outline",
         command=lambda: show_search(scrollbar_frame_obj, search_win_frame,
             key_word_text, selected_values_dir))
     search_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
