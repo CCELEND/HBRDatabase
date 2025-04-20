@@ -300,26 +300,26 @@ def show_style(scrollbar_frame_obj, style):
         if not style.element_attribute or len(style.element_attribute) == 1:
             hoju_photo = get_photo(hoju_img_path, (66, 66))
             hoju_canvas = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo, 66, 66, 0, 0, 0, 0, padx=20)
+                hoju_photo, 66, 66, 0, 0, 0, 0, padx=15)
             text = style.growth_ability.description
             growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
                 justify="left", font=("Monospace", 10, "bold"))
-            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
+            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
         else:
             growth_ability_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 图片列
             growth_ability_frame.grid_columnconfigure(2, weight=5, minsize=500)  # 描述列
 
             hoju_photo0 = get_photo(hoju_img_path0, (66, 66))
             hoju_canvas0 = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo0, 66, 66, 0, 0, 0, 0, padx=20)
+                hoju_photo0, 66, 66, 0, 0, 0, 0, padx=15)
             hoju_photo1 = get_photo(hoju_img_path1, (66, 66))
             hoju_canvas1 = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo1, 66, 66, 0, 0, 0, 1, padx=20)
+                hoju_photo1, 66, 66, 0, 0, 0, 1, padx=15)
 
             text = style.growth_ability.description
             growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
                 justify="left", font=("Monospace", 10, "bold"))
-            growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=5, pady=5)
+            growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=15, pady=5)
 
         growth_status_row = 4
     else:
