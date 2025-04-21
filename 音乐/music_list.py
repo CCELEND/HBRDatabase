@@ -65,7 +65,8 @@ class ExpandableList:
             troughcolor="#f0f0f0",         # 滚动槽颜色
             gripcount=0                    # 移除默认的条纹效果
         )
-        scrollbar = ttk.Scrollbar(self.frame, command=self.tree.yview, style="Custom.Vertical.TScrollbar")
+        scrollbar = tk.Scrollbar(self.frame, command=self.tree.yview)
+        # scrollbar = ttk.Scrollbar(self.frame, command=self.tree.yview, style="Custom.Vertical.TScrollbar")
         scrollbar.grid(row=0, column=1, sticky="ns", padx=(0, 2), pady=2)
         self.tree.configure(yscrollcommand=scrollbar.set)
 
