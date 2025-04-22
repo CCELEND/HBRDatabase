@@ -39,6 +39,14 @@
         "type":"回复",
         "series":"回复SP" 
     },
+    "降低SP消耗":{
+        "name":"降低SP消耗",
+        "path":"./战斗系统/状态/HealSp.webp",
+        "effect":"降低SP消耗","description":"降低SP消耗",
+        "stack":"-",
+        "type":"回复",
+        "series":"降低SP消耗" 
+    },
     "回复技能使用次数":{
         "name":"回复技能使用次数",
         "path":"./战斗系统/状态/HealSkillUsedCount.webp",
