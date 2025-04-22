@@ -91,7 +91,7 @@ def show_statu(scrollbar_frame_obj):
     for type_num, type in enumerate(状态.status_info.statu_categories):
         # 状态类型
         type_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=type+"类型状态")
-        type_frame.grid(row=type_num, column=0, columnspan=6, padx=10, pady=(0,5), sticky="nsew") #
+        type_frame.grid(row=type_num, column=0, columnspan=6, padx=10, pady=(0,10), sticky="nsew") #
 
         series_column_count = 0
         for series_num, series in enumerate(状态.status_info.statu_categories[type]):

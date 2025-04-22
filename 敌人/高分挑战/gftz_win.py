@@ -151,7 +151,7 @@ class GFTZCreator:
                     # 计算位置
                     column = self.created_count % 5
                     gftz_frame.grid(row=self.current_row, column=column, 
-                                   padx=(10, 0), pady=(0, 5), sticky="nesw")
+                                   padx=(10, 0), pady=(0, 10), sticky="nesw")
                     gftz_frame.grid_rowconfigure(0, weight=1)
                     gftz_frame.grid_columnconfigure(0, weight=1)
                     

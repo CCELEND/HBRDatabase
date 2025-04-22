@@ -1,0 +1,135 @@
+
+{
+
+"HELL-1F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-1F",
+    "enemys":
+    {
+        "触手鼹鼠α":
+        {
+            "img_path":"./敌人/时钟塔/HELL-1F/触手鼹鼠α.png",
+            "name":"触手鼹鼠α",
+            "border":"380",
+            "DP":"200,000","HP":"455,000",
+            "weakness":"火冰雷光暗-100","resist":"无+50"
+        },
+        "触手鼹鼠α2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-1F/触手鼹鼠α.png",
+            "name":"触手鼹鼠α2",
+            "border":"380",
+            "DP":"200,000","HP":"455,000",
+            "weakness":"火冰雷光暗-100","resist":"无+50"
+        }
+    }
+},
+
+"HELL-2F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-2F",
+    "enemys":
+    {
+        "至高石像":
+        {
+            "img_path":"./敌人/时钟塔/HELL-2F/至高石像.png",
+            "name":"至高石像",
+            "border":"380",
+            "DP":"170,000","HP":"210,000",
+            "weakness":"打-50","resist":"斩+75"
+        },
+        "诅咒玩偶":
+        {
+            "img_path":"./敌人/时钟塔/HELL-2F/诅咒玩偶.png",
+            "name":"诅咒玩偶",
+            "border":"380",
+            "DP":"68,000","HP":"96,000",
+            "weakness":"打-150","resist":""
+        },
+        "三角镖":
+        {
+            "img_path":"./敌人/时钟塔/HELL-2F/三角镖.png",
+            "name":"三角镖",
+            "border":"380",
+            "DP":"41,600","HP":"80,000",
+            "weakness":"","resist":""
+        }
+    }
+},
+
+
+"HELL-3F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-3F",
+    "enemys":
+    {
+        "步行火炮":
+        {
+            "img_path":"./敌人/时钟塔/HELL-3F/步行火炮.png",
+            "name":"步行火炮",
+            "border":"380",
+            "DP":"170,000","HP":"280,000",
+            "weakness":"斩-50","resist":"突+75"
+        },
+        "步行火炮2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-3F/步行火炮.png",
+            "name":"步行火炮2",
+            "border":"380",
+            "DP":"170,000","HP":"280,000",
+            "weakness":"斩-50","resist":"突+75"
+        }
+    }
+},
+
+"HELL-4F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-4F",
+    "enemys":
+    {
+        "暗影·由希[Spitfire]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-4F/暗影·由希[Spitfire].png",
+            "name":"暗影·由希[Spitfire]",
+            "border":"380",
+            "DP":"950,000","HP":"330,000",
+            "weakness":"突-50","resist":"斩打+75"
+        }
+    }
+},
+
+"HELL-5F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-5F",
+    "enemys":
+    {
+        "死亡蛞蝓":
+        {
+            "img_path":"./敌人/时钟塔/HELL-5F/死亡蛞蝓.png",
+            "name":"死亡蛞蝓",
+            "border":"380",
+            "DP":"50,000","HP":"300,000",
+            "weakness":"","resist":""
+        },
+        "死亡蛞蝓2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-5F/死亡蛞蝓.png",
+            "name":"死亡蛞蝓2",
+            "border":"380",
+            "DP":"210,000","HP":"3,000,000",
+            "weakness":"","resist":""
+        }
+    }
+}
+
+}
