@@ -178,8 +178,6 @@ def creat_dsc_win():
 	clear_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
 	open_dsc_wins['伤害分计算'] = dsc_win_frame
-	# 绑定鼠标点击事件到父窗口，点击置顶
-	dsc_win_frame.bind("<Button-1>", lambda event: set_window_top(dsc_win_frame))
 	# 窗口关闭时清理
 	dsc_win_frame.protocol("WM_DELETE_WINDOW", lambda: dsc_win_closing(dsc_win_frame))
 	return "break"  # 阻止事件冒泡

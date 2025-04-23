@@ -222,8 +222,6 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     search_win_frame.minsize(715, 485)
 
     open_search_wins["搜索"] = search_win_frame
-    # 绑定鼠标点击事件到父窗口，点击置顶
-    search_win_frame.bind("<Button-1>", lambda event: set_window_top(search_win_frame))
     # 窗口关闭时清理
     search_win_frame.protocol("WM_DELETE_WINDOW", lambda: search_win_closing(search_win_frame))
 

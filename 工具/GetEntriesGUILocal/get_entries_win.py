@@ -372,8 +372,6 @@ def creat_ct_win():
 
 
     open_ct_wins['词条获取'] = ct_win_frame
-    # 绑定鼠标点击事件到父窗口，点击置顶
-    ct_win_frame.bind("<Button-1>", lambda event: set_window_top(ct_win_frame))
     # 窗口关闭时清理
     ct_win_frame.protocol("WM_DELETE_WINDOW", lambda: ct_win_closing(ct_win_frame))
     return "break"  # 阻止事件冒泡
