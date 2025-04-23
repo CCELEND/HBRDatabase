@@ -136,14 +136,14 @@ def show_team(scrollbar_frame_obj, team):
 
         # 创建 desc_frame 并设置 rowspan=2，占据两行
         desc_frame = ttk.Frame(frame)
-        desc_frame.grid(row=0, column=0, rowspan=2, padx=10, pady=10, sticky="nsew") 
+        desc_frame.grid(row=0, column=0, columnspan=4, pady=10, sticky="nsew") #padx=10, 
         desc_frame.grid_rowconfigure(0, weight=1)  
         desc_frame.grid_columnconfigure(0, weight=1, minsize=200)
-        desc_frame.grid_columnconfigure(1, weight=3, minsize=600)
+        desc_frame.grid_columnconfigure(1, weight=4, minsize=800)
 
         photo = get_photo(role.img_path, (130, 254))
         canvas = create_canvas_with_image(desc_frame, 
-            photo, 130, 254, 0, 0, 0, 0, rowspan=2)
+            photo, 200, 254, 45, 0, 0, 0, rowspan=2)
         # 绑定事件到 Canvas
         mouse_bind_canvas_events(canvas)
         bind_canvas_events(canvas, 
@@ -154,7 +154,8 @@ def show_team(scrollbar_frame_obj, team):
 
         # 角色描述
         # 设置了标签的字体为 Monospace 大小为 10，加粗
-        label = ttk.Label(desc_frame, text=role.description, justify="left", font=("Monospace", 10, "bold"))
+        # label = ttk.Label(desc_frame, text=role.description, justify="left", font=("Monospace", 10, "bold"))
+        label = ttk.Label(desc_frame, text=role.description, anchor="w", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
 
         show_rarity(frame, role, team)
