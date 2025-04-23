@@ -13,10 +13,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 
 import time
-import role_info
 
-from HBRbrochure.role_info import team_id_names, role_id_names, style_id_all_infos
-from HBRbrochure.brochure import get_brochure
+import HBRbrochure.role_info
+import HBRbrochure.brochure
 
 def list_newline(you_list, how_projects_newline):
     for i in range(0, len(you_list), how_projects_newline):
@@ -116,12 +115,16 @@ def switch_to_brochure(driver, style_infos):
     # 切换到新打开的标签页
     driver.switch_to.window(handles[-1])
 
-    get_brochure(driver, style_infos)
+    HBRbrochure.brochure.get_brochure(driver, style_infos)
 
 
 def get_hbr_brochure():
 
     try:
+
+        # 加载资源文件
+        HBRbrochure.role_info.load_resources()
+
         # 设置 Chrome 选项以在后台运行
         chrome_options = Options()
         chrome_options.add_argument("--headless")
@@ -177,12 +180,12 @@ def get_hbr_brochure():
             limit_break_levels[my_style_id] = limit_break_level
 
             try:
-                my_style_infos[my_style_id] = style_id_all_infos[my_style_id]
+                my_style_infos[my_style_id] = HBRbrochure.role_info.style_id_all_infos[my_style_id]
                 my_style_infos[my_style_id]["current_level"] = current_level
                 my_style_infos[my_style_id]["maximum_level"] = maximum_level
                 my_style_infos[my_style_id]["limit_break_level"] = limit_break_level
             except KeyError:
-                print("[-] Missing information on style ID, please modify the role_info.py file, style ID: " + my_style_id)
+                print("[-] Missing information on style ID, please modify the style_id_all_infos.json file, style ID: " + my_style_id)
                 continue
 
             my_style_num += 1

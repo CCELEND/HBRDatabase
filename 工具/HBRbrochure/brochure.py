@@ -9,7 +9,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
-from HBRbrochure.mapping import GetBrochureIdByStyleId, test_style_infos
+from HBRbrochure.mapping import GetBrochureIdByStyleId
+import HBRbrochure.mapping
 
 def switch_cn(driver):
     try:
@@ -45,7 +46,7 @@ def click_brochure(driver, my_style_infos):
             try:
                 brochure_id = GetBrochureIdByStyleId(style_id)
             except KeyError:
-                print("[-] Missing mapping, please modify the mapping.py file, style ID: " + style_id)
+                print("[-] Missing mapping, please modify the style_id_brochure_id.json file, style ID: " + style_id)
                 continue
             limit_break_level = int(my_style_infos[style_id]["limit_break_level"])
 
@@ -83,6 +84,9 @@ def press_esc(driver):
         print(f"[-] {e}")
 
 def get_brochure(driver, style_infos):
+
+    # 加载资源文件
+    HBRbrochure.mapping.load_resources()
     try:
         # 等待立华奏加载完成 绝对不是因为我是一个奏厨（
         TachibanaKanadeElement = WebDriverWait(driver, 30).until(
