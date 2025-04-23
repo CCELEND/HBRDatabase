@@ -89,24 +89,24 @@ def creat_szt_win(event, parent_frame, szt):
         info_frame.grid(row=0, column=1, sticky="nsew")
         info_frame.grid_rowconfigure(0, weight=1) # 确保行填充
         info_frame.grid_columnconfigure(0, weight=2, minsize=100)
-        info_frame.grid_columnconfigure(1, weight=2, minsize=100)
-        info_frame.grid_columnconfigure(2, weight=2, minsize=100)
+        info_frame.grid_columnconfigure(1, weight=3, minsize=150)
+        info_frame.grid_columnconfigure(2, weight=3, minsize=150)
         info_frame.grid_columnconfigure(3, weight=3, minsize=150)
         info_frame.grid_columnconfigure(4, weight=3, minsize=150)
         
         border_label = ttk.Label(info_frame, text="属性："+enemy.border, anchor="center")
         border_label.grid(row=0, column=0, sticky="nsew")
 
-        DP_label = ttk.Label(info_frame, text="DP："+enemy.DP, anchor="center")
+        DP_label = ttk.Label(info_frame, text="DP："+enemy.DP, anchor="w")
         DP_label.grid(row=0, column=1, sticky="nsew")
 
-        HP_label = ttk.Label(info_frame, text="HP："+enemy.HP, anchor="center")
+        HP_label = ttk.Label(info_frame, text="HP："+enemy.HP, anchor="w")
         HP_label.grid(row=0, column=2, sticky="nsew")
 
-        weakness_label = ttk.Label(info_frame, text="弱点："+enemy.weakness, anchor="center")
+        weakness_label = ttk.Label(info_frame, text="弱点："+enemy.weakness, anchor="w")
         weakness_label.grid(row=0, column=3, sticky="nsew")
 
-        resist_label = ttk.Label(info_frame, text="抗性："+enemy.resist, anchor="center")
+        resist_label = ttk.Label(info_frame, text="抗性："+enemy.resist, anchor="w")
         resist_label.grid(row=0, column=4, sticky="nsew")
 
 

@@ -106,6 +106,7 @@ def set_window_icon_webp(frame, webp_path, size=(64, 64)):
 
 # 当父窗口被点击时，将其置于顶层
 def set_window_top(parent_frame):
+    parent_frame.deiconify()  # 如果窗口被最小化，先恢复窗口
     parent_frame.lift()
 
 

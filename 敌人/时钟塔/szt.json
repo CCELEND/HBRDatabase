@@ -130,6 +130,292 @@
             "weakness":"","resist":""
         }
     }
+},
+
+
+"HELL-6F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-6F",
+    "enemys":
+    {
+        "侏儒寄居兽":
+        {
+            "img_path":"./敌人/时钟塔/HELL-6F/侏儒寄居兽.png",
+            "name":"侏儒寄居兽",
+            "border":"380",
+            "DP":"400,000","HP":"180,000",
+            "weakness":"突-50","resist":"斩打+75"
+        },
+        "侏儒寄居兽2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-6F/侏儒寄居兽.png",
+            "name":"侏儒寄居兽2",
+            "border":"380",
+            "DP":"400,000","HP":"180,000",
+            "weakness":"突-50","resist":"斩打+75"
+        }
+    }
+},
+
+"HELL-7F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-7F",
+    "enemys":
+    {
+        "暗影·绯雨[枪弹]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-7F/暗影·绯雨[枪弹].png",
+            "name":"暗影·绯雨[枪弹]",
+            "border":"380",
+            "DP":"1,500,000","HP":"650,000",
+            "weakness":"突-50","resist":"斩打+75"
+        }
+    }
+},
+
+
+"HELL-8F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-8F",
+    "enemys":
+    {
+        "深渊重锤":
+        {
+            "img_path":"./敌人/时钟塔/HELL-8F/深渊重锤.png",
+            "name":"深渊重锤",
+            "border":"380",
+            "DP":"300,000","HP":"1,550,000",
+            "weakness":"斩-50","resist":"突+50"
+        }
+    }
+},
+
+"HELL-9F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-9F",
+    "enemys":
+    {
+        "暗影·二以奈[BrandNew]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-9F/暗影·二以奈[BrandNew].png",
+            "name":"暗影·二以奈[BrandNew]",
+            "border":"380",
+            "DP":"150,000","HP":"13,500,000",
+            "weakness":"火-100","resist":""
+        }
+    }
+},
+
+"HELL-10F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-10F",
+    "enemys":
+    {
+        "黛紫线圈巨轮y":
+        {
+            "img_path":"./敌人/时钟塔/HELL-10F/黛紫线圈巨轮y.png",
+            "name":"黛紫线圈巨轮y",
+            "border":"390",
+            "DP":"450,000","HP":"650,000",
+            "weakness":"斩-50、光-100","resist":""
+        },
+        "黛紫线圈巨轮y2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-10F/黛紫线圈巨轮y.png",
+            "name":"黛紫线圈巨轮y2",
+            "border":"390",
+            "DP":"450,000","HP":"650,000",
+            "weakness":"斩-50、光-100","resist":""
+        }
+    }
+},
+
+"HELL-11F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-11F",
+    "enemys":
+    {
+        "暗影·菅原[洛丽塔白书]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-11F/暗影·菅原[洛丽塔白书].png",
+            "name":"暗影·菅原[洛丽塔白书]",
+            "border":"390",
+            "DP":"800,000","HP":"1,000,000",
+            "weakness":"打-50","resist":"斩突+75"
+        }
+    }
+},
+
+"HELL-12F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-12F",
+    "enemys":
+    {
+        "阿拉克尼碧蓝巨蛛":
+        {
+            "img_path":"./敌人/时钟塔/HELL-12F/阿拉克尼碧蓝巨蛛.png",
+            "name":"阿拉克尼碧蓝巨蛛",
+            "border":"390",
+            "DP":"1,300,000","HP":"2,000,000",
+            "weakness":"突-150、雷-150","resist":"打+50"
+        }
+    }
+},
+
+"HELL-13F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-13F",
+    "enemys":
+    {
+        "暗影·三乡[终结]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-13F/暗影·三乡[终结].png",
+            "name":"暗影·三乡[终结]",
+            "border":"390",
+            "DP":"400,000","HP":"3,000,000",
+            "weakness":"暗-150","resist":""
+        }
+    }
+},
+
+"HELL-14F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-14F",
+    "enemys":
+    {
+        "坚甲皓珠":
+        {
+            "img_path":"./敌人/时钟塔/HELL-14F/坚甲皓珠.png",
+            "name":"坚甲皓珠",
+            "border":"390",
+            "DP":"820,000","HP":"950,000",
+            "weakness":"打-50、暗-50","resist":"斩+50、光+75"
+        }
+    }
+},
+
+"HELL-15F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-15F",
+    "enemys":
+    {
+        "烈焰重锤":
+        {
+            "img_path":"./敌人/时钟塔/HELL-15F/烈焰重锤.png",
+            "name":"烈焰重锤",
+            "border":"390",
+            "DP":"230,000","HP":"1,490,000",
+            "weakness":"斩-50、冰-100","resist":""
+        },
+        "烈焰重锤2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-15F/烈焰重锤.png",
+            "name":"烈焰重锤2",
+            "border":"390",
+            "DP":"230,000","HP":"1,490,000",
+            "weakness":"斩-50、冰-100","resist":""
+        }
+    }
+},
+
+"HELL-16F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-16F",
+    "enemys":
+    {
+        "暗影·惠[lkki Burst]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-16F/暗影·惠[lkki Burst].png",
+            "name":"暗影·惠[lkki Burst]",
+            "border":"390",
+            "DP":"370,000","HP":"12,200,000",
+            "weakness":"打-150","resist":"斩突+75"
+        }
+    }
+},
+
+"HELL-17F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-17F",
+    "enemys":
+    {
+        "光绚步行火炮Ω":
+        {
+            "img_path":"./敌人/时钟塔/HELL-17F/光绚步行火炮Ω.png",
+            "name":"光绚步行火炮Ω",
+            "border":"390",
+            "DP":"1,900,000","HP":"2,550,000",
+            "weakness":"暗-100","resist":"无+50"
+        }
+    }
+},
+
+"HELL-18F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-18F",
+    "enemys":
+    {
+        "暗影·千吕瑠[急速消失]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-18F/暗影·千吕瑠[急速消失].png",
+            "name":"暗影·千吕瑠[急速消失]",
+            "border":"390",
+            "DP":"550,000","HP":"3,150,000",
+            "weakness":"打-150","resist":"斩突+75"
+        }
+    }
+},
+
+"HELL-19F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-19F",
+    "enemys":
+    {
+        "黛紫三柱守卫":
+        {
+            "img_path":"./敌人/时钟塔/HELL-19F/黛紫三柱守卫.png",
+            "name":"黛紫三柱守卫",
+            "border":"390",
+            "DP":"315,000","HP":"470,000",
+            "weakness":"打-150、光-150","resist":"斩+50"
+        },
+        "黛紫三柱守卫2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-19F/黛紫三柱守卫.png",
+            "name":"黛紫三柱守卫2",
+            "border":"390",
+            "DP":"315,000","HP":"470,000",
+            "weakness":"打-150、光-150","resist":"斩+50"
+        }
+    }
 }
 
 }
