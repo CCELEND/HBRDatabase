@@ -24,6 +24,7 @@
 	RandomMainAbility_index=
 控制获取数据数，修改 DataCount，这里默认是获取300条数据
 	DataCount=300
+（如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系）
 风格图鉴获取：自动获取炽焰天穹国服风格 Heaven Burns Red Style Chart 图鉴
 	需要安装最新版本的 chrome 浏览器
 
