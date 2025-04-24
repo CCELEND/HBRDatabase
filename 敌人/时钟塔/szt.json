@@ -416,6 +416,148 @@
             "weakness":"打-150、光-150","resist":"斩+50"
         }
     }
+},
+
+"HELL-20F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-20F",
+    "enemys":
+    {
+        "治愈跳虫":
+        {
+            "img_path":"./敌人/时钟塔/HELL-20F/治愈跳虫.png",
+            "name":"治愈跳虫",
+            "border":"400",
+            "DP":"120,000","HP":"1,600,000",
+            "weakness":"","resist":""
+        },
+        "猫角兽β":
+        {
+            "img_path":"./敌人/时钟塔/HELL-20F/猫角兽β.png",
+            "name":"猫角兽β",
+            "border":"400",
+            "DP":"170,000","HP":"2,040,000",
+            "weakness":"打-50","resist":""
+        },
+        "猫角兽β2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-20F/猫角兽β.png",
+            "name":"猫角兽β2",
+            "border":"400",
+            "DP":"170,000","HP":"2,040,000",
+            "weakness":"打-50","resist":""
+        }
+    }
+},
+
+
+"HELL-21F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-21F",
+    "enemys":
+    {
+        "暗影·莓[坠入爱河]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-21F/暗影·莓[坠入爱河].png",
+            "name":"暗影·莓[坠入爱河]",
+            "border":"400",
+            "DP":"860,000","HP":"56,500,000",
+            "weakness":"突-150、雷-150","resist":"打+75"
+        }
+    }
+},
+
+
+"HELL-22F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-22F",
+    "enemys":
+    {
+        "闪电触手α":
+        {
+            "img_path":"./敌人/时钟塔/HELL-22F/闪电触手α.png",
+            "name":"闪电触手α",
+            "border":"400",
+            "DP":"190,000","HP":"10,400,000",
+            "weakness":"斩-150、火-150","resist":"突+50"
+        },
+        "闪电触手α2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-22F/闪电触手α.png",
+            "name":"闪电触手α2",
+            "border":"400",
+            "DP":"190,000","HP":"10,400,000",
+            "weakness":"斩-150、火-150","resist":"突+50"
+        }
+    }
+},
+
+"HELL-23F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-23F",
+    "enemys":
+    {
+        "暗影·李[光]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-23F/暗影·李[光].png",
+            "name":"暗影·李[光]",
+            "border":"400",
+            "DP":"6,500,000","HP":"2,800,000",
+            "weakness":"斩-150、雷-150","resist":"打+75"
+        }
+    }
+},
+
+"HELL-24F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-24F",
+    "enemys":
+    {
+        "章鱼尾γ":
+        {
+            "img_path":"./敌人/时钟塔/HELL-24F/章鱼尾γ.png",
+            "name":"章鱼尾γ",
+            "border":"400",
+            "DP":"1,000,000","HP":"38,000",
+            "weakness":"突-50","resist":""
+        },
+        "章鱼尾γ2":
+        {
+            "img_path":"./敌人/时钟塔/HELL-24F/章鱼尾γ.png",
+            "name":"章鱼尾γ2",
+            "border":"400",
+            "DP":"1,000,000","HP":"38,000",
+            "weakness":"突-50","resist":""
+        }
+    }
+},
+
+"HELL-25F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-25F",
+    "enemys":
+    {
+        "暗影·山胁[Knight]":
+        {
+            "img_path":"./敌人/时钟塔/HELL-25F/暗影·山胁[Knight].png",
+            "name":"暗影·山胁[Knight]",
+            "border":"400",
+            "DP":"900,000","HP":"12,500,000",
+            "weakness":"斩-150、冰-150","resist":"打+75"
+        }
+    }
 }
 
 }
