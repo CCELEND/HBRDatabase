@@ -14,7 +14,8 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json, output_string, is_parentstring, int_to_comma_str
 
 from style_info import SkillEffect
-from style_proc import get_hit_damage_str,on_attack_combo_select, on_heal_combo_select
+from style_proc import get_hit_damage_str
+from style_proc import on_attack_combo_select, on_heal_combo_select, on_buff_combo_select, on_debuff_combo_select, on_mindeye_combo_select
 
 import 强化素材.strengthen_materials_win
 import 职业.careers_info
@@ -33,7 +34,7 @@ skill_options = ["Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill 
 special_effects = [
     "心眼", "脆弱", "额外回合", "净化减益", "禁锢", "灾厄","特殊状态", "影分身", "混乱", 
     "弱点强击破", "退避", "充能", "贯通暴击", "斗志", "士气", "持续回复DP", "击破保护",
-    "强化领域", "上升增益技能强化", "无敌", "掩护", "嘲讽", "抗性清除", "抗性下降", "眩晕","清除病毒状态"
+    "强化领域", "上升增益技能强化", "减益效果强化", "无敌", "掩护", "嘲讽", "抗性清除", "抗性下降", "眩晕","清除病毒状态"
 ]
 def skill_effect_text(skill):
 
@@ -55,21 +56,39 @@ def skill_effect_text(skill):
 
     return text
 
-def show_style(scrollbar_frame_obj, style):
-
-    # 清除之前的组件
-    scrollbar_frame_obj.destroy_components()
-
-    # 职业
-    career = 职业.careers_info.careers[style.career]
-    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
-    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
-    career_frame.grid_rowconfigure(0, weight=1)
-    career_photo = get_photo(career.path, (200, 40))
-    career_canvas = create_canvas_with_image(career_frame, 
-        career_photo, 240, 40, 20, 0, 0, 0)
-
+# 主动技能描述 frame
+def creat_desc_frame(row_frame, active_skill):
     
+    desc_frame = ttk.Frame(row_frame)
+    desc_frame.grid(row=0, column=0, columnspan=4, pady=(0,5), sticky="nsew")
+    desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
+    # 为 desc_frame 设置列权重 4:1:1
+    desc_frame.grid_columnconfigure(0, weight=4, minsize=400)
+    desc_frame.grid_columnconfigure(1, weight=1, minsize=100)
+    desc_frame.grid_columnconfigure(2, weight=1, minsize=100)
+    # 技能描述
+    desc_lab = ttk.Label(desc_frame, text=active_skill.description, 
+        justify="left", font=("Monospace", 10, "bold"))
+    desc_lab.grid(row=0, column=0, sticky="nsw", padx=5, pady=0)
+    # 技能强化等级需求
+    text = ""
+    for level_req in active_skill.level_reqs:
+        text += "Lv" + level_req + " "
+    level_req_lab = ttk.Label(desc_frame, text=text, 
+        justify="left", font=("Monospace", 10, "bold"))
+    level_req_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
+    # 技能消耗SP和使用次数
+    if active_skill.max_uses:
+        text = "SP" + active_skill.sp_cost + '\n' + active_skill.max_uses
+    else:
+        text = "SP" + active_skill.sp_cost + '\n' + "∞"
+    sp_use_lab = ttk.Label(desc_frame, text=text, 
+        justify="right", font=("Monospace", 10, "bold"))
+    sp_use_lab.grid(row=0, column=2, sticky="nse", padx=5, pady=5)
+
+# 主动技能
+def creat_active_skill_frame(parent_frame, style):
+
     # attack_combos = {}
     # heal_combos = {}
     combos = {}
@@ -83,7 +102,7 @@ def show_style(scrollbar_frame_obj, style):
     )
 
     # 主动技能
-    active_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="主动技能")
+    active_skill_frame = ttk.LabelFrame(parent_frame, text="主动技能")
     active_skill_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
@@ -99,38 +118,14 @@ def show_style(scrollbar_frame_obj, style):
         for col_index in range(4):
             row_frame.grid_columnconfigure(col_index, weight=1)
 
-        # 描述 frame
-        desc_frame = ttk.Frame(row_frame)
-        desc_frame.grid(row=0, column=0, columnspan=4, pady=(0,5), sticky="nsew")
-        desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
-        # 为 desc_frame 设置列权重 4:1:1
-        desc_frame.grid_columnconfigure(0, weight=4, minsize=400)
-        desc_frame.grid_columnconfigure(1, weight=1, minsize=100)
-        desc_frame.grid_columnconfigure(2, weight=1, minsize=100)
+        # 一个主动技能的描述 frame
+        creat_desc_frame(row_frame, active_skill)
 
-        # 技能描述
-        desc_lab = ttk.Label(desc_frame, text=active_skill.description, 
-            justify="left", font=("Monospace", 10, "bold"))
-        desc_lab.grid(row=0, column=0, sticky="nsw", padx=5, pady=0)
-
-        # 技能强化等级需求
-        text = ""
-        for level_req in active_skill.level_reqs:
-            text += "Lv" + level_req + " "
-        level_req_lab = ttk.Label(desc_frame, text=text, 
-            justify="left", font=("Monospace", 10, "bold"))
-        level_req_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
-
-        # 技能消耗SP和使用次数
-        if active_skill.max_uses:
-            text = "SP" + active_skill.sp_cost + '\n' + active_skill.max_uses
-        else:
-            text = "SP" + active_skill.sp_cost + '\n' + "∞"
-        sp_use_lab = ttk.Label(desc_frame, text=text, 
-            justify="right", font=("Monospace", 10, "bold"))
-        sp_use_lab.grid(row=0, column=2, sticky="nse", padx=5, pady=5)
-
-        # 技能效果
+        lv1_attack_skill_strength_flag = False
+        lv_combo_name = ""
+        lv_combo_text = ""
+        lv_combo_lab = None
+        # 技能效果列表
         for j, skill in enumerate(active_skill.effects):
             # 属性倍率
             if skill.attribute_multiplier:
@@ -161,6 +156,7 @@ def show_style(scrollbar_frame_obj, style):
                     text += '技能属性差值：' + skill.attribute_difference
                     if skill.target in ['单体','全体'] and skill.effect_type not in special_effects:
                         text += f"（{skill.attribute_difference}+敌方属性）"
+
             # 否则就是攻击技能
             else:
                 weapon_attribute = skill.weapon_attribute
@@ -193,36 +189,62 @@ def show_style(scrollbar_frame_obj, style):
                 if skill.destructive_multiplier:
                     text += "破坏倍率：" + skill.destructive_multiplier
 
-            if "技能强度" in text or "回复DP" in text:
-                desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
-                desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
-
-                level_max = int(active_skill.level_max)
-
-                combo = ttk.Combobox(effect_frame, 
-                    values=skill_options[:level_max], style="Custom.TCombobox")
-                combo.grid(row=1, column=1, sticky="nsw", padx=5, pady=0)
-                combo.configure(state="readonly")
-                combo.set("Skill Lv.1")
-                # 不要使用 lambda，在 lambda 函数中直接使用 combo 会导致闭包延迟绑定，使用 partial 传递额外参数
-                if "技能强度" in text:
-                    combos[active_skill.name+"_attack"] = combo
-                    combo.bind(
-                        "<<ComboboxSelected>>", 
-                        partial(on_attack_combo_select, desc_lab=desc_lab, lv1_skill_strength=text)
-                    )
-                else:
-                    combos[active_skill.name+"_heal"] = combo
-                    combo.bind(
-                        "<<ComboboxSelected>>", 
-                        partial(on_heal_combo_select, desc_lab=desc_lab, lv1_skill_strength=text)
-                    )    
+            desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+            desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
+            if "技能强度" in text:
+                lv_combo_lab = desc_lab
+                lv_combo_text = text
             else:
-                desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
-                desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
+                if not lv_combo_text:
+                    lv_combo_text = text
+                    lv_combo_lab = desc_lab
 
-    # 被动技能
-    passive_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="天赋/被动技能")
+        lv_combo_name = active_skill.name
+        lv_combo_row = 1 + len(active_skill.effects)
+        level_max = int(active_skill.level_max)
+
+        lv_combo = ttk.Combobox(row_frame, 
+            values=skill_options[:level_max], style="Custom.TCombobox")
+        lv_combo.grid(row=lv_combo_row, column=0, sticky="nswe", padx=10, pady=(5,10))
+        lv_combo.configure(state="readonly")
+        lv_combo.set("Skill Lv.1")
+
+        if "技能强度" in lv_combo_text:
+            combos[active_skill.name+"_attack"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_attack_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )
+        elif "回复DP" in lv_combo_text:
+            combos[active_skill.name+"_heal"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_heal_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )
+        elif "上升" in lv_combo_text:
+            combos[active_skill.name+"_buff"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_buff_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )
+        elif "下降" in lv_combo_text:
+            combos[active_skill.name+"_buff"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_debuff_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )
+        elif "心眼" in lv_combo_text:
+            combos[active_skill.name+"_buff"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_mindeye_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )        
+
+        
+
+# 被动技能
+def creat_passive_skill_frame(parent_frame, style):
+    passive_skill_frame = ttk.LabelFrame(parent_frame, text="天赋/被动技能")
     passive_skill_frame.grid(row=2, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     passive_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 passive_skill_frame 的每一列权重
@@ -273,6 +295,26 @@ def show_style(scrollbar_frame_obj, style):
 
         effect_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
         effect_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
+
+def show_style(scrollbar_frame_obj, style):
+
+    # 清除之前的组件
+    scrollbar_frame_obj.destroy_components()
+
+    # 职业
+    career = 职业.careers_info.careers[style.career]
+    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
+    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    career_frame.grid_rowconfigure(0, weight=1)
+    career_photo = get_photo(career.path, (200, 40))
+    career_canvas = create_canvas_with_image(career_frame, 
+        career_photo, 240, 40, 20, 0, 0, 0)
+
+    # 主动技能
+    creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
+
+    # 被动技能
+    creat_passive_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
 
     if style.growth_ability:
 

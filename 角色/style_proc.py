@@ -5,41 +5,40 @@ import re
 import math
 
 # 提取范围值列表
-def extract_skill_numbers(text):
+def extract_skill_numbers(text, type):
     # 添加 re.DOTALL 以匹配换行符
-    strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
-    # 提取所有数字并转为整数
-    return [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
-# 回写字符串
-def write_numbers_back(text, modified_numbers):
-    # 使用 re.DOTALL 分割原字符串
-    parts = re.split(r"(技能强度：.*?，属性倍率)", text, flags=re.DOTALL)
-    
-    strength_text = parts[1]
-    numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
-    
-    # 替换数字（保留原始格式的逗号）
-    for i, num in enumerate(numbers_with_commas):
-        new_num = "{:,}".format(modified_numbers[i]) # 添加千位分隔符
-        strength_text = strength_text.replace(num, new_num, 1)  # 只替换第一次出现
-    
-    parts[1] = strength_text
-    return "".join(parts)
+    if type == "攻击":
+        strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "治疗":
+        strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "上升":
+        strength_text = re.search(r"上升(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "下降":
+        strength_text = re.search(r"下降(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "心眼":
+        strength_text = re.search(r"伤害增加：(.*?)，属性倍率", text, re.DOTALL).group(1)
 
-def heal_extract_skill_numbers(text):
-    # 添加 re.DOTALL 以匹配换行符
-    strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
-    # 提取所有数字并转为整数
+    # 提取所有数字并转为整数（偶数个）
     result = [int(num.replace(",", "")) for num in re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)]
     n = len(result)
     effective_range = n if n % 2 == 0 else n - 1
-    
     return result[:effective_range]
 
-def heal_write_numbers_back(text, modified_numbers):
+# 回写字符串
+def write_numbers_back(text, modified_numbers, type):
     # 使用 re.DOTALL 分割原字符串
-    parts = re.split(r"(回复DP.*?，属性倍率)", text, flags=re.DOTALL)
-    
+
+    if type == "攻击":
+        parts = re.split(r"(技能强度：.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "治疗":
+        parts = re.split(r"(回复DP.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "上升":
+        parts = re.split(r"(上升.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "下降":
+        parts = re.split(r"(下降.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "心眼":
+        parts = re.split(r"(伤害增加：.*?，属性倍率)", text, flags=re.DOTALL)
+
     strength_text = parts[1]
     numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
     n = len(numbers_with_commas)
@@ -82,6 +81,25 @@ def get_lv_heal_min_max(heal_min_max, lv):
 
     return [lv_heal_min, lv_heal_max]
 
+# [] 返回不同等级buff最大值 最小值 列表形式 [min, max]
+def get_lv_buff_min_max(buff_min_max, lv):
+    buff_min_base = float(buff_min_max[0])
+    buff_max_base = float(buff_min_max[1])
+
+    lv_buff_min = round(buff_min_base * (1 + 0.03 * (lv - 1)))
+    lv_buff_max = round(buff_max_base * (1 + 0.02 * (lv - 1)))
+
+    return [lv_buff_min, lv_buff_max]
+
+# [] 返回不同等级debuff最大值 最小值 列表形式 [min, max]
+def get_lv_debuff_min_max(debuff_min_max, lv):
+    debuff_min_base = float(debuff_min_max[0])
+    debuff_max_base = float(debuff_min_max[1])
+
+    lv_debuff_min = round(debuff_min_base * (1 + 0.05 * (lv - 1)))
+    lv_debuff_max = round(debuff_max_base * (1 + 0.02 * (lv - 1)))
+    return [lv_debuff_min, lv_debuff_max]
+
 # 技能 hit 伤害分布：0.1×2，0.25×2，0.3×1
 def get_hit_damage_str(hit_damage):
     # 统计每个数值出现的次数
@@ -107,14 +125,14 @@ def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
-        original_numbers = extract_skill_numbers(lv1_skill_strength)
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "攻击")
         if len(original_numbers) == 2:
             new_original_numbers = get_lv_strength_min_max(original_numbers, lv)
-            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "攻击")
         else:
             new_original_numbers0 = get_lv_strength_min_max(original_numbers[:2], lv)
             new_original_numbers1 = get_lv_strength_min_max(original_numbers[2:], lv)
-            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "攻击")
 
         desc_lab["text"] = new_text
     except:
@@ -129,15 +147,76 @@ def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
     lv_select = event.widget.get()
     lv = int(lv_select.replace("Skill Lv.",""))
 
-    original_numbers = heal_extract_skill_numbers(lv1_skill_strength)
+    original_numbers = extract_skill_numbers(lv1_skill_strength, "治疗")
     if len(original_numbers) == 2:
         new_original_numbers = get_lv_heal_min_max(original_numbers, lv)
-        new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers)
+        new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "治疗")
     else:
         new_original_numbers0 = get_lv_heal_min_max(original_numbers[:2], lv)
         new_original_numbers1 = get_lv_heal_min_max(original_numbers[2:], lv)
-        new_text = heal_write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1)
+        new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "治疗")
 
     desc_lab["text"] = new_text
     # except:
     #     return
+
+
+def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        last_text = desc_lab["text"]
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "上升")
+        if len(original_numbers) == 2:
+            new_original_numbers = get_lv_buff_min_max(original_numbers, lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "上升")
+        else:
+            new_original_numbers0 = get_lv_buff_min_max(original_numbers[:2], lv)
+            new_original_numbers1 = get_lv_buff_min_max(original_numbers[2:], lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "上升")
+
+        desc_lab["text"] = new_text
+    except:
+        return
+
+def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        last_text = desc_lab["text"]
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "心眼")
+        if len(original_numbers) == 2:
+            new_original_numbers = get_lv_buff_min_max(original_numbers, lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "心眼")
+        else:
+            new_original_numbers0 = get_lv_buff_min_max(original_numbers[:2], lv)
+            new_original_numbers1 = get_lv_buff_min_max(original_numbers[2:], lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "心眼")
+
+        desc_lab["text"] = new_text
+    except:
+        return
+
+def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        last_text = desc_lab["text"]
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "下降")
+        if len(original_numbers) == 2:
+            new_original_numbers = get_lv_debuff_min_max(original_numbers, lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "下降")
+        else:
+            new_original_numbers0 = get_lv_debuff_min_max(original_numbers[:2], lv)
+            new_original_numbers1 = get_lv_debuff_min_max(original_numbers[2:], lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "下降")
+
+        desc_lab["text"] = new_text
+    except:
+        return
