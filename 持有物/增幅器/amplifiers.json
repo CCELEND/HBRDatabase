@@ -1,5 +1,27 @@
 
 {
+
+    "指挥家":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"提升智慧，用辅助技能支援同伴吧\n智慧 +53 / 其他性能 +39\n芯片装备栏4", 
+        "price":"1,875,000 GP", 
+        "location":"商店（主线剧情 第五章 上篇 day2）"
+    },
+    "监察员":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"提升灵巧，贯穿敌人的DP吧\n灵巧 +51 / 其他性能 +40\n芯片装备栏4", 
+        "price":"1,875,000 GP", 
+        "location":"商店（主线剧情 第五章 上篇 day2）"
+    },
+    "大师":{
+        "path":"./持有物/增幅器/SeraphBooster1.webp", 
+        "description":"强化力量，将敌人的HP削减至最低吧\n力量 +51 / 其他性能 +40\n芯片装备栏4",
+        "price":"1,875,000 GP", 
+        "location":"商店（主线剧情 第五章 上篇 day2）"
+    },
+
+
+
     "空蝉":{
         "path":"./持有物/增幅器/SeraphBooster2.webp", 
         "description":"提高战斗稳定性的新世代增幅器\n体力、精神 +60 / 其他性能 +35\n芯片装备栏1",
