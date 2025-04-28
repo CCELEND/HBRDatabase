@@ -50,6 +50,7 @@ album_cover_paths={
     "Love_Song_from_the_Water":"./音乐/下载/Love_Song_from_the_Water/Love_Song_from_the_Water.jpg",
     "麻枝准_やなぎなぎ":"./音乐/下载/麻枝准_やなぎなぎ/",
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
+    "Stargazer":"./音乐/下载/Stargazer/",
     "Inst_Test_Examples":"./音乐/下载/Inst_Test_Examples/"
 
 }
@@ -62,6 +63,8 @@ def get_album_cover_path(all_albun_name, file_name):
         return album_cover_paths["She_is_Legend"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "Inst_Test_Examples":
         return album_cover_paths["Inst_Test_Examples"] + file_name.replace("flac", "jpg")
+    elif all_albun_name == "Stargazer":
+        return album_cover_paths["Stargazer"] + file_name.replace("flac", "jpg")
     else:
         return album_cover_paths[all_albun_name]
 
