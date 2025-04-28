@@ -58,6 +58,7 @@ def get_album_cover_path(all_albun_name, file_name):
         return album_cover_paths["麻枝准_やなぎなぎ"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "She_is_Legend":
         file_name = file_name.replace("03.陽のさす向こうへ", "02.春眠旅団")
+        file_name = file_name.replace("11.World We Changed", "02.春眠旅団")
         return album_cover_paths["She_is_Legend"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "Inst_Test_Examples":
         return album_cover_paths["Inst_Test_Examples"] + file_name.replace("flac", "jpg")
