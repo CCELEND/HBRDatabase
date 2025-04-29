@@ -131,8 +131,10 @@ def get_hbr_brochure():
 
         # 设置 ChromeDriver 的服务
         chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
-        # service = Service(executable_path=ChromeDriverManager().install())
-        service = Service(executable_path=chromedriver_path)
+        try:
+            service = Service(executable_path=chromedriver_path)
+        except:
+            service = Service(executable_path=ChromeDriverManager().install())
         # 初始化 Chrome WebDriver
         driver = webdriver.Chrome(service=service)
 
