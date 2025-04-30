@@ -92,7 +92,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         # 计算行和列的位置
         row = i // 6  # 每6个换行
         column = i % 6  # 列位置
-        style_frame.grid(row=row, column=column, padx=(10,0), sticky="nesw")  # 设置间距
+        style_frame.grid(row=row, column=column, padx=(10,0), pady=(0,10), sticky="nesw")  # 设置间距
         style_frame.grid_rowconfigure(0, weight=1)
         style_frame.grid_columnconfigure(0, weight=1)
 

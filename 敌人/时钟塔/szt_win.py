@@ -134,8 +134,8 @@ class sztCreator:
                 if self.created_count >= self.total_szts:
                     break
                 
-                # 每个线程创建5个框架
-                for _ in range(5):
+                # 每个线程创建4个框架
+                for _ in range(4):
                     if self.created_count >= self.total_szts:
                         break
                         
@@ -149,7 +149,7 @@ class sztCreator:
                     bind_szt_canvas(szt_frame, szt, 0, 0)
                     
                     # 计算位置
-                    column = self.created_count % 5
+                    column = self.created_count % 4
                     szt_frame.grid(row=self.current_row, column=column, 
                                    padx=(10, 0), pady=(0, 10), sticky="nesw")
                     szt_frame.grid_rowconfigure(0, weight=1)
@@ -157,8 +157,8 @@ class sztCreator:
                     
                     self.created_count += 1
                     
-                    # 每5个框架换行
-                    if self.created_count % 5 == 0:
+                    # 每4个框架换行
+                    if self.created_count % 4 == 0:
                         self.current_row += 1
                 
                 self.scrollbar_frame_obj.update_canvas()

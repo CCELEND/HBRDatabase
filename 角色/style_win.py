@@ -191,7 +191,7 @@ def creat_active_skill_frame(parent_frame, style):
 
             desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
             desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
-            if "技能强度" in text:
+            if "技能强度" in text and "属性倍率" in text:
                 lv_combo_lab = desc_lab
                 lv_combo_text = text
             else:
