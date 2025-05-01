@@ -1,8 +1,8 @@
 {
-    "刀":{
-        "name":"刀","en":"Sword",
+    "剑":{
+        "name":"剑","en":"Sword",
         "path":"./战斗系统/武器/Sword.webp",
-        "description":"刀（斩武器属性）","hit":"3"
+        "description":"剑（斩武器属性）","hit":"3"
     },
 
     "双刀":{
@@ -41,10 +41,10 @@
         "description":"摩托（突武器属性）\n（目前是七濑七海的武器）","hit":"3"
     },
 
-    "大刀":{
-        "name":"大刀","en":"LargeSword",
+    "大剑":{
+        "name":"大剑","en":"LargeSword",
         "path":"./战斗系统/武器/LargeSword.webp",
-        "description":"大刀（打武器属性）","hit":"1"
+        "description":"大剑（打武器属性）","hit":"1"
     },
     
     "盾":{

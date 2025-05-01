@@ -39,7 +39,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
 
         # 使用 LabelFrame 作为每一行的容器
         row_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry.name)
-        row_frame.grid(row=i, column=0, columnspan=6, padx=10, pady=(0,5), sticky="nsew")
+        row_frame.grid(row=i, column=0, columnspan=6, padx=10, pady=(0,10), sticky="nsew")
         row_frame.grid_columnconfigure(0, weight=1)  # 让 inner_frame 适应 row_frame
      
         # 创建 inner_frame 让 Canvas 和 Label 并排
