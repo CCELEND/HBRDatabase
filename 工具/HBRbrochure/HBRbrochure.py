@@ -130,13 +130,14 @@ def get_hbr_brochure():
         chrome_options.add_argument("--headless")
 
         # 设置 ChromeDriver 的服务
-        chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
+        # 初始化 Chrome WebDriver
         try:
+            chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
             service = Service(executable_path=chromedriver_path)
+            driver = webdriver.Chrome(service=service)
         except:
             service = Service(executable_path=ChromeDriverManager().install())
-        # 初始化 Chrome WebDriver
-        driver = webdriver.Chrome(service=service)
+            driver = webdriver.Chrome(service=service)
 
         # 打开 game.bilibili.com
         driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
