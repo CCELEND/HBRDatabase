@@ -195,6 +195,14 @@ class ArtworkDisplayerHeight:
         self.canvas.create_image(x_offset, 0, anchor=tk.NW, image=self.tk_image)
         self.canvas.image = self.tk_image  # 保持引用，避免被垃圾回收
 
+    def destroy(self):
+        # 销毁 Canvas
+        self.canvas.destroy()
+        # 释放图片资源
+        self.tk_image = None
+        # 如果需要，也可以关闭原始图片
+        self.original_image.close()
+
 
 # webp 静态图显示
 class ArtworkDisplayer:

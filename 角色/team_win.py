@@ -26,16 +26,17 @@ def creat_role_right_menu(event, parent_frame, role, team):
 # 已打开的角色窗口字典，键：角色名，值：窗口句柄
 open_role_wins = {}
 #关闭窗口时，清除角色窗口字典中的句柄，并销毁窗口
-def role_win_closing(parent_frame):
+def role_win_closing(parent_frame, displayer):
 
     open_role_win = parent_frame.title()
     while open_role_win in open_role_wins:
         del open_role_wins[open_role_win]
 
     parent_frame.destroy()  # 销毁窗口
+    displayer.destroy() # 释放类资源
 
 # 显示全身画
-def show_role_full_img(parent_frame, role, team):
+def show_role_full_img(event, parent_frame, role, team):
 
     open_role_win = role.name+"-full"
     # 重复打开时，窗口置顶并直接返回
@@ -49,6 +50,9 @@ def show_role_full_img(parent_frame, role, team):
 
     role_full_path = role.img_path.replace("Profile", "")
     displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840)
+
+    # 窗口关闭时清理
+    role_full_img_frame.protocol("WM_DELETE_WINDOW", lambda: role_win_closing(role_full_img_frame, displayer))
 
     return "break"  # 阻止事件冒泡
 
@@ -147,10 +151,12 @@ def show_team(scrollbar_frame_obj, team):
         # 绑定事件到 Canvas
         mouse_bind_canvas_events(canvas)
         bind_canvas_events(canvas, 
-            show_role_img, parent_frame=frame, role=role, team=team)
-        # 右键点击事件绑定
-        right_click_bind_canvas_events(canvas, 
-            creat_role_right_menu, parent_frame=frame, role=role, team=team)
+            show_role_full_img, parent_frame=frame, role=role, team=team)
+        # bind_canvas_events(canvas, 
+        #     show_role_img, parent_frame=frame, role=role, team=team)
+        # # 右键点击事件绑定
+        # right_click_bind_canvas_events(canvas, 
+        #     creat_role_right_menu, parent_frame=frame, role=role, team=team)
 
         # 角色描述
         # 设置了标签的字体为 Monospace 大小为 10，加粗
