@@ -89,7 +89,7 @@ def get_brochure(driver, style_infos):
     HBRbrochure.mapping.load_resources()
     try:
         # 等待立华奏加载完成 绝对不是因为我是一个奏厨（
-        TachibanaKanadeElement = WebDriverWait(driver, 30).until(
+        TachibanaKanadeElement = WebDriverWait(driver, 300).until(
             EC.visibility_of_element_located((By.ID, "AliceADefault_R3"))
         )
         

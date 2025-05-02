@@ -150,7 +150,7 @@ def get_hbr_brochure():
         driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
 
         # 等待 class 为 card-box 的元素加载完成
-        card_box_element = WebDriverWait(driver, 30).until(
+        card_box_element = WebDriverWait(driver, 300).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "card-box"))
         )
 
