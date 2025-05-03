@@ -21,7 +21,7 @@
 
     "风格报告":{
         "path":"./持有物/成长素材/StyleExp01.webp", 
-        "description":"可获得Slv经验值的道具", 
+        "description":"可获得风格等级经验值的道具", 
         "price":"", 
         "location":""
     },
