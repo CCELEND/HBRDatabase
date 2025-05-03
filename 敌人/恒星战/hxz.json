@@ -17,6 +17,15 @@
     "logo_path":"./敌人/恒星战/宣告终焉的邂逅#2/DimensionBattleCentralTop_003.ico",
     "name":"宣告终焉的邂逅#2",
     "guide_path":"./敌人/恒星战/宣告终焉的邂逅#2/2.jpg"
+},
+
+"轮转的凶祸#3":
+{
+    "img_path":"./敌人/恒星战/轮转的凶祸#3/hxz3.jpg",
+    "img_path_enemy":"./敌人/恒星战/轮转的凶祸#3/DimensionBattleCentralTop_004.webp",
+    "logo_path":"./敌人/恒星战/轮转的凶祸#3/DimensionBattleCentralTop_004.ico",
+    "name":"轮转的凶祸#3",
+    "guide_path":"./敌人/恒星战/轮转的凶祸#3/3.jpg"
 }
 
 }
