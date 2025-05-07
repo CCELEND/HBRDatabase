@@ -558,6 +558,283 @@
             "weakness":"斩-150、冰-150","resist":"打+75"
         }
     }
+},
+
+
+
+
+"HELL-26F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-26F",
+    "enemys":
+    {
+        "IvoryScooper":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"IvoryScooper",
+            "border":"400",
+            "DP":"300,000","HP":"1,600,000",
+            "weakness":"打-50","resist":"斩+75"
+        },
+        "IvoryScooper2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"IvoryScooper2",
+            "border":"400",
+            "DP":"300,000","HP":"1,600,000",
+            "weakness":"打-50","resist":"斩+75"
+        }
+    }
+},
+
+"HELL-27F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-27F",
+    "enemys":
+    {
+        "暗影·月歌[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·月歌[]",
+            "border":"400",
+            "DP":"900,000","HP":"70,000,000",
+            "weakness":"斩-150、火-150","resist":"突+75"
+        }
+    }
+},
+
+"HELL-28F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-28F",
+    "enemys":
+    {
+        "ThunderBird":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ThunderBird",
+            "border":"400",
+            "DP":"3,050,000","HP":"4,600,000",
+            "weakness":"突-50、火-100","resist":"打+50"
+        }
+    }
+},
+
+"HELL-29F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-29F",
+    "enemys":
+    {
+        "ObjectionPurple":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ObjectionPurple",
+            "border":"410",
+            "DP":"900,000","HP":"6,900,000",
+            "weakness":"打-150、光-150","resist":""
+        },
+        "ObjectionPurple2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ObjectionPurple2",
+            "border":"410",
+            "DP":"900,000","HP":"6,900,000",
+            "weakness":"打-150、光-150","resist":""
+        }
+    }
+},
+
+"HELL-30F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-30F",
+    "enemys":
+    {
+        "暗影·司[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·司[]",
+            "border":"410",
+            "DP":"1,400,000","HP":"5,300,000",
+            "weakness":"火-150","resist":"打+75"
+        }
+    }
+},
+
+"HELL-31F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-31F",
+    "enemys":
+    {
+        "VeiledDeath":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"VeiledDeath",
+            "border":"410",
+            "DP":"650,000","HP":"2,000,000",
+            "weakness":"火-50、冰-50、雷-50","resist":""
+        }
+    }
+},
+
+"HELL-32F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-32F",
+    "enemys":
+    {
+        "暗影·梢[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·梢[]",
+            "border":"410",
+            "DP":"800,000","HP":"53,500,000",
+            "weakness":"斩-150、雷-150","resist":"突+75"
+        }
+    }
+},
+
+"HELL-33F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-33F",
+    "enemys":
+    {
+        "DiamondEyeS":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DiamondEyeS",
+            "border":"410",
+            "DP":"120,000","HP":"11,000,000",
+            "weakness":"打-50","resist":"斩+75"
+        }
+    }
+},
+
+"HELL-34F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-34F",
+    "enemys":
+    {
+        "WireRedβ":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"WireRedβ",
+            "border":"410",
+            "DP":"550,000","HP":"17,000,000",
+            "weakness":"斩-50、冰-100","resist":""
+        },
+        "WireRedβ2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"WireRedβ2",
+            "border":"410",
+            "DP":"550,000","HP":"17,000,000",
+            "weakness":"斩-50、冰-100","resist":""
+        }
+    }
+},
+
+"HELL-35F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-35F",
+    "enemys":
+    {
+        "暗影·丸山[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·丸山[]",
+            "border":"410",
+            "DP":"7,700,000","HP":"1,050,000",
+            "weakness":"突-150、暗-150","resist":"打+75"
+        }
+    }
+},
+
+"HELL-36F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-36F",
+    "enemys":
+    {
+        "PurpleElephantWhip":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"PurpleElephantWhip",
+            "border":"410",
+            "DP":"2,300,000","HP":"62,500,000",
+            "weakness":"斩-150、光-150","resist":"突+50"
+        }
+    }
+},
+
+"HELL-37F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-37F",
+    "enemys":
+    {
+        "暗影·丸山2[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·丸山2[]",
+            "border":"410",
+            "DP":"8,400,000","HP":"1,380,000",
+            "weakness":"突-150、暗-150","resist":"打+75"
+        },
+        "暗影·柳[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·柳[]",
+            "border":"410",
+            "DP":"4,900,000","HP":"3,200,000",
+            "weakness":"突-150、暗-150","resist":"打+75"
+        }
+    }
+},
+
+"HELL-38F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-38F",
+    "enemys":
+    {
+        "CorollaScythe":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"CorollaScythe",
+            "border":"420",
+            "DP":"4,300,000","HP":"500,000",
+            "weakness":"突-150","resist":""
+        },
+        "CurseDoll":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"CurseDoll",
+            "border":"420",
+            "DP":"4,100,000","HP":"500,000",
+            "weakness":"打-150","resist":""
+        }
+    }
 }
 
 }
