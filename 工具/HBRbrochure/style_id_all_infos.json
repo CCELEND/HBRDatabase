@@ -109,6 +109,9 @@
     "1002504":{
         "style_name":"剧终的黄昏", "character_role":"减益者", "element_type":"冰", "weapon_type":"斩"
     },
+    "1002505":{
+        "style_name":"起跳，跨步，滑倒啦！", "character_role":"增益者", "element_type":"无", "weapon_type":"斩"
+    },
     "1002603":{
         "style_name":"狂怒之兽", "character_role":"破坏者", "element_type":"无", "weapon_type":"突"
     },
