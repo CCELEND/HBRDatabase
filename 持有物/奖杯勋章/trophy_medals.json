@@ -144,5 +144,24 @@
         "description":"在10回合内通关X层级时\n可在恒星扫荡战线#6获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#6"
+    },
+
+    "制霸异兽者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Bronze.webp", 
+        "description":"通关B层级时\n可在恒星扫荡战线#7获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#7"
+    },
+    "狩猎异兽者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Silver.webp", 
+        "description":"通关X层级时\n可在恒星扫荡战线#7获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#7"
+    },
+    "征伐异兽者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Gold.webp", 
+        "description":"在15回合内通关X层级时\n可在恒星扫荡战线#7获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#7"
     }
 } 
