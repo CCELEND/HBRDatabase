@@ -29,6 +29,19 @@
         "description":"可购买背景主题的道具", 
         "price":"", 
         "location":"恒星扫荡战线"
+    },
+
+    "赛季点数":{
+        "path":"./持有物/道具/ThumbnailArcadeSeasonPoint.webp", 
+        "description":"讨伐敌人卡可获得相应分数\n获得一定量赛季点数后，可获得赛季奖励", 
+        "price":"", 
+        "location":"技术模拟战"
+    },
+    "技术卡奖章":{
+        "path":"./持有物/道具/ThumbnailArtsMedal.webp", 
+        "description":"可以在技术模拟战获得的道具\n收集技术卡奖章，可解锁新的技术卡", 
+        "price":"", 
+        "location":"技术模拟战"
     }
 
 } 
