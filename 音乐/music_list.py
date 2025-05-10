@@ -137,6 +137,8 @@ class ExpandableList:
 
                     music_handle(all_album_name, disc_name, file_name)
                 except Exception as e:
-                    print(f"节点解析错误: {str(e)}")
+                    # print(f"节点解析错误: {str(e)}")
+                    messagebox.showerror("错误", f"节点解析错误：{str(e)}")
             else:
-                print(f"未找到父节点: {file_name}")
+                # print(f"未找到父节点: {file_name}")
+                messagebox.showerror("错误", f"未找到父节点：{file_name}")
