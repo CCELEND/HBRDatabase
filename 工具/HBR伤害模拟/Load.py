@@ -18,15 +18,17 @@ def load_hbr_damage_simulation():
         chrome_options = Options()
         # chrome_options.add_argument("--headless")
 
-        chrome_options.add_argument("--ignore-certificate-errors")  # 忽略 SSL 证书错误
+        # 忽略 SSL 证书错误
+        chrome_options.add_argument("--ignore-certificate-errors")  
         # 忽略 Bluetooth: bluetooth_adapter_winrt.cc:1075 Getting Default Adapter failed. 错误
         chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
         # 忽略 DevTools listening on ws://127.0.0.1... 提示
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+
+        # 加载插件
         chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
 
-        # 设置 ChromeDriver 的服务
-        # 初始化 Chrome WebDriver
+        # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
         try:
             chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
             service = Service(executable_path=chromedriver_path)
