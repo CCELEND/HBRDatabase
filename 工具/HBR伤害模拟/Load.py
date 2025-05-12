@@ -34,7 +34,7 @@ def load_hbr_damage_simulation():
             driver = webdriver.Chrome(service=service, options=chrome_options)
         except:
             service = Service(executable_path=ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service)
+            driver = webdriver.Chrome(service=service, options=chrome_options)
 
         driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
 
