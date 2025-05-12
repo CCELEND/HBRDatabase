@@ -20,10 +20,9 @@ def load_hbr_damage_simulation():
 
         # 忽略 SSL 证书错误
         chrome_options.add_argument("--ignore-certificate-errors")  
-        # 忽略 Bluetooth: bluetooth_adapter_winrt.cc:1075 Getting Default Adapter failed. 错误
-        chrome_options.add_experimental_option('excludeSwitches', ['enable-automation'])
-        # 忽略 DevTools listening on ws://127.0.0.1... 提示
-        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+        # 禁用控制台日志输出，隐藏自动化标记
+        chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
+        chrome_options.add_experimental_option("useAutomationExtension", False)
 
         # 加载插件
         chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
