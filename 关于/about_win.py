@@ -32,7 +32,7 @@ def creat_about_win(parent_frame):
     # 创建 LabelFrame
     ver_frame = ttk.LabelFrame(about_win_frame, text="🧰版本")
     ver_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=(5,0), sticky="nsew")
-    describe = "HBRDatabase1.44\n(build-0b112a18)"
+    describe = "HBRDatabase1.44 (build-0b112a18)"
     # 设置了标签的字体为 Monospace 大小为 10，加粗
     label = ttk.Label(ver_frame, text=describe, anchor="center", font=("Monospace", 10, "bold"))
     label.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
@@ -43,7 +43,7 @@ def creat_about_win(parent_frame):
     # 创建 LabelFrame
     develop_frame = ttk.LabelFrame(about_win_frame, text="🔧开发")
     develop_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=(5,0), sticky="nsew")
-    describe = "如有疑问请与我联系：\n不吃花椒的汪汪队（B站空间：https://space.bilibili.com/442776860）\nQQ：2644884626\n邮箱：celend2644884626@163.com"
+    describe = "如有疑问请与我联系：\n不吃花椒的汪汪队（B站空间：https://space.bilibili.com/442776860）\nQQ：2644884626\n邮箱：celend2644884626@163.com\nGitHub：https://github.com/CCELEND/HBRDatabase"
     # 设置了标签的字体为 Monospace 大小为 10，加粗
     label = ttk.Label(develop_frame, text=describe, anchor="center", font=("Monospace", 10, "bold"))
     label.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
