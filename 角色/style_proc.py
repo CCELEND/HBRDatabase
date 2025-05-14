@@ -3,6 +3,7 @@ import os
 from functools import partial
 import re
 import math
+from decimal import Decimal, ROUND_HALF_UP
 
 # 提取范围值列表
 def extract_skill_numbers(text, type):
@@ -69,7 +70,7 @@ def get_lv_strength_min_max(strength_min_max, lv):
 
     return [lv_strength_min, lv_strength_max]
 
-# [] 返回不同等级回量最大值 最小值 列表形式 [min, max]
+# [] 返回不同等级回复量最大值 最小值 列表形式 [min, max]
 def get_lv_heal_min_max(heal_min_max, lv):
     heal_min_base = float(heal_min_max[0])
     heal_max_base = float(heal_min_max[1])
@@ -86,8 +87,13 @@ def get_lv_buff_min_max(buff_min_max, lv):
     buff_min_base = float(buff_min_max[0])
     buff_max_base = float(buff_min_max[1])
 
-    lv_buff_min = round(buff_min_base * (1 + 0.03 * (lv - 1)))
-    lv_buff_max = round(buff_max_base * (1 + 0.02 * (lv - 1)))
+    # lv_buff_min = round(buff_min_base * (1 + 0.03 * (lv - 1)), 1)
+    # lv_buff_max = round(buff_max_base * (1 + 0.02 * (lv - 1)), 1)
+
+    lv_buff_min = buff_min_base * (1 + 0.03 * (lv - 1))
+    lv_buff_max = buff_max_base * (1 + 0.02 * (lv - 1))
+    lv_buff_min = float(f"{lv_buff_min:.1f}")
+    lv_buff_max = float(f"{lv_buff_max:.1f}")
 
     return [lv_buff_min, lv_buff_max]
 
@@ -96,8 +102,14 @@ def get_lv_debuff_min_max(debuff_min_max, lv):
     debuff_min_base = float(debuff_min_max[0])
     debuff_max_base = float(debuff_min_max[1])
 
-    lv_debuff_min = round(debuff_min_base * (1 + 0.05 * (lv - 1)))
-    lv_debuff_max = round(debuff_max_base * (1 + 0.02 * (lv - 1)))
+    # lv_debuff_min = round(debuff_min_base * (1 + 0.05 * (lv - 1)), 1)
+    # lv_debuff_max = round(debuff_max_base * (1 + 0.02 * (lv - 1)), 1)
+
+    lv_debuff_min = debuff_min_base * (1 + 0.05 * (lv - 1))
+    lv_debuff_max = debuff_max_base * (1 + 0.02 * (lv - 1))
+    lv_debuff_min = float(f"{lv_debuff_min:.1f}")
+    lv_debuff_max = float(f"{lv_debuff_max:.1f}")    
+
     return [lv_debuff_min, lv_debuff_max]
 
 # 技能 hit 伤害分布：0.1×2，0.25×2，0.3×1
