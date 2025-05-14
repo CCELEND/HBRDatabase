@@ -112,6 +112,7 @@ def get_lv_debuff_min_max(debuff_min_max, lv):
 
     return [lv_debuff_min, lv_debuff_max]
 
+
 # 技能 hit 伤害分布：0.1×2，0.25×2，0.3×1
 def get_hit_damage_str(hit_damage):
     # 统计每个数值出现的次数
@@ -228,6 +229,43 @@ def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers0 = get_lv_debuff_min_max(original_numbers[:2], lv)
             new_original_numbers1 = get_lv_debuff_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "下降")
+
+        desc_lab["text"] = new_text
+    except:
+        return
+
+
+# 返回不同等级百分比值
+def get_lv_percentage(percentage_base, lv):
+    lv_percentage_base = float(percentage_base)
+    lv_percentage = lv_percentage_base + 1.668 * (lv - 1)
+    lv_percentage = float(f"{lv_percentage:.1f}")
+
+    return lv_percentage
+
+def extract_percentage_skill_numbers(text):
+    # 添加 re.DOTALL 以匹配换行符
+    percentage = re.search(r"百分比的伤害：(.*?)%", text, re.DOTALL).group(1).strip()
+    return percentage
+
+def write_percentage_numbers_back(text, new_percentage):
+    new_text = re.sub(
+        r"(百分比的伤害：)(\d+\.?\d*)(%，)",  # 匹配模式
+        lambda m: f"{m.group(1)}{new_percentage}{m.group(3)}",  # 替换逻辑
+        text
+    )
+    return new_text
+
+def on_percentage_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        last_text = desc_lab["text"]
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_percentage_skill_numbers(lv1_skill_strength)
+        lv_percentage = get_lv_percentage(original_numbers, lv)
+        new_text = write_percentage_numbers_back(lv1_skill_strength, lv_percentage)
 
         desc_lab["text"] = new_text
     except:
