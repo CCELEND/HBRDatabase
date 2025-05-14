@@ -442,6 +442,22 @@
         "type":"增益",
         "series":"Babied" 
     },
+    "永恒誓言":{
+        "name":"永恒誓言",
+        "path":"./战斗系统/状态/EternalOath.webp",
+        "effect":"永久技能攻击上升50%，永久防御上升25%，永久暴击率上升50%","description":"永久技能攻击上升50%，永久防御上升25%，永久暴击率上升50%",
+        "stack":"-",
+        "type":"增益",
+        "series":"永恒誓言" 
+    },
+    "跟班":{
+        "name":"跟班",
+        "path":"./战斗系统/状态/BIYamawakiServant.webp",
+        "effect":"处于山胁大人的小跟班状态，虚弱伤害增加30%","description":"处于山胁大人的小跟班状态，虚弱伤害增加30%",
+        "stack":"-",
+        "type":"增益",
+        "series":"跟班" 
+    },
     "上升增益技能强化":{
         "name":"上升增益技能强化",
         "path":"./战斗系统/状态/GiveAttackBuffUp.webp",
@@ -485,7 +501,7 @@
     "攻击上升且减益效果强化":{
         "name":"攻击上升且减益效果强化",
         "path":"./战斗系统/状态/ArrowCherryBlossoms.webp",
-        "effect":"攻击上升50%\n减益效果的强度上升20%（不叠加）","description":"攻击上升且减益效果强化",
+        "effect":"攻击上升50%\n减益效果的强度上升20%（不叠加）","description":"攻击上升50%\n减益效果的强度上升20%（不叠加）",
         "stack":"-",
         "type":"增益",
         "series":"技能效果强化"         
