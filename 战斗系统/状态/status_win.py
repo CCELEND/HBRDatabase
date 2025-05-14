@@ -80,6 +80,16 @@ def creat_statu_win(event, parent_frame, statu):
     return "break"  # 阻止事件冒泡
 
 
+def set_frame_newline(frame, item_num, newline_num, column_count):
+    # 计算行和列的位置
+    row = item_num // newline_num  # 每newline_num个换行
+    column = item_num % newline_num  # 列位置
+    frame.grid(row=row, column=column, padx=5, pady=(0,5), sticky="nesw")  # 设置间距
+    column_count += 1  # 更新列计数器
+    if column_count == newline_num:  # 如果已经到达第newline_num列，重置列计数器并增加行
+        column_count = 0
+    return column_count
+
 # 加载图片并显示的函数
 def show_statu(scrollbar_frame_obj):
 
@@ -112,40 +122,20 @@ def show_statu(scrollbar_frame_obj):
                     bind_statu_canvas(statu_frame, statu, 0, 0)
 
                     if type in ['增益', '减益']:
-                        # 计算行和列的位置
-                        statu_row = statu_num // 4  # 每4个换行
-                        statu_column = statu_num % 4  # 列位置
-                        statu_frame.grid(row=statu_row, column=statu_column, padx=5, pady=(0,5), sticky="nesw")  # 设置间距
-                        statu_column_count += 1  # 更新列计数器
-                        if statu_column_count == 4:  # 如果已经到达第4列，重置列计数器并增加行
-                            statu_column_count = 0 
+                        if series == "技能效果强化":
+                            statu_column_count = set_frame_newline(statu_frame, statu_num, 3, statu_column_count)
+                        else: 
+                            statu_column_count = set_frame_newline(statu_frame, statu_num, 4, statu_column_count)
                     else:
                         statu_frame.grid(row=0, column=statu_num, padx=5, pady=(0,5), sticky="nesw")  # 设置间距      
 
             if type in ['增益']:
-                # 计算行和列的位置
-                series_row = series_num // 3  # 每3个换行
-                series_column = series_num % 3  # 列位置
-                series_frame.grid(row=series_row, column=series_column, padx=(5,0), sticky="nesw")  # 设置间距
-                series_column_count += 1  # 更新列计数器
-                if series_column_count == 3:  # 如果已经到达第3列，重置列计数器并增加行
-                    series_column_count = 0
-            elif type in ['减益']:
-                # 计算行和列的位置
-                series_row = series_num // 4  # 每4个换行
-                series_column = series_num % 4  # 列位置
-                series_frame.grid(row=series_row, column=series_column, padx=(5,0), sticky="nesw")  # 设置间距
-                series_column_count += 1  # 更新列计数器
-                if series_column_count == 4:  # 如果已经到达第4列，重置列计数器并增加行
-                    series_column_count = 0                
+                # padx=(5,0)
+                series_column_count = set_frame_newline(series_frame, series_num, 3, series_column_count)
+            elif type in ['减益']: 
+                series_column_count = set_frame_newline(series_frame, series_num, 4, series_column_count)           
             elif type in ['其他']:
-                # 计算行和列的位置
-                series_row = series_num // 5  # 每5个换行
-                series_column = series_num % 5  # 列位置
-                series_frame.grid(row=series_row, column=series_column, padx=(5,0), sticky="nesw")  # 设置间距
-                series_column_count += 1  # 更新列计数器
-                if series_column_count == 5:  # 如果已经到达第5列，重置列计数器并增加行
-                    series_column_count = 0
+                series_column_count = set_frame_newline(series_frame, series_num, 5, series_column_count) 
             else:
                 series_frame.grid(row=0, column=series_num, padx=(5,0), sticky="nesw")  # 设置间距
 
