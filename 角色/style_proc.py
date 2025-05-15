@@ -96,6 +96,10 @@ def get_lv_buff_min_max(buff_min_max, lv):
     lv_buff_min = float(f"{lv_buff_min:.1f}")
     lv_buff_max = float(f"{lv_buff_max:.1f}")
 
+    # 如果小数部分为0则转换为整数
+    lv_buff_min = int(lv_buff_min) if lv_buff_min.is_integer() else lv_buff_min
+    lv_buff_max = int(lv_buff_max) if lv_buff_max.is_integer() else lv_buff_max
+
     return [lv_buff_min, lv_buff_max]
 
 # [] 返回不同等级debuff最大值 最小值 列表形式 [min, max]
@@ -110,7 +114,11 @@ def get_lv_debuff_min_max(debuff_min_max, lv):
     lv_debuff_max = debuff_max_base * (1 + 0.02 * (lv - 1))
     # 保留一位小数
     lv_debuff_min = float(f"{lv_debuff_min:.1f}")
-    lv_debuff_max = float(f"{lv_debuff_max:.1f}")    
+    lv_debuff_max = float(f"{lv_debuff_max:.1f}")
+
+    # 如果小数部分为0则转换为整数
+    lv_debuff_min = int(lv_debuff_min) if lv_debuff_min.is_integer() else lv_debuff_min
+    lv_debuff_max = int(lv_debuff_max) if lv_debuff_max.is_integer() else lv_debuff_max
 
     return [lv_debuff_min, lv_debuff_max]
 
@@ -244,6 +252,9 @@ def get_lv_percentage(percentage_base, lv):
     lv_percentage_base = float(percentage_base)
     lv_percentage = lv_percentage_base + 1.668 * (lv - 1)
     lv_percentage = float(f"{lv_percentage:.1f}")
+
+    # 如果小数部分为0则转换为整数
+    lv_percentage = int(lv_percentage) if lv_percentage.is_integer() else lv_percentage
 
     return lv_percentage
 
