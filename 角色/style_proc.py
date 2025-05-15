@@ -92,6 +92,7 @@ def get_lv_buff_min_max(buff_min_max, lv):
 
     lv_buff_min = buff_min_base * (1 + 0.03 * (lv - 1))
     lv_buff_max = buff_max_base * (1 + 0.02 * (lv - 1))
+    # 保留一位小数
     lv_buff_min = float(f"{lv_buff_min:.1f}")
     lv_buff_max = float(f"{lv_buff_max:.1f}")
 
@@ -107,6 +108,7 @@ def get_lv_debuff_min_max(debuff_min_max, lv):
 
     lv_debuff_min = debuff_min_base * (1 + 0.05 * (lv - 1))
     lv_debuff_max = debuff_max_base * (1 + 0.02 * (lv - 1))
+    # 保留一位小数
     lv_debuff_min = float(f"{lv_debuff_min:.1f}")
     lv_debuff_max = float(f"{lv_debuff_max:.1f}")    
 
@@ -173,7 +175,7 @@ def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
     # except:
     #     return
 
-
+# 不同等级时的增益数值处理
 def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
@@ -194,6 +196,7 @@ def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
     except:
         return
 
+# 不同等级时的心眼数值处理
 def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
@@ -214,6 +217,7 @@ def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
     except:
         return
 
+# 不同等级时的减益值处理
 def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
@@ -243,11 +247,13 @@ def get_lv_percentage(percentage_base, lv):
 
     return lv_percentage
 
+# 提取百分比数字
 def extract_percentage_skill_numbers(text):
     # 添加 re.DOTALL 以匹配换行符
     percentage = re.search(r"百分比的伤害：(.*?)%", text, re.DOTALL).group(1).strip()
     return percentage
 
+# 回写
 def write_percentage_numbers_back(text, new_percentage):
     new_text = re.sub(
         r"(百分比的伤害：)(\d+\.?\d*)(%，)",  # 匹配模式
@@ -256,6 +262,7 @@ def write_percentage_numbers_back(text, new_percentage):
     )
     return new_text
 
+# 不同等级时的百分比分数处理
 def on_percentage_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:

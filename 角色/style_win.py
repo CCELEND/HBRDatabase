@@ -29,8 +29,13 @@ def load_resources():
     状态.status_info.get_all_statu_obj()
     属性.attributes_info.get_all_attribute_obj()
 
-skill_options = ["Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill Lv.5", "Skill Lv.6", "Skill Lv.7", "Skill Lv.8", "Skill Lv.9", "Skill Lv.10", "Skill Lv.11", "Skill Lv.12", "Skill Lv.13", "Skill Lv.14", "Skill Lv.15", "Skill Lv.16", "Skill Lv.17"]
+skill_options = [
+    "Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill Lv.5", "Skill Lv.6", "Skill Lv.7", "Skill Lv.8", "Skill Lv.9", "Skill Lv.10", 
+    "Skill Lv.11", "Skill Lv.12", "Skill Lv.13", 
+    "Skill Lv.14", "Skill Lv.15", "Skill Lv.16", "Skill Lv.17"
+]
 
+# 特殊的效果状态，下列状态会显示：描述：值，或者描述
 special_effects = [
     "心眼", "脆弱", "额外回合", "净化减益", "禁锢", "灾厄","特殊状态", "影分身", "混乱", 
     "弱点强击破", "退避", "充能", "贯通暴击", "斗志", "持续回复DP", "击破保护",
@@ -90,8 +95,6 @@ def creat_desc_frame(row_frame, active_skill):
 # 主动技能
 def creat_active_skill_frame(parent_frame, style):
 
-    # attack_combos = {}
-    # heal_combos = {}
     combos = {}
     # 创建自定义样式
     style_tc = ttk.Style()
@@ -241,7 +244,7 @@ def creat_active_skill_frame(parent_frame, style):
                 partial(on_mindeye_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
             )        
         elif "百分比的伤害" in lv_combo_text:
-            combos[active_skill.name+"_debuff"] = lv_combo
+            combos[active_skill.name+"_other"] = lv_combo
             lv_combo.bind(
                 "<<ComboboxSelected>>", 
                 partial(on_percentage_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
@@ -302,79 +305,56 @@ def creat_passive_skill_frame(parent_frame, style):
         effect_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
         effect_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
 
-def show_style(scrollbar_frame_obj, style):
+# 宝珠强化
+def creat_growth_ability_frame(parent_frame, style):
+    
+    growth_ability_frame = ttk.LabelFrame(parent_frame, text="强化")
+    growth_ability_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    growth_ability_frame.grid_rowconfigure(0, weight=1)
+    growth_ability_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
+    growth_ability_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 描述列
 
-    # 清除之前的组件
-    scrollbar_frame_obj.destroy_components()
-
-    # 职业
-    career = 职业.careers_info.careers[style.career]
-    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
-    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
-    career_frame.grid_rowconfigure(0, weight=1)
-    career_photo = get_photo(career.path, (200, 40))
-    career_canvas = create_canvas_with_image(career_frame, 
-        career_photo, 240, 40, 20, 0, 0, 0)
-
-    # 主动技能
-    creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
-
-    # 被动技能
-    creat_passive_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
-
-    if style.growth_ability:
-
-        # 宝珠强化
-        growth_ability_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="强化")
-        growth_ability_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
-        growth_ability_frame.grid_rowconfigure(0, weight=1)
-        growth_ability_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
-        growth_ability_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 描述列
-
-        # 判断元素属性
-        if style.element_attribute:
-            if len(style.element_attribute) == 1:
-                hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
-                    f"宝珠（{style.element_attribute}属性）"]['path']
-            else:
-                hoju_img_path0 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
-                    f"宝珠（{style.element_attribute[0]}属性）"]['path']
-                hoju_img_path1 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
-                    f"宝珠（{style.element_attribute[1]}属性）"]['path']
-        else:
+    # 判断元素属性
+    if style.element_attribute:
+        if len(style.element_attribute) == 1:
             hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
-                f"宝珠（{style.weapon_attribute}属性）"]['path']
-
-        if not style.element_attribute or len(style.element_attribute) == 1:
-            hoju_photo = get_photo(hoju_img_path, (66, 66))
-            hoju_canvas = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo, 66, 66, 0, 0, 0, 0, padx=15)
-            text = style.growth_ability.description
-            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
-                justify="left", font=("Monospace", 10, "bold"))
-            growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
+                f"宝珠（{style.element_attribute}属性）"]['path']
         else:
-            growth_ability_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 图片列
-            growth_ability_frame.grid_columnconfigure(2, weight=5, minsize=500)  # 描述列
-
-            hoju_photo0 = get_photo(hoju_img_path0, (66, 66))
-            hoju_canvas0 = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo0, 66, 66, 0, 0, 0, 0, padx=15)
-            hoju_photo1 = get_photo(hoju_img_path1, (66, 66))
-            hoju_canvas1 = create_canvas_with_image(growth_ability_frame, 
-                hoju_photo1, 66, 66, 0, 0, 0, 1, padx=15)
-
-            text = style.growth_ability.description
-            growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
-                justify="left", font=("Monospace", 10, "bold"))
-            growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=15, pady=5)
-
-        growth_status_row = 4
+            hoju_img_path0 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+                f"宝珠（{style.element_attribute[0]}属性）"]['path']
+            hoju_img_path1 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+                f"宝珠（{style.element_attribute[1]}属性）"]['path']
     else:
-        growth_status_row = 3
+        hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+            f"宝珠（{style.weapon_attribute}属性）"]['path']
 
-    # 成长状态
-    growth_status_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text="成长状态")
+    if not style.element_attribute or len(style.element_attribute) == 1:
+        hoju_photo = get_photo(hoju_img_path, (66, 66))
+        hoju_canvas = create_canvas_with_image(growth_ability_frame, 
+            hoju_photo, 66, 66, 0, 0, 0, 0, padx=15)
+        text = style.growth_ability.description
+        growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
+            justify="left", font=("Monospace", 10, "bold"))
+        growth_ability_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
+    else:
+        growth_ability_frame.grid_columnconfigure(1, weight=1, minsize=100)  # 图片列
+        growth_ability_frame.grid_columnconfigure(2, weight=5, minsize=500)  # 描述列
+
+        hoju_photo0 = get_photo(hoju_img_path0, (66, 66))
+        hoju_canvas0 = create_canvas_with_image(growth_ability_frame, 
+            hoju_photo0, 66, 66, 0, 0, 0, 0, padx=15)
+        hoju_photo1 = get_photo(hoju_img_path1, (66, 66))
+        hoju_canvas1 = create_canvas_with_image(growth_ability_frame, 
+            hoju_photo1, 66, 66, 0, 0, 0, 1, padx=15)
+
+        text = style.growth_ability.description
+        growth_ability_lab = ttk.Label(growth_ability_frame, text=text, 
+            justify="left", font=("Monospace", 10, "bold"))
+        growth_ability_lab.grid(row=0, column=2, sticky="nsw", padx=15, pady=5)
+
+# 成长状态
+def creat_growth_status_frame(parent_frame, style, growth_status_row):
+    growth_status_frame = ttk.LabelFrame(parent_frame, text="成长状态")
     growth_status_frame.grid(row=growth_status_row, column=0, 
         columnspan=4, padx=10, pady=(5,10), sticky="nsew")
     growth_status_frame.grid_rowconfigure(0, weight=1)
@@ -397,6 +377,36 @@ def show_style(scrollbar_frame_obj, style):
     growth_status_lab1 = ttk.Label(growth_status_frame, text=text, 
         justify="right", font=("Monospace", 10, "bold"))
     growth_status_lab1.grid(row=0, column=1, sticky="sw", padx=20, pady=5)
+
+def show_style(scrollbar_frame_obj, style):
+
+    # 清除之前的组件
+    scrollbar_frame_obj.destroy_components()
+
+    # 职业
+    career = 职业.careers_info.careers[style.career]
+    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
+    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    career_frame.grid_rowconfigure(0, weight=1)
+    career_photo = get_photo(career.path, (200, 40))
+    career_canvas = create_canvas_with_image(career_frame, 
+        career_photo, 240, 40, 20, 0, 0, 0)
+
+    # 主动技能
+    creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
+
+    # 被动技能
+    creat_passive_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
+
+    # 宝珠强化
+    if style.growth_ability:
+        creat_growth_ability_frame(scrollbar_frame_obj.scrollable_frame, style)
+        growth_status_row = 4
+    else:
+        growth_status_row = 3
+
+    # 成长状态
+    creat_growth_status_frame(scrollbar_frame_obj.scrollable_frame, style, growth_status_row)
 
     scrollbar_frame_obj.update_canvas()
 
