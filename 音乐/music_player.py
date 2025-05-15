@@ -63,7 +63,7 @@ class FLACPlayerApp:
 
         file_frame = ttk.Frame(self.frame)
         file_frame.pack(pady=(0, 5), fill=ttk.X)
-        self.file_label = ttk.Label(file_frame, text="未选择文件", width=40, anchor='w')
+        self.file_label = ttk.Label(file_frame, text="未选择文件", width=50, anchor='w')
         self.file_label.pack(side=ttk.LEFT, padx=5)
 
         # 进度条 - 使用Canvas实现更精确的点击跳转
