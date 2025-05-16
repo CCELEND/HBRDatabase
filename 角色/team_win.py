@@ -44,7 +44,7 @@ def show_role_full_img(event, parent_frame, role, team):
         set_window_top(open_role_wins[open_role_win])
         return "break"
 
-    role_full_img_frame = creat_Toplevel(open_role_win)
+    role_full_img_frame = creat_Toplevel(open_role_win, x=770, y=100)
     set_window_icon(role_full_img_frame, team.logo_path)
     open_role_wins[open_role_win] = role_full_img_frame
 
@@ -194,7 +194,7 @@ def creat_team_win(parent_frame, team_name):
     # 通过队伍名获取队伍对象
     team = get_team_obj(team_name)
 
-    team_win_frame = creat_Toplevel(team_name, 1130, 880, 440, 50)
+    team_win_frame = creat_Toplevel(team_name, 1130, 880, 90, 80)
     set_window_icon(team_win_frame, team.logo_path)
     set_window_expand(team_win_frame, rowspan=1, columnspan=2)
     scrollbar_frame_obj = ScrollbarFrameWin(team_win_frame, columnspan=2)

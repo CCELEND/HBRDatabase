@@ -32,7 +32,7 @@ def creat_od_win(parent_frame):
             return "break"
         del open_od_wins['OD']
 
-    od_win_frame = creat_Toplevel('OD', 1100, 386, 440, 50)
+    od_win_frame = creat_Toplevel('OD', 1100, 386, 330, 220)
     set_window_icon(od_win_frame, od_logo_path)
     open_od_wins['OD'] = od_win_frame
 

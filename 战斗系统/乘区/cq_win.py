@@ -32,7 +32,7 @@ def creat_cq_win(parent_frame):
             return "break"
         del open_cq_wins['乘区']
 
-    cq_win_frame = creat_Toplevel('乘区', 820, 500, 440, 50)
+    cq_win_frame = creat_Toplevel('乘区', 820, 500, 330, 220)
     set_window_icon(cq_win_frame, cq_logo_path)
     open_cq_wins['乘区'] = cq_win_frame
 

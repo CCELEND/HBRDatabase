@@ -36,6 +36,8 @@ def creat_Toplevel(title,
             new_window = ttk.Toplevel(title=title, size=(wide, high), position=(x,y))
         else:
             new_window = ttk.Toplevel(title=title, size=(wide, high))
+    elif x and y:
+        new_window = ttk.Toplevel(title=title, position=(x,y))
     else:
         new_window = ttk.Toplevel(title=title)
 
