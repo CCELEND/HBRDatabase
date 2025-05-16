@@ -42,6 +42,25 @@
         "description":"可以在技术模拟战获得的道具\n收集技术卡奖章，可解锁新的技术卡", 
         "price":"", 
         "location":"技术模拟战"
+    },
+
+    "闪耀研磨膏Ⅰ":{
+        "path":"./持有物/道具/ThumbnailSynthesisBronze.webp", 
+        "description":"可以在饰品合成时获得少量经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
+    },
+    "闪耀研磨膏Ⅱ":{
+        "path":"./持有物/道具/ThumbnailSynthesisSilver.webp", 
+        "description":"可以在饰品合成时获得经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
+    },
+    "闪耀研磨膏Ⅲ":{
+        "path":"./持有物/道具/ThumbnailSynthesisGold.webp", 
+        "description":"可以在饰品合成时获得不少经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
     }
 
 } 

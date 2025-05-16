@@ -28,6 +28,7 @@ from 碎片.fragments_win import show_fragments
 
 sys.path.append(os.path.abspath("./战斗系统"))
 from 基础.jc_win import creat_jc_win
+from OD.od_win import creat_od_win
 from 乘区.cq_win import creat_cq_win
 from 职业.careers_win import show_career
 from 武器.weapons_win import show_weapon
@@ -156,6 +157,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 定义菜单项的名称和对应的回调函数
     menu_battle_calls = [
         ("基础", creat_jc_win),
+        ("Hit", creat_od_win),
         ("乘区", creat_cq_win),
         ("职业", show_career),
         ("武器", show_weapon),
@@ -164,7 +166,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     ]
     # 循环创建菜单项
     for battle_call_name, callback in menu_battle_calls:
-        if battle_call_name in ['基础','乘区']:
+        if battle_call_name in ['基础','Hit','乘区']:
             create_menu_item(battle_menu, battle_call_name, callback, parent_frame)
         else:
             create_menu_item(battle_menu, battle_call_name, callback, scrollbar_frame_obj)
