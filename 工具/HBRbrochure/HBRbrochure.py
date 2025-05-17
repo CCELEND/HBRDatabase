@@ -125,9 +125,9 @@ def get_hbr_brochure():
         # 加载资源文件
         HBRbrochure.role_info.load_resources()
 
-        # 设置 Chrome 选项以在后台运行
+        # 设置 Chrome 选项
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless")  # 无头模式
 
         # 无痕浏览模式
         chrome_options.add_argument("--incognito")

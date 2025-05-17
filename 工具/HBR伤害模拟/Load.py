@@ -14,9 +14,9 @@ from selenium.common.exceptions import TimeoutException, StaleElementReferenceEx
 
 def load_hbr_damage_simulation():
     try:
-        # 设置 Chrome 选项以在后台运行
+        # 设置 Chrome 选项
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless") # 无头模式
 
         # 忽略 SSL 证书错误
         chrome_options.add_argument("--ignore-certificate-errors")  
