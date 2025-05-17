@@ -65,6 +65,8 @@ from GetEntriesGUILocal.get_entries_win import creat_ct_win
 from DamageScoreCal.damage_score_cal_win import creat_dsc_win
 from HBRbrochure.HBRbrochure import get_hbr_brochure
 from HBR伤害模拟.Load import load_hbr_damage_simulation
+from hbr_tool.Load import load_hbr_tool
+from hbr_axletool.Load import load_hbr_axletool
 
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
@@ -186,6 +188,8 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     create_menu_item(tool_menu, "伤害分计算", creat_dsc_win)
     create_menu_item(tool_menu, "风格图鉴获取", get_hbr_brochure)
     create_menu_item(tool_menu, "伤害模拟", load_hbr_damage_simulation)
+    create_menu_item(tool_menu, "hbr-tool", load_hbr_tool)
+    create_menu_item(tool_menu, "hbr-axletool", load_hbr_axletool)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
     # 更新数据菜单
