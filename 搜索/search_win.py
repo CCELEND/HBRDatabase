@@ -127,7 +127,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 获取全部队伍对象
     get_all_team_obj()
 
-    search_win_frame = creat_Toplevel("搜索", 715, 485)
+    search_win_frame = creat_Toplevel("搜索", 715, 485, x=190, y=210)
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
