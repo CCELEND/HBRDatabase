@@ -146,6 +146,7 @@ def get_hbr_brochure():
             service = Service(executable_path=ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        driver.set_window_size(1160, 820)
         # 打开 game.bilibili.com
         driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
 

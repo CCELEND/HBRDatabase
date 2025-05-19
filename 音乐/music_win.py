@@ -51,7 +51,11 @@ def creat_music_win():
     music_player.play_info_frame.grid_rowconfigure(1, weight=1, minsize=200)
     music_player.play_info_frame.grid_columnconfigure(0, weight=1)
 
-    music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
+    try:
+        music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
+    except:
+        music_win_frame.destroy()
+        return
 
     # music_win_frame.resizable(False, False)
     # 设置最大尺寸和最小尺寸相同，以阻止最大化

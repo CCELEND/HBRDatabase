@@ -31,8 +31,12 @@ class FLACPlayerApp:
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
 
-        # 初始化音频系统
-        pygame.mixer.init()
+        try:
+            # 初始化音频系统
+            pygame.mixer.init()
+        except Exception as e:
+            messagebox.showerror("错误", f"初始化音频系统\n请重试 {str(e)}")
+            raise RuntimeError("音频系统初始化失败") from e
         self.current_file = None
         self.paused = False
         self.playing = False
