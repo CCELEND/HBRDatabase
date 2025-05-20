@@ -67,6 +67,7 @@ from HBRbrochure.HBRbrochure import get_hbr_brochure
 from HBR伤害模拟.Load import load_hbr_damage_simulation
 from hbr_tool.Load import load_hbr_tool
 from hbr_axletool.Load import load_hbr_axletool
+from wiki_hbr_hd.Load import load_wiki_hbr_hd
 from 词条计算器.Load import load_entry_calculator
 
 sys.path.append(os.path.abspath("./关于"))
@@ -191,6 +192,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     create_menu_item(tool_menu, "伤害模拟", load_hbr_damage_simulation)
     create_menu_item(tool_menu, "hbr-tool", load_hbr_tool)
     create_menu_item(tool_menu, "hbr-axletool", load_hbr_axletool)
+    create_menu_item(tool_menu, "wiki.hbr-hd", load_wiki_hbr_hd)
     create_menu_item(tool_menu, "词条计算器（在线）", load_entry_calculator)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
