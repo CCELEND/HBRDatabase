@@ -53,7 +53,8 @@ def creat_music_win():
 
     try:
         music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
-    except:
+    except Exception as e:
+        messagebox.showerror("错误", f"请重试：{str(e)}")
         music_win_frame.destroy()
         return
 
