@@ -835,6 +835,78 @@
             "weakness":"打-150","resist":""
         }
     }
+},
+
+"HELL-39F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-39F",
+    "enemys":
+    {
+        "暗影·樱庭[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·樱庭[]",
+            "border":"420",
+            "DP":"3,300,000","HP":"2,500,000",
+            "weakness":"打-150","resist":"斩突+75"
+        }
+    }
+},
+
+"HELL-40F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-40F",
+    "enemys":
+    {
+        "GiraffeIce":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"GiraffeIce",
+            "border":"420",
+            "DP":"2,000,000","HP":"15,000,000",
+            "weakness":"打-150、雷-150","resist":"斩+50"
+        }
+    }
+},
+
+"HELL-41F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-41F",
+    "enemys":
+    {
+        "暗影·石榴石[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·石榴石[]",
+            "border":"420",
+            "DP":"3,600,000","HP":"1,300,000",
+            "weakness":"突-150","resist":""
+        }
+    }
+},
+
+"HELL-42F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-42F",
+    "enemys":
+    {
+        "ArachneRedLine":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ArachneRedLine",
+            "border":"420",
+            "DP":"3,600,000","HP":"38,000,000",
+            "weakness":"突-150、冰-150","resist":"打+50"
+        }
+    }
 }
 
 }
