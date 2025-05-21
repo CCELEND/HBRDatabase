@@ -135,6 +135,9 @@
     "1003204":{
         "style_name":"对决！!空气舞台", "character_role":"防御者", "element_type":"冰", "weapon_type":"打"
     },
+    "1003206":{
+        "style_name":"Sanctuary Veil", "character_role":"防御者", "element_type":"火", "weapon_type":"打"
+    },
     "1003303":{
         "style_name":"实验性的你", "character_role":"减益者", "element_type":"无", "weapon_type":"突"
     },
@@ -194,11 +197,17 @@
     "1004304":{
         "style_name":"丰饶喜乐神秘莫测", "character_role":"减益者", "element_type":"雷", "weapon_type":"突"
     },
+    "1004305":{
+        "style_name":"顷刻，一夜梦火", "character_role":"减益者", "element_type":"冰", "weapon_type":"突"
+    },
     "1004403":{
         "style_name":"末日洛丽塔白书", "character_role":"防御者", "element_type":"无", "weapon_type":"打"
     },
     "1004404":{
         "style_name":"亡国的纯洁之心", "character_role":"防御者", "element_type":"暗", "weapon_type":"打"
+    },
+    "1004406":{
+        "style_name":"克己洛丽塔", "character_role":"增益者", "element_type":"冰", "weapon_type":"打"
     },
     "1004503":{
         "style_name":"朦胧月夜的子弹", "character_role":"破盾者", "element_type":"无", "weapon_type":"突"
@@ -334,6 +343,9 @@
     },
     "1008604":{
         "style_name":"永恒的思念", "character_role":"减益者", "element_type":"雷", "weapon_type":"突"
+    },
+    "1008605":{
+        "style_name":"圣洁新娘", "character_role":"增益者", "element_type":"暗", "weapon_type":"突"
     },
 
 

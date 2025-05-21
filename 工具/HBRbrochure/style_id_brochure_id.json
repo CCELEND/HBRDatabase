@@ -48,6 +48,7 @@
     "1003106":"BIYamawakiDaydream_R3",
     "1003203":"SSakurabaDefault_R3",
     "1003204":"SSakurabaNewYear2023_R3",
+    "1003206":"SSakurabaBride_R3",
     "1003303":"MTenneDefault_R3",
     "1003304":"MTenneAnimal_R3",
     "1003305":"MTenneWizard_R3",
@@ -69,8 +70,10 @@
     "1004204":"MTsukishiroRugged_R3",
     "1004303":"MKiryuDefault_R3",
     "1004304":"MKiryuGothic_R3",
+    "1004305":"MKiryuCerulean_R3",
     "1004403":"CSugaharaDefault_R3",
     "1004404":"CSugaharaPurity_R3",
+    "1004406":"CSugaharaExcellency_R3",
     "1004503":"HOgasawaraDefault_R3",
     "1004504":"HOgasawaraCutieMaid_R3",
     "1004505":"HOgasawaraNightdress_R3",
@@ -121,6 +124,7 @@
     "1008504":"MdAngelisKnights_R3",
     "1008603":"CSkopovskayaDefault_R3",
     "1008604":"CSkopovskayaVampire_R3",
+    "1008605":"CSkopovskayaBride_R3",
 
 
     "1020103":"AliceADefault_R3",
