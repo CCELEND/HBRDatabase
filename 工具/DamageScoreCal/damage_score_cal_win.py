@@ -98,7 +98,7 @@ def creat_dsc_win():
 			return "break"
 		del open_dsc_wins['伤害分计算']
 
-	dsc_win_frame = creat_Toplevel("伤害分计算", 550, 400)
+	dsc_win_frame = creat_Toplevel("伤害分计算", 550, 400, 160, 160)
 	set_window_icon(dsc_win_frame, "./工具/DamageScoreCal/dsc.ico")
 
 	# 配置主窗口的列和行的伸展
