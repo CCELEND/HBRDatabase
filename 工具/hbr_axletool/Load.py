@@ -33,6 +33,7 @@ def load_hbr_axletool():
             service = Service(executable_path=ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        driver.set_window_size(1160, 820)
         driver.get("https://hbr-axletool.pages.dev/")
 
     except Exception as e:

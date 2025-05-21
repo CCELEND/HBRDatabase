@@ -33,6 +33,7 @@ def load_wiki_hbr_hd():
             service = Service(executable_path=ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        driver.set_window_size(1160, 820)
         driver.get("https://wiki.hbr-hd.com/")
 
     except Exception as e:

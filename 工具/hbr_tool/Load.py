@@ -33,6 +33,7 @@ def load_hbr_tool():
             service = Service(executable_path=ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
+        driver.set_window_size(1160, 820)
         driver.get("https://www.hbr-tool.com/")
 
     except Exception as e:
