@@ -1,0 +1,335 @@
+{
+   "All": {
+      "message": "敵方全體"
+   },
+   "AllyAll": {
+      "message": "全體的"
+   },
+   "AllyAllWithoutSelf": {
+      "message": "自己以外的我方成員的"
+   },
+   "AllyFront": {
+      "message": "前衛的"
+   },
+   "AllySingle": {
+      "message": "我方單體的"
+   },
+   "AllySingleWithoutSelf": {
+      "message": "自己以外的我方單體的"
+   },
+   "AllySub": {
+      "message": "後衛的"
+   },
+   "ClockTowerHell": {
+      "message": "鐘樓HELL"
+   },
+   "ClockTowerNormal": {
+      "message": "鐘樓"
+   },
+   "Conquest": {
+      "message": "壓制戰"
+   },
+   "Count": {
+      "message": "次"
+   },
+   "Customize": {
+      "message": "自訂"
+   },
+   "Dark": {
+      "message": "暗屬性"
+   },
+   "EnemyTurnEnd": {
+      "message": "敵方回合"
+   },
+   "Eternal": {
+      "message": "永存"
+   },
+   "Field": {
+      "message": "強化空間"
+   },
+   "Fire": {
+      "message": "火屬性"
+   },
+   "GateDark": {
+      "message": "闇門"
+   },
+   "GateFire": {
+      "message": "火門"
+   },
+   "GateIce": {
+      "message": "冰門"
+   },
+   "GateLight": {
+      "message": "光門"
+   },
+   "GateThunder": {
+      "message": "雷門"
+   },
+   "HardMC": {
+      "message": "異時層"
+   },
+   "Ice": {
+      "message": "冰屬性"
+   },
+   "Jewel": {
+      "message": "寶珠迷宮"
+   },
+   "Light": {
+      "message": "光屬性"
+   },
+   "Nonelement": {
+      "message": "無"
+   },
+   "Orb": {
+      "message": "光球Boss"
+   },
+   "OverDriveEnd": {
+      "message": "OVERDRIVE進行中"
+   },
+   "PenetrationCriticalAttack": {
+      "message": "貫通暴擊"
+   },
+   "PlayerTurnEnd": {
+      "message": "回合"
+   },
+   "ScoreAttack": {
+      "message": "積分挑戰"
+   },
+   "Self": {
+      "message": "自己的"
+   },
+   "Single": {
+      "message": "敵方單體"
+   },
+   "Slash": {
+      "message": "斬"
+   },
+   "Stab": {
+      "message": "突"
+   },
+   "Stellar": {
+      "message": "恒星掃戦線"
+   },
+   "Strike": {
+      "message": "打"
+   },
+   "Thunder": {
+      "message": "雷屬性"
+   },
+   "WaveBattle": {
+      "message": "遭遇戰演習"
+   },
+   "add": {
+      "message": "添加"
+   },
+   "addSkillsAutomatically": {
+      "message": "自動添加技能"
+   },
+   "allStatus": {
+      "message": "全屬性值"
+   },
+   "atk": {
+      "message": "攻擊力"
+   },
+   "atkUpSkillEffect": {
+      "message": "攻擊力增加技能強度"
+   },
+   "attackSkill": {
+      "message": "攻擊技能"
+   },
+   "attacker": {
+      "message": "攻擊者"
+   },
+   "back": {
+      "message": "後退"
+   },
+   "border": {
+      "message": "屬性值"
+   },
+   "clear": {
+      "message": "清空"
+   },
+   "clearAddedSkills": {
+      "message": "清空已新增的技能"
+   },
+   "close": {
+      "message": "關閉"
+   },
+   "con": {
+      "message": "體力"
+   },
+   "copyFormation": {
+      "message": "複製編組"
+   },
+   "crit": {
+      "message": "暴擊"
+   },
+   "critDMG": {
+      "message": "暴擊傷害"
+   },
+   "critRate": {
+      "message": "暴擊率"
+   },
+   "damage": {
+      "message": "傷害"
+   },
+   "debuffSkillEffect": {
+      "message": "減益技能強度"
+   },
+   "def": {
+      "message": "防禦力"
+   },
+   "defenseDebuffSkillEffect": {
+      "message": "降防技能強度"
+   },
+   "destructionCoefficient": {
+      "message": "破壞率係數"
+   },
+   "devastationRate": {
+      "message": "破壞率"
+   },
+   "dex": {
+      "message": "靈巧"
+   },
+   "dmg": {
+      "message": "傷害"
+   },
+   "doubleClickToRemoveSkill": {
+      "message": "雙擊技能後刪除技能"
+   },
+   "dpRate": {
+      "message": "DP比率"
+   },
+   "dr": {
+      "message": "破壞率"
+   },
+   "dragHereToRemove": {
+      "message": "拖曳到此處即可刪除"
+   },
+   "edit": {
+      "message": "編组"
+   },
+   "enable": {
+      "message": "啟用"
+   },
+   "enabled": {
+      "message": "已啟用"
+   },
+   "enemy": {
+      "message": "敵方"
+   },
+   "enemyBorder": {
+      "message": "敵方屬性值"
+   },
+   "enemyElementResist": {
+      "message": "敵方$1耐性"
+   },
+   "enemyValues": {
+      "message": "敵方數值"
+   },
+   "enhancement": {
+      "message": "增強"
+   },
+   "extDescription": {
+      "message": "透過增加的技能與填入的能力值來計算出最終傷害。緋染天空傷害計算機。"
+   },
+   "extName": {
+      "message": "HBR 傷害模擬"
+   },
+   "fragile": {
+      "message": "脆弱"
+   },
+   "growthAbility": {
+      "message": "寶珠强化"
+   },
+   "hit": {
+      "message": "對"
+   },
+   "hitCount": {
+      "message": "連擊數"
+   },
+   "independent": {
+      "message": "單獨發動"
+   },
+   "latestStyle": {
+      "message": "最新風格"
+   },
+   "limitBreak": {
+      "message": "突破"
+   },
+   "luk": {
+      "message": "運氣"
+   },
+   "masterSkill": {
+      "message": "大師技能"
+   },
+   "mindEye": {
+      "message": "心眼"
+   },
+   "morale": {
+      "message": "士氣"
+   },
+   "normalAttack": {
+      "message": "普通攻擊"
+   },
+   "options": {
+      "message": "選項"
+   },
+   "passiveSkill": {
+      "message": "被動技能"
+   },
+   "passives": {
+      "message": "被動"
+   },
+   "remove": {
+      "message": "移除"
+   },
+   "removeEnemyElementResist": {
+      "message": "清除敵方$1耐性"
+   },
+   "reportABugOrMakeASuggestion": {
+      "message": "報告錯誤或提出建議"
+   },
+   "select": {
+      "message": "選擇"
+   },
+   "set": {
+      "message": "設置"
+   },
+   "skill": {
+      "message": "技能"
+   },
+   "skills": {
+      "message": "技能"
+   },
+   "skillsAfterSelectedStyle": {
+      "message": "在選擇的風格後實裝的技能不會自動添加。"
+   },
+   "sort": {
+      "message": "調整排序"
+   },
+   "spr": {
+      "message": "精神"
+   },
+   "squad": {
+      "message": "部隊"
+   },
+   "status": {
+      "message": "屬性值"
+   },
+   "str": {
+      "message": "力量"
+   },
+   "token": {
+      "message": "象徵"
+   },
+   "underConstruction": {
+      "message": "建設中..."
+   },
+   "wis": {
+      "message": "智力"
+   },
+   "zoneEffect": {
+      "message": "強化空間強度"
+   }
+}

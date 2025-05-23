@@ -12,6 +12,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import TimeoutException, StaleElementReferenceException
 
+import os
+
 def load_hbr_damage_simulation():
     try:
         # 设置 Chrome 选项
@@ -24,8 +26,15 @@ def load_hbr_damage_simulation():
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
+        # 插件绝对路径
+        extension_path = os.path.abspath('./工具/HBR伤害模拟/1.3.0_0')
+        chrome_options.add_argument(f'--load-extension={extension_path}')
+        # 添加开发者模式参数
+        chrome_options.add_argument('--disable-extensions-except=' + extension_path)
+
         # 加载插件
-        chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
+        # chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
+        # chrome_options.add_argument('--load-extension=./工具/HBR伤害模拟/1.3.0_0')
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
         try:
@@ -37,7 +46,8 @@ def load_hbr_damage_simulation():
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
         driver.set_window_size(1160, 820)
-        driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
+        # driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
+        driver.get("chrome://extensions/")
 
     except Exception as e:
         print(f"[-] {e}")

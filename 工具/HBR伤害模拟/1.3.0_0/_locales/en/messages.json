@@ -1,0 +1,335 @@
+{
+   "All": {
+      "message": "All Enemies"
+   },
+   "AllyAll": {
+      "message": "All Allies'"
+   },
+   "AllyAllWithoutSelf": {
+      "message": "All Allies'(Except This Unit)"
+   },
+   "AllyFront": {
+      "message": "Frontline Units'"
+   },
+   "AllySingle": {
+      "message": "Single Ally's"
+   },
+   "AllySingleWithoutSelf": {
+      "message": "Single Ally's(Except This Unit)"
+   },
+   "AllySub": {
+      "message": "Reserve Units'"
+   },
+   "ClockTowerHell": {
+      "message": "Clock Tower (HELL)"
+   },
+   "ClockTowerNormal": {
+      "message": "Clock Tower"
+   },
+   "Conquest": {
+      "message": "Conquest"
+   },
+   "Count": {
+      "message": "use(s)"
+   },
+   "Customize": {
+      "message": "Customize"
+   },
+   "Dark": {
+      "message": "Dark"
+   },
+   "EnemyTurnEnd": {
+      "message": "turn(s)"
+   },
+   "Eternal": {
+      "message": "Eternal"
+   },
+   "Field": {
+      "message": "Field"
+   },
+   "Fire": {
+      "message": "Fire"
+   },
+   "GateDark": {
+      "message": "Gate Dark"
+   },
+   "GateFire": {
+      "message": "Gate Fire"
+   },
+   "GateIce": {
+      "message": "Gate Ice"
+   },
+   "GateLight": {
+      "message": "Gate Light"
+   },
+   "GateThunder": {
+      "message": "Gate Thunder"
+   },
+   "HardMC": {
+      "message": "Divergence"
+   },
+   "Ice": {
+      "message": "Ice"
+   },
+   "Jewel": {
+      "message": "Oubliette of Tears"
+   },
+   "Light": {
+      "message": "Light"
+   },
+   "Nonelement": {
+      "message": "Nonelement"
+   },
+   "Orb": {
+      "message": "Orb Boss"
+   },
+   "OverDriveEnd": {
+      "message": "During Overdrive"
+   },
+   "PenetrationCriticalAttack": {
+      "message": "Penetration Critical Attack"
+   },
+   "PlayerTurnEnd": {
+      "message": "turn(s)"
+   },
+   "ScoreAttack": {
+      "message": "Score Attack"
+   },
+   "Self": {
+      "message": "This Unit's"
+   },
+   "Single": {
+      "message": "Single Enemy"
+   },
+   "Slash": {
+      "message": "Slash"
+   },
+   "Stab": {
+      "message": "Stab"
+   },
+   "Stellar": {
+      "message": "Stellar SF"
+   },
+   "Strike": {
+      "message": "Strike"
+   },
+   "Thunder": {
+      "message": "Thunder"
+   },
+   "WaveBattle": {
+      "message": "Wave Battle"
+   },
+   "add": {
+      "message": "Add"
+   },
+   "addSkillsAutomatically": {
+      "message": "Add skills automatically"
+   },
+   "allStatus": {
+      "message": "All Status"
+   },
+   "atk": {
+      "message": "ATK"
+   },
+   "atkUpSkillEffect": {
+      "message": "ATK Up Skill Effect"
+   },
+   "attackSkill": {
+      "message": "Attack Skill"
+   },
+   "attacker": {
+      "message": "Attacker"
+   },
+   "back": {
+      "message": "Back"
+   },
+   "border": {
+      "message": "Border"
+   },
+   "clear": {
+      "message": "Clear"
+   },
+   "clearAddedSkills": {
+      "message": "Clear added skills"
+   },
+   "close": {
+      "message": "Close"
+   },
+   "con": {
+      "message": "CON"
+   },
+   "copyFormation": {
+      "message": "Copy Formation"
+   },
+   "crit": {
+      "message": "CRTI"
+   },
+   "critDMG": {
+      "message": "CRIT DMG"
+   },
+   "critRate": {
+      "message": "CRIT Rate"
+   },
+   "damage": {
+      "message": "Damage"
+   },
+   "debuffSkillEffect": {
+      "message": "Debuff Skill Effect"
+   },
+   "def": {
+      "message": "DEF"
+   },
+   "defenseDebuffSkillEffect": {
+      "message": "Defense Down Skill Effect"
+   },
+   "destructionCoefficient": {
+      "message": "Destruction Coefficient"
+   },
+   "devastationRate": {
+      "message": "Devastation Rate"
+   },
+   "dex": {
+      "message": "DEX"
+   },
+   "dmg": {
+      "message": "DMG"
+   },
+   "doubleClickToRemoveSkill": {
+      "message": "Remove the skill after double clicking it"
+   },
+   "dpRate": {
+      "message": "DP Rate"
+   },
+   "dr": {
+      "message": "DR"
+   },
+   "dragHereToRemove": {
+      "message": "DRAG HERE TO REMOVE"
+   },
+   "edit": {
+      "message": "Swap"
+   },
+   "enable": {
+      "message": "Enable"
+   },
+   "enabled": {
+      "message": "Enabled"
+   },
+   "enemy": {
+      "message": "Enemy"
+   },
+   "enemyBorder": {
+      "message": "Enemy Border"
+   },
+   "enemyElementResist": {
+      "message": "Enemy $1 Resist"
+   },
+   "enemyValues": {
+      "message": "Enemy Values"
+   },
+   "enhancement": {
+      "message": "Enhancement"
+   },
+   "extDescription": {
+      "message": "Get your final damage by adding skills and filling in ability values. A damage calculator for Heaven Burns Red."
+   },
+   "extName": {
+      "message": "HBR Damage Simulation"
+   },
+   "fragile": {
+      "message": "Fragile"
+   },
+   "growthAbility": {
+      "message": "Growth Ability"
+   },
+   "hit": {
+      "message": "Hit"
+   },
+   "hitCount": {
+      "message": "Hit Count"
+   },
+   "independent": {
+      "message": "Independent"
+   },
+   "latestStyle": {
+      "message": "Latest Style"
+   },
+   "limitBreak": {
+      "message": "Limit Break"
+   },
+   "luk": {
+      "message": "LUK"
+   },
+   "masterSkill": {
+      "message": "Master Skill"
+   },
+   "mindEye": {
+      "message": "Mind Eye"
+   },
+   "morale": {
+      "message": "Morale"
+   },
+   "normalAttack": {
+      "message": "Normal Attack"
+   },
+   "options": {
+      "message": "Options"
+   },
+   "passiveSkill": {
+      "message": "Passive Skill"
+   },
+   "passives": {
+      "message": "Passives"
+   },
+   "remove": {
+      "message": "Remove"
+   },
+   "removeEnemyElementResist": {
+      "message": "Remove Enemy $1 Resist"
+   },
+   "reportABugOrMakeASuggestion": {
+      "message": "Report a bug or make a suggestion"
+   },
+   "select": {
+      "message": "Select"
+   },
+   "set": {
+      "message": "Set"
+   },
+   "skill": {
+      "message": "Skill"
+   },
+   "skills": {
+      "message": "Skills"
+   },
+   "skillsAfterSelectedStyle": {
+      "message": "Skills implemented after the selected style will not be added automatically"
+   },
+   "sort": {
+      "message": "Reorder"
+   },
+   "spr": {
+      "message": "SPR"
+   },
+   "squad": {
+      "message": "Squad"
+   },
+   "status": {
+      "message": "Status"
+   },
+   "str": {
+      "message": "STR"
+   },
+   "token": {
+      "message": "Token"
+   },
+   "underConstruction": {
+      "message": "Under construction..."
+   },
+   "wis": {
+      "message": "WIS"
+   },
+   "zoneEffect": {
+      "message": "Zone Effect"
+   }
+}

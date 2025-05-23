@@ -1,0 +1,24 @@
+{
+   "action": {
+      "default_title": "__MSG_extName__"
+   },
+   "background": {
+      "service_worker": "background.js"
+   },
+   "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'"
+   },
+   "default_locale": "en",
+   "description": "__MSG_extDescription__",
+   "homepage_url": "https://github.com/chunibyocola/HBR-Damage-Simulation-issues",
+   "icons": {
+      "128": "icon.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsfyeMTT7MxgOX2EyaWfjAYkO288nNzs/s7lHmw7us72tEAlPTZo7fVCQn1yv15aS6hR0Sdj7mn0oP2avthlXFS4U/1WbuiF8OIxQrhoE34hsVBij/6TLPz55gYzzw0YVPykiq1+w16huQYXFRy7Qlcxc2Trw4Txofd/oOqw9jjN0FFfUzQANJj/GrTcHfMVDr81bSmt2IYxZu6+1h/jIOPwzxi2bNyyqRKCBui4Du5Ak9Q8EJbMlLStcomuIR9P+m7As2LWp99Cgd/HINoswJLail9hc0ihsOLHNBGIBDzpnwp2bw2Mgsq9nK8cd+QLsHu6m0Tz6TP0+YgPEKD2LgQIDAQAB",
+   "manifest_version": 3,
+   "minimum_chrome_version": "100",
+   "name": "__MSG_extName__",
+   "permissions": [ "storage" ],
+   "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
+   "version": "1.3.0"
+}
