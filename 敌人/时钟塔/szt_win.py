@@ -57,7 +57,7 @@ def creat_szt_win(event, parent_frame, szt):
             return "break"
         del open_szt_wins[szt.name]
 
-    szt_win_frame = creat_Toplevel(szt.name)
+    szt_win_frame = creat_Toplevel(szt.name, x=200,y=250)
     set_window_icon(szt_win_frame, szt.logo_path)
     open_szt_wins[szt.name] = szt_win_frame
 
