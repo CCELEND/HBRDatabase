@@ -155,7 +155,8 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 循环创建菜单项
     for enemy_call_name, callback in menu_enemy_calls:
         create_menu_item(enemy_menu, enemy_call_name, callback, scrollbar_frame_obj)
-    menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
+    # menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
+    menu_bar.add_cascade(label="👾敌人", menu=enemy_menu)
     
     # 战斗系统菜单
     battle_menu = ttk.Menu(menu_bar, tearoff=0)
