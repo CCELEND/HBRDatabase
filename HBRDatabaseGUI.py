@@ -187,16 +187,22 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     # 工具菜单
     tool_menu = ttk.Menu(menu_bar, tearoff=0)
-    create_menu_item(tool_menu, "词条获取", creat_ct_win)
-    create_menu_item(tool_menu, "伤害分计算", creat_dsc_win)
-    create_menu_item(tool_menu, "伤害分计算V2", creat_dsc_win_v2)
-    create_menu_item(tool_menu, "风格图鉴获取", get_hbr_brochure)
-    create_menu_item(tool_menu, "伤害模拟", load_hbr_damage_simulation)
-    create_menu_item(tool_menu, "hbr-tool", load_hbr_tool)
-    create_menu_item(tool_menu, "hbr-axletool", load_hbr_axletool)
-    create_menu_item(tool_menu, "wiki.hbr-hd", load_wiki_hbr_hd)
-    create_menu_item(tool_menu, "词条计算器（在线）", load_entry_calculator)
+    menu_tool_calls = [
+        ("词条获取", creat_ct_win),
+        ("伤害分计算", creat_dsc_win),
+        ("伤害分计算V2", creat_dsc_win_v2),
+        ("风格图鉴获取", get_hbr_brochure),
+        ("伤害模拟", load_hbr_damage_simulation),
+        ("hbr-tool", load_hbr_tool),
+        ("hbr-axletool", load_hbr_axletool),
+        ("wiki.hbr-hd", load_wiki_hbr_hd),
+        ("词条计算器（在线）", load_entry_calculator),
+    ]
+    # 循环创建菜单项
+    for tool_call_name, callback in menu_tool_calls:
+        create_menu_item(tool_menu, tool_call_name, callback)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
+
 
     # 更新数据菜单
     menu_bar.add_command(label="📲更新", 
