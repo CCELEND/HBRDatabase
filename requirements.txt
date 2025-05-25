@@ -1,0 +1,10 @@
+opencv_python==4.11.0.86
+opencv_python_headless==4.11.0.86
+openpyxl==3.1.5
+pandas==2.2.3
+Pillow==11.2.1
+pygame==2.6.1
+Requests==2.32.3
+selenium==4.33.0
+ttkbootstrap==1.12.0
+webdriver_manager==4.0.2
