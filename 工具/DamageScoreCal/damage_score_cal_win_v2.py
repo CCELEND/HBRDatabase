@@ -11,6 +11,8 @@ from ttkbootstrap.constants import *
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top, set_bg_opacity, set_global_bg
 from window import copy_text, paste_text, cut_text, show_context_menu, clear_text, edit_text
 
+from decimal import Decimal, getcontext, ROUND_HALF_UP
+
 threshold_value_text = None
 damage_coefficient_text = None
 input_text_v2 = None
@@ -67,19 +69,33 @@ def damage_value():
 	threshold_value = get_threshold_value()
 	if (threshold_value == -1):
 		return
-	threshold_value = float(threshold_value)
-
+	
 	damage_coefficient = get_damage_coefficient()
 	if (damage_coefficient == -1):
 		return
-	damage_coefficient = float(damage_coefficient)
-
+	
 	damage_reward = get_input()
 	if (damage_reward == -1):
 		return
-	damage_reward = float(damage_reward)
 
-	damage_value = math.e ** ( 100 * damage_reward / (threshold_value * damage_coefficient) - 1 + math.log(threshold_value) )
+	# 转换为 Decimal 类型
+	damage_reward = Decimal(str(damage_reward))
+	threshold_value = Decimal(str(threshold_value))
+	damage_coefficient = Decimal(str(damage_coefficient))
+	# 计算指数部分
+	try:
+		exponent = (Decimal('100') * damage_reward) / (threshold_value * damage_coefficient) - Decimal('1') + threshold_value.ln()
+		# 使用 math.exp 计算e的幂
+		damage_value = Decimal(str(math.exp(exponent)))
+	except DecimalException as de:
+		raise ValueError(f"Decimal计算错误: {de}")
+	except Exception as e:
+		raise ValueError(f"计算错误: {e}")
+
+	# threshold_value = float(threshold_value)
+	# damage_coefficient = float(damage_coefficient)
+	# damage_reward = float(damage_reward)
+	# damage_value = math.e ** ( 100 * damage_reward / (threshold_value * damage_coefficient) - 1 + math.log(threshold_value) )
 	edit_text(output_text_v2, int(damage_value))
 
 # 伤害值转换伤害奖励
@@ -87,20 +103,38 @@ def damage_reward():
 	threshold_value = get_threshold_value()
 	if (threshold_value == -1):
 		return
-	threshold_value = float(threshold_value)
-
+	
 	damage_coefficient = get_damage_coefficient()
 	if (damage_coefficient == -1):
 		return
-	damage_coefficient = float(damage_coefficient)
-
+	
 	damage_value = get_input()
 	if (damage_value == -1):
 		return
-	damage_value = float(damage_value)
+	
 
+	# 转换为 Decimal 类型
+	damage_coefficient = Decimal(str(damage_coefficient))
+	threshold_value = Decimal(str(threshold_value))
+	damage_value = Decimal(str(damage_value))
+	# 计算对数部分，使用 ln 函数
+	try:
+		log_damage = damage_value.ln()
+		log_threshold = threshold_value.ln()
+	except Exception as e:
+		raise ValueError(f"对数计算错误: {e}")
 
-	damage_reward = (damage_coefficient/100) * threshold_value * ( 1 + math.log(damage_value) - math.log(threshold_value) ) 
+	# 确保damage_value大于等于threshold_value，避免对数结果为负
+	if damage_value < threshold_value:
+		raise ValueError("damage_value 必须大于或等于 threshold_value")
+    
+	# 计算奖励值
+	damage_reward = (damage_coefficient/Decimal('100')) * threshold_value * ( Decimal('1') + log_damage - log_threshold )
+
+	# threshold_value = float(threshold_value)
+	# damage_coefficient = float(damage_coefficient)
+	# damage_value = float(damage_value)
+	# damage_reward = (damage_coefficient/100) * threshold_value * ( 1 + math.log(damage_value) - math.log(threshold_value) ) 
 	edit_text(output_text_v2, int(damage_reward))
 
 
