@@ -1,17 +1,46 @@
+
 import sys
-import os
 import subprocess
-import importlib
+import tkinter as tk
 from tkinter import messagebox
 
-try:
-    pip_args = [
-        sys.executable, "-m", "pip", "install",
-        "ttkbootstrap", "opencv-python", "pillow", "requests", "pygame", "numpy", "pandas", "openpyxl", "selenium", "webdriver-manager"
-        ,"-i", "https://pypi.tuna.tsinghua.edu.cn/simple",  # 清华镜像
-        "--trusted-host", "pypi.tuna.tsinghua.edu.cn"      # 避免 SSL 错误
+def install_modules():
+    mirrors = [
+        {"url": "https://pypi.tuna.tsinghua.edu.cn/simple", "host": "pypi.tuna.tsinghua.edu.cn"},
+        {"url": "https://mirrors.aliyun.com/pypi/simple", "host": "mirrors.aliyun.com"}
     ]
-    subprocess.check_call(pip_args)
-    messagebox.showinfo("提示", "模块已安装")
-except Exception as e:
-    messagebox.showerror("错误", f"请重试 {str(e)}")
+    
+    packages = [
+        "ttkbootstrap", "opencv-python", "pillow", "requests", 
+        "pygame", "numpy", "pandas", "openpyxl", 
+        "selenium", "webdriver-manager"
+    ]
+    
+    for mirror in mirrors:
+        try:
+            pip_args = [
+                sys.executable, "-m", "pip", "install",
+                *packages,
+                "-i", mirror["url"],
+                "--trusted-host", mirror["host"]
+            ]
+            
+            subprocess.check_call(pip_args, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            messagebox.showinfo("提示", "依赖模块已成功安装")
+            return True
+            
+        except subprocess.CalledProcessError as e:
+            print(f"[-] 使用镜像 {mirror['url']} 安装失败: {e}")
+            continue
+        except Exception as e:
+            print(f"[-] 发生未知错误: {e}")
+            continue
+    
+    # 所有镜像都失败
+    messagebox.showerror("错误", "所有镜像源尝试失败，请检查网络连接或手动安装")
+    return False
+
+if __name__ == "__main__":
+    install_modules()
+    
+
