@@ -35,7 +35,7 @@ def creat_music_win():
             return "break"
         del open_music_wins["音乐"]
 
-    music_win_frame = creat_Toplevel("音乐", 850, 575, x=190, y=160)
+    music_win_frame = creat_Toplevel("音乐", 850, 575, x=190, y=140)
     set_window_icon(music_win_frame, "./音乐/Sound.ico")
 
     music_win_frame.grid_rowconfigure(0, weight=1)
