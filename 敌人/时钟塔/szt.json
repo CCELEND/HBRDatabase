@@ -570,18 +570,18 @@
     "name":"HELL-26F",
     "enemys":
     {
-        "IvoryScooper":
+        "象牙异蛛":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"IvoryScooper",
+            "img_path":"./敌人/时钟塔/HELL-26F/象牙异蛛.jpg",
+            "name":"象牙异蛛",
             "border":"400",
             "DP":"300,000","HP":"1,600,000",
             "weakness":"打-50","resist":"斩+75"
         },
-        "IvoryScooper2":
+        "象牙异蛛2":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"IvoryScooper2",
+            "img_path":"./敌人/时钟塔/HELL-26F/象牙异蛛.jpg",
+            "name":"象牙异蛛2",
             "border":"400",
             "DP":"300,000","HP":"1,600,000",
             "weakness":"打-50","resist":"斩+75"
@@ -596,10 +596,10 @@
     "name":"HELL-27F",
     "enemys":
     {
-        "暗影·月歌[]":
+        "暗影·月歌[感性之魂]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·月歌[]",
+            "img_path":"./敌人/时钟塔/HELL-27F/暗影·月歌[感性之魂].png",
+            "name":"暗影·月歌[感性之魂]",
             "border":"400",
             "DP":"900,000","HP":"70,000,000",
             "weakness":"斩-150、火-150","resist":"突+75"
@@ -614,10 +614,10 @@
     "name":"HELL-28F",
     "enemys":
     {
-        "ThunderBird":
+        "闪电鸟":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"ThunderBird",
+            "img_path":"./敌人/时钟塔/HELL-28F/闪电鸟.png",
+            "name":"闪电鸟",
             "border":"400",
             "DP":"3,050,000","HP":"4,600,000",
             "weakness":"突-50、火-100","resist":"打+50"
@@ -632,18 +632,18 @@
     "name":"HELL-29F",
     "enemys":
     {
-        "ObjectionPurple":
+        "黛紫异议之门":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"ObjectionPurple",
+            "img_path":"./敌人/时钟塔/HELL-29F/黛紫异议之门.png",
+            "name":"黛紫异议之门",
             "border":"410",
             "DP":"900,000","HP":"6,900,000",
             "weakness":"打-150、光-150","resist":""
         },
-        "ObjectionPurple2":
+        "黛紫异议之门2":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"ObjectionPurple2",
+            "img_path":"./敌人/时钟塔/HELL-29F/黛紫异议之门.png",
+            "name":"黛紫异议之门2",
             "border":"410",
             "DP":"900,000","HP":"6,900,000",
             "weakness":"打-150、光-150","resist":""
@@ -658,10 +658,10 @@
     "name":"HELL-30F",
     "enemys":
     {
-        "暗影·司[]":
+        "暗影·司[生命无常]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·司[]",
+            "img_path":"./敌人/时钟塔/HELL-30F/暗影·司[生命无常].png",
+            "name":"暗影·司[生命无常]",
             "border":"410",
             "DP":"1,400,000","HP":"5,300,000",
             "weakness":"火-150","resist":"打+75"
@@ -676,10 +676,10 @@
     "name":"HELL-31F",
     "enemys":
     {
-        "VeiledDeath":
+        "掩面死神":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"VeiledDeath",
+            "img_path":"./敌人/时钟塔/HELL-31F/掩面死神.png",
+            "name":"掩面死神",
             "border":"410",
             "DP":"650,000","HP":"2,000,000",
             "weakness":"火-50、冰-50、雷-50","resist":""
@@ -694,10 +694,10 @@
     "name":"HELL-32F",
     "enemys":
     {
-        "暗影·梢[]":
+        "暗影·梢[夜曲]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·梢[]",
+            "img_path":"./敌人/时钟塔/HELL-32F/暗影·梢[夜曲].png",
+            "name":"暗影·梢[夜曲]",
             "border":"410",
             "DP":"800,000","HP":"53,500,000",
             "weakness":"斩-150、雷-150","resist":"突+75"
