@@ -30,10 +30,10 @@ def install_modules():
             return True
             
         except subprocess.CalledProcessError as e:
-            print(f"[-] 使用镜像 {mirror['url']} 安装失败: {e}")
+            messagebox.showerror("错误", f"使用镜像 {mirror['url']} 安装失败: {e}")
             continue
         except Exception as e:
-            print(f"[-] 发生未知错误: {e}")
+            messagebox.showerror("错误", f"发生未知错误: {e}")
             continue
     
     # 所有镜像都失败
