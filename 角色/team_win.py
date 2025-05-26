@@ -122,17 +122,33 @@ def show_rarity(frame, role, team, row=2):
         for ss, SSstyle in enumerate(role.SSstyles):
             bind_style_canvas(RaritySSframe, team, SSstyle, 0, ss+1)
 
+# 队伍描述
+def creat_team_desc_frame(parent_frame, team):
+    team_desc_frame = ttk.LabelFrame(parent_frame, text=team.name)
+    team_desc_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
+    team_desc_frame.grid_rowconfigure(0, weight=1)
+    team_desc_frame.grid_columnconfigure(0, weight=1, minsize=100)
+    team_desc_frame.grid_columnconfigure(1, weight=9, minsize=900)
+
+    team_desc_photo = get_photo(team.logo_path, (64, 64))
+    team_desc_canvas = create_canvas_with_image(team_desc_frame, 
+        team_desc_photo, 100, 64, 18, 0, 0, 0)
+
+    team_desc_label = ttk.Label(team_desc_frame, text=team.description, anchor="w", font=("Monospace", 10, "bold"))
+    team_desc_label.grid(row=0, column=1, sticky="nswe", padx=0, pady=10)    
 
 def show_team(scrollbar_frame_obj, team):
 
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
 
+    creat_team_desc_frame(scrollbar_frame_obj.scrollable_frame, team)
+
     for i, role in enumerate(team.roles):
 
         # 创建 LabelFrame
         frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=role.name)
-        frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
+        frame.grid(row=i+1, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
         # 配置网格布局的权重
         frame.grid_rowconfigure(0, weight=1)
         frame.grid_rowconfigure(1, weight=1)
