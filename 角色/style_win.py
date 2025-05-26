@@ -15,7 +15,12 @@ from tools import load_json, output_string, is_parentstring, int_to_comma_str
 
 from style_info import SkillEffect
 from style_proc import get_hit_damage_str
-from style_proc import on_attack_combo_select, on_heal_combo_select, on_buff_combo_select, on_debuff_combo_select, on_mindeye_combo_select,on_percentage_combo_select
+from style_proc import on_attack_combo_select
+from style_proc import on_heal_combo_select
+from style_proc import on_defense_combo_select, on_buff_combo_select
+from style_proc import on_debuff_combo_select
+from style_proc import on_mindeye_combo_select
+from style_proc import on_percentage_combo_select
 
 import 强化素材.strengthen_materials_win
 import 职业.careers_info
@@ -224,6 +229,12 @@ def creat_active_skill_frame(parent_frame, style):
             lv_combo.bind(
                 "<<ComboboxSelected>>", 
                 partial(on_heal_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
+            )
+        elif "防御上升" in lv_combo_text:
+            combos[active_skill.name+"_defense"] = lv_combo
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_defense_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
             )
         elif "上升" in lv_combo_text:
             combos[active_skill.name+"_buff"] = lv_combo

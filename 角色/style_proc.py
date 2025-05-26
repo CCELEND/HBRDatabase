@@ -12,6 +12,8 @@ def extract_skill_numbers(text, type):
         strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "治疗":
         strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "防御上升":
+        strength_text = re.search(r"防御上升(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "上升":
         strength_text = re.search(r"上升(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "下降":
@@ -33,6 +35,8 @@ def write_numbers_back(text, modified_numbers, type):
         parts = re.split(r"(技能强度：.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "治疗":
         parts = re.split(r"(回复DP.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "防御上升":
+        parts = re.split(r"(防御上升.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "上升":
         parts = re.split(r"(上升.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "下降":
@@ -101,6 +105,24 @@ def get_lv_buff_min_max(buff_min_max, lv):
     lv_buff_max = int(lv_buff_max) if lv_buff_max.is_integer() else lv_buff_max
 
     return [lv_buff_min, lv_buff_max]
+
+
+# [] 返回不同等级defense上升最大值 最小值 列表形式 [min, max]
+def get_lv_defense_min_max(defense_min_max, lv):
+    defense_min_base = float(defense_min_max[0])
+    defense_max_base = float(defense_min_max[1])
+
+    lv_defense_min = defense_min_base * (1 + 0.05 * (lv - 1))
+    lv_defense_max = defense_max_base * (1 + 0.02 * (lv - 1))
+    # 保留一位小数
+    lv_defense_min = float(f"{lv_defense_min:.1f}")
+    lv_defense_max = float(f"{lv_defense_max:.1f}")
+
+    # 如果小数部分为0则转换为整数
+    lv_defense_min = int(lv_defense_min) if lv_defense_min.is_integer() else lv_defense_min
+    lv_defense_max = int(lv_defense_max) if lv_defense_max.is_integer() else lv_defense_max
+
+    return [lv_defense_min, lv_defense_max]
 
 # [] 返回不同等级debuff最大值 最小值 列表形式 [min, max]
 def get_lv_debuff_min_max(debuff_min_max, lv):
@@ -182,6 +204,27 @@ def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
     desc_lab["text"] = new_text
     # except:
     #     return
+
+# 不同等级时的防御上升数值处理
+def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        last_text = desc_lab["text"]
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "防御上升")
+        if len(original_numbers) == 2:
+            new_original_numbers = get_lv_defense_min_max(original_numbers, lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "防御上升")
+        else:
+            new_original_numbers0 = get_lv_defense_min_max(original_numbers[:2], lv)
+            new_original_numbers1 = get_lv_defense_min_max(original_numbers[2:], lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "防御上升")
+
+        desc_lab["text"] = new_text
+    except:
+        return
 
 # 不同等级时的增益数值处理
 def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
