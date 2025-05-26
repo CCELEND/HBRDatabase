@@ -22,14 +22,14 @@ from style_proc import on_debuff_combo_select
 from style_proc import on_mindeye_combo_select
 from style_proc import on_percentage_combo_select
 
-import 强化素材.strengthen_materials_win
+import 强化素材.strengthen_materials
 import 职业.careers_info
 import 属性.attributes_info
 import 状态.status_info
 
 # 加载资源文件
 def load_resources():
-    强化素材.strengthen_materials_win.load_resources()
+    强化素材.strengthen_materials.load_resources()
     职业.careers_info.get_all_career_obj()
     状态.status_info.get_all_statu_obj()
     属性.attributes_info.get_all_attribute_obj()
@@ -66,6 +66,19 @@ def skill_effect_text(skill):
         text += "，" + 状态.status_info.status[skill.effect_type].description
 
     return text
+
+# 职能 frame
+def cret_career_frame(parent_frame, style):
+
+    career = 职业.careers_info.careers[style.career]
+    career_frame = ttk.LabelFrame(parent_frame, text=style.career)
+    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    career_frame.grid_rowconfigure(0, weight=1)
+
+    career_photo = get_photo(career.path, (200, 40))
+    career_canvas = create_canvas_with_image(career_frame, 
+        career_photo, 240, 40, 20, 0, 0, 0)
+
 
 # 主动技能描述 frame
 def creat_desc_frame(row_frame, active_skill):
@@ -328,15 +341,15 @@ def creat_growth_ability_frame(parent_frame, style):
     # 判断元素属性
     if style.element_attribute:
         if len(style.element_attribute) == 1:
-            hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+            hoju_img_path = 强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute}属性）"]['path']
         else:
-            hoju_img_path0 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+            hoju_img_path0 = 强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute[0]}属性）"]['path']
-            hoju_img_path1 = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+            hoju_img_path1 = 强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute[1]}属性）"]['path']
     else:
-        hoju_img_path = 强化素材.strengthen_materials_win.strengthen_materials_dir[
+        hoju_img_path = 强化素材.strengthen_materials.strengthen_materials_dir[
             f"宝珠（{style.weapon_attribute}属性）"]['path']
 
     if not style.element_attribute or len(style.element_attribute) == 1:
@@ -395,13 +408,7 @@ def show_style(scrollbar_frame_obj, style):
     scrollbar_frame_obj.destroy_components()
 
     # 职业
-    career = 职业.careers_info.careers[style.career]
-    career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.career)
-    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
-    career_frame.grid_rowconfigure(0, weight=1)
-    career_photo = get_photo(career.path, (200, 40))
-    career_canvas = create_canvas_with_image(career_frame, 
-        career_photo, 240, 40, 20, 0, 0, 0)
+    cret_career_frame(scrollbar_frame_obj.scrollable_frame, style)
 
     # 主动技能
     creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
