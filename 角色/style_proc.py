@@ -67,8 +67,8 @@ def get_lv_strength_min_max(strength_min_max, lv):
     strength_min_base = float(strength_min_max[0])
     strength_max_base = float(strength_min_max[1])
 
-    step_len_min = strength_min_base / 20
-    step_len_max = strength_min_base / 10
+    step_len_min = strength_min_base * 0.05
+    step_len_max = strength_min_base * 0.1
     lv_strength_min = round(step_len_min * (lv - 1) + strength_min_base)
     lv_strength_max = round(step_len_max * (lv - 1) + strength_max_base)
 
@@ -79,8 +79,8 @@ def get_lv_heal_min_max(heal_min_max, lv):
     heal_min_base = float(heal_min_max[0])
     heal_max_base = float(heal_min_max[1])
 
-    step_len_min = heal_min_base / 20
-    step_len_max = step_len_min * 1.2
+    step_len_min = heal_min_base * 0.05
+    step_len_max = heal_min_base * 0.06
     lv_heal_min = round(step_len_min * (lv - 1) + heal_min_base)
     lv_heal_max = round(step_len_max * (lv - 1) + heal_max_base)
 
@@ -90,9 +90,6 @@ def get_lv_heal_min_max(heal_min_max, lv):
 def get_lv_buff_min_max(buff_min_max, lv):
     buff_min_base = float(buff_min_max[0])
     buff_max_base = float(buff_min_max[1])
-
-    # lv_buff_min = round(buff_min_base * (1 + 0.03 * (lv - 1)), 1)
-    # lv_buff_max = round(buff_max_base * (1 + 0.02 * (lv - 1)), 1)
 
     lv_buff_min = buff_min_base * (1 + 0.03 * (lv - 1))
     lv_buff_max = buff_max_base * (1 + 0.02 * (lv - 1))
@@ -128,9 +125,6 @@ def get_lv_defense_min_max(defense_min_max, lv):
 def get_lv_debuff_min_max(debuff_min_max, lv):
     debuff_min_base = float(debuff_min_max[0])
     debuff_max_base = float(debuff_min_max[1])
-
-    # lv_debuff_min = round(debuff_min_base * (1 + 0.05 * (lv - 1)), 1)
-    # lv_debuff_max = round(debuff_max_base * (1 + 0.02 * (lv - 1)), 1)
 
     lv_debuff_min = debuff_min_base * (1 + 0.05 * (lv - 1))
     lv_debuff_max = debuff_max_base * (1 + 0.02 * (lv - 1))
