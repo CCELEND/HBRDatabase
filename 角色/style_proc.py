@@ -158,6 +158,12 @@ def get_hit_damage_expand_str(hit_damage):
     hit_damage_expand_str = "，".join(map(str, hit_damage))
     return hit_damage_expand_str
 
+# 暗忍用
+def on_buff_attack_combo_select(event, desc_labs, lv1_skill_strengths):
+    on_attack_combo_select(event, desc_labs[0], lv1_skill_strengths[0])
+    on_buff_combo_select(event, desc_labs[1], lv1_skill_strengths[1])
+
+
 # 绑定事件：当选项改变时触发，优先使用 event.widget 获取事件来源的控件
 def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
     try:

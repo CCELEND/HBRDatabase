@@ -4,6 +4,7 @@ class SkillEffect:
     def __init__(self, effect_type = None, value = None, 
         attribute_multiplier = None, attribute_difference = None, 
         turn_num = None, duration = None, target= None, 
+        main_effect = False,
         probability = "100%"):
 
         self.effect_type = effect_type  # 效果类型 e.g., "降防 防御下降", "攻击上升" "暴击率上升" "攻击下降" "连击数上升" "强化领域"
@@ -15,6 +16,8 @@ class SkillEffect:
         self.duration = duration    # 敌方回合, 我方回合, 持续，次；如果没说明回合数或者次数这个成员就填 None
         self.target = target        # 敌方 全体敌方 自身 前锋 后卫 全体友方 一名友方
         
+        self.main_effect = main_effect  # 是否是主效果
+
         self.probability = probability  # 成功概率值
 
     @classmethod
@@ -27,6 +30,7 @@ class SkillEffect:
             'turn_num': None,
             'duration': None,
             'target': None,
+            'main_effect': False,
             'probability': "100%"
         }
         
@@ -46,6 +50,8 @@ class SkillEffect:
             elif i == 6:
                 params['target'] = data
             elif i == 7:
+                params['main_effect'] = data
+            elif i == 8:
                 params['probability'] = data
 
         return cls(**params)

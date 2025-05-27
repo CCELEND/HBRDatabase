@@ -15,7 +15,7 @@ from tools import load_json, output_string, is_parentstring, int_to_comma_str
 
 from style_info import SkillEffect
 from style_proc import get_hit_damage_str
-from style_proc import on_attack_combo_select
+from style_proc import on_attack_combo_select, on_buff_attack_combo_select
 from style_proc import on_heal_combo_select
 from style_proc import on_defense_combo_select, on_buff_combo_select
 from style_proc import on_debuff_combo_select
@@ -110,10 +110,73 @@ def creat_desc_frame(row_frame, active_skill):
         justify="right", font=("Monospace", 10, "bold"))
     sp_use_lab.grid(row=0, column=2, sticky="nse", padx=5, pady=5)
 
+# 新建并绑定技能等级选择框
+def bind_lv_combo_lab(parent_frame, active_skill, lv_combo_labs, lv_combo_texts):
+    lv_combo_name = active_skill.name
+    lv_combo_row = 1 + len(active_skill.effects)
+    level_max = int(active_skill.level_max)
+
+    lv_combo = ttk.Combobox(parent_frame, 
+        values=skill_options[:level_max], style="Custom.TCombobox")
+    lv_combo.grid(row=lv_combo_row, column=0, sticky="nswe", padx=10, pady=(5,10))
+    lv_combo.configure(state="readonly")
+    lv_combo.set("Skill Lv.1")
+
+
+    if "技能强度" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_attack"] = lv_combo
+        if len(lv_combo_texts) == 2:
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_buff_attack_combo_select, desc_labs=lv_combo_labs, lv1_skill_strengths=lv_combo_texts)
+            )
+        else:            
+            lv_combo.bind(
+                "<<ComboboxSelected>>", 
+                partial(on_attack_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+            )
+    elif "回复DP" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_heal"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_heal_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+    elif "防御上升" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_defense"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_defense_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+    elif "上升" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_buff"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_buff_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+    elif "下降" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_debuff"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_debuff_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+    elif "心眼" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_buff"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_mindeye_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )        
+    elif "百分比的伤害" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_other"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_percentage_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+
+
 # 主动技能
 def creat_active_skill_frame(parent_frame, style):
 
-    combos = {}
+    # combos = {}
     # 创建自定义样式
     style_tc = ttk.Style()
     # 定义自定义样式
@@ -143,10 +206,11 @@ def creat_active_skill_frame(parent_frame, style):
         # 一个主动技能的描述 frame
         creat_desc_frame(row_frame, active_skill)
 
-        lv1_attack_skill_strength_flag = False
-        lv_combo_name = ""
-        lv_combo_text = ""
-        lv_combo_lab = None
+        att_lv_combo_text = ""
+        att_lv_combo_lab = None
+        main_lv_combo_text = ""
+        main_lv_combo_lab = None
+        main_effect_flag = False
         # 技能效果列表
         for j, skill in enumerate(active_skill.effects):
             # 属性倍率
@@ -213,67 +277,38 @@ def creat_active_skill_frame(parent_frame, style):
 
             desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
             desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
-            if "技能强度" in text and "属性倍率" in text:
-                lv_combo_lab = desc_lab
-                lv_combo_text = text
+
+            # 如果是攻击技能
+            if not isinstance(skill, SkillEffect):
+                att_lv_combo_text = text
+                att_lv_combo_lab = desc_lab
             else:
-                if not lv_combo_text:
-                    lv_combo_text = text
-                    lv_combo_lab = desc_lab
+                if not main_lv_combo_text:
+                    main_lv_combo_text = text
+                    main_lv_combo_lab = desc_lab
 
-        lv_combo_name = active_skill.name
-        lv_combo_row = 1 + len(active_skill.effects)
-        level_max = int(active_skill.level_max)
+                # 主效果（暗忍触发）
+                if skill.main_effect:
+                    main_effect_flag = True
+                    main_lv_combo_text = text
+                    main_lv_combo_lab = desc_lab
 
-        lv_combo = ttk.Combobox(row_frame, 
-            values=skill_options[:level_max], style="Custom.TCombobox")
-        lv_combo.grid(row=lv_combo_row, column=0, sticky="nswe", padx=10, pady=(5,10))
-        lv_combo.configure(state="readonly")
-        lv_combo.set("Skill Lv.1")
+        lv_combo_labs = []
+        lv_combo_texts = []
+        if att_lv_combo_text:
+            lv_combo_texts.append(att_lv_combo_text)
+            lv_combo_labs.append(att_lv_combo_lab)
+            if main_effect_flag:
+                lv_combo_texts.append(main_lv_combo_text)
+                lv_combo_labs.append(main_lv_combo_lab)
+        else:
+            lv_combo_texts.append(main_lv_combo_text)
+            lv_combo_labs.append(main_lv_combo_lab)
 
-        if "技能强度" in lv_combo_text:
-            combos[active_skill.name+"_attack"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_attack_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )
-        elif "回复DP" in lv_combo_text:
-            combos[active_skill.name+"_heal"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_heal_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )
-        elif "防御上升" in lv_combo_text:
-            combos[active_skill.name+"_defense"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_defense_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )
-        elif "上升" in lv_combo_text:
-            combos[active_skill.name+"_buff"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_buff_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )
-        elif "下降" in lv_combo_text:
-            combos[active_skill.name+"_debuff"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_debuff_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )
-        elif "心眼" in lv_combo_text:
-            combos[active_skill.name+"_buff"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_mindeye_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )        
-        elif "百分比的伤害" in lv_combo_text:
-            combos[active_skill.name+"_other"] = lv_combo
-            lv_combo.bind(
-                "<<ComboboxSelected>>", 
-                partial(on_percentage_combo_select, desc_lab=lv_combo_lab, lv1_skill_strength=lv_combo_text)
-            )    
-        
+        # print(lv_combo_texts)
+        # 新建并绑定技能等级选择框
+        bind_lv_combo_lab(row_frame, active_skill, lv_combo_labs, lv_combo_texts)
+
 
 # 被动技能
 def creat_passive_skill_frame(parent_frame, style):
