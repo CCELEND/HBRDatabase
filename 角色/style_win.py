@@ -22,6 +22,8 @@ from style_proc import on_debuff_combo_select
 from style_proc import on_mindeye_combo_select
 from style_proc import on_percentage_combo_select
 
+from style_text import output_attack_skill, output_skill_effect
+
 import 强化素材.strengthen_materials
 import 职业.careers_info
 import 属性.attributes_info
@@ -39,33 +41,6 @@ skill_options = [
     "Skill Lv.11", "Skill Lv.12", "Skill Lv.13", 
     "Skill Lv.14", "Skill Lv.15", "Skill Lv.16", "Skill Lv.17"
 ]
-
-# 特殊的效果状态，下列状态会显示：描述：值，或者描述
-special_effects = [
-    "心眼", "脆弱", "额外回合", "净化减益", "禁锢", "灾厄","特殊状态", "影分身", "混乱", 
-    "弱点强击破", "退避", "充能", "贯通暴击", "斗志", "持续回复DP", "击破保护",
-    "强化领域", "上升增益技能强化", "减益效果强化", "无敌", "掩护", "嘲讽", "抗性清除", "抗性下降", 
-    "眩晕","清除病毒状态","清除攻击下降类状态","攻击上升且减益效果强化","回复技能强化","永恒誓言","对HP百分比攻击"
-]
-def skill_effect_text(skill):
-
-    text = ""
-    text += output_string(skill.turn_num) + output_string(skill.duration) + output_string(skill.target)
-    text += output_string(skill.effect_type) + '\n'
-    
-    # 如果 skill.effect_type 是 special_effects 中字符串的父串
-    if is_parentstring(skill.effect_type, special_effects):
-        if skill.value:
-            text += 状态.status_info.status[skill.effect_type].description + "：" + skill.value
-        else:
-            text += 状态.status_info.status[skill.effect_type].description
-    else:
-        text += output_string(skill.value)
-
-    if skill.effect_type in ["连击数上升（大）", "连击数上升（小）"]:
-        text += "，" + 状态.status_info.status[skill.effect_type].description
-
-    return text
 
 # 职能 frame
 def cret_career_frame(parent_frame, style):
@@ -213,11 +188,6 @@ def creat_active_skill_frame(parent_frame, style):
         main_effect_flag = False
         # 技能效果列表
         for j, skill in enumerate(active_skill.effects):
-            # 属性倍率
-            if skill.attribute_multiplier:
-                attribute_multiplier = "、".join(
-                    [f"{key}×{value}" for key, value in skill.attribute_multiplier.items()]
-                )
 
             # 技能效果 frame
             effect_frame = ttk.Frame(row_frame)
@@ -234,14 +204,11 @@ def creat_active_skill_frame(parent_frame, style):
                 effect_canvas = create_canvas_with_image(effect_frame, 
                     effect_photo, 60, 60, 0, 0, 0, 0)
 
-                text = skill_effect_text(skill)
-
-                if skill.attribute_multiplier:
-                    text += '，属性倍率：' + attribute_multiplier  + '\n'
-                if skill.attribute_difference:
-                    text += '技能属性差值：' + skill.attribute_difference
-                    if skill.target in ['单体','全体'] and skill.effect_type not in special_effects:
-                        text += f"（{skill.attribute_difference}+敌方属性）"
+                text = output_skill_effect(skill.turn_num, skill.duration, skill.target, skill.effect_type,
+                    状态.status_info.status[skill.effect_type].description, skill.value, skill.attribute_multiplier,
+                    skill.attribute_difference,
+                    IsActive=True
+                )
 
             # 否则就是攻击技能
             else:
@@ -256,32 +223,21 @@ def creat_active_skill_frame(parent_frame, style):
                 attack_canvas = create_canvas_with_image(effect_frame, 
                     attack_photo, 60, 60, 0, 0, 0, 0)
 
-                text = skill.hit_num + '-hit' + skill.target + '攻击'
-                if skill.hit_damage:
-                    hit_damage = get_hit_damage_str(skill.hit_damage)
-                    text += "，hit伤害分布：" + f"（{hit_damage}）"
-                text += '\n'
-
-                if skill.biased:
-                    text += "技能偏向：" + skill.biased + '\n'
-
-                if skill.strength:
-                    text += "技能强度：" + skill.strength 
-                if skill.attribute_multiplier:
-                    text += '，属性倍率：' + attribute_multiplier + '\n'
-                    
-                if skill.attribute_difference:
-                    text += '技能属性差值：' + skill.attribute_difference + f"（{skill.attribute_difference}+敌方属性），"
-                if skill.destructive_multiplier:
-                    text += "破坏倍率：" + skill.destructive_multiplier
+                # 攻击技能信息
+                text = output_attack_skill(skill.hit_num, skill.target, skill.hit_damage, 
+                    skill.biased, 
+                    skill.strength, skill.attribute_multiplier, 
+                    skill.attribute_difference, skill.destructive_multiplier
+                )
 
             desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
             desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
             # 如果是攻击技能
             if not isinstance(skill, SkillEffect):
-                att_lv_combo_text = text
-                att_lv_combo_lab = desc_lab
+                if not att_lv_combo_text:
+                    att_lv_combo_text = text
+                    att_lv_combo_lab = desc_lab
             else:
                 if not main_lv_combo_text:
                     main_lv_combo_text = text
@@ -359,7 +315,10 @@ def creat_passive_skill_frame(parent_frame, style):
         effect_canvas = create_canvas_with_image(effect_frame, 
             effect_photo, 60, 60, 0, 0, 0, 0)
 
-        text = skill_effect_text(passive_skill)
+        text = output_skill_effect(passive_skill.turn_num, passive_skill.duration, passive_skill.target, passive_skill.effect_type,
+            状态.status_info.status[passive_skill.effect_type].description, passive_skill.value,
+            IsActive=False
+        )
 
         effect_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
         effect_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
