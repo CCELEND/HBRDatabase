@@ -66,6 +66,7 @@ def calculate_file_hash_block(filepath, key):
 # 计算指定目录下所有文件的哈希值（使用多线程）
 def calculate_file_hashes(directory):
     file_hashes = {}
+    skip_items = ["__pycache__", ".mp3", ".flac", ".xlsx", "chrome_user_data"]
 
     # 遍历目录，收集所有需要计算哈希的文件路径
     file_tasks = []
@@ -80,7 +81,7 @@ def calculate_file_hashes(directory):
                 key = key.replace('\\', '/')
 
             # 跳过不需要的文件
-            if "__pycache__" in key or ".mp3" in key or ".flac" in key or ".xlsx" in key:
+            if any(item in key for item in skip_items):
                 continue
 
             # 将任务添加到任务列表
