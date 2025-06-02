@@ -31,59 +31,94 @@ def on_select(check_vars, options, last, selected_values, all_index=0):
     selected_values[:] = [value for i, (value, check_var) in enumerate(zip(options, check_vars)) 
                       if check_var.get() and i != all_index]
 
+# 复选判断
+def check_filter(style, filter_dict, element_attribute):
+    filters = [
+        ('队伍', lambda: style.team_name in filter_dict['队伍']),
+        ('稀有度', lambda: style.rarity in filter_dict['稀有度']),
+        ('职能', lambda: style.career in filter_dict['职能']),
+        ('武器属性', lambda: style.weapon_attribute in filter_dict['武器属性']),
+        ('元素属性', lambda: is_parentstring(element_attribute, filter_dict['元素属性']))
+    ]
+    return all(not filter_dict.get(key) or check() for key, check in filters)
+
+# 角色名称昵称关键词判断
+def should_include(role, style, keyword_list):
+    if not keyword_list:
+        return True
+        
+    checks = [
+        list_val_in_another(role.nicknames, keyword_list),
+        list_val_in_another(style.nicknames, keyword_list),
+        is_parentstring(style.role_name, keyword_list),
+        is_parentstring(style.name, keyword_list)
+    ]
+    
+    return any(checks)
+
+# 技能关键词判断
+def check_keywords_in_skills(style, keyword_list, filter_dict):
+    if not keyword_list:
+        return False
+
+    # 定义技能类型与获取方法的映射
+    skill_type_map = {
+        "主动技能": lambda: style.active_skills,
+        "被动技能": lambda: style.passive_skills
+    }
+
+    # 定义主动技能效果的检查函数
+    def check_active_effect(effect):
+        if isinstance(effect, SkillEffect):
+            return (is_parentstring(effect.target, keyword_list) or
+                    is_parentstring(effect.effect_type, keyword_list) or
+                    is_parentstring(output_string(effect.target) + output_string(effect.effect_type), keyword_list))
+        else:
+            return (is_parentstring(effect.target + "攻击", keyword_list) or
+                    is_parentstring(effect.biased, keyword_list))
+
+    # 定义被动技能效果的检查函数
+    def check_passive_effect(skill):
+        return (is_parentstring(skill.effect_type, keyword_list) or
+                is_parentstring(skill.description, keyword_list) or
+                is_parentstring(output_string(skill.target) + output_string(skill.effect_type), keyword_list))
+
+    # 遍历筛选的技能类型
+    for select_skill in filter_dict['技能']:
+        if select_skill in skill_type_map:
+            skills = skill_type_map[select_skill]()
+            
+            # 遍历该类型下的所有技能
+            for skill in skills:
+                # 检查技能名称
+                if is_parentstring(skill.name, keyword_list):
+                    return True
+                
+                # 检查技能描述
+                if is_parentstring(skill.description, keyword_list):
+                    return True
+                
+                # 根据技能类型检查不同的效果
+                if select_skill == "主动技能":
+                    for effect in skill.effects:
+                        if check_active_effect(effect):
+                            return True
+                elif select_skill == "被动技能":
+                    if check_passive_effect(skill):
+                        return True
+    return False
+
 # 检查风格是否符合筛选条件
 def filter_judge(filter_dict, keyword_list, role, style):
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"
 
-    if (not filter_dict.get('队伍') or style.team_name in filter_dict['队伍']) and \
-       (not filter_dict.get('稀有度') or style.rarity in filter_dict['稀有度']) and \
-       (not filter_dict.get('职能') or style.career in filter_dict['职能']) and \
-       (not filter_dict.get('武器属性') or style.weapon_attribute in filter_dict['武器属性']) and \
-       (not filter_dict.get('元素属性') or is_parentstring(element_attribute, filter_dict['元素属性'])):
+    if check_filter(style, filter_dict, element_attribute):
 
-        if not keyword_list or list_val_in_another(role.nicknames, keyword_list):
+        if should_include(role, style, keyword_list):
             return True
 
-        if not keyword_list or list_val_in_another(style.nicknames, keyword_list):
+        if check_keywords_in_skills(style, keyword_list, filter_dict):
             return True
-
-        if not keyword_list or is_parentstring(style.role_name, keyword_list):
-            return True
-
-        if not keyword_list or is_parentstring(style.name, keyword_list):
-            return True
-
-        if keyword_list:
-            for select_skill in filter_dict['技能']:
-                if select_skill == "主动技能":
-                    for active_skill in style.active_skills:
-                        if is_parentstring(active_skill.name, keyword_list):
-                            return True
-                        # if is_parentstring(active_skill.description, keyword_list):
-                        #     return True
-                        for skill in active_skill.effects:
-                            if isinstance(skill, SkillEffect):
-                                if (is_parentstring(skill.target, keyword_list)) or \
-                                   (is_parentstring(skill.effect_type, keyword_list)) or \
-                                   (is_parentstring(output_string(skill.target)+output_string(skill.effect_type), keyword_list)):
-                                    return True
-                            else:
-                                if (is_parentstring(skill.target+"攻击", keyword_list)) or \
-                                   (is_parentstring(skill.biased, keyword_list)):
-                                    return True
-                        if is_parentstring(active_skill.description, keyword_list):
-                            return True
-                if select_skill == "被动技能":
-                    for passive_skill in style.passive_skills:
-                        if is_parentstring(passive_skill.name, keyword_list):
-                            return True
-                        # if is_parentstring(passive_skill.description, keyword_list):
-                        #     return True
-                        if (is_parentstring(passive_skill.effect_type, keyword_list)) or \
-                           (is_parentstring(passive_skill.description, keyword_list)) or \
-                           (is_parentstring(output_string(passive_skill.target)+output_string(passive_skill.effect_type), keyword_list)):
-                            return True
-
 
 # 根据筛选条件获取风格对象列表
 def get_filtered_styles(filter_dict, keyword_list):
@@ -110,14 +145,14 @@ def replace_dp_sp(text):
     text = re.sub(r'(SP回复|SP恢复|恢复SP|回复SP)', '回复SP', text)
     return text
 
+# 替换与 OD 相关的词为：OD
 def replace_od_up(text):
-    # 替换与 OD 相关的词为：OD
     text = re.sub(r'(超频条|超频|OD条|OD)', 'OD条', text)
     text = re.sub(r'(增加OD条|OD条增加|OD条上升)', 'OD条上升', text)
     return text
 
+# 替换与场地相关的词为：强化领域
 def replace_zone(text):
-    # 替换与场地相关的词为：强化领域
     text = re.sub(r'(场地|场|强化领域|领域)', '强化领域', text)
     text = re.sub(r'(大强化领域)', '强化领域（大）', text)
     text = re.sub(r'(小强化领域)', '强化领域（小）', text)
