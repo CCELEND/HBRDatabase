@@ -71,6 +71,11 @@ from hbr_axletool.Load import load_hbr_axletool
 from wiki_hbr_hd.Load import load_wiki_hbr_hd
 from 词条计算器.Load import load_entry_calculator
 
+from hbr_quest.Load import load_hbr_quest
+from game8_hbr.Load import load_game8_hbr
+from gamekee_hbr.Load import load_gamekee_hbr
+from 入队培训手册.Load import load_game_bilibili_com
+
 sys.path.append(os.path.abspath("./关于"))
 from about_win import creat_about_win
 
@@ -198,6 +203,11 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("hbr-axletool", load_hbr_axletool),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
+
+        ("hbr.quest", load_hbr_quest),
+        ("入队培训手册", load_game_bilibili_com),
+        ("gamekee", load_gamekee_hbr),
+        ("game8", load_game8_hbr),
     ]
     # 循环创建菜单项
     for tool_call_name, callback in menu_tool_calls:
