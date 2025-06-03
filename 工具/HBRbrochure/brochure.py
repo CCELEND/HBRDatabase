@@ -108,6 +108,11 @@ def get_brochure(driver, style_infos):
     # 下载图鉴
     download_brochure(driver)
 
+    driver.delete_all_cookies()  # 清除所有cookies
+    driver.execute_script('window.localStorage.clear();')  # 清除localStorage
+    driver.execute_script('window.sessionStorage.clear();')  # 清除sessionStorage
+
+
 
 
 

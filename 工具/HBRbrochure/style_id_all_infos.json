@@ -50,6 +50,9 @@
     "1001405":{
         "style_name":"秘密特工·静谧", "character_role":"增益者", "element_type":"光", "weapon_type":"突"
     },
+    "1001406":{
+        "style_name":"背离常规的黠兔争锋", "character_role":"减益者", "element_type":"暗", "weapon_type":"突"
+    },
     "1001503":{
         "style_name":"红莲月华之杀戮镰刀", "character_role":"破坏者", "element_type":"无", "weapon_type":"斩"
     },
@@ -325,6 +328,9 @@
     },
     "1008204":{
         "style_name":"引路一袭露草色", "character_role":"增益者", "element_type":"雷", "weapon_type":"斩"
+    },
+    "1008205":{
+        "style_name":"春宵我爱你", "character_role":"减益者", "element_type":"无", "weapon_type":"斩"
     },
     "1008303":{
         "style_name":"蓝色石榴石", "character_role":"破盾者", "element_type":"无", "weapon_type":"突"
