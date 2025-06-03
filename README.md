@@ -26,7 +26,7 @@
 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
 1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
 * 修改 config.ini 配置文件：  
-使用之前需要修改 config.ini 配置文件，文件路径：HBRDatabase/工具/GetEntriesGUILocal/config.ini    
+使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini    
 * 填入洗孔的 seed 和 index：  
 	ChangeAbility_seed=  
 	ChangeAbility_index=  
@@ -38,11 +38,13 @@
 （如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系）  
 2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴  
 * 需要安装最新版本的 chrome 浏览器，登录之后可能会出现没有数据的情况，刷新一下网页即可  
+* 如果图鉴数据错误，就删除目录：./工具/HBRbrochure/chrome_user_data  
 3. 伤害模拟：通过添加的技能与填写的能力值来计算出最终伤害。炽焰天穹伤害计算器  
 * 需要点击浏览器的拓展程序来运行  
 4. hbr-tool：包含一些便利的工具（日文）  
 5. hbr-axletool：一个 HBR 的排轴工具网站  
-6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备
+6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备  
+7. 资源和攻略网站：hbr.quest、入队培训手册、gamekee、game8
 
 
 ### 音乐
