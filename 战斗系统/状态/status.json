@@ -458,6 +458,14 @@
         "type":"增益",
         "series":"跟班" 
     },
+    "高阶增强":{
+        "name":"高阶增强",
+        "path":"./战斗系统/状态/HighBoost.webp",
+        "effect":"技能攻击力增加180%\n攻击力提升增益效果提升20%\n增强减益效果20%","description":"技能攻击力增加180%\n攻击力提升增益效果提升20%\n增强减益效果20%",
+        "stack":"-",
+        "type":"增益",
+        "series":"高阶增强" 
+    },
     "上升增益技能强化":{
         "name":"上升增益技能强化",
         "path":"./战斗系统/状态/GiveAttackBuffUp.webp",
@@ -1032,7 +1040,23 @@
         "stack":"-",
         "type":"其他",
         "series":"扣除SP"         
-    }      
+    },
+    "SP上限增加":{
+        "name":"SP上限增加",
+        "path":"./战斗系统/状态/SpLimitOverwrite.webp",
+        "effect":"SP上限变为30（默认限制为20）","description":"SP上限变为30（默认限制为20）",
+        "stack":"-",
+        "type":"其他",
+        "series":"SP上限增加"         
+    },
+    "SP消耗增加":{
+        "name":"SP消耗增加",
+        "path":"./战斗系统/状态/Fatigue.webp",
+        "effect":"SP消耗量增加2","description":"SP消耗量增加2",
+        "stack":"-",
+        "type":"其他",
+        "series":"SP消耗增加"         
+    }          
 
 
 }
