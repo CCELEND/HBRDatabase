@@ -32,7 +32,10 @@ def on_select(check_vars, options, last, selected_values, all_index=0):
                       if check_var.get() and i != all_index]
 
 # 复选判断
-def check_filter(style, filter_dict, element_attribute):
+def check_filter(style, filter_dict):
+
+    element_attribute = style.element_attribute if style.element_attribute is not None else "无"
+
     filters = [
         ('队伍', lambda: style.team_name in filter_dict['队伍']),
         ('稀有度', lambda: style.rarity in filter_dict['稀有度']),
@@ -46,7 +49,7 @@ def check_filter(style, filter_dict, element_attribute):
 def should_include(role, style, keyword_list):
     if not keyword_list:
         return True
-        
+    
     checks = [
         list_val_in_another(role.nicknames, keyword_list),
         list_val_in_another(style.nicknames, keyword_list),
@@ -110,9 +113,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 
 # 检查风格是否符合筛选条件
 def filter_judge(filter_dict, keyword_list, role, style):
-    element_attribute = style.element_attribute if style.element_attribute is not None else "无"
-
-    if check_filter(style, filter_dict, element_attribute):
+    if check_filter(style, filter_dict):
 
         if should_include(role, style, keyword_list):
             return True
@@ -120,7 +121,7 @@ def filter_judge(filter_dict, keyword_list, role, style):
         if check_keywords_in_skills(style, keyword_list, filter_dict):
             return True
 
-# 根据筛选条件获取风格对象列表
+# 根据筛选条件和关键词列表获取风格对象列表
 def get_filtered_styles(filter_dict, keyword_list):
 
     filtered_styles = []  # 存储符合条件的风格对象
