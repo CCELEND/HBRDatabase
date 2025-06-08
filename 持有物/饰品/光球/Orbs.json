@@ -7,7 +7,7 @@
 		"en":"Orb1_fire",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「暴击冥想」",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼R"
 	},
 	"复活光球":{
 		"path":"./持有物/饰品/光球/Orb1_ice.webp",
@@ -15,7 +15,7 @@
 		"en":"Orb1_ice",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「修缮之光」",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼B"
 	},
 	"驱动光球":{
 		"path":"./持有物/饰品/光球/Orb1_thunder.webp",
@@ -23,7 +23,7 @@
 		"en":"Orb1_thunder",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「驱动增益」",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼Y"
 	},
 	"防护光球":{
 		"path":"./持有物/饰品/光球/Orb1_light.webp",
@@ -31,7 +31,7 @@
 		"en":"Orb1_light",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「保护」",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼W"
 	},
 	"强攻光球":{
 		"path":"./持有物/饰品/光球/Orb1_dark.webp",
@@ -39,7 +39,7 @@
 		"en":"Orb1_dark",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「攻击增进」",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼P"
 	},
 
 	"集中光球":{
@@ -48,7 +48,7 @@
 		"en":"Orb2_fire",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「专注」",
-		"rarity":"5","location":"光球BOSSⅡ"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无R"
 	},
 	"填充光球":{
 		"path":"./持有物/饰品/光球/Orb2_ice.webp",
@@ -56,7 +56,7 @@
 		"en":"Orb2_ice",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「点数援助」",
-		"rarity":"5","location":"光球BOSSⅡ"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无B"
 	},
 	"治愈光球":{
 		"path":"./持有物/饰品/光球/Orb2_thunder.webp",
@@ -64,7 +64,7 @@
 		"en":"Orb2_thunder",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「自我复原」",
-		"rarity":"5","location":"光球BOSSⅡ"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无Y"
 	},
 	"软化光球":{
 		"path":"./持有物/饰品/光球/Orb2_light.webp",
@@ -72,7 +72,7 @@
 		"en":"Orb2_light",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「软体化」",
-		"rarity":"5","location":"光球BOSSⅡ"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无W"
 	},
 	"衰灭光球":{
 		"path":"./持有物/饰品/光球/Orb2_dark.webp",
@@ -80,16 +80,33 @@
 		"en":"Orb2_dark",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「衰灭之力」",
-		"rarity":"5","location":"光球BOSSⅡ"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无P"
 	},
 
+
+	"加重光球（冰）":{
+		"path":"./持有物/饰品/光球/Orb3_ice.webp",
+		"name":"加重光球（冰）",
+		"en":"Orb3_ice",
+		"type":"光球",
+		"description":"蕴含技能之力的神奇宝玉\n可习得「冰霜重力子」",
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门R"
+	},
 	"加重光球（雷）":{
 		"path":"./持有物/饰品/光球/Orb3_thunder.webp",
 		"name":"加重光球（雷）",
 		"en":"Orb3_thunder",
 		"type":"光球",
 		"description":"蕴含技能之力的神奇宝玉\n可习得「雷电重力子」",
-		"rarity":"5","location":"光球BOSSⅢ"
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门B"
+	},
+	"加重光球（暗）":{
+		"path":"./持有物/饰品/光球/Orb3_dark.webp",
+		"name":"加重光球（暗）",
+		"en":"Orb3_dark",
+		"type":"光球",
+		"description":"蕴含技能之力的神奇宝玉\n可习得「暗黑重力子」",
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门W"
 	}
 
 }

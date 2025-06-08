@@ -49,7 +49,7 @@
 		"en":"Bracelet_High1_fire_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自异度监测之眼R的伤害\n体力、精神 +32",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼R"
 	},
 	"冰门手环":{
 		"path":"./持有物/饰品/手环/Bracelet_High1_ice_1.webp",
@@ -57,7 +57,7 @@
 		"en":"Bracelet_High1_ice_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自异度监测之眼B的伤害\n体力、精神 +32",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼B"
 	},
 	"雷门手环":{
 		"path":"./持有物/饰品/手环/Bracelet_High1_thunder_1.webp",
@@ -65,7 +65,7 @@
 		"en":"Bracelet_High1_thunder_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自异度监测之眼Y的伤害\n体力、精神 +32",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼Y"
 	},
 	"光门手环":{
 		"path":"./持有物/饰品/手环/Bracelet_High1_light_1.webp",
@@ -73,7 +73,7 @@
 		"en":"Bracelet_High1_light_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自异度监测之眼W的伤害\n体力、精神 +32",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼W"
 	},
 	"暗门手环":{
 		"path":"./持有物/饰品/手环/Bracelet_High1_dark_1.webp",
@@ -81,7 +81,7 @@
 		"en":"Bracelet_High1_dark_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自异度监测之眼P的伤害\n体力、精神 +32",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSS\n异度监测之眼P"
 	},
 
 
@@ -91,7 +91,7 @@
 		"en":"Bracelet_High2_fire_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自正之右肌·空无R与恶之左肌·空无R的伤害\n体力、精神 +35",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无R"
 	},
 	"冰门手环Ⅱ":{
 		"path":"./持有物/饰品/手环/Bracelet_High2_ice_1.webp",
@@ -99,7 +99,7 @@
 		"en":"Bracelet_High2_ice_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自正之右肌·空无R与恶之左肌·空无B的伤害\n体力、精神 +35",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无B"
 	},
 	"雷门手环Ⅱ":{
 		"path":"./持有物/饰品/手环/Bracelet_High2_thunder_1.webp",
@@ -107,7 +107,7 @@
 		"en":"Bracelet_High2_thunder_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自正之右肌·空无R与恶之左肌·空无Y的伤害\n体力、精神 +35",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无Y"
 	},
 	"光门手环Ⅱ":{
 		"path":"./持有物/饰品/手环/Bracelet_High2_light_1.webp",
@@ -115,7 +115,7 @@
 		"en":"Bracelet_High2_light_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自正之右肌·空无R与恶之左肌·空无W的伤害\n体力、精神 +35",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无W"
 	},
 	"暗门手环Ⅱ":{
 		"path":"./持有物/饰品/手环/Bracelet_High2_dark_1.webp",
@@ -123,17 +123,32 @@
 		"en":"Bracelet_High2_dark_1",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自正之右肌·空无R与恶之左肌·空无P的伤害\n体力、精神 +35",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无P"
 	},
 
-
+	"火门手环Ⅲ":{
+		"path":"./持有物/饰品/手环/Bracelet_High2_fire_3.webp",
+		"name":"火门手环Ⅲ",
+		"en":"Bracelet_High2_fire_3",
+		"type":"手环",
+		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自阿蒙之门R的伤害\n体力、精神 +38",
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门R"
+	},
 	"冰门手环Ⅲ":{
 		"path":"./持有物/饰品/手环/Bracelet_High2_ice_3.webp",
 		"name":"冰门手环Ⅲ",
 		"en":"Bracelet_High2_ice_3",
 		"type":"手环",
 		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自阿蒙之门B的伤害\n体力、精神 +38",
-		"rarity":"5","location":"光球BOSS"
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门B"
+	},
+	"光门手环Ⅲ":{
+		"path":"./持有物/饰品/手环/Bracelet_High2_light_3.webp",
+		"name":"光门手环Ⅲ",
+		"en":"Bracelet_High2_light_3",
+		"type":"手环",
+		"description":"（小幅减少25%、减少50%、大幅减少75%）\n来自阿蒙之门W的伤害\n体力、精神 +38",
+		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门W"
 	},
 
 	"退魔手环":{
