@@ -25,14 +25,14 @@ def creat_about_win(parent_frame):
         set_window_top(open_about_wins["关于 HBRDatabase"])
         return
 
-    about_win_frame = creat_Toplevel("关于 HBRDatabase", 730, 540)
+    about_win_frame = creat_Toplevel("关于 HBRDatabase", 730, 540, x=180, y=170)
     set_window_icon(about_win_frame, "./关于/KamiSama.ico")
     set_window_expand(about_win_frame, rowspan=3, columnspan=2)
 
     # 创建 LabelFrame
     ver_frame = ttk.LabelFrame(about_win_frame, text="🧰版本")
     ver_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=(5,0), sticky="nsew")
-    describe = "HBRDatabase1.50 (build-61b94921) [main 5c10c942]"
+    describe = "HBRDatabase1.50a (build-1efbc75f) [main 5c10c942]"
     # 设置了标签的字体为 Monospace 大小为 10，加粗
     label = ttk.Label(ver_frame, text=describe, anchor="center", font=("Monospace", 10, "bold"))
     label.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
