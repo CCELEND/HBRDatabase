@@ -977,14 +977,6 @@
         "type":"其他",
         "series":"特殊状态" 
     },
-    "对HP百分比攻击":{
-        "name":"对HP百分比攻击",
-        "path":"./战斗系统/状态/FixedHpDamageRateAttack.webp",
-        "effect":"对目标HP造成相当于当前HP值百分比的伤害","description":"对目标HP造成相当于当前HP值百分比的伤害",
-        "stack":"-",
-        "type":"其他",
-        "series":"对HP百分比攻击"         
-    },
     "恢复EShield盾":{
         "name":"恢复EShield盾",
         "path":"./战斗系统/状态/ReviveEShield.webp",
@@ -1056,7 +1048,55 @@
         "stack":"-",
         "type":"其他",
         "series":"SP消耗增加"         
-    }          
+    },
 
+    "对火弱点HP百分比攻击":{
+        "name":"对火弱点HP百分比攻击",
+        "path":"./战斗系统/状态/其他/FireFixedHpDamageRate.webp",
+        "effect":"对火弱点目标HP造成相当于当前HP值百分比的伤害","description":"对火弱点目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    },     
+    "对冰弱点HP百分比攻击":{
+        "name":"对冰弱点HP百分比攻击",
+        "path":"./战斗系统/状态/其他/IceFixedHpDamageRate.webp",
+        "effect":"对冰弱点目标HP造成相当于当前HP值百分比的伤害","description":"对冰弱点目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    },          
+    "对雷弱点HP百分比攻击":{
+        "name":"对雷弱点HP百分比攻击",
+        "path":"./战斗系统/状态/其他/ThunderFixedHpDamageRate.webp",
+        "effect":"对雷弱点目标HP造成相当于当前HP值百分比的伤害","description":"对雷弱点目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    }, 
+    "对光弱点HP百分比攻击":{
+        "name":"对光弱点HP百分比攻击",
+        "path":"./战斗系统/状态/其他/LightFixedHpDamageRate.webp",
+        "effect":"对光弱点目标HP造成相当于当前HP值百分比的伤害","description":"对光弱点目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    },
+    "对暗弱点HP百分比攻击":{
+        "name":"对暗弱点HP百分比攻击",
+        "path":"./战斗系统/状态/其他/DarkFixedHpDamageRate.webp",
+        "effect":"对暗弱点目标HP造成相当于当前HP值百分比的伤害","description":"对暗弱点目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    },
+    "对HP百分比攻击":{
+        "name":"对HP百分比攻击",
+        "path":"./战斗系统/状态/FixedHpDamageRateAttack.webp",
+        "effect":"对目标HP造成相当于当前HP值百分比的伤害","description":"对目标HP造成相当于当前HP值百分比的伤害",
+        "stack":"-",
+        "type":"其他",
+        "series":"对HP百分比伤害"         
+    }
 
 }

@@ -4,6 +4,8 @@ import threading
 from threading import Lock
 from tools import load_json
 
+from 饰品.光球.orbs_info  import creat_orb_obj
+
 # 饰品
 class Jewelry:
     def __init__(self, path = "", 
@@ -37,15 +39,28 @@ def creat_jewelry(jewelry_json):
     rarity = jewelry_json['rarity']
     location = jewelry_json['location']
 
-    jewelry = Jewelry(
-        path,
-        name,
-        en,
-        type,
-        description,
-        rarity,
-        location
-    )
+    if type == "光球":
+        skill_info = jewelry_json['skill']
+        jewelry = creat_orb_obj(
+            path,
+            name,
+            en,
+            type,
+            description,
+            rarity,
+            location,
+            skill_info
+        )
+    else:
+        jewelry = Jewelry(
+            path,
+            name,
+            en,
+            type,
+            description,
+            rarity,
+            location
+        )
 
     return jewelry
 
@@ -95,7 +110,7 @@ jewelry_categories = {
     "all":{}
 }
 
-# 根据风格对象的稀有度、武器属性和元素属性分类存储样式
+# 根据饰品分类存储样式
 def set_jewelry_category(jewelry):
 
     # 按稀有度分类

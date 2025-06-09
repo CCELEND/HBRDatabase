@@ -1,0 +1,131 @@
+import sys
+import os
+import tkinter as tk
+import ttkbootstrap as ttk
+from ttkbootstrap.constants import *
+from PIL import Image, ImageTk
+
+from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
+from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
+from canvas_events import ImageViewerWithScrollbar
+from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from scrollbar_frame_win import ScrollbarFrameWin
+
+from 角色.style_text import output_skill_effect
+import 战斗系统.状态.status_info
+
+# 加载资源文件
+def load_resources():
+    战斗系统.状态.status_info.get_all_statu_obj()
+
+
+# 光球技能描述 frame
+def creat_desc_frame(row_frame, orb_skill):
+    
+    desc_frame = ttk.Frame(row_frame)
+    desc_frame.grid(row=0, column=0, columnspan=4, pady=(0,5), sticky="nsew")
+    desc_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
+    # 为 desc_frame 设置列权重 4:1
+    desc_frame.grid_columnconfigure(0, weight=4, minsize=400)
+    desc_frame.grid_columnconfigure(1, weight=1, minsize=100)
+
+    # 技能描述
+    desc_lab = ttk.Label(desc_frame, text=orb_skill.description, 
+        justify="left", font=("Monospace", 10, "bold"))
+    desc_lab.grid(row=0, column=0, sticky="nsw", padx=5, pady=0)
+
+    # 技能消耗SP和使用次数
+    if orb_skill.max_uses:
+        text = "SP" + orb_skill.sp_cost + '\n' + orb_skill.max_uses
+    else:
+        text = "SP" + orb_skill.sp_cost + '\n' + "∞"
+    sp_use_lab = ttk.Label(desc_frame, text=text, 
+        justify="right", font=("Monospace", 10, "bold"))
+    sp_use_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
+
+
+# 光球技能
+def creat_orb_skill_frame(scrollbar_frame_obj, orb_skill):
+
+    # 清除之前的组件
+    scrollbar_frame_obj.destroy_components()
+
+    row_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=orb_skill.name)
+    row_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew") #5
+    row_frame.grid_rowconfigure(0, weight=1)
+    # 配置 row_frame 的每一列权重
+    for col_index in range(4):
+        row_frame.grid_columnconfigure(col_index, weight=1)
+
+    # 一个主动技能的描述 frame
+    creat_desc_frame(row_frame, orb_skill)
+
+    # 技能效果列表
+    for j, skill in enumerate(orb_skill.effects):
+
+        # 技能效果 frame
+        effect_frame = ttk.Frame(row_frame)
+        effect_frame.grid(row=j+1, column=0, columnspan=4, pady=(0,5), sticky="nsew")
+        effect_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
+        # 为 effect_frame 设置列权重 1:6
+        effect_frame.grid_columnconfigure(0, weight=1, minsize=100)  # Canvas 列
+        effect_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 右侧信息列，权重更大以填充更多空间
+
+        # 创建技能效果图标 canvas
+        effect_photo = get_photo(战斗系统.状态.status_info.status[skill.effect_type].path, (60, 60))
+        effect_canvas = create_canvas_with_image(effect_frame, 
+            effect_photo, 60, 60, 0, 0, 0, 0)
+
+        text = output_skill_effect(skill.turn_num, skill.duration, skill.target, skill.effect_type,
+            战斗系统.状态.status_info.status[skill.effect_type].description, skill.value, skill.attribute_multiplier,
+            skill.attribute_difference,
+            IsActive=True
+        )
+
+        desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
+        desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
+
+
+
+# 已打开的光球窗口字典，键：风格名，值：窗口句柄
+open_orb_wins = {}
+# 关闭窗口时，清除风格名列表中对应的风格名，并销毁窗口
+def orb_win_closing(parent_frame):
+
+    open_orb_win = parent_frame.title()
+    while open_orb_win in open_orb_wins:
+        del open_orb_wins[open_orb_win]
+
+    parent_frame.destroy()  # 销毁窗口
+
+def creat_orb_skill_win(event, parent_frame, orb):
+
+    # 初始化资源文件
+    load_resources()
+
+    # 光球技能对象
+    orb_skill = orb.skill
+
+    open_orb_win = orb_skill.name
+    # 重复打开时，窗口置顶并直接返回
+    if open_orb_win in open_orb_wins:
+        # 判断窗口是否存在
+        if open_orb_wins[open_orb_win].winfo_exists():
+            set_window_top(open_orb_wins[open_orb_win])
+            return "break"
+        del open_orb_wins[open_orb_win]
+
+    orb_win_frame = creat_Toplevel(open_orb_win, 812, 300, 350, 280)
+    set_window_expand(orb_win_frame, rowspan=1, columnspan=2)
+    scrollbar_frame_obj = ScrollbarFrameWin(orb_win_frame, columnspan=2)
+
+    open_orb_wins[open_orb_win] = orb_win_frame
+
+    # 绑定鼠标点击事件到父窗口，点击置顶
+    orb_win_frame.bind("<Button-1>", lambda event: set_window_top(orb_win_frame))
+    # 窗口关闭时清理
+    orb_win_frame.protocol("WM_DELETE_WINDOW", lambda: orb_win_closing(orb_win_frame))
+
+    creat_orb_skill_frame(scrollbar_frame_obj, orb_skill)
+
+    return "break"  # 阻止事件冒泡

@@ -12,6 +12,7 @@ from window import set_window_expand, set_window_icon, creat_Toplevel, set_windo
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 饰品.jewelrys_info import get_jewelrys_obj, load_type_resources
+from 饰品.光球.orbs_skill_win import creat_orb_skill_win
 import 饰品.jewelrys_info
 
 # 图片背景路径
@@ -60,6 +61,10 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         row_canvas.create_image(2, 2, anchor="nw", image=halo_photo)  # `z-index` 高于 Base
         # 设置 jewelry 图坐标（70x70 居中）
         row_canvas.create_image(17, 17, anchor="nw", image=jewelry_photo)
+
+        if jewelry.type == "光球":
+            mouse_bind_canvas_events(row_canvas)
+            bind_canvas_events(row_canvas, creat_orb_skill_win, parent_frame=row_frame, orb=jewelry)
 
         # 右侧信息 Frame（放描述和价格和获取地点）
         info_frame = ttk.Frame(inner_frame)
@@ -123,7 +128,7 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
 
     jewelrys = get_jewelrys_obj(jewelry_type_json)
 
-    jewelry_win_frame = creat_Toplevel(jewelry_win_name, 1040, 800, 440, 50)
+    jewelry_win_frame = creat_Toplevel(jewelry_win_name, 1040, 800, 240, 80)
     # 配置 jewelry_win_frame 的布局
     logo_path = jewelry_type_json['logo_path']
     set_window_icon(jewelry_win_frame, logo_path)

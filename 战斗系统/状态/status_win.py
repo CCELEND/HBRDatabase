@@ -121,8 +121,8 @@ def show_statu(scrollbar_frame_obj):
                     statu_frame = ttk.LabelFrame(series_frame, text=statu_name)
                     bind_statu_canvas(statu_frame, statu, 0, 0)
 
-                    if type in ['增益', '减益']:
-                        if series == "技能效果强化":
+                    if type in ['增益', '减益', '其他', '异常']:
+                        if series in ["技能效果强化", "对HP百分比伤害", "减益，异常移除", '强击破']:
                             statu_column_count = set_frame_newline(statu_frame, statu_num, 3, statu_column_count)
                         else: 
                             statu_column_count = set_frame_newline(statu_frame, statu_num, 4, statu_column_count)
