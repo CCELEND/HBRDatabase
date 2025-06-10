@@ -23,13 +23,13 @@
     "10连探索券4":{
         "path":"./持有物/扭蛋材料/ThumbnailmonthlyPackTicket.webp"
     },
-    "10连探索券5":{
+    "新手风格探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailScoutGachaTicket.webp"
     },
     "特别10连探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailScoreGachaTicket_02.png"
     },
-    "特别10连探索券2":{
+    "高分报酬探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailScoreGachaTicket.webp"
     },
 
@@ -52,13 +52,13 @@
     "必得SS探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailSSgachaCPTicket.webp"
     },
-    "HalfAnniversaryTicket":{
+    "周年纪念探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailHalfAnniversaryTicket.webp"
     },
-    "NightmareGachaCPTicket":{
+    "夏洛的恶梦探索券":{
         "path":"./持有物/扭蛋材料/ThumbnailNightmareGachaCPTicket.webp"
     },
-    "100thAnniversaryTicket":{
+    "纪念探索券":{
         "path":"./持有物/扭蛋材料/Thumbnail100thAnniversaryTicket.webp"
     },
 

@@ -1,0 +1,127 @@
+
+{
+    "鱼竿":{
+        "path":"./持有物/主线道具/ThumbnailFishingRod.webp", 
+        "description":"从秋婆婆那里借的鱼竿\n虽然已经有些年头\n但因为精心的保养，现在依然能派上用场",
+        "price":"", 
+        "location":""
+    },
+
+    "蚯蚓":{
+        "path":"./持有物/主线道具/ThumbnailFishingBait1.webp", 
+        "description":"面向新手的鱼饵\n很容易买到，也能随意使用",
+        "price":"100 Justice", 
+        "location":"废品收集·杂货店"
+    },
+    "沙蚕":{
+        "path":"./持有物/主线道具/ThumbnailFishingBait2.webp", 
+        "description":"面向行家的鱼饵\n出海钓鱼时的经典选择\n用这种鱼饵容易钓到大鱼",
+        "price":"400 Justice", 
+        "location":"废品收集·杂货店"
+    },
+    "厚纹蟹":{
+        "path":"./持有物/主线道具/ThumbnailFishingBait3.webp", 
+        "description":"面向大师的鱼饵\n要是想准备丰盛的待客宴席\n这种鱼饵必不可少",
+        "price":"700 Justice", 
+        "location":"废品收集·杂货店"
+    },
+    "唱片":{
+        "path":"./持有物/主线道具/ThumbnailRecord.webp", 
+        "description":"杂货店会根据现在的氛围自行选择歌曲", 
+        "price":"550 Justice", 
+        "location":"杂货店"
+    },
+    "大号保温箱":{
+        "path":"./持有物/主线道具/ThumbnailCoolerBox.webp", 
+        "description":"能将更多鱼保鲜的大容量保温箱\n最多容纳10条鱼", 
+        "price":"5,000 Justice", 
+        "location":"杂货店"
+    },
+
+    "冰淇淋":{
+        "path":"./持有物/主线道具/ThumbnailIceCream.webp", 
+        "description":"冰点大师处售卖的甜点", 
+        "price":"", 
+        "location":"冰点大师"
+    },
+
+    "普通金属废料":{
+        "path":"./持有物/主线道具/ThumbnailScrap1.webp", 
+        "description":"用于制作鱼竿的废品\n略微提升鱼竿的强度\n（Max Lv.+3）", 
+        "price":"400 Justice", 
+        "location":"收集废品（区域2、3）"
+    },
+    "稀有金属废料":{
+        "path":"./持有物/主线道具/ThumbnailScrap2.webp", 
+        "description":"用于制作鱼竿的废品\n大幅提升鱼竿的强度\n（Max Lv.+5）", 
+        "price":"600 Justice", 
+        "location":"收集废品（区域4、5※概率低）"
+    },
+    "稀土金属废料":{
+        "path":"./持有物/主线道具/ThumbnailScrap3.webp", 
+        "description":"用于制作鱼竿的废品\n可颇为大幅地提升鱼竿的强度\n（Max Lv.+7）", 
+        "price":"800 Justice", 
+        "location":"收集废品（区域5※概率极低）"
+    },
+    "贱金属废料":{
+        "path":"./持有物/主线道具/ThumbnailScrap4.webp", 
+        "description":"用于出售的废品\n废品站随处可见的铁屑", 
+        "price":"300 Justice", 
+        "location":"废品收集"
+    },
+    "贵金属废料":{
+        "path":"./持有物/主线道具/ThumbnailScrap5.webp", 
+        "description":"用于出售的废品\n其中含有贵金属，能换到好价钱", 
+        "price":"3,500 Justice", 
+        "location":"废品收集"
+    },
+
+    "虾虎鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish1.webp", 
+        "description":"身长10厘米左右的小型鱼\n虽然不大，但是做成天妇罗也很美味", 
+        "price":"200 Justice", 
+        "location":"钓鱼"
+    },
+    "沙梭鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish2.webp", 
+        "description":"身长15厘米左右的小型鱼\n虽然脂肪少，吃起来有点清淡\n但肉质柔软可口", 
+        "price":"300 Justice", 
+        "location":"钓鱼"
+    },     
+    "针鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish3.webp", 
+        "description":"身长20厘米左右的小型鱼\n通体银白而美丽，味道也较为上乘", 
+        "price":"400 Justice", 
+        "location":"钓鱼"
+    },     
+    "平鲉":{
+        "path":"./持有物/主线道具/ThumbnailFish4.webp", 
+        "description":"身长25厘米左右的中型鱼\n不用特殊鱼饵就难以钓到\n也较为考验钓鱼者的技术", 
+        "price":"500 Justice", 
+        "location":"钓鱼"
+    },     
+    "幼鰤鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish5.webp", 
+        "description":"身长40厘米左右的中型鱼\n营养价值高，不论怎样烹调都很会是佳肴", 
+        "price":"700 Justice", 
+        "location":"钓鱼"
+    },     
+    "鲈鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish6.webp", 
+        "description":"身长65厘米左右的大型鱼\n其身体暗红色部分较少\n显得晶莹剔透，吃起来\n会让人不由自主地绽放笑容", 
+        "price":"10,00 Justice", 
+        "location":"钓鱼"
+    },     
+    "黑鲷":{
+        "path":"./持有物/主线道具/ThumbnailFish7.webp", 
+        "description":"身长50厘米左右的大型鱼\n需要极高的钓鱼技术才能钓上来，味道极佳", 
+        "price":"1,300 Justice", 
+        "location":"钓鱼"
+    },    
+    "梦幻之鱼":{
+        "path":"./持有物/主线道具/ThumbnailFish8.webp", 
+        "description":"身长180厘米左右的超大型鱼\n好几年才在近海出现一次的传说中的主宰", 
+        "price":"2,500 Justice", 
+        "location":"钓鱼"
+    }
+} 

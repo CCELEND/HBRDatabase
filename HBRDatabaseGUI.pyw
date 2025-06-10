@@ -15,6 +15,7 @@ sys.path.append(os.path.abspath("./持有物"))
 from 饰品.jewelrys_win import show_jewelrys_type
 from 奖杯勋章.trophy_medals_win import show_trophy_medals
 from 道具.props_win import show_props
+from 主线道具.main_props_win import show_main_props
 from 饰品材料.jewelry_materials_win import show_jewelry_materials
 from 成长素材.growth_materials_win import show_growth_materials
 from 活动奖章.medals_win import show_medals
@@ -112,13 +113,14 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 物品材料菜单
     item_menu = ttk.Menu(menu_bar, tearoff=0)
     item_names = [
-        "主线道具", "活动道具"
+        "活动道具"
     ]
     for item_name in item_names:
         create_menu_item(item_menu, item_name, update_output, item_name)
 
     # 定义菜单项的名称和对应的回调函数
     menu_item_calls = [
+        ("主线道具", show_main_props),
         ("道具", show_props),
         ("饰品", show_jewelrys_type),
         ("饰品材料", show_jewelry_materials),
