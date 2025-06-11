@@ -1,4 +1,4 @@
-import sys
+
 import os
 from style_info import get_style_obj
 from tools import load_json, get_dir_values_list

@@ -2,14 +2,10 @@ import sys
 import os
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from PIL import Image, ImageTk
-import json
-import tkinter
 
 from canvas_events import ArtworkDisplayerHeight
-from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity, set_global_bg
+from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import load_json
 
 sys.path.append(os.path.abspath("./持有物"))
 from 饰品.jewelrys_win import show_jewelrys_type

@@ -1,13 +1,7 @@
 import sys
-import os
-import importlib
 import subprocess
-
 import tkinter as tk
-from tkinter import scrolledtext, Menu, messagebox
-from PIL import Image, ImageTk
-import json
-# from tkinter import ttk
+from tkinter import messagebox
 
 import music_player
 from music_handle_processing import music_handle

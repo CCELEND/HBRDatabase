@@ -2,24 +2,20 @@
 # -*- coding: UTF-8 -*-
 
 import os
-import time
 import configparser
 import pandas as pd
-import openpyxl
-from tkinter import scrolledtext, Menu, messagebox
+from tkinter import scrolledtext, messagebox
 from openpyxl.styles import PatternFill
-from openpyxl.utils.dataframe import dataframe_to_rows
 from openpyxl.utils import get_column_letter
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-import math
 import datetime
 import threading
 from collections import OrderedDict
 
-from window import set_window_expand, set_window_icon, show_context_menu, set_window_top, creat_Toplevel
+from window import set_window_icon, show_context_menu, set_window_top, creat_Toplevel
 from 工具.GetEntriesGUILocal.proc import parallel_process_indexes
 
 index_wash_entries = {}

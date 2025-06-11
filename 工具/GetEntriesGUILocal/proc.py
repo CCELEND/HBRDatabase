@@ -2,17 +2,11 @@
 # -*- coding: UTF-8 -*-
 
 
-import os
-import time
 import math
-import datetime
 import concurrent.futures
-from functools import partial
-import threading
 
 from 工具.GetEntriesGUILocal.get_ct import get_random_value, get_property
-from 工具.GetEntriesGUILocal.get_ct import first_entry, DP_entry, wisdom_entry, attack_power_entry, physical_strength_entry
-from 工具.GetEntriesGUILocal.get_ct import spirit_entry, career_entry, charm_entry, wash_entry
+from 工具.GetEntriesGUILocal.get_ct import career_entry, charm_entry, wash_entry
 from 工具.GetEntriesGUILocal.get_ct import spct
 
 def list_dict(dict):

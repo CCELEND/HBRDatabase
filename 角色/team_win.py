@@ -1,6 +1,4 @@
-import sys
-import os
-from PIL import Image, ImageTk
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 

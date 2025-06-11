@@ -1,10 +1,7 @@
 
-from hash import calculate_file_hashes, save_hashes_to_json
-from tools import load_json, is_all_values_empty
-
+from hash import calculate_file_hashes
 from client import send_hashes_to_server
 import asyncio
-import json
 
 
 def update_data():

@@ -1,17 +1,11 @@
-import asyncio
-import json
-import time
+
 import os
-import hashlib
-import traceback
-import base64
 import requests
 from tkinter import messagebox
 from urllib.parse import quote
 
 
 from canvas_events import get_photo, create_canvas_with_image
-
 import music_player
 
 # 检查目录是否存在，如果不存在则创建

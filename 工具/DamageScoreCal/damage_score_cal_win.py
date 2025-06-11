@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import tkinter as tk
-from tkinter import scrolledtext, Menu, messagebox
+from tkinter import scrolledtext
 import math
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top, set_bg_opacity, set_global_bg
-from window import copy_text, paste_text, cut_text, show_context_menu, clear_text, edit_text
+from window import set_window_icon, creat_Toplevel, set_window_top
+from window import show_context_menu, clear_text, edit_text
 
 maximum_damage_limit_text = None
 input_text = None

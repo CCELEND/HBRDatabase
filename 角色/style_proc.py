@@ -1,8 +1,6 @@
-import sys
-import os
+
 from functools import partial
 import re
-import math
 from decimal import Decimal, ROUND_HALF_UP
 
 # 提取范围值列表
@@ -60,7 +58,7 @@ def write_numbers_back(text, modified_numbers, type):
 # [] 返回技能强度最大值 最小值 列表形式 [min, max]
 def get_strength_min_max(strength):
     strength_min_max_str = strength.replace(',', '').split(' ~ ')
-    return [int(strength_min_max[0]), int(strength_min_max[1])]
+    return [int(strength_min_max_str[0]), int(strength_min_max_str[1])]
 
 # [] 返回不同等级技能强度最大值 最小值 列表形式 [min, max]
 def get_lv_strength_min_max(strength_min_max, lv):

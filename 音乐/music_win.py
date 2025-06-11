@@ -1,13 +1,8 @@
 
-import sys
-import os
-import tkinter as tk
-
-from tkinter import scrolledtext, Menu, messagebox
+from tkinter import messagebox
 from tkinter import ttk
 
-from canvas_events import get_photo, create_canvas_with_image
-from window import set_window_expand, set_window_icon, show_context_menu, set_window_top, creat_Toplevel
+from window import set_window_icon, set_window_top, creat_Toplevel
 from tools import load_json
 
 from music_list import ExpandableList

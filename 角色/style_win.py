@@ -1,20 +1,15 @@
-import sys
+
 import os
-from PIL import Image, ImageTk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from functools import partial
-import re
-import math
 
-from canvas_events import get_photo, create_canvas_with_image, VideoPlayer, ArtworkDisplayer, ArtworkDisplayerHeight
+from canvas_events import get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import load_json, output_string, is_parentstring, int_to_comma_str
 
 from style_info import SkillEffect
-from style_proc import get_hit_damage_str
 from style_proc import on_attack_combo_select, on_buff_attack_combo_select
 from style_proc import on_heal_combo_select
 from style_proc import on_defense_combo_select, on_buff_combo_select

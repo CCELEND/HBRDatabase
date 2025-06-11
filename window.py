@@ -1,8 +1,7 @@
 
 import tkinter as tk
 from PIL import Image, ImageTk
-from tkinter import scrolledtext, Menu, messagebox
-import ctypes
+from tkinter import Menu, messagebox
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *

@@ -2,7 +2,7 @@ import sys
 import os
 # import tkinter as tk
 from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
-from tkinter import scrolledtext, Menu, messagebox
+from tkinter import scrolledtext
 
 sys.path.append(os.path.abspath("./角色"))
 from team_info import get_all_team_obj

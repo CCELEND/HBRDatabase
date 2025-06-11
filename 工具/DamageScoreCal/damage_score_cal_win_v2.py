@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 
-import tkinter as tk
-from tkinter import scrolledtext, Menu, messagebox
+from tkinter import scrolledtext
 import math
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top, set_bg_opacity, set_global_bg
-from window import copy_text, paste_text, cut_text, show_context_menu, clear_text, edit_text
+from window import set_window_icon, creat_Toplevel, set_window_top
+from window import show_context_menu, clear_text, edit_text
 
-from decimal import Decimal, getcontext, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP, DecimalException
 
 threshold_value_text = None
 damage_coefficient_text = None
@@ -41,7 +40,7 @@ def get_damage_coefficient():
 		return 0.47
 		
 	try:
-		damage_coefficient = float(threshold_value_str)
+		damage_coefficient = float(damage_coefficient_str)
 	except Exception as e:
 		edit_text(output_text_v2, f"[-] {e}")
 		return -1
@@ -92,10 +91,6 @@ def damage_value():
 	except Exception as e:
 		raise ValueError(f"计算错误: {e}")
 
-	# threshold_value = float(threshold_value)
-	# damage_coefficient = float(damage_coefficient)
-	# damage_reward = float(damage_reward)
-	# damage_value = math.e ** ( 100 * damage_reward / (threshold_value * damage_coefficient) - 1 + math.log(threshold_value) )
 	edit_text(output_text_v2, int(damage_value))
 
 # 伤害值转换伤害奖励
@@ -130,11 +125,6 @@ def damage_reward():
     
 	# 计算奖励值
 	damage_reward = (damage_coefficient/Decimal('100')) * threshold_value * ( Decimal('1') + log_damage - log_threshold )
-
-	# threshold_value = float(threshold_value)
-	# damage_coefficient = float(damage_coefficient)
-	# damage_value = float(damage_value)
-	# damage_reward = (damage_coefficient/100) * threshold_value * ( 1 + math.log(damage_value) - math.log(threshold_value) ) 
 	edit_text(output_text_v2, int(damage_reward))
 
 

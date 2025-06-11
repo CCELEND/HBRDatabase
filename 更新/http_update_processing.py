@@ -1,5 +1,5 @@
 
-from hash import calculate_file_hashes, save_hashes_to_json
+from hash import calculate_file_hashes
 from tkinter import messagebox
 
 from http_client import send_hashes_to_server, download_files_from_server
