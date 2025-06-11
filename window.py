@@ -27,20 +27,27 @@ def creat_window(title,
     return new_window   
 
 # 创建一个新窗口 子窗口
-def creat_Toplevel(title, 
-    wide=None, high=None, x=None, y=None):
+def creat_Toplevel(title, width=None, height=None, x=None, y=None):
+    # 参数类型校验
+    if not isinstance(title, str):
+        raise TypeError("title参数必须是字符串类型")
+    for param, name in [(width, "width"), (height, "height"), (x, "x"), (y, "y")]:
+        if param is not None and not isinstance(param, int):
+            raise TypeError(f"{name}参数必须是整数类型或None")
 
-    # 设置新窗口的大小
-    if wide and high:
-        if x and y:
-            new_window = ttk.Toplevel(title=title, size=(wide, high), position=(x,y))
-        else:
-            new_window = ttk.Toplevel(title=title, size=(wide, high))
-    elif x and y:
-        new_window = ttk.Toplevel(title=title, position=(x,y))
-    else:
-        new_window = ttk.Toplevel(title=title)
-
+    # 构建窗口参数
+    window_args = {"title": title}
+    
+    # 处理尺寸参数
+    if width is not None and height is not None:
+        window_args["size"] = (width, height)
+    
+    # 处理位置参数
+    if x is not None and y is not None:
+        window_args["position"] = (x, y)
+    
+    # 创建窗口
+    new_window = ttk.Toplevel(**window_args)
     return new_window
 
 # 配置窗口的行和列的伸展
