@@ -491,10 +491,10 @@ def creat_style_right_menu(event, parent_frame, team, style):
     right_click_menu.add_command(label="动画", 
         command=lambda: show_style_animation(parent_frame, team, style))
 
-    right_click_menu.add_command(label="静态图", 
+    right_click_menu.add_command(label="立绘", 
         command=lambda: show_style_artwork(parent_frame, team, style))
 
-    right_click_menu.add_command(label="静态图3D", 
+    right_click_menu.add_command(label="3D立绘", 
         command=lambda: show_style_artwork_3d(parent_frame, team, style))
 
     right_click_menu.post(event.x_root, event.y_root)
