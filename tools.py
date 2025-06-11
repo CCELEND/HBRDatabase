@@ -1,10 +1,8 @@
 import sys
 import os
-from PIL import Image, ImageTk
+from PIL import Image
 from tkinter import messagebox
 import json
-import subprocess
-import importlib
 import re
 
 # 弹出确认框，询问用户是否重启

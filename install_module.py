@@ -1,7 +1,6 @@
 
 import sys
 import subprocess
-import tkinter as tk
 from tkinter import messagebox
 
 def install_modules():
