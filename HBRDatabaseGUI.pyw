@@ -6,7 +6,7 @@ from PIL import Image, ImageTk
 import json
 import tkinter
 
-from canvas_events import ArtworkDisplayerHeight2, ImageViewerWithScrollbar, ArtworkDisplayerHeight
+from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_bg_opacity, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import load_json
