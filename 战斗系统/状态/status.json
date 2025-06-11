@@ -493,7 +493,7 @@
     "防御下降技能强化":{
         "name":"防御下降技能强化",
         "path":"./战斗系统/状态/GiveDefenseDebuffUp.webp",
-        "effect":"","description":"防御下降类技能效果上升",
+        "effect":"防御下降类减益技能的强度上升","description":"防御下降类减益技能的强度上升",
         "stack":"-",
         "type":"增益",
         "series":"技能效果强化" 
@@ -940,7 +940,7 @@
     "贯通暴击":{
         "name":"贯通暴击",
         "path":"./战斗系统/状态/Nonelement.webp",
-        "effect":"","description":"临时无视抗性，并造成400%的伤害（计弱点），一定触发暴击",
+        "effect":"","description":"临时无视抗性，并造成大量的伤害（计弱点），一定触发暴击",
         "stack":"-",
         "type":"其他",
         "series":"贯通暴击"        
