@@ -1,5 +1,4 @@
-import sys
-import os
+
 
 from 时钟塔.szt_enemy_info import get_enemys
 

@@ -1,9 +1,6 @@
 
-# import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from tkinter import messagebox
-from PIL import Image, ImageTk
 from canvas_events import get_photo, create_canvas_with_image
 
 # 图片背景路径

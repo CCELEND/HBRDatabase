@@ -1,5 +1,4 @@
-import sys
-import os
+
 
 # 棱镜战敌人
 class Ljz:

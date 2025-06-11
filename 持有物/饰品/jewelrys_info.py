@@ -1,9 +1,5 @@
-import sys
-import os
-import threading
-from threading import Lock
-from tools import load_json
 
+from tools import load_json
 from 饰品.光球.orbs_info  import creat_orb_obj
 
 # 饰品

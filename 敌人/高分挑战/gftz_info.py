@@ -1,5 +1,3 @@
-import sys
-import os
 
 # 高分挑战敌人
 class Gftz:

@@ -1,5 +1,3 @@
-import sys
-import os
 
 # 宝石棱镜战敌人
 class Bsljz:

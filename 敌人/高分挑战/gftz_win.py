@@ -1,18 +1,14 @@
-import sys
-import os
-# import tkinter as tk
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from PIL import Image, ImageTk
 import threading
 import time
 from typing import Dict, Any
 
-from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
+from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
+from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
-from scrollbar_frame_win import ScrollbarFrameWin
+from window import set_window_icon, creat_Toplevel, set_window_top
 
 from tools import load_json
 from 高分挑战.gftz_info import gftzs, get_all_gftz_obj
@@ -79,45 +75,6 @@ def creat_gftz_win(event, parent_frame, gftz):
     gftz_win_frame.protocol("WM_DELETE_WINDOW", lambda: gftz_win_closing(gftz_win_frame))
 
     return "break"  # 阻止事件冒泡
-
-
-# 加载图片并显示的函数
-# def show_gftz_enemys(scrollbar_frame_obj):
-
-#     load_resources()
-
-#     get_all_gftz_obj(gftzs_json)
-
-#     global gftzs
-
-#     # 清除之前的组件
-#     scrollbar_frame_obj.destroy_components()
-
-#     column_count = 0
-#     for i, gftz_name in enumerate(gftzs):
-#         # 高分挑战敌人对象
-#         gftz = gftzs[gftz_name]
-
-#         gftz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gftz_name)
-#         bind_gftz_canvas(gftz_frame, gftz, 0, 0)
-
-#         # 计算行和列的位置
-#         row = i // 5  # 每5个换行
-#         column = i % 5  # 列位置
-#         gftz_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")  # 设置间距
-#         gftz_frame.grid_rowconfigure(0, weight=1)
-#         gftz_frame.grid_columnconfigure(0, weight=1)
-
-#         column_count += 1  # 更新列计数器
-#         if column_count == 5:  # 如果已经到达第5列，重置列计数器并增加行
-#             column_count = 0
-
-
-#     scrollbar_frame_obj.update_canvas()
-#     return "break"  # 阻止事件冒泡
-
-
-
 
 class GFTZCreator:
     def __init__(self, scrollbar_frame_obj, gftzs: Dict[str, Any]):

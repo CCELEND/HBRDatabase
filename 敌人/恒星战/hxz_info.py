@@ -1,5 +1,4 @@
-import sys
-import os
+
 
 # 恒星战敌人
 class Hxz:

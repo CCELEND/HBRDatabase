@@ -1,5 +1,3 @@
-import sys
-import os
 
 # 光球BOSS敌人
 class Gqboss:

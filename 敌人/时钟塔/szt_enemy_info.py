@@ -1,5 +1,3 @@
-import sys
-import os
 
 class SztEnemy:
     def __init__(self, img_path = "",

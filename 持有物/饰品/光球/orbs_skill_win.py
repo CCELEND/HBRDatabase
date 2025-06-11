@@ -1,14 +1,9 @@
-import sys
-import os
-import tkinter as tk
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from PIL import Image, ImageTk
 
-from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
-from canvas_events import ImageViewerWithScrollbar
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from canvas_events import get_photo, create_canvas_with_image
+from window import set_window_expand, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.style_text import output_skill_effect

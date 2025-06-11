@@ -1,17 +1,13 @@
-import sys
-import os
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from PIL import Image, ImageTk
 import threading
 import time
 from typing import Dict, Any
 
-from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
-from canvas_events import ImageViewerWithScrollbar
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
-from scrollbar_frame_win import ScrollbarFrameWin
+from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
+from canvas_events import mouse_bind_canvas_events
+from window import set_window_icon, creat_Toplevel, set_window_top
 
 from tools import load_json
 from 时钟塔.szt_info import szts, get_all_szt_obj

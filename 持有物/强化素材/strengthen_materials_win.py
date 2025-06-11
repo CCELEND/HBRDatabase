@@ -1,9 +1,4 @@
 
-import tkinter as tk
-from tkinter import messagebox
-from PIL import Image, ImageTk
-
-from tools import load_json
 from holding_win import show_holding
 
 import 强化素材.strengthen_materials

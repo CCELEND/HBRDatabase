@@ -1,10 +1,7 @@
-import sys
-import os
-# import tkinter as tk
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
-from tkinter import scrolledtext, Menu, messagebox
+from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 
 # 已打开的窗口字典，键：名，值：窗口句柄
 open_about_wins = {}

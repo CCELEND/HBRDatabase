@@ -1,5 +1,4 @@
-import sys
-import os
+
 
 # 异时层敌人
 class Ysc:
