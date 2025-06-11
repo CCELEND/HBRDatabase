@@ -1,13 +1,6 @@
-import sys
-import os
-import tkinter as tk
-from PIL import Image, ImageTk
 
-from canvas_events import bind_canvas_events, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
-from scrollbar_frame_win import ScrollbarFrameWin
+from window import set_window_icon, creat_Toplevel, set_window_top
 
 open_od_wins = {}
 #关闭窗口时，清除窗口字典中的句柄，并销毁窗口

@@ -1,15 +1,10 @@
-import sys
-import os
-# import tkinter as tk
+
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from PIL import Image, ImageTk
 
-from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
-from canvas_events import ImageViewerWithScrollbar
-from window import set_window_expand, set_window_icon_webp, creat_Toplevel, set_window_top
-from scrollbar_frame_win import ScrollbarFrameWin
+from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
+from canvas_events import mouse_bind_canvas_events
+from window import set_window_icon_webp, creat_Toplevel, set_window_top
 
 from 职业.careers_info import get_all_career_obj
 import 职业.careers_info

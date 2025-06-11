@@ -1,7 +1,4 @@
-import sys
-import os
-import threading
-from threading import Lock
+
 from tools import load_json
 
 # 属性
