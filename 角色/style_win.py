@@ -19,17 +19,17 @@ from style_proc import on_percentage_combo_select
 
 from style_text import output_attack_skill, output_skill_effect
 
-import 强化素材.strengthen_materials
-import 职业.careers_info
-import 属性.attributes_info
-import 状态.status_info
+import 持有物.强化素材.strengthen_materials
+import 战斗系统.职业.careers_info
+import 战斗系统.属性.attributes_info
+import 战斗系统.状态.status_info
 
 # 加载资源文件
 def load_resources():
-    强化素材.strengthen_materials.load_resources()
-    职业.careers_info.get_all_career_obj()
-    状态.status_info.get_all_statu_obj()
-    属性.attributes_info.get_all_attribute_obj()
+    持有物.强化素材.strengthen_materials.load_resources()
+    战斗系统.职业.careers_info.get_all_career_obj()
+    战斗系统.状态.status_info.get_all_statu_obj()
+    战斗系统.属性.attributes_info.get_all_attribute_obj()
 
 skill_options = [
     "Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill Lv.5", "Skill Lv.6", "Skill Lv.7", "Skill Lv.8", "Skill Lv.9", "Skill Lv.10", 
@@ -40,7 +40,7 @@ skill_options = [
 # 职能 frame
 def creat_career_frame(parent_frame, style):
 
-    career = 职业.careers_info.careers[style.career]
+    career = 战斗系统.职业.careers_info.careers[style.career]
     career_frame = ttk.LabelFrame(parent_frame, text=style.career)
     career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     career_frame.grid_rowconfigure(0, weight=1)
@@ -195,12 +195,12 @@ def creat_active_skill_frame(parent_frame, style):
             # 检查是否是技能效果的实例
             if isinstance(skill, SkillEffect):
                 # 创建技能效果图标 canvas
-                effect_photo = get_photo(状态.status_info.status[skill.effect_type].path, (60, 60))
+                effect_photo = get_photo(战斗系统.状态.status_info.status[skill.effect_type].path, (60, 60))
                 effect_canvas = create_canvas_with_image(effect_frame, 
                     effect_photo, 60, 60, 0, 0, 0, 0)
 
                 text = output_skill_effect(skill.turn_num, skill.duration, skill.target, skill.effect_type,
-                    状态.status_info.status[skill.effect_type].description, skill.value, skill.attribute_multiplier,
+                    战斗系统.状态.status_info.status[skill.effect_type].description, skill.value, skill.attribute_multiplier,
                     skill.attribute_difference,
                     IsActive=True
                 )
@@ -210,9 +210,9 @@ def creat_active_skill_frame(parent_frame, style):
                 weapon_attribute = skill.weapon_attribute
                 # 判断元素属性
                 if skill.element_attribute:
-                    attack_img_path = 属性.attributes_info.attributes[skill.element_attribute+weapon_attribute].path
+                    attack_img_path = 战斗系统.属性.attributes_info.attributes[skill.element_attribute+weapon_attribute].path
                 else:
-                    attack_img_path = 属性.attributes_info.attributes[weapon_attribute].path
+                    attack_img_path = 战斗系统.属性.attributes_info.attributes[weapon_attribute].path
                 # 创建攻击技能图标 canvas
                 attack_photo = get_photo(attack_img_path, (60, 60))
                 attack_canvas = create_canvas_with_image(effect_frame, 
@@ -306,12 +306,12 @@ def creat_passive_skill_frame(parent_frame, style):
         effect_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 右侧信息列，权重更大以填充更多空间
 
         # 创建技能效果图标 canvas
-        effect_photo = get_photo(状态.status_info.status[passive_skill.effect_type].path, (60, 60))
+        effect_photo = get_photo(战斗系统.状态.status_info.status[passive_skill.effect_type].path, (60, 60))
         effect_canvas = create_canvas_with_image(effect_frame, 
             effect_photo, 60, 60, 0, 0, 0, 0)
 
         text = output_skill_effect(passive_skill.turn_num, passive_skill.duration, passive_skill.target, passive_skill.effect_type,
-            状态.status_info.status[passive_skill.effect_type].description, passive_skill.value,
+            战斗系统.状态.status_info.status[passive_skill.effect_type].description, passive_skill.value,
             IsActive=False
         )
 
@@ -330,15 +330,15 @@ def creat_growth_ability_frame(parent_frame, style):
     # 判断元素属性
     if style.element_attribute:
         if len(style.element_attribute) == 1:
-            hoju_img_path = 强化素材.strengthen_materials.strengthen_materials_dir[
+            hoju_img_path = 持有物.强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute}属性）"]['path']
         else:
-            hoju_img_path0 = 强化素材.strengthen_materials.strengthen_materials_dir[
+            hoju_img_path0 = 持有物.强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute[0]}属性）"]['path']
-            hoju_img_path1 = 强化素材.strengthen_materials.strengthen_materials_dir[
+            hoju_img_path1 = 持有物.强化素材.strengthen_materials.strengthen_materials_dir[
                 f"宝珠（{style.element_attribute[1]}属性）"]['path']
     else:
-        hoju_img_path = 强化素材.strengthen_materials.strengthen_materials_dir[
+        hoju_img_path = 持有物.强化素材.strengthen_materials.strengthen_materials_dir[
             f"宝珠（{style.weapon_attribute}属性）"]['path']
 
     if not style.element_attribute or len(style.element_attribute) == 1:

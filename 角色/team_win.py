@@ -10,10 +10,10 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from team_info import get_team_obj, get_all_team_obj
 from style_win import creat_style_skill_win, creat_style_right_menu
 
-import 武器.weapons_info
+import 战斗系统.武器.weapons_info
 # 加载资源文件
 def load_resources():
-    武器.weapons_info.get_all_weapon_obj()
+    战斗系统.武器.weapons_info.get_all_weapon_obj()
 
 # 创建右键菜单
 def creat_role_right_menu(event, parent_frame, role, team):
@@ -142,7 +142,7 @@ def creat_team_desc_frame(parent_frame, team):
 # 武器 frame
 def creat_weapon_frame(parent_frame, role):
 
-    weapon = 武器.weapons_info.weapons[role.weapon]
+    weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
     # weapon_frame = ttk.LabelFrame(parent_frame, text=role.weapon)
     weapon_frame = ttk.Frame(parent_frame)
     weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
