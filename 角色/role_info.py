@@ -8,7 +8,7 @@ class Role:
     def __init__(self, img_path = None, 
         name = None, en = None,nicknames = None, description = None,
         team = None,
-        weapon_attribute = None,
+        weapon_attribute = None, weapon = None,
         Astyles = None, Sstyles = None, SSstyles = None
         ):
         self.img_path = img_path                    # 角色头像路径
@@ -18,6 +18,7 @@ class Role:
         self.description = description              # 描述
         self.team = team                            # 队伍
         self.weapon_attribute = weapon_attribute    # 武器属性 斩 突 打
+        self.weapon = weapon                        # 武器
 
         self.Astyles = Astyles                      # A风格对象列表
         self.Sstyles = Sstyles                      # S风格对象列表
@@ -33,6 +34,7 @@ def creat_role(role_json, Astyles, Sstyles, SSstyles):
     description = role_json['description']
     team = role_json['team']
     weapon_attribute = role_json['weapon_attribute']
+    weapon = role_json['weapon']
 
     role = Role(
         img_path,
@@ -42,6 +44,7 @@ def creat_role(role_json, Astyles, Sstyles, SSstyles):
         description,
         team,
         weapon_attribute,
+        weapon,
 
         Astyles,
         Sstyles,

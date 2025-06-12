@@ -38,7 +38,7 @@ skill_options = [
 ]
 
 # 职能 frame
-def cret_career_frame(parent_frame, style):
+def creat_career_frame(parent_frame, style):
 
     career = 职业.careers_info.careers[style.career]
     career_frame = ttk.LabelFrame(parent_frame, text=style.career)
@@ -397,7 +397,7 @@ def show_style(scrollbar_frame_obj, style):
     scrollbar_frame_obj.destroy_components()
 
     # 职业
-    cret_career_frame(scrollbar_frame_obj.scrollable_frame, style)
+    creat_career_frame(scrollbar_frame_obj.scrollable_frame, style)
 
     # 主动技能
     creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)

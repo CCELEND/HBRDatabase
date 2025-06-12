@@ -10,6 +10,10 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from team_info import get_team_obj, get_all_team_obj
 from style_win import creat_style_skill_win, creat_style_right_menu
 
+import 武器.weapons_info
+# 加载资源文件
+def load_resources():
+    武器.weapons_info.get_all_weapon_obj()
 
 # 创建右键菜单
 def creat_role_right_menu(event, parent_frame, role, team):
@@ -135,6 +139,19 @@ def creat_team_desc_frame(parent_frame, team):
     team_desc_label = ttk.Label(team_desc_frame, text=team.description, anchor="w", font=("Monospace", 10, "bold"))
     team_desc_label.grid(row=0, column=1, sticky="nswe", padx=0, pady=10)    
 
+# 武器 frame
+def creat_weapon_frame(parent_frame, role):
+
+    weapon = 武器.weapons_info.weapons[role.weapon]
+    # weapon_frame = ttk.LabelFrame(parent_frame, text=role.weapon)
+    weapon_frame = ttk.Frame(parent_frame)
+    weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
+    weapon_frame.grid_rowconfigure(0, weight=1)
+
+    weapon_photo = get_photo(weapon.path, (60, 60))
+    weapon_canvas = create_canvas_with_image(weapon_frame, 
+        weapon_photo, 100, 200, 20, 90, 0, 2)
+
 def show_team(scrollbar_frame_obj, team):
 
     # 清除之前的组件
@@ -157,7 +174,8 @@ def show_team(scrollbar_frame_obj, team):
         desc_frame.grid(row=0, column=0, columnspan=4, pady=10, sticky="nsew") #padx=10, 
         desc_frame.grid_rowconfigure(0, weight=1)  
         desc_frame.grid_columnconfigure(0, weight=1, minsize=200)
-        desc_frame.grid_columnconfigure(1, weight=4, minsize=800)
+        desc_frame.grid_columnconfigure(1, weight=4, minsize=750)
+        desc_frame.grid_columnconfigure(2, weight=1, minsize=100)
 
         photo = get_photo(role.img_path, (130, 254))
         canvas = create_canvas_with_image(desc_frame, 
@@ -177,6 +195,12 @@ def show_team(scrollbar_frame_obj, team):
         # label = ttk.Label(desc_frame, text=role.description, justify="left", font=("Monospace", 10, "bold"))
         label = ttk.Label(desc_frame, text=role.description, anchor="w", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
+
+        # weapon = 武器.weapons_info.weapons[role.weapon]
+        # weapon_photo = get_photo(weapon.path, (60, 60))
+        # weapon_canvas = create_canvas_with_image(desc_frame, 
+        #     weapon_photo, 60, 60, 0, 0, 0, 2, rowspan=2)
+        creat_weapon_frame(desc_frame, role)
 
         show_rarity(frame, role, team)
 
@@ -207,6 +231,9 @@ def creat_team_win(parent_frame, team_name):
     get_all_team_obj()
     # 通过队伍名获取队伍对象
     team = get_team_obj(team_name)
+
+    # 加载资源
+    load_resources()
 
     team_win_frame = creat_Toplevel(team_name, 1130, 880, 90, 80)
     set_window_icon(team_win_frame, team.logo_path)
