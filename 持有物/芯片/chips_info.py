@@ -13,14 +13,14 @@ class Chip:
 chips = {}
 
 def get_all_chips_obj(chips_dir):
-    for chip_name in chip_dir:
+    for chip_name in chips_dir:
         chip = Chip(
             chip_name,
-            chip_dir[chip_name]["path"],
-            chip_dir[chip_name]["description"],
-            chip_dir[chip_name]["price"],
-            chip_dir[chip_name]["location"],
-            chip_dir[chip_name]["rarity"]
+            chips_dir[chip_name]["path"],
+            chips_dir[chip_name]["description"],
+            chips_dir[chip_name]["price"],
+            chips_dir[chip_name]["location"],
+            chips_dir[chip_name]["rarity"]
         )
         chips[chip_name] = chip
 
