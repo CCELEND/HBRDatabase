@@ -139,18 +139,31 @@ def creat_team_desc_frame(parent_frame, team):
     team_desc_label = ttk.Label(team_desc_frame, text=team.description, anchor="w", font=("Monospace", 10, "bold"))
     team_desc_label.grid(row=0, column=1, sticky="nswe", padx=0, pady=10)    
 
-# 武器 frame
-def creat_weapon_frame(parent_frame, role):
+# 武器和大师技能 frame
+def creat_weapon_master_skill_frame(parent_frame, role):
 
     weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
-    # weapon_frame = ttk.LabelFrame(parent_frame, text=role.weapon)
-    weapon_frame = ttk.Frame(parent_frame)
-    weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
-    weapon_frame.grid_rowconfigure(0, weight=1)
+    if role.master_skill:
+        weapon_master_skill_frame = ttk.Frame(parent_frame)
+        weapon_master_skill_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
+        weapon_master_skill_frame.grid_rowconfigure(0, weight=1)
+        weapon_master_skill_frame.grid_rowconfigure(1, weight=1)
 
-    weapon_photo = get_photo(weapon.path, (60, 60))
-    weapon_canvas = create_canvas_with_image(weapon_frame, 
-        weapon_photo, 100, 200, 20, 90, 0, 2)
+        weapon_photo = get_photo(weapon.path, (60, 60))
+        weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
+            weapon_photo, 100, 100, 20, 30, 0, 0)
+
+        master_skill_photo = get_photo("./角色/iconMasterSkill.webp", (80, 68))
+        master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
+            master_skill_photo, 100, 100, 10, 16, 1, 0)
+    else:
+        weapon_frame = ttk.Frame(parent_frame)
+        weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
+        weapon_frame.grid_rowconfigure(0, weight=1)
+
+        weapon_photo = get_photo(weapon.path, (60, 60))
+        weapon_canvas = create_canvas_with_image(weapon_frame, 
+            weapon_photo, 100, 200, 20, 90, 0, 2)
 
 def show_team(scrollbar_frame_obj, team):
 
@@ -191,7 +204,7 @@ def show_team(scrollbar_frame_obj, team):
         label = ttk.Label(desc_frame, text=role.description, anchor="w", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
 
-        creat_weapon_frame(desc_frame, role)
+        creat_weapon_master_skill_frame(desc_frame, role)
 
         show_rarity(frame, role, team)
 
