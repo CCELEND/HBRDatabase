@@ -5,8 +5,8 @@ import re
 from tools import list_val_in_another, is_parentstring, output_string
 
 sys.path.append(os.path.abspath("./角色"))
-from style_info import SkillEffect
-import team_info
+from 角色.style_info import SkillEffect
+import 角色.team_info
 
 # 选中处理
 def on_select(check_vars, options, last, selected_values, all_index=0):
@@ -126,7 +126,7 @@ def get_filtered_styles(filter_dict, keyword_list):
     filtered_styles = []  # 存储符合条件的风格对象
 
     # 遍历队伍
-    for team in team_info.teams.values():
+    for team in 角色.team_info.teams.values():
         # 遍历队伍中的角色
         for role in team.roles:
             # 遍历角色中的风格
