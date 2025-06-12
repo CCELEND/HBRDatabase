@@ -89,7 +89,7 @@ def show_rarity(frame, role, team, row=2):
     if role.Astyles:
         # 创建 RarityAframe 并设置 row
         RarityAframe = ttk.Frame(frame)
-        RarityAframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
+        RarityAframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRarityA = get_photo("./角色/IconRarityA.webp", (130, 130))
         canvasRarityA = create_canvas_with_image(RarityAframe, 
             photoRarityA, 130, 130, 0, 0, 0, 0)
@@ -101,7 +101,7 @@ def show_rarity(frame, role, team, row=2):
     if role.Sstyles:
         # 创建 RaritySframe 并设置 row
         RaritySframe = ttk.Frame(frame)
-        RaritySframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
+        RaritySframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRarityS = get_photo("./角色/IconRarityS.webp", (130, 130))
         canvasRarityS = create_canvas_with_image(RaritySframe, 
             photoRarityS, 130, 130, 0, 0, 0, 0)
@@ -113,7 +113,7 @@ def show_rarity(frame, role, team, row=2):
     if role.SSstyles:
         # 创建 RaritySSframe 并设置 row
         RaritySSframe = ttk.Frame(frame)
-        RaritySSframe.grid(row=row, column=0, padx=10, pady=10, sticky="nsew")
+        RaritySSframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRaritySS = get_photo("./角色/IconRaritySS.webp", (130, 130))
         canvasRaritySS = create_canvas_with_image(RaritySSframe, 
             photoRaritySS, 130, 130, 0, 0, 0, 0)
