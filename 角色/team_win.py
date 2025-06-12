@@ -184,11 +184,6 @@ def show_team(scrollbar_frame_obj, team):
         mouse_bind_canvas_events(canvas)
         bind_canvas_events(canvas, 
             show_role_full_img, parent_frame=frame, role=role, team=team)
-        # bind_canvas_events(canvas, 
-        #     show_role_img, parent_frame=frame, role=role, team=team)
-        # # 右键点击事件绑定
-        # right_click_bind_canvas_events(canvas, 
-        #     creat_role_right_menu, parent_frame=frame, role=role, team=team)
 
         # 角色描述
         # 设置了标签的字体为 Monospace 大小为 10，加粗
@@ -196,10 +191,6 @@ def show_team(scrollbar_frame_obj, team):
         label = ttk.Label(desc_frame, text=role.description, anchor="w", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
 
-        # weapon = 武器.weapons_info.weapons[role.weapon]
-        # weapon_photo = get_photo(weapon.path, (60, 60))
-        # weapon_canvas = create_canvas_with_image(desc_frame, 
-        #     weapon_photo, 60, 60, 0, 0, 0, 2, rowspan=2)
         creat_weapon_frame(desc_frame, role)
 
         show_rarity(frame, role, team)

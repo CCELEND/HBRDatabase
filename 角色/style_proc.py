@@ -1,7 +1,5 @@
 
-from functools import partial
 import re
-from decimal import Decimal, ROUND_HALF_UP
 
 # 提取范围值列表
 def extract_skill_numbers(text, type):
@@ -186,7 +184,6 @@ def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
 def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
 
     # try:
-    last_text = desc_lab["text"]
     lv_select = event.widget.get()
     lv = int(lv_select.replace("Skill Lv.",""))
 
@@ -207,7 +204,6 @@ def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
 def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
-        last_text = desc_lab["text"]
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
@@ -228,7 +224,6 @@ def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
 def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
-        last_text = desc_lab["text"]
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
@@ -249,7 +244,6 @@ def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
 def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
-        last_text = desc_lab["text"]
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
@@ -270,7 +264,6 @@ def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
 def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
-        last_text = desc_lab["text"]
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
@@ -318,7 +311,6 @@ def write_percentage_numbers_back(text, new_percentage):
 def on_percentage_combo_select(event, desc_lab, lv1_skill_strength):
 
     try:
-        last_text = desc_lab["text"]
         lv_select = event.widget.get()
         lv = int(lv_select.replace("Skill Lv.",""))
 
