@@ -162,17 +162,11 @@ def get_hbr_brochure():
             By.XPATH, ".//div[contains(@class, 'style-item') and contains(@class, 'card')]"
         )
 
-
         my_style_num = 0
         my_style_ids = []
-        my_style_png_srcs = {}
-        my_style_character_roles = {}
-        my_style_element_types = {}
-        my_style_weapon_types = {}
         my_style_levels = {}
         limit_break_levels = {}
         my_style_infos = {}
-
 
         # 获取风格数据
         for i, style_item_card_element in enumerate(style_item_card_elements):
