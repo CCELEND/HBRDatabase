@@ -8,73 +8,70 @@ from window import set_window_expand, set_window_icon, creat_window, set_window_
 from scrollbar_frame_win import ScrollbarFrameWin
 
 sys.path.append(os.path.abspath("./持有物"))
-from 饰品.jewelrys_win import show_jewelrys_type
-from 奖杯勋章.trophy_medals_win import show_trophy_medals
-from 道具.props_win import show_props
-from 主线道具.main_props_win import show_main_props
-from 饰品材料.jewelry_materials_win import show_jewelry_materials
-from 成长素材.growth_materials_win import show_growth_materials
-from 活动奖章.medals_win import show_medals
-from 强化素材.strengthen_materials_win import show_strengthen_materials
-from 入场券.tickets_win import show_tickets
-from 货币.currencys_win import show_currencys
-from 增幅器.amplifiers_win import show_amplifiers
-from 扭蛋材料.capsuletoys_win import show_capsuletoys
-from 芯片.chips_win import show_chips
-from 碎片.fragments_win import show_fragments
+from 持有物.饰品.jewelrys_win import show_jewelrys_type
+from 持有物.奖杯勋章.trophy_medals_win import show_trophy_medals
+from 持有物.道具.props_win import show_props
+from 持有物.主线道具.main_props_win import show_main_props
+from 持有物.饰品材料.jewelry_materials_win import show_jewelry_materials
+from 持有物.成长素材.growth_materials_win import show_growth_materials
+from 持有物.活动奖章.medals_win import show_medals
+from 持有物.强化素材.strengthen_materials_win import show_strengthen_materials
+from 持有物.入场券.tickets_win import show_tickets
+from 持有物.货币.currencys_win import show_currencys
+from 持有物.增幅器.amplifiers_win import show_amplifiers
+from 持有物.扭蛋材料.capsuletoys_win import show_capsuletoys
+from 持有物.芯片.chips_win import show_chips
+from 持有物.碎片.fragments_win import show_fragments
 
 sys.path.append(os.path.abspath("./战斗系统"))
-from 基础.jc_win import creat_jc_win
-from OD.od_win import creat_od_win
-from 乘区.cq_win import creat_cq_win
-from 职业.careers_win import show_career
-from 武器.weapons_win import show_weapon
-from 属性.attributes_win import show_attribute
-from 状态.status_win import show_statu
+from 战斗系统.基础.jc_win import creat_jc_win
+from 战斗系统.OD.od_win import creat_od_win
+from 战斗系统.乘区.cq_win import creat_cq_win
+from 战斗系统.职业.careers_win import show_career
+from 战斗系统.武器.weapons_win import show_weapon
+from 战斗系统.属性.attributes_win import show_attribute
+from 战斗系统.状态.status_win import show_statu
 
 sys.path.append(os.path.abspath("./敌人"))
-from 主线.zx_win import show_zx_enemys
-from 时钟塔.szt_win import show_szt_enemys
-from 光球BOSS.gqboss_win import show_gqboss_enemys
-from 时之修炼场.szxlc_win import show_szxlc_enemys
-from 棱镜战.ljz_win import show_ljz_enemys
-from 宝石棱镜战.bsljz_win import show_bsljz_enemys
-from 异时层.ysc_win import show_ysc_enemys
-from 高分挑战.gftz_win import show_gftz_enemys
-from 恒星战.hxz_win import show_hxz_enemys
+from 敌人.主线.zx_win import show_zx_enemys
+from 敌人.时钟塔.szt_win import show_szt_enemys
+from 敌人.光球BOSS.gqboss_win import show_gqboss_enemys
+from 敌人.时之修炼场.szxlc_win import show_szxlc_enemys
+from 敌人.棱镜战.ljz_win import show_ljz_enemys
+from 敌人.宝石棱镜战.bsljz_win import show_bsljz_enemys
+from 敌人.异时层.ysc_win import show_ysc_enemys
+from 敌人.高分挑战.gftz_win import show_gftz_enemys
+from 敌人.恒星战.hxz_win import show_hxz_enemys
 
 sys.path.append(os.path.abspath("./搜索"))
-from search_win import creat_search_win
+from 搜索.search_win import creat_search_win
 
 sys.path.append(os.path.abspath("./角色"))
-from team_win import creat_team_win
-from team_info import get_all_team_obj
+from 角色.team_win import creat_team_win
 
 sys.path.append(os.path.abspath("./更新"))
-from update_processing import update_data
-from http_update_processing import http_update_data
+from 更新.http_update_processing import http_update_data
 
 sys.path.append(os.path.abspath("./音乐"))
-from music_win import creat_music_win
+from 音乐.music_win import creat_music_win
 
 sys.path.append(os.path.abspath("./工具"))
-from GetEntriesGUILocal.get_entries_win import creat_ct_win
-from DamageScoreCal.damage_score_cal_win import creat_dsc_win
-from DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
-from HBRbrochure.HBRbrochure import get_hbr_brochure
-from HBR伤害模拟.Load import load_hbr_damage_simulation
-from hbr_tool.Load import load_hbr_tool
-from hbr_axletool.Load import load_hbr_axletool
-from wiki_hbr_hd.Load import load_wiki_hbr_hd
-from 词条计算器.Load import load_entry_calculator
-
-from hbr_quest.Load import load_hbr_quest
-from game8_hbr.Load import load_game8_hbr
-from gamekee_hbr.Load import load_gamekee_hbr
-from 入队培训手册.Load import load_game_bilibili_com
+from 工具.GetEntriesGUILocal.get_entries_win import creat_ct_win
+from 工具.DamageScoreCal.damage_score_cal_win import creat_dsc_win
+from 工具.DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
+from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
+from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
+from 工具.hbr_tool.Load import load_hbr_tool
+from 工具.hbr_axletool.Load import load_hbr_axletool
+from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
+from 工具.词条计算器.Load import load_entry_calculator
+from 工具.hbr_quest.Load import load_hbr_quest
+from 工具.game8_hbr.Load import load_game8_hbr
+from 工具.gamekee_hbr.Load import load_gamekee_hbr
+from 工具.入队培训手册.Load import load_game_bilibili_com
 
 sys.path.append(os.path.abspath("./关于"))
-from about_win import creat_about_win
+from 关于.about_win import creat_about_win
 
 # 占位函数
 def update_output(text):
