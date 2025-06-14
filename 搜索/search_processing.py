@@ -5,7 +5,7 @@ import re
 from tools import list_val_in_another, is_parentstring, output_string
 
 sys.path.append(os.path.abspath("./角色"))
-from 角色.style_info import SkillEffect
+from style_info import SkillEffect
 import 角色.team_info
 
 # 选中处理
