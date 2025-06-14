@@ -23,6 +23,17 @@ def mouse_bind_canvas_events(canvas):
     canvas.bind("<Enter>", mouse_on_enter)
     canvas.bind("<Leave>", mouse_on_leave) 
 
+# 显示边框
+def mouse_on_enter_frame(event):
+    event.widget.config(highlightbackground="blue", highlightthickness=2)  # 鼠标进入时显示边框
+
+def mouse_on_leave_frame(event):
+    event.widget.config(highlightbackground="SystemButtonFace", highlightthickness=0)   # 鼠标离开时隐藏边框gray
+
+# 绑定鼠标进入和离开事件到 Canvas
+def mouse_frame_bind_canvas_events(canvas):
+    canvas.bind("<Enter>", mouse_on_enter_frame)
+    canvas.bind("<Leave>", mouse_on_leave_frame) 
 
 # 右键绑定 动态调整被绑定函数参数并传入
 def right_click_bind_canvas_events(canvas, right_click_handler=None, **kwargs):

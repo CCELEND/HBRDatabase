@@ -3,7 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events
+from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_frame_bind_canvas_events
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
@@ -78,10 +78,14 @@ def show_role_img(event, parent_frame, role, team):
 
 # 绑定风格 canvas 的事件
 def bind_style_canvas(parent_frame, team, style, x, y):
+
     photo = get_photo(style.path, (90, 90))
     canvas = create_canvas_with_image(parent_frame, 
         photo, 130, 130, 20, 20, x, y)
+    
     mouse_bind_canvas_events(canvas)
+    # mouse_frame_bind_canvas_events(canvas)
+
     bind_canvas_events(canvas, 
         creat_style_skill_win, parent_frame=parent_frame, team=team, style=style)
     # 右键点击事件绑定
