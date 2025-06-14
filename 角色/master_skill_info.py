@@ -46,6 +46,69 @@ class MasterSkillEffect:
         return cls(**params)
 
 
+# 攻击技能
+class MasterAttackSkill:
+    def __init__(self, weapon_attribute = None, element_attribute = None, 
+        hit_num = None, hit_damage = None, 
+        strength = None, attribute_multiplier = None, biased = None, 
+        attribute_difference = None, destructive_multiplier = None, target = None,
+        probability = "100%"):
+
+        self.weapon_attribute = weapon_attribute   # 武器属性
+        self.element_attribute = element_attribute  # 元素属性
+        self.hit_num = hit_num                  # hit 数 5
+        self.hit_damage = hit_damage            # hit 伤害分布 e.g., [0.1, 0.1, 0.25, 0.25, 0.3]
+        self.strength = strength                # 技能强度 2,673 ~ 13,365
+        self.attribute_multiplier = attribute_multiplier # 属性倍率 {"力量": 2, "灵巧": 1}
+        self.biased = biased                    # 技能偏向 DP+30% HP+50% None
+        self.attribute_difference = attribute_difference        # 属性差值 149
+        self.destructive_multiplier = destructive_multiplier    # 破坏倍率 3.625
+        self.target = target  # 单体或者全体、群体
+
+        self.probability = probability          # 成功概率值
+
+    @classmethod
+    def from_list(cls, effect_data):
+        params = {
+            'weapon_attribute': None,
+            'element_attribute': None,
+            'hit_num': None,
+            'hit_damage': None,
+            'strength': None,
+            'attribute_multiplier': None,
+            'biased': None,
+            'attribute_difference': None,
+            'destructive_multiplier': None,
+            'target': None,
+            'probability': "100%"
+        }
+        
+        for i, data in enumerate(effect_data):
+            if i == 0:
+                params['weapon_attribute'] = data
+            elif i == 1:
+                params['element_attribute'] = data
+            elif i == 2:
+                params['hit_num'] = data
+            elif i == 3:
+                params['hit_damage'] = data
+            elif i == 4:
+                params['strength'] = data
+            elif i == 5:
+                params['attribute_multiplier'] = data
+            elif i == 6:
+                params['biased'] = data
+            elif i == 7:
+                params['attribute_difference'] = data
+            elif i == 8:
+                params['destructive_multiplier'] = data
+            elif i == 9:
+                params['target'] = data
+            elif i == 10:
+                params['probability'] = data
+        return cls(**params)
+
+
 # 大师技能类
 class MasterSkill:
     def __init__(self, name = None, description = None, 
@@ -67,7 +130,11 @@ def get_master_skill_obj(skill_info):
 
     effects = []
     for effect in skill_info[4]:
-        effect_obj = MasterSkillEffect.from_list(effect)
+        if effect[0] in ["斩","突","打"]:
+            effect_obj = MasterAttackSkill.from_list(effect)
+        else:
+            effect_obj = MasterSkillEffect.from_list(effect)
+
         effects.append(effect_obj)
 
     Master_skill = MasterSkill(
