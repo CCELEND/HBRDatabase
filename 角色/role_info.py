@@ -1,6 +1,7 @@
 
 import os
 from style_info import get_style_obj
+from master_skill_info import get_master_skill_obj
 from tools import load_json, get_dir_values_list
 
 # 角色
@@ -37,7 +38,8 @@ def creat_role(role_json, Astyles, Sstyles, SSstyles):
     weapon_attribute = role_json['weapon_attribute']
     weapon = role_json['weapon']
 
-    master_skill = role_json.get("master_skill")
+    skill_info = role_json.get("master_skill")
+    master_skill = get_master_skill_obj(skill_info)
 
     role = Role(
         img_path,
