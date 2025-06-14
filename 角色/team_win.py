@@ -161,7 +161,7 @@ def creat_weapon_master_skill_frame(parent_frame, role):
 
         mouse_bind_canvas_events(master_skill_canvas)
         # bind_canvas_events(master_skill_canvas, 
-        #     creat_master_skill_win, parent_frame=parent_frame, master_skill=master_skill)
+        #     creat_master_skill_win, parent_frame=parent_frame, role=role)
     else:
         weapon_frame = ttk.Frame(parent_frame)
         weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")

@@ -52,7 +52,7 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     for col_index in range(4):
         row_frame.grid_columnconfigure(col_index, weight=1)
 
-    # 一个主动技能的描述 frame
+    # 一个技能的描述 frame
     creat_desc_frame(row_frame, master_skill)
 
     # 技能效果列表
@@ -93,13 +93,13 @@ def master_win_closing(parent_frame):
 
     parent_frame.destroy()  # 销毁窗口
 
-def creat_master_skill_win(event, parent_frame, master):
+def creat_master_skill_win(event, parent_frame, role):
 
     # 初始化资源文件
     load_resources()
 
     # 大师技能对象
-    master_skill = master.skill
+    master_skill = role.master_skill
 
     open_master_win = master_skill.name
     # 重复打开时，窗口置顶并直接返回
