@@ -1,55 +1,55 @@
 {
     "剑":{
         "name":"剑","en":"Sword",
-        "path":"./战斗系统/武器/Sword.webp",
+        "path":"./战斗系统/武器/Sword.png",
         "description":"剑（斩武器属性）","hit":"3"
     },
 
     "双刀":{
         "name":"双刀","en":"DoubleSword",
-        "path":"./战斗系统/武器/DoubleSword.webp",
+        "path":"./战斗系统/武器/DoubleSword.png",
         "description":"双刀（斩武器属性）\n（目前是茅森月歌和立华奏的武器）","hit":"2"
     },
 
     "镰刀":{
         "name":"镰刀","en":"Scythe",
-        "path":"./战斗系统/武器/Scythe.webp",
+        "path":"./战斗系统/武器/Scythe.png",
         "description":"镰刀（斩武器属性）","hit":"3"
     },
     
     "枪":{
         "name":"枪","en":"Gun",
-        "path":"./战斗系统/武器/Gun.webp",
+        "path":"./战斗系统/武器/Gun.png",
         "description":"枪（突武器属性）","hit":"3"
     },
 
     "炮":{
         "name":"炮","en":"Cannon",
-        "path":"./战斗系统/武器/Cannon.webp",
+        "path":"./战斗系统/武器/Cannon.png",
         "description":"炮（突武器属性）","hit":"3"
     },
 
     "爪":{
         "name":"爪","en":"Claw",
-        "path":"./战斗系统/武器/Claw.webp",
+        "path":"./战斗系统/武器/Claw.png",
         "description":"爪（突武器属性）\n（目前是白虎的武器）","hit":"1"
     },
 
     "摩托":{
         "name":"摩托","en":"Bike",
-        "path":"./战斗系统/武器/Bike.webp",
+        "path":"./战斗系统/武器/Bike.png",
         "description":"摩托（突武器属性）\n（目前是七濑七海的武器）","hit":"3"
     },
 
     "大剑":{
         "name":"大剑","en":"LargeSword",
-        "path":"./战斗系统/武器/LargeSword.webp",
+        "path":"./战斗系统/武器/LargeSword.png",
         "description":"大剑（打武器属性）","hit":"1"
     },
     
     "盾":{
         "name":"盾","en":"Shield",
-        "path":"./战斗系统/武器/Shield.webp",
+        "path":"./战斗系统/武器/Shield.png",
         "description":"盾（打武器属性）","hit":"1"
     }
 
