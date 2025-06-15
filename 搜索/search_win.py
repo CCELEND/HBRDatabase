@@ -86,6 +86,9 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         team = 角色.team_info.teams[style.team_name]
 
         style_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.name)
+        # 设置LabelFrame的最小高度
+        style_frame.grid_propagate(False)
+        style_frame.configure(height=170)
         bind_style_canvas(style_frame, team, style, 0, 0)
 
         # 计算行和列的位置

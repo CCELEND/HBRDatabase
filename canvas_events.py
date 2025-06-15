@@ -35,6 +35,23 @@ def mouse_frame_bind_canvas_events(canvas):
     canvas.bind("<Enter>", mouse_on_enter_frame)
     canvas.bind("<Leave>", mouse_on_leave_frame) 
 
+
+def mouse_on_enter2(event):
+    # 获取触发事件的控件，设置光标为手型并显示蓝色边框
+    widget = event.widget
+    widget.config(cursor="hand2", highlightbackground="#93CBE4", highlightthickness=2)
+
+def mouse_on_leave2(event):
+    # 获取触发事件的控件，恢复默认光标并隐藏边框
+    widget = event.widget
+    widget.config(cursor="", highlightbackground="SystemButtonFace", highlightthickness=0)
+
+# 绑定鼠标进入和离开事件到Canvas
+def mouse_bind_canvas_events2(canvas):
+    canvas.bind("<Enter>", mouse_on_enter2)
+    canvas.bind("<Leave>", mouse_on_leave2)
+
+
 # 右键绑定 动态调整被绑定函数参数并传入
 def right_click_bind_canvas_events(canvas, right_click_handler=None, **kwargs):
     # 为 Canvas 绑定事件

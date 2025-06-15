@@ -3,7 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_frame_bind_canvas_events
+from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
@@ -79,12 +79,16 @@ def show_role_img(event, parent_frame, role, team):
 # 绑定风格 canvas 的事件
 def bind_style_canvas(parent_frame, team, style, x, y):
 
+    # 创建一个 Frame 并禁用自动调整大小
+    outer_frame = ttk.Frame(parent_frame, width=140, height=134)  # 预留边框空间
+    outer_frame.grid_propagate(False)  # 禁止自动调整大小
+    outer_frame.grid(row=x, column=y, sticky="nsew")
+
     photo = get_photo(style.path, (90, 90))
-    canvas = create_canvas_with_image(parent_frame, 
-        photo, 130, 130, 20, 20, x, y)
+    canvas = create_canvas_with_image(outer_frame, 
+        photo, 130, 130, 20, 20, 0, 0)
     
-    mouse_bind_canvas_events(canvas)
-    # mouse_frame_bind_canvas_events(canvas)
+    mouse_bind_canvas_events2(canvas)
 
     bind_canvas_events(canvas, 
         creat_style_skill_win, parent_frame=parent_frame, team=team, style=style)
@@ -101,7 +105,7 @@ def show_rarity(frame, role, team, row=2):
         RarityAframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRarityA = get_photo("./角色/IconRarityA.webp", (130, 130))
         canvasRarityA = create_canvas_with_image(RarityAframe, 
-            photoRarityA, 130, 130, 0, 0, 0, 0)
+            photoRarityA, 134, 134, 0, 0, 0, 0)
         for a, Astyle in enumerate(role.Astyles):
             bind_style_canvas(RarityAframe, team, Astyle, 0, a+1)
 
@@ -113,7 +117,7 @@ def show_rarity(frame, role, team, row=2):
         RaritySframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRarityS = get_photo("./角色/IconRarityS.webp", (130, 130))
         canvasRarityS = create_canvas_with_image(RaritySframe, 
-            photoRarityS, 130, 130, 0, 0, 0, 0)
+            photoRarityS, 134, 134, 0, 0, 0, 0)
         for s, Sstyle in enumerate(role.Sstyles):
             bind_style_canvas(RaritySframe, team, Sstyle, 0, s+1)
 
@@ -125,7 +129,7 @@ def show_rarity(frame, role, team, row=2):
         RaritySSframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
         photoRaritySS = get_photo("./角色/IconRaritySS.webp", (130, 130))
         canvasRaritySS = create_canvas_with_image(RaritySSframe, 
-            photoRaritySS, 130, 130, 0, 0, 0, 0)
+            photoRaritySS, 134, 134, 0, 0, 0, 0)
         for ss, SSstyle in enumerate(role.SSstyles):
             bind_style_canvas(RaritySSframe, team, SSstyle, 0, ss+1)
 
