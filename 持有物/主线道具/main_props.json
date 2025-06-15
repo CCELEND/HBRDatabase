@@ -8,19 +8,19 @@
     },
 
     "蚯蚓":{
-        "path":"./持有物/主线道具/ThumbnailFishingBait1.webp", 
+        "path":"./持有物/主线道具/ThumbnailFishingBait1.png", 
         "description":"面向新手的鱼饵\n很容易买到，也能随意使用",
         "price":"100 Justice", 
         "location":"废品收集·杂货店"
     },
     "沙蚕":{
-        "path":"./持有物/主线道具/ThumbnailFishingBait2.webp", 
+        "path":"./持有物/主线道具/ThumbnailFishingBait2.png", 
         "description":"面向行家的鱼饵\n出海钓鱼时的经典选择\n用这种鱼饵容易钓到大鱼",
         "price":"400 Justice", 
         "location":"废品收集·杂货店"
     },
     "厚纹蟹":{
-        "path":"./持有物/主线道具/ThumbnailFishingBait3.webp", 
+        "path":"./持有物/主线道具/ThumbnailFishingBait3.png", 
         "description":"面向大师的鱼饵\n要是想准备丰盛的待客宴席\n这种鱼饵必不可少",
         "price":"700 Justice", 
         "location":"废品收集·杂货店"
@@ -77,49 +77,49 @@
     },
 
     "虾虎鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish1.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish1.png", 
         "description":"身长10厘米左右的小型鱼\n虽然不大，但是做成天妇罗也很美味", 
         "price":"200 Justice", 
         "location":"钓鱼"
     },
     "沙梭鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish2.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish2.png", 
         "description":"身长15厘米左右的小型鱼\n虽然脂肪少，吃起来有点清淡\n但肉质柔软可口", 
         "price":"300 Justice", 
         "location":"钓鱼"
     },     
     "针鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish3.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish3.png", 
         "description":"身长20厘米左右的小型鱼\n通体银白而美丽，味道也较为上乘", 
         "price":"400 Justice", 
         "location":"钓鱼"
     },     
     "平鲉":{
-        "path":"./持有物/主线道具/ThumbnailFish4.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish4.png", 
         "description":"身长25厘米左右的中型鱼\n不用特殊鱼饵就难以钓到\n也较为考验钓鱼者的技术", 
         "price":"500 Justice", 
         "location":"钓鱼"
     },     
     "幼鰤鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish5.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish5.png", 
         "description":"身长40厘米左右的中型鱼\n营养价值高，不论怎样烹调都很会是佳肴", 
         "price":"700 Justice", 
         "location":"钓鱼"
     },     
     "鲈鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish6.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish6.png", 
         "description":"身长65厘米左右的大型鱼\n其身体暗红色部分较少\n显得晶莹剔透，吃起来\n会让人不由自主地绽放笑容", 
         "price":"10,00 Justice", 
         "location":"钓鱼"
     },     
     "黑鲷":{
-        "path":"./持有物/主线道具/ThumbnailFish7.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish7.png", 
         "description":"身长50厘米左右的大型鱼\n需要极高的钓鱼技术才能钓上来，味道极佳", 
         "price":"1,300 Justice", 
         "location":"钓鱼"
     },    
     "梦幻之鱼":{
-        "path":"./持有物/主线道具/ThumbnailFish8.webp", 
+        "path":"./持有物/主线道具/ThumbnailFish8.png", 
         "description":"身长180厘米左右的超大型鱼\n好几年才在近海出现一次的传说中的主宰", 
         "price":"2,500 Justice", 
         "location":"钓鱼"
