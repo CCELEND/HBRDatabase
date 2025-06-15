@@ -99,6 +99,12 @@
         "price":"4 GGP", 
         "location":"棱镜战（等级5之后）[幻影]钻石眼魔\n商店（记忆之庭）"
     },
+    "新星原水":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv5_Event.png",
+        "description":"",
+        "price":"", 
+        "location":""
+    },
 
 
     "史瓦西之核（斩属性）":{
@@ -119,9 +125,15 @@
         "price":"6 GGP", 
         "location":"棱镜战（等级8之后）[幻影]钻石眼魔\n商店（记忆之庭）"
     },
+    "史瓦西之核":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv6_Event.png",
+        "description":"",
+        "price":"", 
+        "location":""
+    },
 
     "努德斯特伦结晶":{
-        "path":"./持有物/强化素材/ThumbnailMaterial_Lv7_Light.webp",
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv7_Light.png",
         "description":"可从星癌体身上获得的风格强化素材\n技能通用化的道具",
         "price":"", 
         "location":"异时层\n高分挑战120,000"
@@ -208,7 +220,7 @@
     },
 
     "暗物质":{
-        "path":"./持有物/强化素材/ThumbnailMaterial_SkillEvolution.webp",
+        "path":"./持有物/强化素材/ThumbnailMaterial_SkillEvolution.png",
         "description":"可在时钟塔获得的EX技能进化素材",
         "price":"", 
         "location":"时钟塔"
@@ -222,7 +234,7 @@
     },
 
     "技能指南":{
-        "path":"./持有物/强化素材/ThumbnailSkillLevelUpItem.webp",
+        "path":"./持有物/强化素材/ThumbnailSkillLevelUpItem.png",
         "description":"提升角色技能等级的道具",
         "price":"400 活动奖章\n40 GGP", 
         "location":"兑换所\n异时层\n商店（记忆之庭）\n高分挑战160,000、300,000"
