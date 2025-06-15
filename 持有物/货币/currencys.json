@@ -6,6 +6,12 @@
         "price":"", 
         "location":""
     },
+    "GGP":{
+        "path":"./持有物/货币/ThumbnailGGP.webp", 
+        "description":"可以购买一些物品",
+        "price":"", 
+        "location":"扭蛋点数"
+    },
     "公正币/正义币":{
         "path":"./持有物/货币/ThumbnailJustice.webp", 
         "description":"这个是在第四章下篇习志野避难所流通的钱币\n可以用于购买芯片、唱片、鱼饵等", 
