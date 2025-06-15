@@ -103,7 +103,7 @@ def show_rarity(frame, role, team, row=2):
         # 创建 RarityAframe 并设置 row
         RarityAframe = ttk.Frame(frame)
         RarityAframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
-        photoRarityA = get_photo("./角色/IconRarityA.webp", (130, 130))
+        photoRarityA = get_photo("./角色/IconRarityA.png", (130, 130))
         canvasRarityA = create_canvas_with_image(RarityAframe, 
             photoRarityA, 134, 134, 0, 0, 0, 0)
         for a, Astyle in enumerate(role.Astyles):
@@ -115,7 +115,7 @@ def show_rarity(frame, role, team, row=2):
         # 创建 RaritySframe 并设置 row
         RaritySframe = ttk.Frame(frame)
         RaritySframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
-        photoRarityS = get_photo("./角色/IconRarityS.webp", (130, 130))
+        photoRarityS = get_photo("./角色/IconRarityS.png", (130, 130))
         canvasRarityS = create_canvas_with_image(RaritySframe, 
             photoRarityS, 134, 134, 0, 0, 0, 0)
         for s, Sstyle in enumerate(role.Sstyles):
@@ -127,7 +127,7 @@ def show_rarity(frame, role, team, row=2):
         # 创建 RaritySSframe 并设置 row
         RaritySSframe = ttk.Frame(frame)
         RaritySSframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
-        photoRaritySS = get_photo("./角色/IconRaritySS.webp", (130, 130))
+        photoRaritySS = get_photo("./角色/IconRaritySS.png", (130, 130))
         canvasRaritySS = create_canvas_with_image(RaritySSframe, 
             photoRaritySS, 134, 134, 0, 0, 0, 0)
         for ss, SSstyle in enumerate(role.SSstyles):
@@ -163,7 +163,7 @@ def creat_weapon_master_skill_frame(parent_frame, role):
         weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
             weapon_photo, 100, 100, 20, 30, 0, 0)
 
-        master_skill_photo = get_photo("./角色/iconMasterSkill.webp", (80, 68))
+        master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 68))
         master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
             master_skill_photo, 100, 100, 10, 16, 1, 0)
 

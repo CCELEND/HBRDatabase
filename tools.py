@@ -1,5 +1,6 @@
 import sys
 import os
+import pathlib
 from PIL import Image
 from tkinter import messagebox
 import json
@@ -145,3 +146,26 @@ def webp_to_ico(size=(80, 66)):
             tempiconpath = os.path.splitext(filename)[0] + '.ico'
             # 保存为ICO文件
             iconimage.save(tempiconpath, format='ICO', sizes=[(size[0], size[1])])
+
+def delete_webp_files(directory: str) -> None:
+
+    # 检查目录是否存在
+    if not os.path.exists(directory):
+        return
+    
+    # 检查是否为有效目录
+    if not os.path.isdir(directory):
+        return
+    
+    # 转换为Path对象以便使用更现代的文件操作API
+    dir_path = pathlib.Path(directory)
+    
+    # 遍历目录及其子目录中的所有.webp文件
+    for webp_file in dir_path.rglob('*.webp'):
+        try:
+            # 删除文件
+            webp_file.unlink()
+        except PermissionError:
+            print(f"[-] 没有权限删除 {webp_file}")
+        except Exception as e:
+            print(f"[-] 删除 {webp_file} 时出错: {e}")
