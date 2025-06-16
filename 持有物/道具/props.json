@@ -20,13 +20,13 @@
     },
     "体力":{
         "path":"./持有物/道具/ThumbnailStamina.png", 
-        "description":"", 
+        "description":"每四小时回复1点，上限5点\n达到5点时，开始回复备用体力", 
         "price":"", 
         "location":""
     },
     "备用体力":{
         "path":"./持有物/道具/ThumbnailExtraLife.png", 
-        "description":"", 
+        "description":"每12小时回复1，上限200点", 
         "price":"", 
         "location":""
     },
