@@ -26,7 +26,7 @@
     },
     "备用体力":{
         "path":"./持有物/道具/ThumbnailExtraLife.png", 
-        "description":"每12小时回复1，上限200点", 
+        "description":"每12小时回复1点，上限200点", 
         "price":"", 
         "location":""
     },
