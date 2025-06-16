@@ -6,6 +6,7 @@ from ttkbootstrap.constants import *
 from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
+from tools import delete_webp_files
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
@@ -223,6 +224,8 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
 bg = []
 if __name__ == "__main__":
+
+    delete_webp_files("./")
 
     # 创建主窗口
     root = creat_window("HBRDatabase", 1160, 717, 440, 50)#1160
