@@ -1,7 +1,7 @@
 {
 
 	"击碎耳坠":{
-		"path":"./持有物/饰品/耳坠/Earrings_High2_ice_w5.webp",
+		"path":"./持有物/饰品/耳坠/Earrings_High2_ice_w5.png",
 		"name":"击碎耳坠",
 		"en":"Earrings_High2_ice_w5",
 		"type":"耳坠",
@@ -9,7 +9,7 @@
 		"rarity":"6","location":"炼金\n3 蓝宝石、5 钻石\n100,000 GP"
 	},
 	"攻击耳坠":{
-		"path":"./持有物/饰品/耳坠/Earrings_High2_thunder_w5.webp",
+		"path":"./持有物/饰品/耳坠/Earrings_High2_thunder_w5.png",
 		"name":"攻击耳坠",
 		"en":"Earrings_High2_thunder_w5",
 		"type":"耳坠",
@@ -17,7 +17,7 @@
 		"rarity":"6","location":"炼金\n3 黄玉、5 钻石\n100,000 GP"
 	},
 	"驱动耳坠":{
-		"path":"./持有物/饰品/耳坠/Earrings_High3_fire_w1.webp",
+		"path":"./持有物/饰品/耳坠/Earrings_High3_fire_w1.png",
 		"name":"驱动耳坠",
 		"en":"Earrings_High3_fire_w1",
 		"type":"耳坠",
@@ -25,7 +25,7 @@
 		"rarity":"6","location":"炼金\n3 红宝石、5 钻石\n100,000 GP"
 	},
 	"破坏耳坠":{
-		"path":"./持有物/饰品/耳坠/Earrings_High3_light_w1.webp",
+		"path":"./持有物/饰品/耳坠/Earrings_High3_light_w1.png",
 		"name":"破坏耳坠",
 		"en":"Earrings_High3_light_w1",
 		"type":"耳坠",
@@ -34,7 +34,7 @@
 	},
 
 	"博爱耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsHighw4.webp",
+		"path":"./持有物/饰品/耳坠/EarringsHighw4.png",
 		"name":"博爱耳坠",
 		"en":"EarringsHighw4",
 		"type":"耳坠",
@@ -43,7 +43,7 @@
 	},
 
 	"星光耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsHighw3.webp",
+		"path":"./持有物/饰品/耳坠/EarringsHighw3.png",
 		"name":"星光耳坠",
 		"en":"EarringsHighw3",
 		"type":"耳坠",
@@ -51,7 +51,7 @@
 		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
 	},
 	"秘银耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsHigh3.webp",
+		"path":"./持有物/饰品/耳坠/EarringsHigh3.png",
 		"name":"秘银耳坠",
 		"en":"EarringsHigh3",
 		"type":"耳坠",
@@ -61,7 +61,7 @@
 
 
 	"符文耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsMediumw3.webp",
+		"path":"./持有物/饰品/耳坠/EarringsMediumw3.png",
 		"name":"符文耳坠",
 		"en":"EarringsMediumw3",
 		"type":"耳坠",
@@ -69,7 +69,7 @@
 		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
 	},
 	"白金耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsMediumw1.webp",
+		"path":"./持有物/饰品/耳坠/EarringsMediumw1.png",
 		"name":"白金耳坠",
 		"en":"EarringsMediumw1",
 		"type":"耳坠",
@@ -78,7 +78,7 @@
 	},
 
 	"才华耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsMedium5.webp",
+		"path":"./持有物/饰品/耳坠/EarringsMedium5.png",
 		"name":"才华耳坠",
 		"en":"EarringsMedium5",
 		"type":"耳坠",
@@ -86,7 +86,7 @@
 		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
 	},
 	"黄金耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsMedium3.webp",
+		"path":"./持有物/饰品/耳坠/EarringsMedium3.png",
 		"name":"黄金耳坠",
 		"en":"EarringsMedium3",
 		"type":"耳坠",
@@ -95,7 +95,7 @@
 	},
 
 	"聪慧耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsLoww3.webp",
+		"path":"./持有物/饰品/耳坠/EarringsLoww3.png",
 		"name":"聪慧耳坠",
 		"en":"EarringsLoww3",
 		"type":"耳坠",
@@ -103,7 +103,7 @@
 		"rarity":"1","location":"棱镜战：等级1"
 	},
 	"精致耳坠":{
-		"path":"./持有物/饰品/耳坠/EarringsLoww1.webp",
+		"path":"./持有物/饰品/耳坠/EarringsLoww1.png",
 		"name":"精致耳坠",
 		"en":"EarringsLoww1",
 		"type":"耳坠",

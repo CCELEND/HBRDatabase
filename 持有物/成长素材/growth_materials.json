@@ -1,71 +1,71 @@
 
 {
     "战斗报告Ⅰ":{
-        "path":"./持有物/成长素材/ThumbnailExperienceS.webp", 
+        "path":"./持有物/成长素材/ThumbnailExperienceS.png", 
         "description":"可获得少量经验值的道具",
         "price":"5,000 GP", 
         "location":"商店（记忆之庭）等"
     },
     "战斗报告Ⅱ":{
-        "path":"./持有物/成长素材/ThumbnailExperienceM.webp", 
+        "path":"./持有物/成长素材/ThumbnailExperienceM.png", 
         "description":"可获得较多经验值的道具", 
         "price":"43,000 GP\n1 GGP", 
         "location":"商店（记忆之庭）等"
     },
     "战斗报告Ⅲ":{
-        "path":"./持有物/成长素材/ThumbnailExperienceL.webp", 
+        "path":"./持有物/成长素材/ThumbnailExperienceL.png", 
         "description":"可获得较多经验值的道具", 
         "price":"370,000 GP\n10 GGP", 
         "location":"商店（记忆之庭）等"
     },
 
     "风格报告":{
-        "path":"./持有物/成长素材/StyleExp01.webp", 
+        "path":"./持有物/成长素材/StyleExp01.png", 
         "description":"可获得风格等级经验值的道具", 
         "price":"", 
         "location":""
     },
 
     "强化教材（Lv.20）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookA.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookA.png", 
         "description":"可升至20级的道具", 
         "price":"", 
         "location":"商店（记忆之庭）"
     },
     "强化教材（Lv.30）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookA.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookA.png", 
         "description":"可升至30级的道具", 
         "price":"160,000 GP", 
         "location":"商店（记忆之庭）"
     },
 
     "强化教材（Lv.40）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookB.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookB.png", 
         "description":"可升至40级的道具", 
         "price":"620,000 GP", 
         "location":"商店（记忆之庭）"
     },
     "强化教材（Lv.50）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookB.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookB.png", 
         "description":"可升至50级的道具", 
         "price":"1,850,000 GP", 
         "location":"商店（记忆之庭）"
     },
     "强化教材（Lv.60）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookB.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookB.png", 
         "description":"可升至60级的道具", 
         "price":"4,530,000 GP", 
         "location":"商店（记忆之庭）"
     },
 
     "强化教材（Lv.70）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookC.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookC.png", 
         "description":"可升至70级的道具", 
         "price":"10,700,000 GP", 
         "location":"商店（记忆之庭）"
     },
     "强化教材（Lv.80）":{
-        "path":"./持有物/成长素材/ThumbnailExpBookC.webp", 
+        "path":"./持有物/成长素材/ThumbnailExpBookC.png", 
         "description":"可升至80级的道具", 
         "price":"28,400,000 GP", 
         "location":"商店（记忆之庭）"

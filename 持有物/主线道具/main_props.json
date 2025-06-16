@@ -1,7 +1,7 @@
 
 {
     "鱼竿":{
-        "path":"./持有物/主线道具/ThumbnailFishingRod.webp", 
+        "path":"./持有物/主线道具/ThumbnailFishingRod.png", 
         "description":"从秋婆婆那里借的鱼竿\n虽然已经有些年头\n但因为精心的保养，现在依然能派上用场",
         "price":"", 
         "location":""
@@ -26,51 +26,51 @@
         "location":"废品收集·杂货店"
     },
     "唱片":{
-        "path":"./持有物/主线道具/ThumbnailRecord.webp", 
+        "path":"./持有物/主线道具/ThumbnailRecord.png", 
         "description":"杂货店会根据现在的氛围自行选择歌曲", 
         "price":"550 Justice", 
         "location":"杂货店"
     },
     "大号保温箱":{
-        "path":"./持有物/主线道具/ThumbnailCoolerBox.webp", 
+        "path":"./持有物/主线道具/ThumbnailCoolerBox.png", 
         "description":"能将更多鱼保鲜的大容量保温箱\n最多容纳10条鱼", 
         "price":"5,000 Justice", 
         "location":"杂货店"
     },
 
     "冰淇淋":{
-        "path":"./持有物/主线道具/ThumbnailIceCream.webp", 
+        "path":"./持有物/主线道具/ThumbnailIceCream.png", 
         "description":"冰点大师处售卖的甜点", 
         "price":"", 
         "location":"冰点大师"
     },
 
     "普通金属废料":{
-        "path":"./持有物/主线道具/ThumbnailScrap1.webp", 
+        "path":"./持有物/主线道具/ThumbnailScrap1.png", 
         "description":"用于制作鱼竿的废品\n略微提升鱼竿的强度\n（Max Lv.+3）", 
         "price":"400 Justice", 
         "location":"收集废品（区域2、3）"
     },
     "稀有金属废料":{
-        "path":"./持有物/主线道具/ThumbnailScrap2.webp", 
+        "path":"./持有物/主线道具/ThumbnailScrap2.png", 
         "description":"用于制作鱼竿的废品\n大幅提升鱼竿的强度\n（Max Lv.+5）", 
         "price":"600 Justice", 
         "location":"收集废品（区域4、5※概率低）"
     },
     "稀土金属废料":{
-        "path":"./持有物/主线道具/ThumbnailScrap3.webp", 
+        "path":"./持有物/主线道具/ThumbnailScrap3.png", 
         "description":"用于制作鱼竿的废品\n可颇为大幅地提升鱼竿的强度\n（Max Lv.+7）", 
         "price":"800 Justice", 
         "location":"收集废品（区域5※概率极低）"
     },
     "贱金属废料":{
-        "path":"./持有物/主线道具/ThumbnailScrap4.webp", 
+        "path":"./持有物/主线道具/ThumbnailScrap4.png", 
         "description":"用于出售的废品\n废品站随处可见的铁屑", 
         "price":"300 Justice", 
         "location":"废品收集"
     },
     "贵金属废料":{
-        "path":"./持有物/主线道具/ThumbnailScrap5.webp", 
+        "path":"./持有物/主线道具/ThumbnailScrap5.png", 
         "description":"用于出售的废品\n其中含有贵金属，能换到好价钱", 
         "price":"3,500 Justice", 
         "location":"废品收集"

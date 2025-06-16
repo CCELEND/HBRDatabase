@@ -2,7 +2,7 @@
 
 
 	"炎击手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_fire_w1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_fire_w1.png",
 		"name":"炎击手环",
 		"en":"Bracelet_High2_fire_w1",
 		"type":"手环",
@@ -10,7 +10,7 @@
 		"rarity":"6","location":"炼金\n5 红宝石、2 蓝宝石\n100,000 GP"
 	},
 	"冰击手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_ice_w1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_ice_w1.png",
 		"name":"冰击手环",
 		"en":"Bracelet_High2_ice_w1",
 		"type":"手环",
@@ -18,7 +18,7 @@
 		"rarity":"6","location":"炼金\n5 蓝宝石、2 黄玉\n100,000 GP"
 	},
 	"雷击手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_thunder_w1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_thunder_w1.png",
 		"name":"雷击手环",
 		"en":"Bracelet_High2_thunder_w1",
 		"type":"手环",
@@ -26,7 +26,7 @@
 		"rarity":"6","location":"炼金\n5 黄玉、2 珍珠\n100,000 GP"
 	},
 	"光击手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_light_w1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_light_w1.png",
 		"name":"光击手环",
 		"en":"Bracelet_High2_light_w1",
 		"type":"手环",
@@ -34,7 +34,7 @@
 		"rarity":"6","location":"炼金\n5 珍珠、2 缟玛瑙\n100,000 GP"
 	},
 	"暗击手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_dark_w1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_dark_w1.png",
 		"name":"暗击手环",
 		"en":"Bracelet_High2_dark_w1",
 		"type":"手环",
@@ -44,7 +44,7 @@
 
 
 	"火门手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High1_fire_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High1_fire_1.png",
 		"name":"火门手环",
 		"en":"Bracelet_High1_fire_1",
 		"type":"手环",
@@ -52,7 +52,7 @@
 		"rarity":"5","location":"光球BOSS\n异度监测之眼R"
 	},
 	"冰门手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High1_ice_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High1_ice_1.png",
 		"name":"冰门手环",
 		"en":"Bracelet_High1_ice_1",
 		"type":"手环",
@@ -60,7 +60,7 @@
 		"rarity":"5","location":"光球BOSS\n异度监测之眼B"
 	},
 	"雷门手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High1_thunder_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High1_thunder_1.png",
 		"name":"雷门手环",
 		"en":"Bracelet_High1_thunder_1",
 		"type":"手环",
@@ -68,7 +68,7 @@
 		"rarity":"5","location":"光球BOSS\n异度监测之眼Y"
 	},
 	"光门手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High1_light_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High1_light_1.png",
 		"name":"光门手环",
 		"en":"Bracelet_High1_light_1",
 		"type":"手环",
@@ -76,7 +76,7 @@
 		"rarity":"5","location":"光球BOSS\n异度监测之眼W"
 	},
 	"暗门手环":{
-		"path":"./持有物/饰品/手环/Bracelet_High1_dark_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High1_dark_1.png",
 		"name":"暗门手环",
 		"en":"Bracelet_High1_dark_1",
 		"type":"手环",
@@ -86,7 +86,7 @@
 
 
 	"火门手环Ⅱ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_fire_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_fire_1.png",
 		"name":"火门手环Ⅱ",
 		"en":"Bracelet_High2_fire_1",
 		"type":"手环",
@@ -94,7 +94,7 @@
 		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无R"
 	},
 	"冰门手环Ⅱ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_ice_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_ice_1.png",
 		"name":"冰门手环Ⅱ",
 		"en":"Bracelet_High2_ice_1",
 		"type":"手环",
@@ -102,7 +102,7 @@
 		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无B"
 	},
 	"雷门手环Ⅱ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_thunder_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_thunder_1.png",
 		"name":"雷门手环Ⅱ",
 		"en":"Bracelet_High2_thunder_1",
 		"type":"手环",
@@ -110,7 +110,7 @@
 		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无Y"
 	},
 	"光门手环Ⅱ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_light_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_light_1.png",
 		"name":"光门手环Ⅱ",
 		"en":"Bracelet_High2_light_1",
 		"type":"手环",
@@ -118,7 +118,7 @@
 		"rarity":"5","location":"光球BOSSⅡ\n正之右肌·空无R与\n恶之左肌·空无W"
 	},
 	"暗门手环Ⅱ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_dark_1.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_dark_1.png",
 		"name":"暗门手环Ⅱ",
 		"en":"Bracelet_High2_dark_1",
 		"type":"手环",
@@ -127,7 +127,7 @@
 	},
 
 	"火门手环Ⅲ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_fire_3.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_fire_3.png",
 		"name":"火门手环Ⅲ",
 		"en":"Bracelet_High2_fire_3",
 		"type":"手环",
@@ -135,7 +135,7 @@
 		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门R"
 	},
 	"冰门手环Ⅲ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_ice_3.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_ice_3.png",
 		"name":"冰门手环Ⅲ",
 		"en":"Bracelet_High2_ice_3",
 		"type":"手环",
@@ -143,7 +143,7 @@
 		"rarity":"5","location":"光球BOSSⅢ\n阿蒙之门B"
 	},
 	"光门手环Ⅲ":{
-		"path":"./持有物/饰品/手环/Bracelet_High2_light_3.webp",
+		"path":"./持有物/饰品/手环/Bracelet_High2_light_3.png",
 		"name":"光门手环Ⅲ",
 		"en":"Bracelet_High2_light_3",
 		"type":"手环",
@@ -152,7 +152,7 @@
 	},
 
 	"退魔手环":{
-		"path":"./持有物/饰品/手环/BraceletHighw2.webp",
+		"path":"./持有物/饰品/手环/BraceletHighw2.png",
 		"name":"退魔手环",
 		"en":"BraceletHighw2",
 		"type":"手环",
@@ -160,7 +160,7 @@
 		"rarity":"5","location":"棱镜战：等级9\n棱镜战：等级10"
 	},
 	"庇护手环":{
-		"path":"./持有物/饰品/手环/BraceletHighw3.webp",
+		"path":"./持有物/饰品/手环/BraceletHighw3.png",
 		"name":"庇护手环",
 		"en":"BraceletHighw3",
 		"type":"手环",
@@ -169,7 +169,7 @@
 	},
 
 	"灵魂手环":{
-		"path":"./持有物/饰品/手环/BraceletHigh4.webp",
+		"path":"./持有物/饰品/手环/BraceletHigh4.png",
 		"name":"灵魂手环",
 		"en":"BraceletHigh4",
 		"type":"手环",
@@ -177,7 +177,7 @@
 		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
 	},
 	"守护手环":{
-		"path":"./持有物/饰品/手环/BraceletHigh5.webp",
+		"path":"./持有物/饰品/手环/BraceletHigh5.png",
 		"name":"守护手环",
 		"en":"BraceletHigh5",
 		"type":"手环",
@@ -186,7 +186,7 @@
 	},
 
 	"心灵手环":{
-		"path":"./持有物/饰品/手环/BraceletMediumw2.webp",
+		"path":"./持有物/饰品/手环/BraceletMediumw2.png",
 		"name":"心灵手环",
 		"en":"BraceletMediumw2",
 		"type":"手环",
@@ -194,7 +194,7 @@
 		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
 	},
 	"防护手环":{
-		"path":"./持有物/饰品/手环/BraceletMediumw3.webp",
+		"path":"./持有物/饰品/手环/BraceletMediumw3.png",
 		"name":"防护手环",
 		"en":"BraceletMediumw3",
 		"type":"手环",
@@ -203,7 +203,7 @@
 	},
 
 	"精致手环":{
-		"path":"./持有物/饰品/手环/BraceletMedium3.webp",
+		"path":"./持有物/饰品/手环/BraceletMedium3.png",
 		"name":"精致手环",
 		"en":"BraceletMedium3",
 		"type":"手环",

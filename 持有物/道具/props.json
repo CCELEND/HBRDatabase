@@ -1,19 +1,19 @@
 
 {
     "记忆碎片":{
-        "path":"./持有物/道具/ThumbnailMemoryCrystalSmall.webp", 
+        "path":"./持有物/道具/ThumbnailMemoryCrystalSmall.png", 
         "description":"用于修复记忆的素材",
         "price":"", 
         "location":"棱镜战"
     },
     "雪绒花":{
-        "path":"./持有物/道具/ThumbnailEdelweiss.webp", 
+        "path":"./持有物/道具/ThumbnailEdelweiss.png", 
         "description":"解锁档案活动的奖章内容所需的道具", 
         "price":"300 活动奖章", 
         "location":"兑换所"
     },
     "体力石":{
-        "path":"./持有物/道具/ThumbnailLifeStone.webp", 
+        "path":"./持有物/道具/ThumbnailLifeStone.png", 
         "description":"可以回复1点体力的道具", 
         "price":"", 
         "location":""
@@ -31,45 +31,45 @@
         "location":""
     },
     "晶石":{
-        "path":"./持有物/道具/ThumbnailHC.webp", 
+        "path":"./持有物/道具/ThumbnailHC.png", 
         "description":"用于扭蛋或者回复体力", 
         "price":"", 
         "location":""
     },
     "主题点数":{
-        "path":"./持有物/道具/ThumbnailThemePoint.webp", 
+        "path":"./持有物/道具/ThumbnailThemePoint.png", 
         "description":"可购买背景主题的道具", 
         "price":"", 
         "location":"恒星扫荡战线"
     },
 
     "赛季点数":{
-        "path":"./持有物/道具/ThumbnailArcadeSeasonPoint.webp", 
+        "path":"./持有物/道具/ThumbnailArcadeSeasonPoint.png", 
         "description":"讨伐敌人卡可获得相应分数\n获得一定量赛季点数后，可获得赛季奖励", 
         "price":"", 
         "location":"技术模拟战"
     },
     "技术卡奖章":{
-        "path":"./持有物/道具/ThumbnailArtsMedal.webp", 
+        "path":"./持有物/道具/ThumbnailArtsMedal.png", 
         "description":"可以在技术模拟战获得的道具\n收集技术卡奖章，可解锁新的技术卡", 
         "price":"", 
         "location":"技术模拟战"
     },
 
     "闪耀研磨膏Ⅰ":{
-        "path":"./持有物/道具/ThumbnailSynthesisBronze.webp", 
+        "path":"./持有物/道具/ThumbnailSynthesisBronze.png", 
         "description":"可以在饰品合成时获得少量经验值的素材", 
         "price":"", 
         "location":"高分挑战"
     },
     "闪耀研磨膏Ⅱ":{
-        "path":"./持有物/道具/ThumbnailSynthesisSilver.webp", 
+        "path":"./持有物/道具/ThumbnailSynthesisSilver.png", 
         "description":"可以在饰品合成时获得经验值的素材", 
         "price":"", 
         "location":"高分挑战"
     },
     "闪耀研磨膏Ⅲ":{
-        "path":"./持有物/道具/ThumbnailSynthesisGold.webp", 
+        "path":"./持有物/道具/ThumbnailSynthesisGold.png", 
         "description":"可以在饰品合成时获得不少经验值的素材", 
         "price":"", 
         "location":"高分挑战"

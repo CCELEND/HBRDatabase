@@ -2,7 +2,7 @@
 
 
 	"火之加护项链":{
-		"path":"./持有物/饰品/项链/Necklace_High2_fire_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High2_fire_w5.png",
 		"name":"火之加护项链",
 		"en":"Necklace_High2_fire_w5",
 		"type":"项链",
@@ -10,7 +10,7 @@
 		"rarity":"6","location":"炼金\n5 红宝石、5 钻石\n100,000 GP"
 	},
 	"冰之加护项链":{
-		"path":"./持有物/饰品/项链/Necklace_High2_ice_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High2_ice_w5.png",
 		"name":"冰之加护项链",
 		"en":"Necklace_High2_ice_w5",
 		"type":"项链",
@@ -18,7 +18,7 @@
 		"rarity":"6","location":"炼金\n5 蓝宝石、5 钻石\n100,000 GP"
 	},
 	"雷之加护项链":{
-		"path":"./持有物/饰品/项链/Necklace_High2_thunder_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High2_thunder_w5.png",
 		"name":"雷之加护项链",
 		"en":"Necklace_High2_thunder_w5",
 		"type":"项链",
@@ -26,7 +26,7 @@
 		"rarity":"6","location":"炼金\n5 黄玉、5 钻石\n100,000 GP"
 	},
 	"光之加护项链":{
-		"path":"./持有物/饰品/项链/Necklace_High2_light_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High2_light_w5.png",
 		"name":"光之加护项链",
 		"en":"Necklace_High2_light_w5",
 		"type":"项链",
@@ -34,7 +34,7 @@
 		"rarity":"6","location":"炼金\n5 珍珠、5 钻石\n100,000 GP"
 	},
 	"暗之加护项链":{
-		"path":"./持有物/饰品/项链/Necklace_High2_dark_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High2_dark_w5.png",
 		"name":"暗之加护项链",
 		"en":"Necklace_High2_dark_w5",
 		"type":"项链",
@@ -42,7 +42,7 @@
 		"rarity":"6","location":"炼金\n5 缟玛瑙、5 钻石\n100,000 GP"
 	},
 	"幸甚项链":{
-		"path":"./持有物/饰品/项链/Necklace_High1_ice_w5.webp",
+		"path":"./持有物/饰品/项链/Necklace_High1_ice_w5.png",
 		"name":"幸甚项链",
 		"en":"Necklace_High1_ice_w5",
 		"type":"项链",
@@ -51,7 +51,7 @@
 	},
 
 	"天命项链":{
-		"path":"./持有物/饰品/项链/NecklaceHighw4.webp",
+		"path":"./持有物/饰品/项链/NecklaceHighw4.png",
 		"name":"天命项链",
 		"en":"NecklaceHighw4",
 		"type":"项链",
@@ -59,7 +59,7 @@
 		"rarity":"5","location":"棱镜战：等级9\n棱镜战：等级10"
 	},
 	"女神项链":{
-		"path":"./持有物/饰品/项链/NecklaceHighw1.webp",
+		"path":"./持有物/饰品/项链/NecklaceHighw1.png",
 		"name":"女神项链",
 		"en":"NecklaceHighw1",
 		"type":"项链",
@@ -68,7 +68,7 @@
 	},
 
 	"祝福项链":{
-		"path":"./持有物/饰品/项链/NecklaceHigh4.webp",
+		"path":"./持有物/饰品/项链/NecklaceHigh4.png",
 		"name":"祝福项链",
 		"en":"NecklaceHigh4",
 		"type":"项链",
@@ -76,7 +76,7 @@
 		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
 	},
 	"大天使项链":{
-		"path":"./持有物/饰品/项链/NecklaceHighw3.webp",
+		"path":"./持有物/饰品/项链/NecklaceHighw3.png",
 		"name":"大天使项链",
 		"en":"NecklaceHighw3",
 		"type":"项链",
@@ -85,7 +85,7 @@
 	},
 
 	"运气项链":{
-		"path":"./持有物/饰品/项链/Necklacemediumw1.webp",
+		"path":"./持有物/饰品/项链/Necklacemediumw1.png",
 		"name":"运气项链",
 		"en":"Necklacemediumw1",
 		"type":"项链",
@@ -93,7 +93,7 @@
 		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
 	},
 	"命运项链":{
-		"path":"./持有物/饰品/项链/NecklaceMediumw4.webp",
+		"path":"./持有物/饰品/项链/NecklaceMediumw4.png",
 		"name":"命运项链",
 		"en":"NecklaceMediumw4",
 		"type":"项链",
@@ -102,7 +102,7 @@
 	},
 
 	"天使项链":{
-		"path":"./持有物/饰品/项链/NecklaceMediumw3.webp",
+		"path":"./持有物/饰品/项链/NecklaceMediumw3.png",
 		"name":"天使项链",
 		"en":"NecklaceMediumw3",
 		"type":"项链",
@@ -111,7 +111,7 @@
 	},
 
 	"幸运项链":{
-		"path":"./持有物/饰品/项链/NecklaceMedium4.webp",
+		"path":"./持有物/饰品/项链/NecklaceMedium4.png",
 		"name":"幸运项链",
 		"en":"NecklaceMedium4",
 		"type":"项链",

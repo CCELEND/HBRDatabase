@@ -162,10 +162,14 @@ def delete_webp_files(directory: str) -> None:
     
     # 遍历目录及其子目录中的所有.webp文件
     for webp_file in dir_path.rglob('*.webp'):
-        try:
-            # 删除文件
-            webp_file.unlink()
-        except PermissionError:
-            print(f"[-] 没有权限删除 {webp_file}")
-        except Exception as e:
-            print(f"[-] 删除 {webp_file} 时出错: {e}")
+        # 构建同名PNG文件路径
+        png_file = webp_file.with_suffix('.png')
+        # 检查PNG文件是否存在
+        if png_file.exists():
+            try:
+                # 删除文件
+                webp_file.unlink()
+            except PermissionError:
+                print(f"[-] 没有权限删除 {webp_file}")
+            except Exception as e:
+                print(f"[-] 删除 {webp_file} 时出错: {e}")

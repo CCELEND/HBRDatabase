@@ -13,7 +13,7 @@ def show_holding(parent_frame, data_dir):
     # 图片大小
     base_size = (100, 100)
     halo_size = (96, 96)
-    item_size = (66, 66)#(70,70)
+    item_size = (70, 70)#(70,70)(66, 66)
 
     # 获取 Base 图对象
     base_photo = get_photo(base_path, base_size)
@@ -45,7 +45,7 @@ def show_holding(parent_frame, data_dir):
         # 设置 Halo 图坐标
         row_canvas.create_image(2, 2, anchor="nw", image=halo_photo)  # `z-index` 高于 Base
         # 设置 item 图坐标（70x70 居中）
-        row_canvas.create_image(17, 17, anchor="nw", image=item_photo)
+        row_canvas.create_image(15, 15, anchor="nw", image=item_photo)
 
         # 右侧信息 Frame（放描述和价格和获取地点）
         info_frame = ttk.Frame(inner_frame)

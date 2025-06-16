@@ -1,25 +1,25 @@
 
 {
     "A":{
-        "path":"./持有物/碎片/ImgIconItemL_StylePieceA.webp", 
+        "path":"./持有物/碎片/ImgIconItemL_StylePieceA.png", 
         "description":"Rank A风格用的万能强化素材",
         "price":"50 活动奖章", 
         "location":"转换剩余的风格碎片\n兑换所"
     },
     "S":{
-        "path":"./持有物/碎片/ImgIconItemL_StylePieceS.webp", 
+        "path":"./持有物/碎片/ImgIconItemL_StylePieceS.png", 
         "description":"Rank S风格用的万能强化素材", 
         "price":"150 活动奖章", 
         "location":"转换剩余的风格碎片\n兑换所"
     },
     "SS":{
-        "path":"./持有物/碎片/ImgIconItemL_StylePieceSS.webp", 
+        "path":"./持有物/碎片/ImgIconItemL_StylePieceSS.png", 
         "description":"Rank SS风格用的万能强化素材", 
         "price":"500 活动奖章\n100 高级奖章", 
         "location":"转换剩余的风格碎片\n兑换所\n高级奖章兑换所"
     },
     "PiecePoint/碎片点数":{
-        "path":"./持有物/碎片/ThumbnailPiecePoint.webp", 
+        "path":"./持有物/碎片/ThumbnailPiecePoint.png", 
         "description":"万能风格碎片（Rank A）与万能风格碎片（Rank S）\n可使用「万能碎片转换」功能转换为碎片点数\n希望将万能风格碎片（Rank SS）转换为碎片点数时，请联系客服\nA=>1 PiecePoint，S=>10 PiecePoint，SS<=>250 PiecePoint", 
         "price":"", 
         "location":"万能碎片转换"

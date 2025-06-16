@@ -1,6 +1,6 @@
 {
 	"力量吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Power1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Power1.png",
 		"name":"力量吊饰",
 		"en":"Charm_Power",
 		"type":"吊饰",
@@ -9,7 +9,7 @@
 	},
 
 	"灵巧吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Dexterity1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Dexterity1.png",
 		"name":"灵巧吊饰",
 		"en":"Charm_Dexterity",
 		"type":"吊饰",
@@ -18,7 +18,7 @@
 	},
 
 	"体力吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Toughness1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Toughness1.png",
 		"name":"体力吊饰",
 		"en":"Charm_Toughness",
 		"type":"吊饰",
@@ -27,7 +27,7 @@
 	},
 
 	"精神吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Spirit1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Spirit1.png",
 		"name":"精神吊饰",
 		"en":"Charm_Spirit",
 		"type":"吊饰",
@@ -36,7 +36,7 @@
 	},
 	
 	"智慧吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Wisdom1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Wisdom1.png",
 		"name":"智慧吊饰",
 		"en":"Charm_Wisdom",
 		"type":"吊饰",
@@ -45,7 +45,7 @@
 	},
 	
 	"运气吊饰":{
-		"path":"./持有物/饰品/吊饰/Charm_Luck1.webp",
+		"path":"./持有物/饰品/吊饰/Charm_Luck1.png",
 		"name":"运气吊饰",
 		"en":"Charm_Luck",
 		"type":"吊饰",

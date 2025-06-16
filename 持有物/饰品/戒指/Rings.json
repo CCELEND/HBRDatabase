@@ -1,7 +1,7 @@
 {
 
 	"炎之戒指":{
-		"path":"./持有物/饰品/戒指/Ring_High1_fire_w1.webp",
+		"path":"./持有物/饰品/戒指/Ring_High1_fire_w1.png",
 		"name":"炎之戒指",
 		"en":"Ring_High1_fire_w1",
 		"type":"戒指",
@@ -9,7 +9,7 @@
 		"rarity":"6","location":"炎之回廊"
 	},
 	"冰之戒指":{
-		"path":"./持有物/饰品/戒指/Ring_High1_ice_w1.webp",
+		"path":"./持有物/饰品/戒指/Ring_High1_ice_w1.png",
 		"name":"冰之戒指",
 		"en":"Ring_High1_ice_w1",
 		"type":"戒指",
@@ -17,7 +17,7 @@
 		"rarity":"6","location":"冰之回廊"
 	},
 	"雷之戒指":{
-		"path":"./持有物/饰品/戒指/Ring_High1_thunder_w1.webp",
+		"path":"./持有物/饰品/戒指/Ring_High1_thunder_w1.png",
 		"name":"雷之戒指",
 		"en":"Ring_High1_thunder_w1",
 		"type":"戒指",
@@ -25,7 +25,7 @@
 		"rarity":"6","location":"雷之回廊"
 	},
 	"光之戒指":{
-		"path":"./持有物/饰品/戒指/Ring_High1_light_w1.webp",
+		"path":"./持有物/饰品/戒指/Ring_High1_light_w1.png",
 		"name":"光之戒指",
 		"en":"Ring_High1_light_w1",
 		"type":"戒指",
@@ -33,7 +33,7 @@
 		"rarity":"6","location":"光之回廊"
 	},
 	"暗之戒指":{
-		"path":"./持有物/饰品/戒指/Ring_High1_dark_w1.webp",
+		"path":"./持有物/饰品/戒指/Ring_High1_dark_w1.png",
 		"name":"暗之戒指",
 		"en":"Ring_High1_dark_w1",
 		"type":"戒指",
@@ -42,7 +42,7 @@
 	},
 
 	"神秘戒指":{
-		"path":"./持有物/饰品/戒指/RingHighw5.webp",
+		"path":"./持有物/饰品/戒指/RingHighw5.png",
 		"name":"神秘戒指",
 		"en":"RingHighw5",
 		"type":"戒指",
@@ -50,7 +50,7 @@
 		"rarity":"5","location":"棱镜战：等级9\n棱镜战：等级10"
 	},
 	"奥义戒指":{
-		"path":"./持有物/饰品/戒指/RingHighw4.webp",
+		"path":"./持有物/饰品/戒指/RingHighw4.png",
 		"name":"奥义戒指",
 		"en":"RingHighw4",
 		"type":"戒指",
@@ -59,7 +59,7 @@
 	},
 
 	"游侠戒指":{
-		"path":"./持有物/饰品/戒指/RingHighw3.webp",
+		"path":"./持有物/饰品/戒指/RingHighw3.png",
 		"name":"游侠戒指",
 		"en":"RingHighw3",
 		"type":"戒指",
@@ -67,7 +67,7 @@
 		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
 	},
 	"战士戒指":{
-		"path":"./持有物/饰品/戒指/RingHighw2.webp",
+		"path":"./持有物/饰品/戒指/RingHighw2.png",
 		"name":"战士戒指",
 		"en":"RingHighw2",
 		"type":"戒指",
@@ -75,7 +75,7 @@
 		"rarity":"4","location":"棱镜战：等级6\n棱镜战：等级7\n棱镜战：等级8"
 	},
 	"密银戒指":{
-		"path":"./持有物/饰品/戒指/RingHigh1.webp",
+		"path":"./持有物/饰品/戒指/RingHigh1.png",
 		"name":"密银戒指",
 		"en":"RingHighw1",
 		"type":"戒指",
@@ -84,7 +84,7 @@
 	},
 
 	"狙击手戒指":{
-		"path":"./持有物/饰品/戒指/RingMediumw1.webp",
+		"path":"./持有物/饰品/戒指/RingMediumw1.png",
 		"name":"狙击手戒指",
 		"en":"RingMediumw1",
 		"type":"戒指",
@@ -92,7 +92,7 @@
 		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
 	},
 	"斗士戒指":{
-		"path":"./持有物/饰品/戒指/RingMediumw3.webp",
+		"path":"./持有物/饰品/戒指/RingMediumw3.png",
 		"name":"斗士戒指",
 		"en":"RingMediumw3",
 		"type":"戒指",
@@ -100,7 +100,7 @@
 		"rarity":"3","location":"棱镜战：等级4\n棱镜战：等级5"
 	},
 	"白金戒指":{
-		"path":"./持有物/饰品/戒指/RingMediumw4.webp",
+		"path":"./持有物/饰品/戒指/RingMediumw4.png",
 		"name":"白金戒指",
 		"en":"RingMediumw4",
 		"type":"戒指",
@@ -109,7 +109,7 @@
 	},
 
 	"技巧戒指":{
-		"path":"./持有物/饰品/戒指/RingMedium3.webp",
+		"path":"./持有物/饰品/戒指/RingMedium3.png",
 		"name":"技巧戒指",
 		"en":"RingMedium3",
 		"type":"戒指",
@@ -117,7 +117,7 @@
 		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
 	},
 	"能量戒指":{
-		"path":"./持有物/饰品/戒指/RingMedium2.webp",
+		"path":"./持有物/饰品/戒指/RingMedium2.png",
 		"name":"能量戒指",
 		"en":"RingMedium2",
 		"type":"戒指",
@@ -125,7 +125,7 @@
 		"rarity":"2","location":"棱镜战：等级2\n棱镜战：等级3"
 	},
 	"激情戒指":{
-		"path":"./持有物/饰品/戒指/RingMedium1.webp",
+		"path":"./持有物/饰品/戒指/RingMedium1.png",
 		"name":"激情戒指",
 		"en":"RingMedium1",
 		"type":"戒指",
@@ -135,7 +135,7 @@
 
 
 	"精致戒指":{
-		"path":"./持有物/饰品/戒指/Ringloww2.webp",
+		"path":"./持有物/饰品/戒指/Ringloww2.png",
 		"name":"精致戒指",
 		"en":"Ringloww2",
 		"type":"戒指",
@@ -143,7 +143,7 @@
 		"rarity":"1","location":"棱镜战：等级1"
 	},
 	"光面戒指":{
-		"path":"./持有物/饰品/戒指/Ringlow1.webp",
+		"path":"./持有物/饰品/戒指/Ringlow1.png",
 		"name":"光面戒指",
 		"en":"Ringlow1",
 		"type":"戒指",

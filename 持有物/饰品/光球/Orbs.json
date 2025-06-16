@@ -1,7 +1,7 @@
 {
 
 	"暴击光球":{
-		"path":"./持有物/饰品/光球/Orb1_fire.webp",
+		"path":"./持有物/饰品/光球/Orb1_fire.png",
 		"name":"暴击光球",
 		"en":"Orb1_fire",
 		"type":"光球",
@@ -13,7 +13,7 @@
 		]
 	},
 	"复活光球":{
-		"path":"./持有物/饰品/光球/Orb1_ice.webp",
+		"path":"./持有物/饰品/光球/Orb1_ice.png",
 		"name":"复活光球",
 		"en":"Orb1_ice",
 		"type":"光球",
@@ -25,7 +25,7 @@
 		]
 	},
 	"驱动光球":{
-		"path":"./持有物/饰品/光球/Orb1_thunder.webp",
+		"path":"./持有物/饰品/光球/Orb1_thunder.png",
 		"name":"驱动光球",
 		"en":"Orb1_thunder",
 		"type":"光球",
@@ -37,7 +37,7 @@
 		]
 	},
 	"防护光球":{
-		"path":"./持有物/饰品/光球/Orb1_light.webp",
+		"path":"./持有物/饰品/光球/Orb1_light.png",
 		"name":"防护光球",
 		"en":"Orb1_light",
 		"type":"光球",
@@ -49,7 +49,7 @@
 		]
 	},
 	"强攻光球":{
-		"path":"./持有物/饰品/光球/Orb1_dark.webp",
+		"path":"./持有物/饰品/光球/Orb1_dark.png",
 		"name":"强攻光球",
 		"en":"Orb1_dark",
 		"type":"光球",
@@ -62,7 +62,7 @@
 	},
 
 	"集中光球":{
-		"path":"./持有物/饰品/光球/Orb2_fire.webp",
+		"path":"./持有物/饰品/光球/Orb2_fire.png",
 		"name":"集中光球",
 		"en":"Orb2_fire",
 		"type":"光球",
@@ -74,7 +74,7 @@
 		]
 	},
 	"填充光球":{
-		"path":"./持有物/饰品/光球/Orb2_ice.webp",
+		"path":"./持有物/饰品/光球/Orb2_ice.png",
 		"name":"填充光球",
 		"en":"Orb2_ice",
 		"type":"光球",
@@ -87,7 +87,7 @@
 		
 	},
 	"治愈光球":{
-		"path":"./持有物/饰品/光球/Orb2_thunder.webp",
+		"path":"./持有物/饰品/光球/Orb2_thunder.png",
 		"name":"治愈光球",
 		"en":"Orb2_thunder",
 		"type":"光球",
@@ -99,7 +99,7 @@
 		]
 	},
 	"软化光球":{
-		"path":"./持有物/饰品/光球/Orb2_light.webp",
+		"path":"./持有物/饰品/光球/Orb2_light.png",
 		"name":"软化光球",
 		"en":"Orb2_light",
 		"type":"光球",
@@ -111,7 +111,7 @@
 		]
 	},
 	"衰灭光球":{
-		"path":"./持有物/饰品/光球/Orb2_dark.webp",
+		"path":"./持有物/饰品/光球/Orb2_dark.png",
 		"name":"衰灭光球",
 		"en":"Orb2_dark",
 		"type":"光球",
@@ -125,7 +125,7 @@
 
 
 	"加重光球（冰）":{
-		"path":"./持有物/饰品/光球/Orb3_ice.webp",
+		"path":"./持有物/饰品/光球/Orb3_ice.png",
 		"name":"加重光球（冰）",
 		"en":"Orb3_ice",
 		"type":"光球",
@@ -137,7 +137,7 @@
 		]
 	},
 	"加重光球（雷）":{
-		"path":"./持有物/饰品/光球/Orb3_thunder.webp",
+		"path":"./持有物/饰品/光球/Orb3_thunder.png",
 		"name":"加重光球（雷）",
 		"en":"Orb3_thunder",
 		"type":"光球",
@@ -149,7 +149,7 @@
 		]
 	},
 	"加重光球（暗）":{
-		"path":"./持有物/饰品/光球/Orb3_dark.webp",
+		"path":"./持有物/饰品/光球/Orb3_dark.png",
 		"name":"加重光球（暗）",
 		"en":"Orb3_dark",
 		"type":"光球",
