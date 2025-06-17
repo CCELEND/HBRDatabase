@@ -59,19 +59,19 @@
     },
 
     "闪耀研磨膏Ⅰ":{
-        "path":"./持有物/道具/ThumbnailSynthesisBronze.png", 
+        "path":"./持有物/饰品材料/ThumbnailSynthesisBronze.png", 
         "description":"可以在饰品合成时获得少量经验值的素材", 
         "price":"", 
         "location":"高分挑战"
     },
     "闪耀研磨膏Ⅱ":{
-        "path":"./持有物/道具/ThumbnailSynthesisSilver.png", 
+        "path":"./持有物/饰品材料/ThumbnailSynthesisSilver.png", 
         "description":"可以在饰品合成时获得经验值的素材", 
         "price":"", 
         "location":"高分挑战"
     },
     "闪耀研磨膏Ⅲ":{
-        "path":"./持有物/道具/ThumbnailSynthesisGold.png", 
+        "path":"./持有物/饰品材料/ThumbnailSynthesisGold.png", 
         "description":"可以在饰品合成时获得不少经验值的素材", 
         "price":"", 
         "location":"高分挑战"
