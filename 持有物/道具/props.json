@@ -36,6 +36,18 @@
         "price":"", 
         "location":""
     },
+    "每月轻量通行证":{
+        "path":"./持有物/道具/ThumbnailLitePass.png", 
+        "description":"激活后，根据每月任务的完成情况\n可获得各类丰富的道具奖励", 
+        "price":"", 
+        "location":""
+    },
+    "每月豪华通行证":{
+        "path":"./持有物/道具/ThumbnailPremiumPass.png", 
+        "description":"激活后，根据每月任务的完成情况\n可获得各类丰富的道具奖励", 
+        "price":"", 
+        "location":""
+    },
     "主题点数":{
         "path":"./持有物/道具/ThumbnailThemePoint.png", 
         "description":"可购买背景主题的道具", 
