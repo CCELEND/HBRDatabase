@@ -56,6 +56,25 @@
         "description":"炼金和技能进化所使用的道具",
         "price":"10 高级奖章", 
         "location":"宝石棱镜战\n高级奖章兑换所"
+    },
+
+    "闪耀研磨膏Ⅰ":{
+        "path":"./持有物/道具/ThumbnailSynthesisBronze.png", 
+        "description":"可以在饰品合成时获得少量经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
+    },
+    "闪耀研磨膏Ⅱ":{
+        "path":"./持有物/道具/ThumbnailSynthesisSilver.png", 
+        "description":"可以在饰品合成时获得经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
+    },
+    "闪耀研磨膏Ⅲ":{
+        "path":"./持有物/道具/ThumbnailSynthesisGold.png", 
+        "description":"可以在饰品合成时获得不少经验值的素材", 
+        "price":"", 
+        "location":"高分挑战"
     }
 
 } 
