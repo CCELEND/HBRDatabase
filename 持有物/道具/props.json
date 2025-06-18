@@ -12,6 +12,12 @@
         "price":"300 活动奖章", 
         "location":"兑换所"
     },
+    "Rank经验":{
+        "path":"./持有物/道具/ImgIconItemL_Exp_zhTW.png", 
+        "description":"Rank经验", 
+        "price":"", 
+        "location":""
+    },
     "体力石":{
         "path":"./持有物/道具/ThumbnailLifeStone.png", 
         "description":"可以回复1点体力的道具", 
