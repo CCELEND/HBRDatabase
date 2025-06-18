@@ -3,7 +3,7 @@
 
 "[幻影]深渊重锤":
 {
-    "img_path":"./敌人/棱镜战/[幻影]深渊重锤/[幻影]深渊重锤.png",
+    "img_path":"./敌人/棱镜战/[幻影]深渊重锤/AbyssKnockerDefault_Prism.png",
     "logo_path":"./敌人/棱镜战/[幻影]深渊重锤/[幻影]深渊重锤.ico",
     "name":"[幻影]深渊重锤",
     "guide_path":"./敌人/棱镜战/[幻影]深渊重锤/syzc.png"
@@ -11,7 +11,7 @@
 
 "[幻影]钻石眼魔":
 {
-    "img_path":"./敌人/棱镜战/[幻影]钻石眼魔/[幻影]钻石眼魔.png",
+    "img_path":"./敌人/棱镜战/[幻影]钻石眼魔/DiamondEyeballSmall_Prism.png",
     "logo_path":"./敌人/棱镜战/[幻影]钻石眼魔/[幻影]钻石眼魔.ico",
     "name":"[幻影]钻石眼魔",
     "guide_path":"./敌人/棱镜战/[幻影]钻石眼魔/zsym.png"
@@ -19,7 +19,7 @@
 
 "[幻影]针嘴鸟":
 {
-    "img_path":"./敌人/棱镜战/[幻影]针嘴鸟/[幻影]针嘴鸟.png",
+    "img_path":"./敌人/棱镜战/[幻影]针嘴鸟/NeedleBirdSmall_Prism #136077.png",
     "logo_path":"./敌人/棱镜战/[幻影]针嘴鸟/[幻影]针嘴鸟.ico",
     "name":"[幻影]针嘴鸟",
     "guide_path":"./敌人/棱镜战/[幻影]针嘴鸟/zzn.png"

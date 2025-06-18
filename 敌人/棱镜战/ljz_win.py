@@ -21,9 +21,9 @@ def load_resources():
 # 绑定棱镜战 canvas 的事件
 def bind_ljz_canvas(parent_frame, ljz, x, y):
 
-    photo = get_photo(ljz.img_path, (90, 90))
+    photo = get_photo(ljz.img_path, (128, 176))
     canvas = create_canvas_with_image(parent_frame, 
-        photo, 130, 130, 20, 20, x, y)
+        photo, 150, 176, 65, 0, x, y)
     mouse_bind_canvas_events(canvas)
 
     if ljz.guide_path:

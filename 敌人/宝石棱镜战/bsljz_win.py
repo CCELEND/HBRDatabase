@@ -22,9 +22,9 @@ def load_resources():
 # 绑定宝石棱镜战 canvas 的事件
 def bind_bsljz_canvas(parent_frame, bsljz, x, y):
 
-    photo = get_photo(bsljz.img_path, (90, 90))
+    photo = get_photo(bsljz.img_path, (128, 176))
     canvas = create_canvas_with_image(parent_frame, 
-        photo, 130, 130, 20, 20, x, y)
+        photo, 150, 176, 35, 0, x, y)
     mouse_bind_canvas_events(canvas)
 
     if bsljz.guide_path:
