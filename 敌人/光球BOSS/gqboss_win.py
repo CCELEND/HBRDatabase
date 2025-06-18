@@ -23,9 +23,9 @@ def load_resources():
 # 绑定光球BOSS canvas 的事件
 def bind_gqboss_canvas(parent_frame, gqboss, x, y):
 
-    photo = get_photo(gqboss.img_path, (90, 90))
+    photo = get_photo(gqboss.img_path, (149, 210))
     canvas = create_canvas_with_image(parent_frame, 
-        photo, 130, 130, 20, 20, x, y)
+        photo, 160, 210, 20, 0, x, y)
     mouse_bind_canvas_events(canvas)
 
     if gqboss.guide_path:
