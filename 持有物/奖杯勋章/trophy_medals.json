@@ -128,38 +128,38 @@
     },
 
     "挑战灾祸者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Bronze.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Bronze.png", 
         "description":"通关B层级时\n可在恒星扫荡战线#6获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#6"
     },
     "击破灾祸者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Silver.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Silver.png", 
         "description":"通关X层级时\n可在恒星扫荡战线#6获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#6"
     },
     "超越灾祸者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Gold.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension07_Gold.png", 
         "description":"在10回合内通关X层级时\n可在恒星扫荡战线#6获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#6"
     },
 
     "制霸异兽者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Bronze.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Bronze.png", 
         "description":"通关B层级时\n可在恒星扫荡战线#7获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#7"
     },
     "狩猎异兽者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Silver.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Silver.png", 
         "description":"通关X层级时\n可在恒星扫荡战线#7获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#7"
     },
     "征伐异兽者之证":{
-        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Gold.webp", 
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension08_Gold.png", 
         "description":"在15回合内通关X层级时\n可在恒星扫荡战线#7获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#7"
