@@ -83,7 +83,6 @@ def download_files_with_progress(files_to_download, server_url):
                     # 检查是否是错误响应
                     if response.status_code != 200:
                         err_info = response.json()
-                        # error_var.set(f"错误: {err_info.get('error', '未知错误')}")
                         messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
                         global is_updating
                         is_updating = False
