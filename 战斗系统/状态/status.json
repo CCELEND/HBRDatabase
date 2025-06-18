@@ -757,6 +757,14 @@
         "type":"减益",
         "series":"负面情绪"         
     },
+    "暴击率下降":{
+        "name":"暴击率下降",
+        "path":"./战斗系统/状态/CriticalRateDown.webp",
+        "effect":"暴击率下降","description":"暴击率下降",
+        "stack":"-",
+        "type":"减益",
+        "series":"暴击率下降"         
+    },
 
 
     "光弱点强击破":{
