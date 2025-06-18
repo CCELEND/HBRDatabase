@@ -55,12 +55,12 @@ def download_files_with_progress(files_to_download, server_url):
     # error_var = tk.StringVar()
     # error_label = tk.Label(progress_window, textvariable=error_var, fg="red")
     # error_label.pack()
-    
 
     def check_completion():
         if progress['value'] < progress['maximum']:
             progress_window.after(100, check_completion)
         else:
+            global is_updating
             is_updating = False
             status_var.set("更新完成！")
             confirm_restart("更新完成")
@@ -90,6 +90,7 @@ def download_files_with_progress(files_to_download, server_url):
                         err_info = response.json()
                         # error_var.set(f"错误: {err_info.get('error', '未知错误')}")
                         messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
+                        global is_updating
                         is_updating = False
                         break
                     
@@ -135,7 +136,7 @@ def download_files_from_server(server_url, files_to_download):
         global is_updating
         is_updating = True
         download_files_with_progress(files_to_download, server_url)
-        
+
     else:
         messagebox.showinfo("提示", "已是最新版本")
         
