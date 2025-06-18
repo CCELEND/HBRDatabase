@@ -149,8 +149,8 @@ def webp_to_ico(size=(80, 66)):
 
 def delete_webp_files(directory: str) -> None:
 
-    if os.path.exists("./持有物/饰品/专武/Soul_png.png"):
-        return
+    # if os.path.exists("./持有物/饰品/专武/Soul_png.png"):
+    #     return
 
     # 检查目录是否存在
     if not os.path.exists(directory):
