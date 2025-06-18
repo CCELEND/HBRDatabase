@@ -335,8 +335,14 @@
     "1008303":{
         "style_name":"蓝色石榴石", "character_role":"破盾者", "element_type":"无", "weapon_type":"突"
     },
+    "1008304":{
+        "style_name":"月下捉迷藏", "character_role":"破盾者", "element_type":"无", "weapon_type":"突"
+    },
     "1008403":{
         "style_name":"凛然的杜尔迦", "character_role":"防御者", "element_type":"无", "weapon_type":"打"
+    },
+    "1008405":{
+        "style_name":"美丽圣虎", "character_role":"治疗者", "element_type":"无", "weapon_type":"打"
     },
     "1008503":{
         "style_name":"血红浮雕", "character_role":"治疗者", "element_type":"冰", "weapon_type":"打"
