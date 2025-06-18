@@ -135,33 +135,7 @@ def download_files_from_server(server_url, files_to_download):
         global is_updating
         is_updating = True
         download_files_with_progress(files_to_download, server_url)
-
-        # err_flag = False
-        # err_info = ""
-        # file = ""
-        # for file_name in files_to_download:
-        #     file = file_name
-        #     creat_directory(file_name)
-
-        #     # 编码特殊字符
-        #     encoded_name = quote(file_name)
-        #     # 服务器响应
-        #     response = requests.get(f"{server_url}/download/{encoded_name}")
-
-        #     if response.content.startswith(b'{"error"'):
-        #         err_info = response.content.decode('utf-8')
-        #         err_flag = True
-        #         break
-
-        #     # 保存文件
-        #     with open(file_name, 'wb') as f:
-        #         f.write(response.content)
-        #     print(f"更新：'{file_name}'")
-
-        # if err_flag:
-        #     messagebox.showerror("错误", f"文件 '{file}' 下载失败\n请重试 {err_info}")
-        # else:
-        #     confirm_restart("更新完成")
+        
     else:
         messagebox.showinfo("提示", "已是最新版本")
         
