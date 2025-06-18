@@ -1003,7 +1003,7 @@
     },
     "ShieldAttributeFire":{
         "name":"ShieldAttributeFire",
-        "path":"./战斗系统/状态/ShieldAttributeFire.webp",
+        "path":"./战斗系统/状态/ShieldAttributeFire.png",
         "effect":"E-Shield激活时DR（破坏率）不会增加\n使用多次命中攻击摧毁E-Shield\n推荐元素：火","description":"E-Shield激活时DR不会增加。\n使用多次命中攻击摧毁E-Shield\n推荐元素：火",
         "stack":"-",
         "type":"其他",
@@ -1011,8 +1011,32 @@
     },
     "ShieldAttributeIce":{
         "name":"ShieldAttributeIce",
-        "path":"./战斗系统/状态/ShieldAttributeIce.webp",
+        "path":"./战斗系统/状态/ShieldAttributeIce.png",
         "effect":"E-Shield激活时DR（破坏率）不会增加\n使用多次命中攻击摧毁E-Shield\n推荐元素：冰","description":"E-Shield激活时DR不会增加。\n使用多次命中攻击摧毁E-Shield\n推荐元素：冰",
+        "stack":"-",
+        "type":"其他",
+        "series":"EShield"          
+    },
+    "ShieldAttributeElectric":{
+        "name":"ShieldAttributeElectric",
+        "path":"./战斗系统/状态/ShieldAttributeElectric.png",
+        "effect":"E-Shield激活时DR（破坏率）不会增加\n使用多次命中攻击摧毁E-Shield\n推荐元素：雷","description":"E-Shield激活时DR不会增加。\n使用多次命中攻击摧毁E-Shield\n推荐元素：雷",
+        "stack":"-",
+        "type":"其他",
+        "series":"EShield"          
+    },
+    "ShieldAttributeLight":{
+        "name":"ShieldAttributeLight",
+        "path":"./战斗系统/状态/ShieldAttributeLight.png",
+        "effect":"E-Shield激活时DR（破坏率）不会增加\n使用多次命中攻击摧毁E-Shield\n推荐元素：光","description":"E-Shield激活时DR不会增加。\n使用多次命中攻击摧毁E-Shield\n推荐元素：光",
+        "stack":"-",
+        "type":"其他",
+        "series":"EShield"          
+    },
+    "ShieldAttributeDark":{
+        "name":"ShieldAttributeDark",
+        "path":"./战斗系统/状态/ShieldAttributeDark.png",
+        "effect":"E-Shield激活时DR（破坏率）不会增加\n使用多次命中攻击摧毁E-Shield\n推荐元素：暗","description":"E-Shield激活时DR不会增加。\n使用多次命中攻击摧毁E-Shield\n推荐元素：暗",
         "stack":"-",
         "type":"其他",
         "series":"EShield"          
