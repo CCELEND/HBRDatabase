@@ -23,7 +23,7 @@ def bind_ljz_canvas(parent_frame, ljz, x, y):
 
     photo = get_photo(ljz.img_path, (128, 176))
     canvas = create_canvas_with_image(parent_frame, 
-        photo, 150, 176, 65, 0, x, y)
+        photo, 150, 176, 60, 0, x, y)
     mouse_bind_canvas_events(canvas)
 
     if ljz.guide_path:
