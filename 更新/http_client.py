@@ -51,11 +51,6 @@ def download_files_with_progress(files_to_download, server_url):
     file_label = tk.Label(progress_window, textvariable=file_var)
     file_label.pack(pady=10)
     
-    # # 错误标签
-    # error_var = tk.StringVar()
-    # error_label = tk.Label(progress_window, textvariable=error_var, fg="red")
-    # error_label.pack()
-
     def check_completion():
         if progress['value'] < progress['maximum']:
             progress_window.after(100, check_completion)
@@ -113,7 +108,6 @@ def download_files_with_progress(files_to_download, server_url):
                                     progress_window.update()
             
             except Exception as e:
-                # error_var.set(f"下载 '{file_name}' 失败\n{str(e)}")
                 messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
                 is_updating = False
                 break
