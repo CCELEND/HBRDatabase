@@ -8,7 +8,7 @@
 
 ## 使用
 
-运行 HBRDatabaseGUI.py 即可
+运行 HBRDatabaseGUI.py 即可，无控制台窗口运行：HBRDatabaseGUI.pyw
 
 ### 角色
 
