@@ -4,4 +4,4 @@ chrome_user_data/
 .idea/
 *.flac
 *.mp3
-config.ini
+工具/GetEntriesGUILocal/config.ini
