@@ -4,8 +4,8 @@ from ttkbootstrap.constants import *
 from canvas_events import get_photo, create_canvas_with_image
 
 # 图片背景路径
-base_path = "./持有物/图片背景/ThumbnailBase.webp"
-halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
+base_path = "./持有物/图片背景/ThumbnailBase.png"
+halo_path = "./持有物/图片背景/ThumbnailHalo.png"
 
 # 加载图片并显示的函数
 def show_holding(parent_frame, data_dir):
@@ -13,7 +13,7 @@ def show_holding(parent_frame, data_dir):
     # 图片大小
     base_size = (100, 100)
     halo_size = (96, 96)
-    item_size = (70, 70)#(70,70)(66, 66)
+    item_size = (80, 80)#(70,70)
 
     # 获取 Base 图对象
     base_photo = get_photo(base_path, base_size)
@@ -45,7 +45,7 @@ def show_holding(parent_frame, data_dir):
         # 设置 Halo 图坐标
         row_canvas.create_image(2, 2, anchor="nw", image=halo_photo)  # `z-index` 高于 Base
         # 设置 item 图坐标（70x70 居中）
-        row_canvas.create_image(15, 15, anchor="nw", image=item_photo)
+        row_canvas.create_image(10, 10, anchor="nw", image=item_photo)
 
         # 右侧信息 Frame（放描述和价格和获取地点）
         info_frame = ttk.Frame(inner_frame)

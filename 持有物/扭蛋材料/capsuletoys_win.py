@@ -6,10 +6,11 @@ from canvas_events import get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 
 from tools import load_json
+import 持有物.holding_win
 
 # 图片背景路径
-base_path = "./持有物/图片背景/ThumbnailBase.webp"
-halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
+# base_path = "./持有物/图片背景/ThumbnailBase.webp"
+# halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
 
 capsuletoys_json = {}
 # 加载资源文件
@@ -30,9 +31,9 @@ def show_capsuletoys(scrollbar_frame_obj):
     item_size = (80, 80)
 
     # 获取 Base 图对象
-    base_photo = get_photo(base_path, base_size)
+    base_photo = get_photo(持有物.holding_win.base_path, base_size)
     # 获取 Halo 图对象
-    halo_photo = get_photo(halo_path, halo_size)
+    halo_photo = get_photo(持有物.holding_win.halo_path, halo_size)
 
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()

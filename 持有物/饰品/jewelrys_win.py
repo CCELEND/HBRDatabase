@@ -10,10 +10,11 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from 饰品.jewelrys_info import get_jewelrys_obj, load_type_resources
 from 饰品.光球.orbs_skill_win import creat_orb_skill_win
 import 饰品.jewelrys_info
+import 持有物.holding_win
 
-# 图片背景路径
-base_path = "./持有物/图片背景/ThumbnailBase.webp"
-halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
+# # 图片背景路径
+# base_path = "./持有物/图片背景/ThumbnailBase.webp"
+# halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
 # 加载图片并显示饰品的函数
 def show_jewelrys(scrollbar_frame_obj, jewelrys):
 
@@ -23,12 +24,12 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
     # 图片大小
     base_size = (100, 100)
     halo_size = (96, 96)
-    jewelry_size = (66, 66)
+    jewelry_size = (80, 80)
 
     # 获取 Base 图对象
-    base_photo = get_photo(base_path, base_size)
+    base_photo = get_photo(持有物.holding_win.base_path, base_size)
     # 获取 Halo 图对象
-    halo_photo = get_photo(halo_path, halo_size)
+    halo_photo = get_photo(持有物.holding_win.halo_path, halo_size)
 
     # 循环创建每一行，遍历得到饰品对象
     for i, jewelry_name in enumerate(jewelrys):
@@ -56,7 +57,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
         # 设置 Halo 图坐标
         row_canvas.create_image(2, 2, anchor="nw", image=halo_photo)  # `z-index` 高于 Base
         # 设置 jewelry 图坐标（70x70 居中）
-        row_canvas.create_image(17, 17, anchor="nw", image=jewelry_photo)
+        row_canvas.create_image(10, 10, anchor="nw", image=jewelry_photo)
 
         if jewelry.type == "光球":
             mouse_bind_canvas_events(row_canvas)
