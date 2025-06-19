@@ -11,7 +11,7 @@ from tools import load_json
 from 恒星战.hxz_info import hxzs, get_all_hxz_obj
 
 # 图片背景路径
-base_path = "./敌人/恒星战/dimensionClassFrameL.webp"
+base_path = "./敌人/恒星战/dimensionClassFrameL.png"
 
 hxzs_json = {}
 # 加载资源文件

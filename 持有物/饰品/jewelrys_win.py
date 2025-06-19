@@ -12,9 +12,7 @@ from 饰品.光球.orbs_skill_win import creat_orb_skill_win
 import 饰品.jewelrys_info
 import 持有物.holding_win
 
-# # 图片背景路径
-# base_path = "./持有物/图片背景/ThumbnailBase.webp"
-# halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
+
 # 加载图片并显示饰品的函数
 def show_jewelrys(scrollbar_frame_obj, jewelrys):
 

@@ -8,10 +8,6 @@ from canvas_events import mouse_bind_canvas_events
 from tools import load_json
 import 持有物.holding_win
 
-# 图片背景路径
-# base_path = "./持有物/图片背景/ThumbnailBase.webp"
-# halo_path = "./持有物/图片背景/ThumbnailHalo.webp"
-
 capsuletoys_json = {}
 # 加载资源文件
 def load_resources():
