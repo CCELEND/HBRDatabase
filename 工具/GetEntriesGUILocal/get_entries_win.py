@@ -164,7 +164,10 @@ def get_index_wash_entries():
         chunk_size=10,
         max_workers=max(4, os.cpu_count())
     )
-    index_wash_entries = OrderedDict(sorted(temp_index_wash_entries.items()))
+    index_wash_entries = OrderedDict(sorted(
+        temp_index_wash_entries.items(),
+        key=lambda x: int(x[0])
+    ))
     endtime = datetime.datetime.now()
 
     print("use times {0:.2f}s".format((endtime - starttime).total_seconds()))
@@ -206,7 +209,10 @@ def get_index_equipments():
         chunk_size=10,
         max_workers=max(4, os.cpu_count())
     )
-    index_equipments = OrderedDict(sorted(temp_index_equipments.items()))
+    index_equipments = OrderedDict(sorted(
+        temp_index_equipments.items(),
+        key=lambda x: int(x[0])
+    ))
     endtime = datetime.datetime.now()
 
     print("use times {0:.2f}s".format((endtime - starttime).total_seconds()))

@@ -5,3 +5,4 @@ chrome_user_data/
 *.flac
 *.mp3
 工具/GetEntriesGUILocal/config.ini
+*.xlsx
