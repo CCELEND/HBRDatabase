@@ -53,7 +53,7 @@ def creat_bsljz_win(event, parent_frame, bsljz):
         del open_bsljz_wins[bsljz.name]
 
 
-    bsljz_win_frame = creat_Toplevel(bsljz.name, 600, 840, 440, 50)
+    bsljz_win_frame = creat_Toplevel(bsljz.name, 600, 840, 230, 110)
     set_window_icon(bsljz_win_frame, bsljz.logo_path)
     open_bsljz_wins[bsljz.name] = bsljz_win_frame
 

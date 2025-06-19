@@ -52,7 +52,7 @@ def creat_ljz_win(event, parent_frame, ljz):
         del open_ljz_wins[ljz.name]
 
 
-    ljz_win_frame = creat_Toplevel(ljz.name, 600, 840, 440, 50)
+    ljz_win_frame = creat_Toplevel(ljz.name, 600, 840, 230, 110)
     set_window_icon(ljz_win_frame, ljz.logo_path)
     open_ljz_wins[ljz.name] = ljz_win_frame
 

@@ -52,7 +52,7 @@ def creat_szxlc_win(event, parent_frame, szxlc):
         del open_szxlc_wins[szxlc.name]
 
 
-    szxlc_win_frame = creat_Toplevel(szxlc.name, 600, 840, 440, 50)
+    szxlc_win_frame = creat_Toplevel(szxlc.name, 600, 840, 230, 110)
     set_window_icon(szxlc_win_frame, szxlc.logo_path)
     open_szxlc_wins[szxlc.name] = szxlc_win_frame
 
