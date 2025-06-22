@@ -535,6 +535,9 @@ video {
 .m-0 {
   margin: 0px;
 }
+.m-0\.5 {
+  margin: 0.125rem;
+}
 .m-1 {
   margin: 0.25rem;
 }
@@ -602,6 +605,9 @@ video {
 .h-0\.5 {
   height: 0.125rem;
 }
+.h-1 {
+  height: 0.25rem;
+}
 .h-10 {
   height: 2.5rem;
 }
@@ -629,8 +635,8 @@ video {
 .h-8 {
   height: 2rem;
 }
-.h-\[110px\] {
-  height: 110px;
+.h-\[100px\] {
+  height: 100px;
 }
 .h-\[30px\] {
   height: 30px;
@@ -653,6 +659,9 @@ video {
 }
 .w-0\.5 {
   width: 0.125rem;
+}
+.w-1 {
+  width: 0.25rem;
 }
 .w-10 {
   width: 2.5rem;

@@ -5,6 +5,7 @@ from PIL import Image
 from tkinter import messagebox
 import json
 import re
+import shutil
 
 # 弹出确认框，询问用户是否重启
 def confirm_restart(info):
@@ -176,3 +177,27 @@ def delete_webp_files(directory: str) -> None:
                 print(f"[-] 没有权限删除 {webp_file}")
             except Exception as e:
                 print(f"[-] 删除 {webp_file} 时出错: {e}")
+
+
+def delete_all_files_and_subdirs(directory):
+    if not os.path.isdir(directory):
+        return
+    try:
+        # 删除目录及其所有内容
+        shutil.rmtree(directory)
+        return True
+    except Exception as e:
+        print(f"[-] 清空目录时发生错误: {e}")
+        return False
+
+
+def delete_file(file):
+    if not os.path.isfile(file):
+        return
+    try:
+        # 删除文件
+        os.remove(file)
+        return True
+    except Exception as e:
+        print(f"[-] 删除文件时发生错误: {e}")
+        return False

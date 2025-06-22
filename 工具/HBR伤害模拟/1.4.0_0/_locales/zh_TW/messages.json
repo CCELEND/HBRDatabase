@@ -146,6 +146,9 @@
    "border": {
       "message": "屬性值"
    },
+   "challengeGrade": {
+      "message": "挑戦級別"
+   },
    "clear": {
       "message": "清空"
    },
@@ -316,6 +319,9 @@
    },
    "status": {
       "message": "屬性值"
+   },
+   "statusBonus": {
+      "message": "屬性值提升"
    },
    "str": {
       "message": "力量"

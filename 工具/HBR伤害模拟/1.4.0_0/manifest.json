@@ -10,6 +10,7 @@
    },
    "default_locale": "en",
    "description": "__MSG_extDescription__",
+   "differential_fingerprint": "1.1B2D38AB06E322DB854D327B7E982A7A05F7BAEEA172AB8280E97CE40BAF5B87",
    "homepage_url": "https://github.com/chunibyocola/HBR-Damage-Simulation-issues",
    "icons": {
       "128": "icon.png"
@@ -20,5 +21,5 @@
    "name": "__MSG_extName__",
    "permissions": [ "storage" ],
    "update_url": "https://edge.microsoft.com/extensionwebstorebase/v1/crx",
-   "version": "1.3.0"
+   "version": "1.4.0"
 }

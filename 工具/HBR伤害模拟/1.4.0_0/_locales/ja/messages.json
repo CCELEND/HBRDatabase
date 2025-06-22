@@ -146,6 +146,9 @@
    "border": {
       "message": "能力値"
    },
+   "challengeGrade": {
+      "message": "挑戦グレード"
+   },
    "clear": {
       "message": "クリア"
    },
@@ -316,6 +319,9 @@
    },
    "status": {
       "message": "能力値"
+   },
+   "statusBonus": {
+      "message": "能力値ボーナス"
    },
    "str": {
       "message": "力"

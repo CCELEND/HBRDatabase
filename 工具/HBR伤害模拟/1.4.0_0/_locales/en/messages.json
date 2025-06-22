@@ -146,6 +146,9 @@
    "border": {
       "message": "Border"
    },
+   "challengeGrade": {
+      "message": "Challenge Grade"
+   },
    "clear": {
       "message": "Clear"
    },
@@ -316,6 +319,9 @@
    },
    "status": {
       "message": "Status"
+   },
+   "statusBonus": {
+      "message": "Status Bonus"
    },
    "str": {
       "message": "STR"
