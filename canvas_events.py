@@ -654,7 +654,7 @@ class VideoPlayerWithScrollbar:
         self.is_paused = False  # 是否暂停播放
         self.timer = None  # 定时器
         # self.fps = self.cap.get(cv2.CAP_PROP_FPS)  # 获取视频的帧率
-        self.frame_delay = 25 #int(1000 / self.fps)  # 每帧的延迟时间（毫秒）
+        self.frame_delay = 20 #int(1000 / self.fps)  # 每帧的延迟时间（毫秒）
 
         # 开始播放
         self.start_playback()
