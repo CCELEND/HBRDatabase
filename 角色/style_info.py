@@ -359,3 +359,11 @@ def get_style_obj(data):
         set_style_category(style)
 
     return style
+
+
+# 判断是否是技能效果对象，否则就是攻击技能
+def is_skill_effect(skill):
+    if isinstance(skill, SkillEffect):
+        return True
+    else:
+        return False

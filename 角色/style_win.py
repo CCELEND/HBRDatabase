@@ -9,7 +9,7 @@ from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
-from style_info import SkillEffect
+from style_info import SkillEffect, is_skill_effect
 from style_proc import on_attack_combo_select, on_buff_attack_combo_select
 from style_proc import on_heal_combo_select
 from style_proc import on_defense_combo_select, on_buff_combo_select
@@ -193,7 +193,8 @@ def creat_active_skill_frame(parent_frame, style):
             effect_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 右侧信息列，权重更大以填充更多空间
 
             # 检查是否是技能效果的实例
-            if isinstance(skill, SkillEffect):
+            # if isinstance(skill, SkillEffect):
+            if is_skill_effect(skill):
                 # 创建技能效果图标 canvas
                 effect_photo = get_photo(战斗系统.状态.status_info.status[skill.effect_type].path, (60, 60))
                 effect_canvas = create_canvas_with_image(effect_frame, 
@@ -229,7 +230,8 @@ def creat_active_skill_frame(parent_frame, style):
             desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
             # 如果是攻击技能
-            if not isinstance(skill, SkillEffect):
+            # if not isinstance(skill, SkillEffect):
+            if not is_skill_effect(skill):
                 if not att_lv_combo_text:
                     att_lv_combo_text = text
                     att_lv_combo_lab = desc_lab
