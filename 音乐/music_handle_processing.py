@@ -4,16 +4,9 @@ import requests
 from tkinter import messagebox
 from urllib.parse import quote
 
-
+from tools import creat_directory
 from canvas_events import get_photo, create_canvas_with_image
 import music_player
-
-# 检查目录是否存在，如果不存在则创建
-def creat_directory(file_name):
-    # 获取目录路径
-    directory = os.path.dirname(file_name)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
 
 server_url = "http://47.96.235.36:65431"
 
