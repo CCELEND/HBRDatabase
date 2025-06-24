@@ -1,5 +1,5 @@
 from tools import load_json, get_dir_values_list
-from role_info import creat_role_obj
+from 角色.role_info import creat_role_obj
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 

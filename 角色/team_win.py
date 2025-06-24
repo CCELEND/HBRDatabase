@@ -7,9 +7,9 @@ from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_even
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
-from team_info import get_team_obj, get_all_team_obj
-from style_win import creat_style_skill_win, creat_style_right_menu
-from master_skill_win import creat_master_skill_win
+from 角色.team_info import get_team_obj, get_all_team_obj
+from 角色.style_win import creat_style_skill_win, creat_style_right_menu
+from 角色.master_skill_win import creat_master_skill_win
 
 import 战斗系统.武器.weapons_info
 # 加载资源文件

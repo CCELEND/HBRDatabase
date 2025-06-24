@@ -9,15 +9,15 @@ from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
-from style_info import SkillEffect, is_skill_effect
-from style_proc import on_attack_combo_select, on_buff_attack_combo_select
-from style_proc import on_heal_combo_select
-from style_proc import on_defense_combo_select, on_buff_combo_select
-from style_proc import on_debuff_combo_select
-from style_proc import on_mindeye_combo_select
-from style_proc import on_percentage_combo_select
+from 角色.style_info import is_skill_effect
+from 角色.style_proc import on_attack_combo_select, on_buff_attack_combo_select
+from 角色.style_proc import on_heal_combo_select
+from 角色.style_proc import on_defense_combo_select, on_buff_combo_select
+from 角色.style_proc import on_debuff_combo_select
+from 角色.style_proc import on_mindeye_combo_select
+from 角色.style_proc import on_percentage_combo_select
 
-from style_text import output_attack_skill, output_skill_effect
+from 角色.style_text import output_attack_skill, output_skill_effect
 
 import 持有物.强化素材.strengthen_materials
 import 战斗系统.职业.careers_info

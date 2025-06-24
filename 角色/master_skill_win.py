@@ -6,8 +6,8 @@ from canvas_events import get_photo, create_canvas_with_image
 from window import set_window_expand, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
-from master_skill_info import MasterSkillEffect
-from style_text import output_skill_effect, output_attack_skill
+from 角色.master_skill_info import MasterSkillEffect
+from 角色.style_text import output_skill_effect, output_attack_skill
 import 战斗系统.状态.status_info
 
 # 加载资源文件

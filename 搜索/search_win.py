@@ -1,18 +1,15 @@
-import sys
-import os
-# import tkinter as tk
+
 from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
 from tkinter import scrolledtext
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-sys.path.append(os.path.abspath("./角色"))
 from 角色.team_info import get_all_team_obj
 from 角色.team_win import bind_style_canvas
 import 角色.team_info
 
-from search_processing import on_select, get_filtered_styles, keyword_processing
+from 搜索.search_processing import on_select, get_filtered_styles, keyword_processing
 
 # 创建选项的 frame
 def creat_select_frame(label_content, options, selected_values,

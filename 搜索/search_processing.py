@@ -1,11 +1,8 @@
-import sys
-import os
 import re
 
 from tools import list_val_in_another, is_parentstring, output_string
 
-sys.path.append(os.path.abspath("./角色"))
-from style_info import SkillEffect
+from 角色.style_info import is_skill_effect
 import 角色.team_info
 
 # 选中处理
@@ -71,7 +68,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 
     # 定义主动技能效果的检查函数
     def check_active_effect(effect):
-        if isinstance(effect, SkillEffect):
+        if is_skill_effect(effect):
             return (is_parentstring(effect.target, keyword_list) or
                     is_parentstring(effect.effect_type, keyword_list) or
                     is_parentstring(output_string(effect.target) + output_string(effect.effect_type), keyword_list))

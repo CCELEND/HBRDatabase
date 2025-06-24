@@ -1,7 +1,7 @@
 
 import os
-from style_info import get_style_obj
-from master_skill_info import get_master_skill_obj
+from 角色.style_info import get_style_obj
+from 角色.master_skill_info import get_master_skill_obj
 from tools import load_json, get_dir_values_list
 
 # 角色
