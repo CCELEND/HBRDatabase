@@ -120,16 +120,34 @@ def filter_judge(filter_dict, keyword_list, role, style):
 # 根据筛选条件和关键词列表获取风格对象列表
 def get_filtered_styles(filter_dict, keyword_list):
 
-    filtered_styles = []  # 存储符合条件的风格对象
+    # filtered_styles = []  # 存储符合条件的风格对象
 
-    # 遍历队伍
-    for team in 角色.team_info.teams.values():
-        # 遍历队伍中的角色
-        for role in team.roles:
-            # 遍历角色中的风格
-            for style in role.SSstyles + role.Sstyles + role.Astyles:
-                if (filter_judge(filter_dict, keyword_list, role, style)):
-                    filtered_styles.append(style)
+    # # 遍历队伍
+    # for team in 角色.team_info.teams.values():
+    #     # 遍历队伍中的角色
+    #     for role in team.roles:
+    #         # 遍历角色中的风格
+    #         for style in role.SSstyles + role.Sstyles + role.Astyles:
+    #             if (filter_judge(filter_dict, keyword_list, role, style)):
+    #                 filtered_styles.append(style)
+
+    # return filtered_styles
+
+    # 存储符合条件的风格对象
+    filtered_styles = []
+
+    # 构建角色到风格的映射列表
+    role_style_pairs = [
+        (role, style)
+        for team in 角色.team_info.teams.values()
+        for role in team.roles
+        for style in role.SSstyles + role.Sstyles + role.Astyles
+    ]
+
+    # 映射列表过滤，保持role和style的关联
+    for role, style in role_style_pairs:
+        if filter_judge(filter_dict, keyword_list, role, style):
+            filtered_styles.append(style)
 
     return filtered_styles
 
