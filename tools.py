@@ -6,6 +6,12 @@ from tkinter import messagebox
 import json
 import re
 import shutil
+from pathlib import Path
+
+def get_version():
+    version = read_txt_file("./关于/version.txt", "text")
+    return version
+
 
 # 弹出确认框，询问用户是否重启
 def confirm_restart(info):
@@ -201,3 +207,56 @@ def delete_file(file):
     except Exception as e:
         print(f"[-] 删除文件时发生错误: {e}")
         return False
+
+
+
+def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
+    """
+    读取txt文件内容，支持多种读取模式
+    参数:
+        file_path (str): 文件路径
+        mode (str): 读取模式，可选值:
+            - 'lines': 按行读取，返回字符串列表
+            - 'text': 读取为字符串(默认)
+            - 'binary': 以二进制模式读取
+    返回:
+        str | list[str] | None: 根据模式返回文件内容，失败时返回None
+    """
+    # 转换路径为绝对路径
+    file_path = Path(file_path).absolute()
+    
+    # 检查文件是否存在
+    if not file_path.exists():
+        messagebox.showerror("错误", f"文件不存在: {file_path}\n{e}")
+        return None
+    
+    # 检查是否为文件
+    if not file_path.is_file():
+        messagebox.showerror("错误", f"不是有效的文件: {file_path}\n{e}")
+        return None
+    
+    # 检查文件是否可读
+    if not os.access(file_path, os.R_OK):
+        messagebox.showerror("错误", f"文件不可读: {file_path}\n{e}")
+        return None
+    
+    try:
+        if mode == 'binary':
+            # 二进制模式读取
+            with open(file_path, 'rb') as file:
+                return file.read()
+        elif mode == 'text':
+            # 文本模式读取为单个字符串
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.read()
+        else:  
+            # 默认按行读取
+            # 文本模式按行读取
+            with open(file_path, 'r', encoding='utf-8') as file:
+                return file.readlines()
+    except UnicodeDecodeError:
+        messagebox.showerror("错误", f"文件不是有效的UTF-8编码: {file_path}\n{e}")
+        return None
+    except Exception as e:
+        messagebox.showerror("错误", f"读取文件时发生意外错误: {file_path}\n{e}")
+        return None
