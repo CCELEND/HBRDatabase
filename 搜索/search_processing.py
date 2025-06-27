@@ -1,6 +1,6 @@
 import re
 
-from tools import list_val_in_another, is_parentstring, output_string
+from tools import list_val_in_another, is_parentstring, output_string, list_is
 
 from 角色.style_info import is_skill_effect
 import 角色.team_info
@@ -74,7 +74,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
                     is_parentstring(output_string(effect.target) + output_string(effect.effect_type), keyword_list))
         else:
             return (is_parentstring(effect.target + "攻击", keyword_list) or
-                    is_parentstring(effect.biased, keyword_list))
+                    is_parentstring(effect.biased, keyword_list) and not list_is(keyword_list, "+"))
 
     # 定义被动技能效果的检查函数
     def check_passive_effect(skill):
@@ -89,12 +89,13 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
             
             # 遍历该类型下的所有技能
             for skill in skills:
+
                 # 检查技能名称
                 if is_parentstring(skill.name, keyword_list):
                     return True
                 
                 # 检查技能描述
-                if is_parentstring(skill.description, keyword_list):
+                if is_parentstring(skill.description, keyword_list) and not list_is(keyword_list, "+"):
                     return True
                 
                 # 根据技能类型检查不同的效果

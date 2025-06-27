@@ -99,6 +99,9 @@ def list_val_in_another(list1, list2):
         #     return False
     return False
 
+def list_is(list, string):
+    return (len(list) == 1 and list[0] == string)
+
 # 检查目录是否存在，如果不存在则创建
 def creat_directory(file_name):
     # 获取目录路径
