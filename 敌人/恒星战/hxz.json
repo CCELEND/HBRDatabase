@@ -26,6 +26,15 @@
     "logo_path":"./敌人/恒星战/轮转的凶祸#3/DimensionBattleCentralTop_004.ico",
     "name":"轮转的凶祸#3",
     "guide_path":"./敌人/恒星战/轮转的凶祸#3/3.jpg"
+},
+
+"栖息于峡谷的幽鬼#4":
+{
+    "img_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/hxz4.png",
+    "img_path_enemy":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.png",
+    "logo_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.ico",
+    "name":"栖息于峡谷的幽鬼#4",
+    "guide_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/4.jpg"
 }
 
 }
