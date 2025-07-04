@@ -256,6 +256,9 @@
     "1005603":{
         "style_name":"禁锢的虎鲸", "character_role":"减益者", "element_type":"无", "weapon_type":"打"
     },
+    "1005605":{
+        "style_name":"冲锋！突刺！金枪鱼！", "character_role":"减益者", "element_type":"暗", "weapon_type":"打"
+    },
 
 
     "1006103":{
@@ -302,6 +305,9 @@
     },
     "1007203":{
         "style_name":"不断进化的敏感性", "character_role":"破盾者", "element_type":"暗", "weapon_type":"突"
+    },
+    "1007205":{
+        "style_name":"微笑绽放", "character_role":"破坏者", "element_type":"光", "weapon_type":"突"
     },
     "1007303":{
         "style_name":"与你齐奏", "character_role":"增益者", "element_type":"暗", "weapon_type":"斩"
