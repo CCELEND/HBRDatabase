@@ -75,6 +75,19 @@
         "description":"可以在饰品合成时获得不少经验值的素材", 
         "price":"", 
         "location":"高分挑战"
+    },
+
+    "魂之碎片":{
+        "path":"./持有物/饰品材料/ThumbnailSynthesisSoulSmall.png", 
+        "description":"可在合成饰品时\n获得10000魂之经验值", 
+        "price":"", 
+        "location":"主线剧情第五章中篇"
+    },
+    "魂之辉片":{
+        "path":"./持有物/饰品材料/ThumbnailSynthesisSoul.png", 
+        "description":"可在合成饰品时\n获得50000魂之经验值", 
+        "price":"", 
+        "location":"主线剧情第五章中篇"
     }
 
 } 

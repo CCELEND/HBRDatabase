@@ -69,5 +69,12 @@
         "description":"可升至80级的道具", 
         "price":"28,400,000 GP", 
         "location":"商店（记忆之庭）"
+    },
+
+    "风格强化教材":{
+        "path":"./持有物/成长素材/ThumbnailExpBookStyleA.png", 
+        "description":"可将SLv.提升1级的道具。", 
+        "price":"", 
+        "location":""
     }
 } 
