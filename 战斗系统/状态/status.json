@@ -25,7 +25,7 @@
     },
     "持续回复DP":{
         "name":"持续回复DP",
-        "path":"./战斗系统/状态/RegenerationDp.webp",
+        "path":"./战斗系统/状态/RegeneDP.png",
         "effect":"每回合回复DP","description":"每回合回复",
         "stack":"-",
         "type":"回复",
@@ -59,7 +59,7 @@
 
     "充能":{
         "name":"充能",
-        "path":"./战斗系统/状态/BuffCharge.webp",
+        "path":"./战斗系统/状态/Charge.png",
         "effect":"暴击率上升20%和技能伤害上升20 ~ 30%\n（技能触发 1层）","description":"暴击率上升20%和技能伤害上升20 ~ 30%（技能触发 1层）\n",
         "stack":"1",
         "type":"增益",
@@ -315,7 +315,7 @@
     },
     "心眼":{
         "name":"心眼",
-        "path":"./战斗系统/状态/MindEye.webp",
+        "path":"./战斗系统/状态/MindEye.png",
         "effect":"","description":"命中弱点造成伤害增加",
         "stack":"2",
         "type":"增益",
@@ -323,7 +323,7 @@
     },
     "技能破坏率上升":{
         "name":"技能破坏率上升",
-        "path":"./战斗系统/状态/DamageRateUp.webp",
+        "path":"./战斗系统/状态/DamageRate.png",
         "effect":"","description":"技能破坏率上升",
         "stack":"2",
         "type":"增益",
@@ -355,7 +355,7 @@
     },
     "士气":{
         "name":"士气",
-        "path":"./战斗系统/状态/Morale.webp",
+        "path":"./战斗系统/状态/Morale.png",
         "effect":"","description":"永久提升所有能力值\n随等级提升（10级时增加约50点）",
         "stack":"10",
         "type":"增益",
@@ -363,7 +363,7 @@
     },
     "士气等级上升":{
         "name":"士气等级上升",
-        "path":"./战斗系统/状态/Morale.webp",
+        "path":"./战斗系统/状态/Morale.png",
         "effect":"","description":"每级士气+5全属性值并提供5%技能攻击上升（最大等级：10）",
         "stack":"-",
         "type":"增益",
@@ -371,7 +371,7 @@
     },
     "斗志":{
         "name":"斗志",
-        "path":"./战斗系统/状态/FightingSpirit.webp",
+        "path":"./战斗系统/状态/FightingSpirit.png",
         "effect":"增加全能力值\n（约20点。第二次以后覆盖）","description":"全属性值上升",
         "stack":"-",
         "type":"增益",
@@ -395,7 +395,7 @@
     },
     "躲避":{
         "name":"躲避",
-        "path":"./战斗系统/状态/Dodge.webp",
+        "path":"./战斗系统/状态/Dodge.png",
         "effect":"有概率免疫敌方技能造成的伤害及减益效果\n（消除敌人攻击时会消耗计数）","description":"免疫敌方技能造成的伤害及减益效果",
         "stack":"-",
         "type":"增益",
@@ -420,7 +420,7 @@
     },
     "歌姬加护":{
         "name":"歌姬加护",
-        "path":"./战斗系统/状态/Diva.webp",
+        "path":"./战斗系统/状态/Diva.png",
         "effect":"处于此状态时\nEX技能即使剩余使用次数为0（有限使用次数除外）仍可使用\n且DP恢复为攻击伤害量的30%","description":"造成伤害时回复等于伤害值30%的DP\n即使EX技能次数剩余0也可使用\n（限定次数的技能除外）",
         "stack":"-",
         "type":"增益",
@@ -428,7 +428,7 @@
     },
     "影分身":{
         "name":"影分身",
-        "path":"./战斗系统/状态/ShadowClone.webp",
+        "path":"./战斗系统/状态/ShadowClone.png",
         "effect":"使敌人行动所受的伤害及减益无效化\n并使用技能攻击时增加伤害（使敌人攻击无效化时会消耗计数）","description":"技能攻击上升30%，免疫伤害及其减益效果\n每次免疫敌方攻击减少一层",
         "stack":"-",
         "type":"增益",
@@ -436,7 +436,7 @@
     },
     "速弹":{
         "name":"速弹",
-        "path":"./战斗系统/状态/Shredding.webp",
+        "path":"./战斗系统/状态/Shredding.png",
         "effect":"SP为0或以上时可使用技能\n（对某些技能无影响，如“伤害技能（消耗所有 SP）”）","description":"所有技能只要SP在0以上即可使用\n消耗“所有SP”的技能不受影响\n消耗非SP资源的技能除外",
         "stack":"-",
         "type":"增益",
@@ -444,7 +444,7 @@
     },
     "Babied":{
         "name":"Babied",
-        "path":"./战斗系统/状态/Babied.webp",
+        "path":"./战斗系统/状态/Babied.png",
         "effect":"技能攻击上升30%\nOD效果上升20%","description":"技能攻击上升30%\nOD效果上升20%",
         "stack":"-",
         "type":"增益",
@@ -452,7 +452,7 @@
     },
     "永恒誓言":{
         "name":"永恒誓言",
-        "path":"./战斗系统/状态/EternalOath.webp",
+        "path":"./战斗系统/状态/EternalOath.png",
         "effect":"永久技能攻击上升50%，永久防御上升25%，永久暴击率上升50%","description":"永久技能攻击上升50%，永久防御上升25%，永久暴击率上升50%",
         "stack":"-",
         "type":"增益",
@@ -460,7 +460,7 @@
     },
     "跟班":{
         "name":"跟班",
-        "path":"./战斗系统/状态/BIYamawakiServant.webp",
+        "path":"./战斗系统/状态/BIYamawakiServant.png",
         "effect":"处于山胁大人的小跟班状态，虚弱伤害增加30%","description":"处于山胁大人的小跟班状态，虚弱伤害增加30%",
         "stack":"-",
         "type":"增益",
@@ -468,7 +468,7 @@
     },
     "高阶增强":{
         "name":"高阶增强",
-        "path":"./战斗系统/状态/HighBoost.webp",
+        "path":"./战斗系统/状态/HighBoost.png",
         "effect":"技能攻击力增加180%\n攻击力提升增益效果提升20%\n增强减益效果20%","description":"技能攻击力增加180%\n攻击力提升增益效果提升20%\n增强减益效果20%",
         "stack":"-",
         "type":"增益",
@@ -476,7 +476,7 @@
     },
     "上升增益技能强化":{
         "name":"上升增益技能强化",
-        "path":"./战斗系统/状态/GiveAttackBuffUp.webp",
+        "path":"./战斗系统/状态/GiveAttackBuffUp.png",
         "effect":"","description":"攻击上升类增益技能的强度上升",
         "stack":"-",
         "type":"增益",
@@ -492,7 +492,7 @@
     },
     "减益效果强化":{
         "name":"减益效果强化",
-        "path":"./战斗系统/状态/GiveDebuffUp.webp",
+        "path":"./战斗系统/状态/GiveDebuffUp.png",
         "effect":"增加你所施加的减益技能的效果\n（可以叠加，但一次只能叠加一次）","description":"减益类技能效果上升",
         "stack":"1",
         "type":"增益",
@@ -516,7 +516,7 @@
     },
     "攻击上升且减益效果强化":{
         "name":"攻击上升且减益效果强化",
-        "path":"./战斗系统/状态/ArrowCherryBlossoms.webp",
+        "path":"./战斗系统/状态/ArrowCherryBlossoms.png",
         "effect":"攻击上升50%\n减益效果的强度上升20%（不叠加）","description":"攻击上升50%\n减益效果的强度上升20%（不叠加）",
         "stack":"-",
         "type":"增益",
@@ -615,7 +615,7 @@
     },
     "脆弱":{
         "name":"脆弱",
-        "path":"./战斗系统/状态/Fragile.webp",
+        "path":"./战斗系统/状态/Fragile.png",
         "effect":"","description":"命中弱点造成伤害增加",
         "stack":"2",
         "type":"减益",
@@ -703,7 +703,7 @@
     },
     "灾厄":{
         "name":"灾厄",
-        "path":"./战斗系统/状态/Misfortune.webp",
+        "path":"./战斗系统/状态/Misfortune.png",
         "effect":"全属性值下降20点","description":"全属性值下降",
         "stack":"-",
         "type":"减益",
@@ -711,7 +711,7 @@
     },
     "黑客":{
         "name":"黑客",
-        "path":"./战斗系统/状态/Hacking.webp",
+        "path":"./战斗系统/状态/Hacking.png",
         "effect":"全属性值下降100点","description":"全属性值下降",
         "stack":"-",
         "type":"减益",
@@ -735,7 +735,7 @@
     },
     "退避":{
         "name":"退避",
-        "path":"./战斗系统/状态/RecoilRandom.webp",
+        "path":"./战斗系统/状态/Recoil.png",
         "effect":"","description":"无法行动",
         "stack":"-",
         "type":"减益",
@@ -751,7 +751,7 @@
     },
     "负面情绪":{
         "name":"负面情绪",
-        "path":"./战斗系统/状态/NegativeMind.webp",
+        "path":"./战斗系统/状态/NegativeMind.png",
         "effect":"攻击下降100%\n受到伤害上升100%","description":"攻击下降100%\n受到伤害上升100%",
         "stack":"-",
         "type":"减益",
@@ -785,7 +785,7 @@
     },
     "禁锢":{
         "name":"禁锢",
-        "path":"./战斗系统/状态/ImprisonRandom.webp",
+        "path":"./战斗系统/状态/Imprison.png",
         "effect":"目标无法使用技能（强攻击）","description":"无法使用技能（强攻击）",
         "stack":"-",
         "type":"异常",
@@ -793,7 +793,7 @@
     },
     "眩晕":{
         "name":"眩晕",
-        "path":"./战斗系统/状态/StunRandom.webp",
+        "path":"./战斗系统/状态/Stun.png",
         "effect":"目标无法行动","description":"无法行动",
         "stack":"-",
         "type":"异常",
@@ -801,7 +801,7 @@
     },
     "病毒":{
         "name":"病毒",
-        "path":"./战斗系统/状态/IconVirus.webp",
+        "path":"./战斗系统/状态/Virus.png",
         "effect":"降低最大DP，受病毒影响而丢失的DP无法恢复\n（目前这是只有敌人才能使用的异常状态）","description":"降低最大DP，受病毒影响而丢失的DP无法恢复",
         "stack":"-",
         "type":"异常",
@@ -809,7 +809,7 @@
     },
     "持续伤害":{
         "name":"持续伤害",
-        "path":"./战斗系统/状态/ContinuousDamageRate.webp",
+        "path":"./战斗系统/状态/ContinuousDamage.png",
         "effect":"每回合开始时造成DP/HP伤害（百分比）\n（目前这是只有敌人才能使用的异常状态）","description":"每回合开始时造成DP/HP伤害",
         "stack":"-",
         "type":"异常",
@@ -817,7 +817,7 @@
     },
     "DP破坏":{
         "name":"DP破坏",
-        "path":"./战斗系统/状态/DpBreakRandom.webp",
+        "path":"./战斗系统/状态/CorrosionDp.png",
         "effect":"受到伤害时DP破坏\n此效果不会因连续的DP伤害或自我造成的伤害而激活\n但它会因沙尘暴领域等场地伤害而激活\n（目前这是只有敌人才能使用的异常状态）","description":"受到伤害时DP破坏",
         "stack":"-",
         "type":"异常",
@@ -825,7 +825,7 @@
     },
     "混乱":{
         "name":"混乱",
-        "path":"./战斗系统/状态/IconConfusion.webp",
+        "path":"./战斗系统/状态/Confusion.png",
         "effect":"","description":"概率命中自身",
         "stack":"-",
         "type":"异常",
@@ -833,7 +833,7 @@
     },
     "锁定":{
         "name":"锁定",
-        "path":"./战斗系统/状态/IconBind.webp",
+        "path":"./战斗系统/状态/Bind.png",
         "effect":"目标无法行动\n（目前这是只有敌人才能使用的异常状态）","description":"无法行动",
         "stack":"-",
         "type":"异常",
@@ -841,7 +841,7 @@
     },
     "迷惑":{
         "name":"迷惑",
-        "path":"./战斗系统/状态/IconIllusion.webp",
+        "path":"./战斗系统/状态/Illusion.png",
         "effect":"攻击有概率不会命中\n（目前这是只有敌人才能使用的异常状态）","description":"攻击有概率不会命中",
         "stack":"-",
         "type":"异常",
@@ -849,7 +849,7 @@
     },
     "幻觉":{
         "name":"幻觉",
-        "path":"./战斗系统/状态/Turbidity.webp",
+        "path":"./战斗系统/状态/Turbidity.png",
         "effect":"攻击单个目标时使目标随机化\n（目前这是只有敌人才能使用的异常状态）","description":"攻击单个目标时使目标随机化",
         "stack":"-",
         "type":"异常",
@@ -859,7 +859,7 @@
 
     "掩护":{
         "name":"掩护",
-        "path":"./战斗系统/状态/Cover.webp",
+        "path":"./战斗系统/状态/Cover.png",
         "effect":"嘲讽单体或群体伤害\n（只能攻击特定目标）","description":"嘲讽单体或群体伤害",
         "stack":"-",
         "type":"其他",
@@ -875,7 +875,7 @@
     },
     "减益免疫":{
         "name":"减益免疫",
-        "path":"./战斗系统/状态/DebuffGuard.webp",
+        "path":"./战斗系统/状态/DebuffGuard.png",
         "effect":"","description":"减益类技能无效",
         "stack":"-",
         "type":"其他",
@@ -947,7 +947,7 @@
     },
     "双倍EX技能":{
         "name":"双倍EX技能",
-        "path":"./战斗系统/状态/DoubleActionExtraSkill.webp",
+        "path":"./战斗系统/状态/DoubleActionExtraSkill.png",
         "effect":"","description":"额外使用并释放一次EX技能",
         "stack":"-",
         "type":"其他",
@@ -963,7 +963,7 @@
     },
     "承伤上限":{
         "name":"承伤上限",
-        "path":"./战斗系统/状态/TakenDamageLimit.webp",
+        "path":"./战斗系统/状态/TakenDamageLimit.png",
         "effect":"免疫超过上限的伤害\n（伤害盾）","description":"免疫超过上限的伤害",
         "stack":"-",
         "type":"其他",
@@ -971,7 +971,7 @@
     },
     "击破保护":{
         "name":"击破保护",
-        "path":"./战斗系统/状态/BreakGuard.webp",
+        "path":"./战斗系统/状态/BreakGuard.png",
         "effect":"当DP值大于等于50%时\n若即将受到足以破盾的伤害，则免疫剩余1DP后的伤害","description":"当DP值大于等于50%时\n若即将受到足以破盾的伤害，则免疫剩余1DP后的伤害",
         "stack":"-",
         "type":"其他",
@@ -979,7 +979,7 @@
     },
     "无敌":{
         "name":"无敌",
-        "path":"./战斗系统/状态/Invincible.webp",
+        "path":"./战斗系统/状态/Invincible.png",
         "effect":"免疫伤害\n（不免疫减益、异常效果）","description":"免疫伤害",
         "stack":"-",
         "type":"其他",
@@ -1051,7 +1051,7 @@
     },
     "破坏率抗性上升":{
         "name":"破坏率抗性上升",
-        "path":"./战斗系统/状态/DamageRateResistUp.webp",
+        "path":"./战斗系统/状态/DestructionResist.png",
         "effect":"破坏率抗性上升\n（目前这是只有敌人才能使用的效果）","description":"破坏率抗性上升",
         "stack":"-",
         "type":"其他",
@@ -1059,7 +1059,7 @@
     },
     "无法换位":{
         "name":"无法换位",
-        "path":"./战斗系统/状态/Restraint.webp",
+        "path":"./战斗系统/状态/Restraint.png",
         "effect":"无法更换站位","description":"无法更换站位",
         "stack":"-",
         "type":"其他",
@@ -1075,7 +1075,7 @@
     },
     "SP上限增加":{
         "name":"SP上限增加",
-        "path":"./战斗系统/状态/SpLimitOverwrite.webp",
+        "path":"./战斗系统/状态/SpLimitOverwrite.png",
         "effect":"SP上限变为30（默认限制为20）","description":"SP上限变为30（默认限制为20）",
         "stack":"-",
         "type":"其他",
@@ -1083,7 +1083,7 @@
     },
     "SP消耗增加":{
         "name":"SP消耗增加",
-        "path":"./战斗系统/状态/Fatigue.webp",
+        "path":"./战斗系统/状态/Fatigue.png",
         "effect":"SP消耗量增加2","description":"SP消耗量增加2",
         "stack":"-",
         "type":"其他",
