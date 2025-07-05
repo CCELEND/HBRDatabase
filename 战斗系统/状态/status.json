@@ -867,7 +867,7 @@
     },
     "嘲讽":{
         "name":"嘲讽",
-        "path":"./战斗系统/状态/Provoke.webp",
+        "path":"./战斗系统/状态/Target.png",
         "effect":"只能攻击特定目标","description":"让敌方攻击自身",
         "stack":"-",
         "type":"其他",
