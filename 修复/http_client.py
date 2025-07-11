@@ -7,8 +7,8 @@ from tkinter import ttk
 from threading import Thread
 from urllib.parse import quote
 
-from window import set_window_icon
-from tools import creat_directory, confirm_restart
+from window import set_window_icon, creat_window
+from tools import creat_directory
 
 is_updating = False
         
@@ -22,10 +22,8 @@ def download_files_with_progress(files_to_download, server_url):
 
     global is_updating
     # 创建进度窗口
-    progress_window = tk.Toplevel()
-    progress_window.title("更新")
-    progress_window.geometry("600x166")
-    set_window_icon(progress_window, "./更新/net.ico")
+    progress_window = creat_window("修复", 600, 166, 440, 50)
+    set_window_icon(progress_window, "./修复/net.ico")
     
     # 进度条
     progress = ttk.Progressbar(progress_window, orient="horizontal", 
@@ -34,7 +32,7 @@ def download_files_with_progress(files_to_download, server_url):
     
     # 状态标签
     status_var = tk.StringVar()
-    status_var.set("正在下载更新资源...")
+    status_var.set("正在下载修复资源...")
     status_label = tk.Label(progress_window, textvariable=status_var)
     status_label.pack()
     
@@ -56,8 +54,11 @@ def download_files_with_progress(files_to_download, server_url):
         else:
             global is_updating
             is_updating = False
-            status_var.set("更新完成！")
-            confirm_restart("更新完成")
+            status_var.set("修复完成！")
+            messagebox.showinfo("提示", "成功修复与重置")
+            progress_window.destroy()  # 先销毁窗口
+            progress_window.quit()  # 停止主循环
+            sys.exit()
     
     def download_thread():
         total_files = len(files_to_download)
@@ -65,7 +66,7 @@ def download_files_with_progress(files_to_download, server_url):
         
         for i, file_name in enumerate(files_to_download):
             try:
-                file_var.set(f"下载更新：'{file_name}' ({i+1}/{total_files})")
+                file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
                 progress_window.update()
                 
                 # 创建目录
@@ -85,6 +86,7 @@ def download_files_with_progress(files_to_download, server_url):
                         messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
                         global is_updating
                         is_updating = False
+                        progress_window.destroy()
                         break
                     
                     total_size = int(response.headers.get('content-length', 0))
@@ -108,6 +110,7 @@ def download_files_with_progress(files_to_download, server_url):
             except Exception as e:
                 messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
                 is_updating = False
+                progress_window.destroy()
                 break
             else:
                 # 完成一个文件，增加进度
@@ -121,6 +124,8 @@ def download_files_with_progress(files_to_download, server_url):
     # 在新线程中执行下载
     Thread(target=download_thread, daemon=True).start()
 
+    progress_window.mainloop()
+
 
 # 从服务器下载文件
 def download_files_from_server(server_url, files_to_download):
@@ -130,5 +135,5 @@ def download_files_from_server(server_url, files_to_download):
         download_files_with_progress(files_to_download, server_url)
 
     else:
-        messagebox.showinfo("提示", "已是最新版本")
+        messagebox.showinfo("提示", "未发现资源缺失")
         
