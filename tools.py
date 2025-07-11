@@ -188,6 +188,33 @@ def delete_webp_files(directory: str) -> None:
                 print(f"[-] 删除 {webp_file} 时出错: {e}")
 
 
+def delete_mp3_files(directory: str) -> None:
+
+    # 检查目录是否存在
+    if not os.path.exists(directory):
+        return
+    
+    # 检查是否为有效目录
+    if not os.path.isdir(directory):
+        return
+    
+    # 转换为Path对象以便使用更现代的文件操作API
+    dir_path = pathlib.Path(directory)
+    
+    # 遍历目录及其子目录中的所有.mp3文件
+    for mp3_file in dir_path.rglob('*.mp3'):
+        # 构建同名flac文件路径
+        flac_file = mp3_file.with_suffix('.flac')
+        # 检查flac文件是否存在
+        if flac_file.exists():
+            try:
+                # 删除文件
+                mp3_file.unlink()
+            except PermissionError:
+                print(f"[-] 没有权限删除 {mp3_file}")
+            except Exception as e:
+                print(f"[-] 删除 {mp3_file} 时出错: {e}")
+
 def delete_all_files_and_subdirs(directory):
     if not os.path.isdir(directory):
         return
