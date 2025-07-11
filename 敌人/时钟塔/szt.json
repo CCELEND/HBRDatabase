@@ -907,6 +907,120 @@
             "weakness":"突-150、冰-150","resist":"打+50"
         }
     }
+},
+
+"HELL-43F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-43F",
+    "enemys":
+    {
+        "SwellThunderCrow":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"SwellThunderCrow",
+            "border":"420",
+            "DP":"17,200,000","HP":"1,500,000",
+            "weakness":"突-150、火-150","resist":"打+50"
+        }
+    }
+},
+
+"HELL-44F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-44F",
+    "enemys":
+    {
+        "暗影·可怜[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·可怜[]",
+            "border":"420",
+            "DP":"850,000","HP":"18,500,000",
+            "weakness":"斩-150","resist":""
+        }
+    }
+},
+
+"HELL-45F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-45F",
+    "enemys":
+    {
+        "HailHorse":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"HailHorse",
+            "border":"420",
+            "DP":"4,500,000","HP":"2,000,000",
+            "weakness":"突-50、雷-50","resist":"打+50、冰+75"
+        },
+        "HailHorse2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"HailHorse2",
+            "border":"420",
+            "DP":"4,500,000","HP":"2,000,000",
+            "weakness":"突-50、雷-50","resist":"打+50、冰+75"
+        }
+    }
+},
+
+"HELL-46F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-46F",
+    "enemys":
+    {
+        "暗影·阿迪尔海德[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·阿迪尔海德[]",
+            "border":"420",
+            "DP":"1,350,000","HP":"28,000,000",
+            "weakness":"斩-150","resist":""
+        },
+        "暗影·阿迪尔海德2[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·阿迪尔海德2[]",
+            "border":"420",
+            "DP":"1,350,000","HP":"28,000,000",
+            "weakness":"斩-150","resist":""
+        },
+        "暗影·阿迪尔海德3[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·阿迪尔海德3[]",
+            "border":"420",
+            "DP":"1,350,000","HP":"28,000,000",
+            "weakness":"斩-150","resist":""
+        }
+    }
+},
+
+"HELL-47F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-47F",
+    "enemys":
+    {
+        "DarkBird":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DarkBird",
+            "border":"420",
+            "DP":"4,300,000","HP":"2,700,000",
+            "weakness":"突-50、光-100","resist":"打+50"
+        }
+    }
 }
 
 }
