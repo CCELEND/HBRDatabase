@@ -135,5 +135,5 @@ def download_files_from_server(server_url, files_to_download):
         download_files_with_progress(files_to_download, server_url)
 
     else:
-        messagebox.showinfo("提示", "未发现资源缺失")
+        messagebox.showinfo("提示", "未发现资源完整性冲突")
         
