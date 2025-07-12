@@ -12,6 +12,9 @@ from window import set_window_icon, creat_Toplevel, set_window_top
 from tools import load_json
 from 时钟塔.szt_info import szts, get_all_szt_obj
 
+from 战斗系统.属性.attributes_info import get_all_attribute_obj
+import 战斗系统.属性.attributes_info
+
 szts_json = {}
 # 加载资源文件
 def load_resources():
@@ -30,6 +33,73 @@ def bind_szt_canvas(parent_frame, szt, x, y):
 
     bind_canvas_events(canvas, 
         creat_szt_win, parent_frame=parent_frame, szt=szt)
+
+def extract_compound_attributes(s):
+    # 定义已知的基础元素
+    base_elements = {'火', '冰', '雷', '光', '暗', '无', '斩', '突', '打'}
+    
+    parts = [part.strip() for part in s.split('、')]
+    result = {}
+    
+    for part in parts:
+        # 查找数值部分的分隔位置
+        sign_pos = None
+        for i, char in enumerate(part):
+            if char in '+-':
+                sign_pos = i
+                break
+        
+        if sign_pos is None:
+            # 如果没有找到符号，将整个部分作为键，值为None
+            result[part] = None
+            continue
+        
+        attr_part = part[:sign_pos]
+        value = int(part[sign_pos:])
+        
+        # 检查是否是复合属性（包含多个基础元素）
+        elements = []
+        for elem in base_elements:
+            if elem in attr_part:
+                elements.append(elem)
+        
+        if elements:
+            # 如果是复合属性，为每个元素分配相同的值
+            for elem in elements:
+                result[elem] = value
+        else:
+            # 如果不是已知的基础元素，保持原样
+            result[attr_part] = value
+    
+    return result
+
+def creat_attributes_img_value(info_frames, attribute_value_dir, up_photo, down_photo):
+
+    for i, attribute_name in enumerate(attribute_value_dir):
+        if not attribute_name:
+            break
+        attribute = 战斗系统.属性.attributes_info.attributes[attribute_name]
+        value = attribute_value_dir[attribute_name]
+        
+        # 获取 attribute 图对象
+        attribute_photo = get_photo(attribute.path, (40, 40))
+
+        # 信息 frame，包含：弱点或者抗性图标和数值
+        info_frame = ttk.Frame(info_frames)
+        info_frame.grid(row=0, column=i, sticky="nsew")
+        info_frame.grid_rowconfigure(0, weight=1) # 确保行填充
+        
+        canvas = create_canvas_with_image(info_frame, attribute_photo, 
+            50, 40, 5, 0, 0, 0)
+        # 设置 up_photo 或者 down_photo 图坐标
+        if value < 0:
+            canvas.create_image(25, 20, anchor="nw", image=up_photo)
+        else:
+            canvas.create_image(25, 20, anchor="nw", image=down_photo)
+
+        # 显示数值
+        value_label = ttk.Label(info_frame, text=value, anchor="center")
+        value_label.grid(row=1, column=0, sticky="nsew")
 
 
 open_szt_wins = {}
@@ -57,8 +127,11 @@ def creat_szt_win(event, parent_frame, szt):
     set_window_icon(szt_win_frame, szt.logo_path)
     open_szt_wins[szt.name] = szt_win_frame
 
+    # 获取 up_down 图对象
+    up_photo = get_photo("./战斗系统/状态/IconUp.webp", (20, 20))
+    down_photo = get_photo("./战斗系统/状态/IconDown.webp", (20, 20))
+
     # 配置 szt_win_frame 的布局
-    szt_win_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
     for col_index in range(4):
         szt_win_frame.grid_columnconfigure(col_index, weight=1)
 
@@ -99,11 +172,35 @@ def creat_szt_win(event, parent_frame, szt):
         HP_label = ttk.Label(info_frame, text="HP："+enemy.HP, anchor="w")
         HP_label.grid(row=0, column=2, sticky="nsew")
 
-        weakness_label = ttk.Label(info_frame, text="弱点："+enemy.weakness, anchor="w")
-        weakness_label.grid(row=0, column=3, sticky="nsew")
+        # 弱点 frame
+        weakness_frame = ttk.Frame(info_frame)
+        weakness_frame.grid(row=0, column=3, sticky="nsew")
+        weakness_frame.grid_rowconfigure(0, weight=1) # 确保行填充
+        # 标签
+        weakness_label = ttk.Label(weakness_frame, text="弱点：", anchor="w")
+        weakness_label.grid(row=0, column=0, sticky="nsew")
+        # 弱点信息 frame 集
+        weakness_info_frames = ttk.Frame(weakness_frame)
+        weakness_info_frames.grid(row=0, column=1, sticky="nsew")
+        weakness_info_frames.grid_rowconfigure(0, weight=1) # 确保行填充
 
-        resist_label = ttk.Label(info_frame, text="抗性："+enemy.resist, anchor="w")
-        resist_label.grid(row=0, column=4, sticky="nsew")
+        attribute_value_dir = extract_compound_attributes(enemy.weakness)
+        creat_attributes_img_value(weakness_info_frames, attribute_value_dir, up_photo, down_photo)
+
+        # 抗性 frame
+        resist_frame = ttk.Frame(info_frame)
+        resist_frame.grid(row=0, column=4, sticky="nsew")
+        resist_frame.grid_rowconfigure(0, weight=1) # 确保行填充
+        # 标签
+        resist_label = ttk.Label(resist_frame, text="抗性：", anchor="w")
+        resist_label.grid(row=0, column=0, sticky="nsew")
+        # 抗性信息 frame 集
+        resist_info_frames = ttk.Frame(resist_frame)
+        resist_info_frames.grid(row=0, column=1, sticky="nsew")
+        resist_info_frames.grid_rowconfigure(0, weight=1) # 确保行填充
+
+        attribute_value_dir = extract_compound_attributes(enemy.resist)
+        creat_attributes_img_value(resist_info_frames, attribute_value_dir, up_photo, down_photo)
 
 
     # 绑定鼠标点击事件到父窗口，点击置顶
@@ -182,6 +279,8 @@ def create_szt_interface(scrollbar_frame_obj, szts):
 def show_szt_enemys(scrollbar_frame_obj):
 
     load_resources()
+
+    get_all_attribute_obj()
 
     get_all_szt_obj(szts_json)
 
