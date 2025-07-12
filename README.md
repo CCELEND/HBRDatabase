@@ -2,12 +2,12 @@
 
 * python3.8 以上  
 * opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
-
 >运行 install_module.py 安装依赖模块
 
 ## 使用
 
->运行 HBRDatabaseGUI.py 即可，无控制台窗口运行：HBRDatabaseGUI.pyw
+* 运行 HBRDatabaseGUI.py 即可
+>无控制台窗口运行：HBRDatabaseGUI.pyw
 
 ### 角色
 
@@ -21,11 +21,11 @@
 
 ### 持有物
 
->点击光球可以查看光球技能
+* 点击光球可以查看光球技能
 
 ### 工具
 
->包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
+* 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
 1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
 * 修改 config.ini 配置文件：  
 >使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini    
