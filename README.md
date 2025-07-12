@@ -37,7 +37,7 @@
 	RandomMainAbility_index=  
 * 控制获取数据数，修改 DataCount，这里默认是获取300条数据  
 	DataCount=300  
-> （如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系）  
+>如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系。
 2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
 > 第一次获取时需要登录，后续会自动登录    
 * 需要安装最新版本的 chrome 浏览器，登录之后可能会出现没有数据的情况，刷新一下网页即可  
@@ -57,11 +57,11 @@
 ### 更新
 
 * 点击更新菜单栏，更新数据和版本
-> 更新失败的话多更新几次。更新后如果启动失败，需要运行一下 install_module.py
+>更新失败的话多更新几次。更新后如果启动失败，需要运行一下 install_module.py
 
 ### 修复
 
-> 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
+>当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
 
 ### show
 
