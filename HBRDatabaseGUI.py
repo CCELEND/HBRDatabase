@@ -221,8 +221,6 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
     parent_frame.config(menu=menu_bar)
 
-
-bg = []
 if __name__ == "__main__":
 
     delete_webp_files("./")
