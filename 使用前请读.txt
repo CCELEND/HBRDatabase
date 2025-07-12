@@ -63,4 +63,6 @@
 
 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
 
+### show
+
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show.png)
