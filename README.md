@@ -4,11 +4,11 @@
 
 ### opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
 
-运行 install_module.py 安装依赖模块
+> 运行 install_module.py 安装依赖模块
 
 ## 使用
 
-运行 HBRDatabaseGUI.py 即可，无控制台窗口运行：HBRDatabaseGUI.pyw
+> 运行 HBRDatabaseGUI.py 即可，无控制台窗口运行：HBRDatabaseGUI.pyw
 
 ### 角色
 
@@ -27,7 +27,7 @@
 
 ### 工具
 
-包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
+> 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
 1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
 * 修改 config.ini 配置文件：  
 使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini    
@@ -53,15 +53,15 @@
 
 ### 音乐
 
-点击音乐菜单栏，双击想听的歌，等待从服务器下载，然后播放即可
+> 点击音乐菜单栏，双击想听的歌，等待从服务器下载，然后播放即可
 
 ### 更新
 
-点击更新菜单栏，更新数据和版本，更新失败的话多更新几次。更新后如果启动失败，需要运行一下 install_module.py
+> 点击更新菜单栏，更新数据和版本，更新失败的话多更新几次。更新后如果启动失败，需要运行一下 install_module.py
 
 ### 修复
 
-当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
+> 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
 
 ### show
 
