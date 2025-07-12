@@ -161,13 +161,15 @@ def creat_weapon_master_skill_frame(parent_frame, role):
 
         weapon_photo = get_photo(weapon.path, (60, 60))
         weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
-            weapon_photo, 100, 100, 20, 30, 0, 0)
+            weapon_photo, 104, 100, 20, 30, 0, 0)
 
-        master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 68))
+        master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 80))
         master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
             master_skill_photo, 100, 100, 10, 16, 1, 0)
 
-        mouse_bind_canvas_events(master_skill_canvas)
+        # mouse_bind_canvas_events(master_skill_canvas)
+        mouse_bind_canvas_events2(master_skill_canvas)
+        
         bind_canvas_events(master_skill_canvas, 
             creat_master_skill_win, parent_frame=parent_frame, role=role)
     else:
