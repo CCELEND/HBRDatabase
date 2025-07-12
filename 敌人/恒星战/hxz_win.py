@@ -84,7 +84,7 @@ def show_hxz_enemys(scrollbar_frame_obj):
         hxz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=hxz_name)
         photo = get_photo(hxz.img_path, (128, 72))
         canvas = create_canvas_with_image(hxz_frame, 
-            photo, 130, 130, 1, 29, 0, 0)
+            photo, 130, 130, 20, 29, 0, 0)
 
         base_canvas = create_canvas_with_image(hxz_frame, 
             base_photo, 130, 130, 0, 15, 0, 1)
