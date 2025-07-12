@@ -17,7 +17,8 @@
 ### 搜索
 
 * 点击搜索菜单栏，目前支持搜索角色风格，可以根据关键词的技能、风格名称和俗称进行搜索，多个关键词用逗号分隔  
-* 搜索技能或者效果时，需要指定主动或者被动。（关键词如有疏漏请与我联系）
+* 搜索技能或者效果时，需要指定主动或者被动。
+>关键词如有疏漏请与我联系
 
 ### 持有物
 
@@ -27,8 +28,7 @@
 
 * 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
 1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
-* 修改 config.ini 配置文件：  
->使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini    
+>使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini   
 * 填入洗孔的 seed 和 index：  
 	ChangeAbility_seed=  
 	ChangeAbility_index=  
@@ -48,7 +48,6 @@
 5. hbr-axletool：一个 HBR 的排轴工具网站  
 6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备  
 7. 资源和攻略网站：hbr.quest、入队培训手册、gamekee、game8
-
 
 ### 音乐
 
