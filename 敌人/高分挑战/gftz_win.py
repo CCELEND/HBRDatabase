@@ -27,11 +27,11 @@ def bind_gftz_canvas(parent_frame, gftz, x, y):
     if "攻略" in gftz.name:
         photo = get_photo(gftz.img_path, (90, 90))
         canvas = create_canvas_with_image(parent_frame, 
-            photo, 130, 130, 20, 20, x, y)
+            photo, 130, 130, 30, 20, x, y)
     else:
         photo = get_photo(gftz.img_path, (128, 72))
         canvas = create_canvas_with_image(parent_frame, 
-            photo, 130, 130, 1, 29, x, y)
+            photo, 130, 130, 20, 29, x, y)
     mouse_bind_canvas_events(canvas)
 
     if gftz.guide_path:
