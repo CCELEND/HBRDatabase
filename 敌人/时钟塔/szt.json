@@ -712,10 +712,10 @@
     "name":"HELL-33F",
     "enemys":
     {
-        "DiamondEyeS":
+        "钻石眼魔S":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"DiamondEyeS",
+            "img_path":"./敌人/时钟塔/HELL-33F/钻石眼魔S.png",
+            "name":"钻石眼魔S",
             "border":"410",
             "DP":"120,000","HP":"11,000,000",
             "weakness":"打-50","resist":"斩+75"
@@ -730,18 +730,18 @@
     "name":"HELL-34F",
     "enemys":
     {
-        "WireRedβ":
+        "血红线圈巨轮β":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"WireRedβ",
+            "img_path":"./敌人/时钟塔/HELL-34F/血红线圈巨轮β.png",
+            "name":"血红线圈巨轮β",
             "border":"410",
             "DP":"550,000","HP":"17,000,000",
             "weakness":"斩-50、冰-100","resist":""
         },
-        "WireRedβ2":
+        "血红线圈巨轮β2":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"WireRedβ2",
+            "img_path":"./敌人/时钟塔/HELL-34F/血红线圈巨轮β.png",
+            "name":"血红线圈巨轮β2",
             "border":"410",
             "DP":"550,000","HP":"17,000,000",
             "weakness":"斩-50、冰-100","resist":""
@@ -756,10 +756,10 @@
     "name":"HELL-35F",
     "enemys":
     {
-        "暗影·丸山[]":
+        "暗影·丸山[不断进化]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·丸山[]",
+            "img_path":"./敌人/时钟塔/HELL-35F/暗影·丸山[不断进化].png",
+            "name":"暗影·丸山[不断进化]",
             "border":"410",
             "DP":"7,700,000","HP":"1,050,000",
             "weakness":"突-150、暗-150","resist":"打+75"
@@ -774,10 +774,10 @@
     "name":"HELL-36F",
     "enemys":
     {
-        "PurpleElephantWhip":
+        "黛紫鞭挞巨象":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"PurpleElephantWhip",
+            "img_path":"./敌人/时钟塔/HELL-36F/黛紫鞭挞巨象.png",
+            "name":"黛紫鞭挞巨象",
             "border":"410",
             "DP":"2,300,000","HP":"62,500,000",
             "weakness":"斩-150、光-150","resist":"突+50"
@@ -792,18 +792,18 @@
     "name":"HELL-37F",
     "enemys":
     {
-        "暗影·丸山2[]":
+        "暗影·丸山[不断进化]2":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·丸山2[]",
+            "img_path":"./敌人/时钟塔/HELL-37F/暗影·丸山[不断进化]2.png",
+            "name":"暗影·丸山[不断进化]2",
             "border":"410",
             "DP":"8,400,000","HP":"1,380,000",
             "weakness":"突-150、暗-150","resist":"打+75"
         },
-        "暗影·柳[]":
+        "暗影·柳[Rose]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·柳[]",
+            "img_path":"./敌人/时钟塔/HELL-37F/暗影·柳[Rose].png",
+            "name":"暗影·柳[Rose]",
             "border":"410",
             "DP":"4,900,000","HP":"3,200,000",
             "weakness":"突-150、暗-150","resist":"打+75"
@@ -818,18 +818,18 @@
     "name":"HELL-38F",
     "enemys":
     {
-        "CorollaScythe":
+        "花冠战镰":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"CorollaScythe",
+            "img_path":"./敌人/时钟塔/HELL-38F/花冠战镰.png",
+            "name":"花冠战镰",
             "border":"420",
             "DP":"4,300,000","HP":"500,000",
             "weakness":"突-150","resist":""
         },
-        "CurseDoll":
+        "诅咒玩偶2":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"CurseDoll",
+            "img_path":"./敌人/时钟塔/HELL-38F/诅咒玩偶.png",
+            "name":"诅咒玩偶2",
             "border":"420",
             "DP":"4,100,000","HP":"500,000",
             "weakness":"打-150","resist":""
@@ -844,10 +844,10 @@
     "name":"HELL-39F",
     "enemys":
     {
-        "暗影·樱庭[]":
+        "暗影·樱庭[星海]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·樱庭[]",
+            "img_path":"./敌人/时钟塔/HELL-39F/暗影·樱庭[星海].png",
+            "name":"暗影·樱庭[星海]",
             "border":"420",
             "DP":"3,300,000","HP":"2,500,000",
             "weakness":"打-150","resist":"斩突+75"
@@ -862,10 +862,10 @@
     "name":"HELL-40F",
     "enemys":
     {
-        "GiraffeIce":
+        "寒冰长颈":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"GiraffeIce",
+            "img_path":"./敌人/时钟塔/HELL-40F/寒冰长颈.png",
+            "name":"寒冰长颈",
             "border":"420",
             "DP":"2,000,000","HP":"15,000,000",
             "weakness":"打-150、雷-150","resist":"斩+50"
@@ -880,10 +880,10 @@
     "name":"HELL-41F",
     "enemys":
     {
-        "暗影·石榴石[]":
+        "暗影·艾琳[石榴石]":
         {
-            "img_path":"./敌人/时钟塔/boss.png",
-            "name":"暗影·石榴石[]",
+            "img_path":"./敌人/时钟塔/HELL-41F/暗影·艾琳[石榴石].png",
+            "name":"暗影·艾琳[石榴石]",
             "border":"420",
             "DP":"3,600,000","HP":"1,300,000",
             "weakness":"突-150","resist":""
@@ -898,10 +898,10 @@
     "name":"HELL-42F",
     "enemys":
     {
-        "ArachneRedLine":
+        "阿拉克尼血红巨蛛":
         {
-            "img_path":"./敌人/时钟塔/ordinary.png",
-            "name":"ArachneRedLine",
+            "img_path":"./敌人/时钟塔/HELL-42F/阿拉克尼血红巨蛛.png",
+            "name":"阿拉克尼血红巨蛛",
             "border":"420",
             "DP":"3,600,000","HP":"38,000,000",
             "weakness":"突-150、冰-150","resist":"打+50"
