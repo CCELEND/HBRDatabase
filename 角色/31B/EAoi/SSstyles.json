@@ -218,9 +218,9 @@
         "OD条上升",
         "5%",
 
-        "1",
-        "己方回合",
-        "自身"]
+        null,
+        null,
+        null]
     ],
     "GrowthAbility":"挑衅、注意状态：减轻伤害值",
     "status_growth":{
