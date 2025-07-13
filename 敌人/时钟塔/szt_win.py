@@ -28,7 +28,7 @@ def bind_szt_canvas(parent_frame, szt, x, y):
 
     photo = get_photo(szt.img_path, (72, 72))
     canvas = create_canvas_with_image(parent_frame, 
-        photo, 90, 90, 9, 9, x, y)
+        photo, 90, 90, 40, 9, x, y)
     mouse_bind_canvas_events(canvas)
 
     bind_canvas_events(canvas, 
