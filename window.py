@@ -1,4 +1,4 @@
-
+import os
 import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import Menu, messagebox
@@ -66,17 +66,40 @@ def set_window_colum_expand(frame, columnspan=1):
     for col in range(columnspan):
         frame.grid_columnconfigure(col, weight=1)
 
-# ico 设置窗口图标
+# 设置窗口图标
 def set_window_icon(frame, icon_path):
+    # 检查文件是否存在
+    if not os.path.exists(icon_path):
+        messagebox.showerror("错误", "图标文件未找到")
+        return
+
+    # 获取文件扩展名并转换为小写
+    file_ext = os.path.splitext(icon_path)[1].lower()
+
     try:
-        frame.iconbitmap(icon_path)  # 尝试加载 .ico 文件
-    except tk.TclError:
-        try:
-            icon_image = Image.open(icon_path)  # 尝试加载 .png 文件
-            icon_photo = ImageTk.PhotoImage(icon_image)
-            frame.iconphoto(True, icon_photo)
-        except FileNotFoundError:
-            messagebox.showerror("错误", "图标文件未找到")
+        if file_ext == '.ico':
+            # 直接使用ICO文件
+            frame.iconbitmap(icon_path)
+        elif file_ext in ['.png', '.jpg', '.jpeg', '.bmp']:
+            # 加载图像并调整为64×64像素
+            image = Image.open(icon_path)
+            image = image.resize((64, 64), Image.LANCZOS)
+            
+            # 创建临时ICO文件路径
+            temp_ico_path = os.path.splitext(icon_path)[0] + '_temp.ico'
+            
+            # 保存为ICO格式
+            image.save(temp_ico_path, format='ICO', sizes=[(64, 64)])
+            
+            # 设置窗口图标
+            frame.iconbitmap(temp_ico_path)
+            
+            # 清理临时文件（可选）
+            os.remove(temp_ico_path)
+        else:
+            messagebox.showerror("错误", "不支持的文件格式，请使用ICO、PNG、JPG或BMP格式")
+    except Exception as e:
+        messagebox.showerror("错误", f"设置图标时出错: {str(e)}")
 
 # webp 设置窗口图标，并可以指定图标大小
 def set_window_icon_webp_save(frame, webp_path, size=(64, 64)):
