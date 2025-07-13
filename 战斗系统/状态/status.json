@@ -1137,6 +1137,15 @@
         "stack":"-",
         "type":"其他",
         "series":"对HP百分比伤害"         
+    },
+
+    "浓雾":{
+        "name":"浓雾",
+        "path":"./战斗系统/状态/PhantasmBuff.png",
+        "effect":"无效化因敌人行动而受到的伤害和DEBUFF（不可解除）","description":"无效化因敌人行动而受到的伤害和DEBUFF（不可解除）",
+        "stack":"-",
+        "type":"其他",
+        "series":"浓雾"         
     }
 
 }
