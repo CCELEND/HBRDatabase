@@ -36,6 +36,7 @@ album_cover_paths={
     "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2":"./音乐/下载/HEAVEN_BURNS_RED_Original_Sound_Track_Vol2/HEAVEN_BURNS_RED_Original_Sound_Track_Vol2.jpg",
     "Love_Song_from_the_Water":"./音乐/下载/Love_Song_from_the_Water/Love_Song_from_the_Water.jpg",
     "麻枝准_やなぎなぎ":"./音乐/下载/麻枝准_やなぎなぎ/",
+    "麻枝准_rionos":"./音乐/下载/麻枝准_rionos/",
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
     "Stargazer":"./音乐/下载/Stargazer/",
     "Inst_Test_Examples":"./音乐/下载/Inst_Test_Examples/"
@@ -44,6 +45,8 @@ album_cover_paths={
 def get_album_cover_path(all_albun_name, file_name):
     if all_albun_name == "麻枝准_やなぎなぎ":
         return album_cover_paths["麻枝准_やなぎなぎ"] + file_name.replace("flac", "jpg")
+    elif all_albun_name == "麻枝准_rionos":
+        return album_cover_paths["麻枝准_rionos"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "She_is_Legend":
         file_name = file_name.replace("03.陽のさす向こうへ", "02.春眠旅団")
         file_name = file_name.replace("11.World We Changed", "02.春眠旅団")

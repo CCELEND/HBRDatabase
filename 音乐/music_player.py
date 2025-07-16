@@ -17,6 +17,7 @@ music_dir = {
     "OST2": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2",
     "Love_Song_from_the_Water":"Love_Song_from_the_Water",
     "麻枝准_やなぎなぎ":"麻枝准_やなぎなぎ",
+    "麻枝准_rionos":"麻枝准_rionos",
     "She_is_Legend":"She_is_Legend",
     "Stargazer":"Stargazer",
     "Inst_Test_Examples":"Inst_Test_Examples"
