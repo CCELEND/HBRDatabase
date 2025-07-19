@@ -66,6 +66,7 @@ from 工具.hbr_tool.Load import load_hbr_tool
 from 工具.hbr_axletool.Load import load_hbr_axletool
 from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
 from 工具.词条计算器.Load import load_entry_calculator
+from 工具.o_hbr_quest.Load import load_o_hbr_quest
 from 工具.hbr_quest.Load import load_hbr_quest
 from 工具.game8_hbr.Load import load_game8_hbr
 from 工具.gamekee_hbr.Load import load_gamekee_hbr
@@ -200,6 +201,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
 
+        ("o.hbr.quest", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
         ("入队培训手册", load_game_bilibili_com),
         ("gamekee", load_gamekee_hbr),
