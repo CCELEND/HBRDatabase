@@ -168,6 +168,9 @@
     "1003505":{
         "style_name":"少女的休憩", "character_role":"破坏者", "element_type":"暗", "weapon_type":"斩"
     },
+    "1003506":{
+        "style_name":"向日葵", "character_role":"破坏者", "element_type":"火", "weapon_type":"斩"
+    },
     "1003603":{
         "style_name":"甜美的枪口", "character_role":"增益者", "element_type":"冰", "weapon_type":"突"
     },
@@ -176,6 +179,9 @@
     },
     "1003605":{
         "style_name":"Crying Tears", "character_role":"攻击者", "element_type":"冰", "weapon_type":"突"
+    },
+    "1003606":{
+        "style_name":"比肩烈日", "character_role":"攻击者", "element_type":"火", "weapon_type":"突"
     },
 
 
@@ -187,6 +193,9 @@
     },
     "1004106":{
         "style_name":"盛夏的近卫", "character_role":"攻击者", "element_type":"暗", "weapon_type":"斩"
+    },
+    "1004107":{
+        "style_name":"月色真美", "character_role":"攻击者", "element_type":"冰", "weapon_type":"斩"
     },
     "1004203":{
         "style_name":"黑夜散去，一闪心静", "character_role":"攻击者", "element_type":"暗", "weapon_type":"打"
