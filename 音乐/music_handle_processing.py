@@ -39,6 +39,7 @@ album_cover_paths={
     "麻枝准_rionos":"./音乐/下载/麻枝准_rionos/",
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
     "Stargazer":"./音乐/下载/Stargazer/",
+    "Summer_Pockets_Original_Sound_Track":"./音乐/下载/Summer_Pockets_Original_Sound_Track/Summer_Pockets_Original_Sound_Track.jpg",
     "Inst_Test_Examples":"./音乐/下载/Inst_Test_Examples/"
 
 }
