@@ -40,6 +40,7 @@ album_cover_paths={
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
     "Stargazer":"./音乐/下载/Stargazer/",
     "Summer_Pockets_Original_Sound_Track":"./音乐/下载/Summer_Pockets_Original_Sound_Track/Summer_Pockets_Original_Sound_Track.jpg",
+    "CLANNAD_Original_Sound_Track":"./音乐/下载/CLANNAD_Original_Sound_Track/CLANNAD_Original_Sound_Track.png",
     "Inst_Test_Examples":"./音乐/下载/Inst_Test_Examples/"
 
 }

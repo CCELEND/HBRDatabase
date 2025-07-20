@@ -21,6 +21,7 @@ music_dir = {
     "She_is_Legend":"She_is_Legend",
     "Stargazer":"Stargazer",
     "Summer_Pockets_Original_Sound_Track":"Summer_Pockets_Original_Sound_Track",
+    "CLANNAD_Original_Sound_Track":"CLANNAD_Original_Sound_Track",
     "Inst_Test_Examples":"Inst_Test_Examples"
 }
 
