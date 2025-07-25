@@ -44,6 +44,10 @@ def write_numbers_back(text, modified_numbers, type):
     numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
     n = len(numbers_with_commas)
     effective_range = n if n % 2 == 0 else n - 1
+
+    if "充能" in text:
+        numbers_with_commas = numbers_with_commas[:2]
+        effective_range = 2
     
     # 替换数字（保留原始格式的逗号）
     for i, num in enumerate(numbers_with_commas[:effective_range]):
