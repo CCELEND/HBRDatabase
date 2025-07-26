@@ -4,6 +4,8 @@ import pathlib
 from PIL import Image
 from tkinter import messagebox
 import json
+import hashlib
+import binascii
 import re
 import shutil
 from pathlib import Path
@@ -290,3 +292,20 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
     except Exception as e:
         messagebox.showerror("错误", f"读取文件时发生意外错误: {file_path}\n{e}")
         return None
+
+def compute_hash(text, algorithm = "sha256"):
+
+    # algorithm (str): 
+    # md5
+    # sha1
+    # sha224, sha256, sha384, sha512 
+    # sha3_224, sha3_256, sha3_384, sha3_512
+    # blake2s 
+    # crc32 非加密
+    
+    if algorithm == "crc32":
+        return hex(binascii.crc32(text.encode('utf-8')))[2:]
+
+    hash_func = hashlib.new(algorithm)
+    hash_func.update(text.encode('utf-8'))
+    return hash_func.hexdigest()
