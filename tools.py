@@ -185,9 +185,9 @@ def delete_webp_files(directory: str) -> None:
                 # 删除文件
                 webp_file.unlink()
             except PermissionError:
-                print(f"[-] 没有权限删除 {webp_file}")
+                messagebox.showerror("错误", f"[-] 没有权限删除 {webp_file}")
             except Exception as e:
-                print(f"[-] 删除 {webp_file} 时出错: {e}")
+                messagebox.showerror("错误", f"[-] 删除 {webp_file} 时出错: {e}")
 
 
 def delete_mp3_files(directory: str) -> None:
@@ -213,9 +213,9 @@ def delete_mp3_files(directory: str) -> None:
                 # 删除文件
                 mp3_file.unlink()
             except PermissionError:
-                print(f"[-] 没有权限删除 {mp3_file}")
+                messagebox.showerror("错误", f"[-] 没有权限删除 {mp3_file}")
             except Exception as e:
-                print(f"[-] 删除 {mp3_file} 时出错: {e}")
+                messagebox.showerror("错误", f"[-] 删除 {mp3_file} 时出错: {e}")
 
 def delete_all_files_and_subdirs(directory):
     if not os.path.isdir(directory):
@@ -225,7 +225,7 @@ def delete_all_files_and_subdirs(directory):
         shutil.rmtree(directory)
         return True
     except Exception as e:
-        print(f"[-] 清空目录时发生错误: {e}")
+        messagebox.showerror("错误", f"[-] 清空目录时发生错误: {e}")
         return False
 
 
@@ -237,7 +237,7 @@ def delete_file(file):
         os.remove(file)
         return True
     except Exception as e:
-        print(f"[-] 删除文件时发生错误: {e}")
+        messagebox.showerror("错误", f"[-] 删除文件时发生错误: {e}")
         return False
 
 
