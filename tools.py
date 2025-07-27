@@ -309,3 +309,34 @@ def compute_hash(text, algorithm = "sha256"):
     hash_func = hashlib.new(algorithm)
     hash_func.update(text.encode('utf-8'))
     return hash_func.hexdigest()
+
+# bytes to hex str
+def convert_hex_escape_to_string(hex_escape_string):
+    # 使用正则表达式匹配\x后跟两个十六进制字符的模式
+    hex_pattern = r'\\x([0-9a-fA-F]{2})'
+    
+    # 查找所有匹配项
+    matches = re.findall(hex_pattern, hex_escape_string)
+    
+    # 将匹配到的十六进制值连接成字符串
+    result = ''.join(matches)
+    
+    return result
+
+# hex to bytes str
+def convert_hex_string_to_escape(hex_string):
+    # 确保输入是有效的十六进制字符串（只包含0-9和a-f或A-F）
+    if not re.match(r'^[0-9a-fA-F]+$', hex_string):
+        raise ValueError("输入必须是有效的十六进制字符串")
+    
+    # 确保十六进制字符串长度是偶数
+    if len(hex_string) % 2 != 0:
+        raise ValueError("十六进制字符串长度必须是偶数")
+    
+    # 将每两个字符作为一组，转换为\xHH格式
+    result = ''
+    for i in range(0, len(hex_string), 2):
+        byte = hex_string[i:i+2]
+        result += f'\\x{byte}'
+    
+    return result
