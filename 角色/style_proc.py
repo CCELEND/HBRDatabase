@@ -10,6 +10,8 @@ def extract_skill_numbers(text, type):
         strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "防御上升":
         strength_text = re.search(r"防御上升(.*?)，属性倍率", text, re.DOTALL).group(1)
+    elif type == "连击数上升":
+        strength_text = re.search(r"连击数上升(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "上升":
         strength_text = re.search(r"上升(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "下降":
@@ -33,6 +35,8 @@ def write_numbers_back(text, modified_numbers, type):
         parts = re.split(r"(回复DP.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "防御上升":
         parts = re.split(r"(防御上升.*?，属性倍率)", text, flags=re.DOTALL)
+    elif type == "连击数上升":
+        parts = re.split(r"(连击数上升.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "上升":
         parts = re.split(r"(上升.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "下降":
@@ -48,7 +52,7 @@ def write_numbers_back(text, modified_numbers, type):
     if "充能" in text:
         numbers_with_commas = numbers_with_commas[:2]
         effective_range = 2
-    
+
     # 替换数字（保留原始格式的逗号）
     for i, num in enumerate(numbers_with_commas[:effective_range]):
         new_num = "{:,}".format(modified_numbers[i]) # 添加千位分隔符
@@ -120,6 +124,15 @@ def get_lv_defense_min_max(defense_min_max, lv):
     lv_defense_max = int(lv_defense_max) if lv_defense_max.is_integer() else lv_defense_max
 
     return [lv_defense_min, lv_defense_max]
+
+# [] 返回不同等级连击数上升最大值 最小值 列表形式 [min, max]
+def get_lv_hit_min_max(hit_min_max, lv):
+    lv_hit_min = hit_min_max[0]
+    lv_hit_max = hit_min_max[1]
+    if int(lv) >= 8:
+        lv_hit_min += 1
+
+    return [lv_hit_min, lv_hit_max]
 
 # [] 返回不同等级debuff最大值 最小值 列表形式 [min, max]
 def get_lv_debuff_min_max(debuff_min_max, lv):
@@ -219,6 +232,26 @@ def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers0 = get_lv_defense_min_max(original_numbers[:2], lv)
             new_original_numbers1 = get_lv_defense_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "防御上升")
+
+        desc_lab["text"] = new_text
+    except:
+        return
+
+# 不同等级时的连击数上升数值处理
+def on_hit_combo_select(event, desc_lab, lv1_skill_strength):
+
+    try:
+        lv_select = event.widget.get()
+        lv = int(lv_select.replace("Skill Lv.",""))
+
+        original_numbers = extract_skill_numbers(lv1_skill_strength, "连击数上升")
+        if len(original_numbers) == 2:
+            new_original_numbers = get_lv_hit_min_max(original_numbers, lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers, "连击数上升")
+        else:
+            new_original_numbers0 = get_lv_hit_min_max(original_numbers[:2], lv)
+            new_original_numbers1 = get_lv_hit_min_max(original_numbers[2:], lv)
+            new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "连击数上升")
 
         desc_lab["text"] = new_text
     except:

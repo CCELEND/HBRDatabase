@@ -12,7 +12,7 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from 角色.style_info import is_skill_effect
 from 角色.style_proc import on_attack_combo_select, on_buff_attack_combo_select
 from 角色.style_proc import on_heal_combo_select
-from 角色.style_proc import on_defense_combo_select, on_buff_combo_select
+from 角色.style_proc import on_hit_combo_select, on_defense_combo_select, on_buff_combo_select
 from 角色.style_proc import on_debuff_combo_select
 from 角色.style_proc import on_mindeye_combo_select
 from 角色.style_proc import on_percentage_combo_select
@@ -116,6 +116,12 @@ def bind_lv_combo_lab(parent_frame, active_skill, lv_combo_labs, lv_combo_texts)
         lv_combo.bind(
             "<<ComboboxSelected>>", 
             partial(on_defense_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
+        )
+    elif "连击数上升" in lv_combo_texts[0]:
+        # combos[active_skill.name+"_defense"] = lv_combo
+        lv_combo.bind(
+            "<<ComboboxSelected>>", 
+            partial(on_hit_combo_select, desc_lab=lv_combo_labs[0], lv1_skill_strength=lv_combo_texts[0])
         )
     elif "上升" in lv_combo_texts[0]:
         # combos[active_skill.name+"_buff"] = lv_combo
