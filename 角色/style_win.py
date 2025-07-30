@@ -162,8 +162,8 @@ def creat_active_skill_frame(parent_frame, style):
         fieldbackground="#f0f0f0"  # 输入框背景色
     )
 
-    # 主动技能
-    active_skill_frame = ttk.LabelFrame(parent_frame, text="主动技能")
+    # 主动技能、被动
+    active_skill_frame = ttk.LabelFrame(parent_frame, text="主动技能 / 被动技能")
     active_skill_frame.grid(row=1, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
@@ -271,7 +271,7 @@ def creat_active_skill_frame(parent_frame, style):
 
 # 被动技能
 def creat_passive_skill_frame(parent_frame, style):
-    passive_skill_frame = ttk.LabelFrame(parent_frame, text="天赋/被动技能")
+    passive_skill_frame = ttk.LabelFrame(parent_frame, text="天赋")
     passive_skill_frame.grid(row=2, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     passive_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 passive_skill_frame 的每一列权重
