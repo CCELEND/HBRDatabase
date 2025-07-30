@@ -41,6 +41,9 @@
     "1001307":{
         "style_name":"薄暮时分·飞升", "character_role":"减益者", "element_type":"暗", "weapon_type":"打"
     },
+    "1001308":{
+        "style_name":"无尽夏日", "character_role":"减益者", "element_type":"雷", "weapon_type":"打"
+    },
     "1001403":{
         "style_name":"谨记死亡的美少女", "character_role":"增益者", "element_type":"火", "weapon_type":"突"
     },
@@ -61,6 +64,9 @@
     },
     "1001505":{
         "style_name":"秘密特工·摧毁", "character_role":"破坏者", "element_type":"光", "weapon_type":"斩"
+    },
+    "1001507":{
+        "style_name":"盛夏的开膛手杰克", "character_role":"破坏者", "element_type":"暗", "weapon_type":"斩"
     },
     "1001703":{
         "style_name":"气势一闪天使水手", "character_role":"治疗者", "element_type":"无", "weapon_type":"斩"
@@ -230,6 +236,9 @@
     "1004505":{
         "style_name":"希求与渴望", "character_role":"破盾者", "element_type":"雷", "weapon_type":"突"
     },
+    "1004507":{
+        "style_name":"夏暮色榴石", "character_role":"减益者", "element_type":"冰", "weapon_type":"突"
+    },
     "1004603":{
         "style_name":"此时期盼丰登之神", "character_role":"破坏者", "element_type":"光", "weapon_type":"斩"
     },
@@ -329,6 +338,9 @@
     },
     "1007504":{
         "style_name":"衣香犹记化梦蝶", "character_role":"攻击者", "element_type":"无", "weapon_type":"斩"
+    },
+    "1007505":{
+        "style_name":"青春的青金石", "character_role":"破坏者", "element_type":"雷", "weapon_type":"斩"
     },
     "1007603":{
         "style_name":"特别之日鬼舞狂刀", "character_role":"破坏者", "element_type":"暗", "weapon_type":"打"
