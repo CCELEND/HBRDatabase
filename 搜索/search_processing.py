@@ -184,6 +184,7 @@ def keyword_processing(key_word_str):
     key_word_str = replace_od_up(key_word_str)
     key_word_str = replace_zone(key_word_str)
     key_word_str = key_word_str.replace(',', '，')
+    key_word_str = key_word_str.replace('、', '，')
 
     # 定义替换字典
     replacement_dict = {
