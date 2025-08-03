@@ -227,6 +227,27 @@ def save_to_file():
         messagebox.showinfo("提示", "无数据，请获取词条")
 
 
+def fill_index_equipments_color(df, worksheet):
+
+    # 定义黄色填充样式
+    yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+    # 定义蓝色填充样式
+    blue_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+
+    # 查找 "DP +1200" 并填充整行为黄色
+    for idx, row in df.iterrows():
+        if row['DP'] == "DP+1200":
+            for col in range(1, len(df.columns) + 1):  # +1 因为 openpyxl 是 1-indexed
+                worksheet.cell(row=idx + 2, column=col).fill = yellow_fill
+        else:
+            if row['第一词条'] == "第一词条+15%":
+                worksheet.cell(row=idx + 2, column=2).fill = blue_fill
+
+            if row['通常攻击攻击力'] == "通常攻击攻击力+200％":
+                worksheet.cell(row=idx + 2, column=5).fill = blue_fill 
+
+    return worksheet 
+
 def save_index_equipments_to_file(index_equipments):
 
     # 将字典转换为 DataFrame
@@ -235,11 +256,6 @@ def save_index_equipments_to_file(index_equipments):
     df.reset_index(inplace=True)
     df.rename(columns={'index': '索引'}, inplace=True)
 
-    # 定义黄色填充样式
-    yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
-    # 定义蓝色填充样式
-    blue_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
-
     excel_file_path = './工具/GetEntriesGUILocal/index_equipments.xlsx'
     try:
         # 使用 ExcelWriter 来保存并应用样式
@@ -247,17 +263,7 @@ def save_index_equipments_to_file(index_equipments):
             df.to_excel(writer, index=False, sheet_name='Sheet1')
             worksheet = writer.sheets['Sheet1']
             
-            # 查找 "DP +1200" 并填充整行为黄色
-            for idx, row in df.iterrows():
-                if row['DP'] == "DP+1200":
-                    for col in range(1, len(df.columns) + 1):  # +1 因为 openpyxl 是 1-indexed
-                        worksheet.cell(row=idx + 2, column=col).fill = yellow_fill
-                else:
-                    if row['第一词条'] == "第一词条+15%":
-                        worksheet.cell(row=idx + 2, column=2).fill = blue_fill
-
-                    if row['通常攻击攻击力'] == "通常攻击攻击力+200％":
-                        worksheet.cell(row=idx + 2, column=5).fill = blue_fill
+            worksheet = fill_index_equipments_color(df, worksheet)
 
             # 设置每列的宽度
             column_widths = [10, 14, 12, 12, 22, 16, 12, 12, 12, 12, 12, 14]
@@ -268,15 +274,22 @@ def save_index_equipments_to_file(index_equipments):
     except Exception as e:
         messagebox.showerror("错误", f"{e}\n请关闭打开的 index_equipments.xlsx 并重试")
 
+def fill_index_wash_entries_color(df, worksheet):
+    # 定义黄色填充样式
+    yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+    for idx, row in df.iterrows():
+        if '+3' in str(row['词条']) and ('+30' not in str(row['词条'])):
+            for col in range(1, len(df.columns) + 1):  # +1 因为 openpyxl 是 1-indexed
+                worksheet.cell(row=idx + 2, column=col).fill = yellow_fill  # +2因为标题行
+    
+    return worksheet
+
 def save_index_wash_entries_to_file(index_wash_entries):
     # 将字典转换为 DataFrame
     df = pd.DataFrame.from_dict(index_wash_entries, orient='index', columns=['词条','真实随机值'])
 
     df.reset_index(inplace=True)
     df.rename(columns={'index': '索引'}, inplace=True)
-
-    # 定义黄色填充样式
-    yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 
     excel_file_path = './工具/GetEntriesGUILocal/index_wash_entries.xlsx'
     try:
@@ -285,10 +298,7 @@ def save_index_wash_entries_to_file(index_wash_entries):
             df.to_excel(writer, index=False, sheet_name='Sheet1')
             worksheet = writer.sheets['Sheet1']
 
-            for idx, row in df.iterrows():
-                if '+3' in str(row['词条']) and ('+30' not in str(row['词条'])):
-                    for col in range(1, len(df.columns) + 1):  # +1 因为 openpyxl 是 1-indexed
-                        worksheet.cell(row=idx + 2, column=col).fill = yellow_fill  # +2因为标题行
+            worksheet = fill_index_wash_entries_color(df, worksheet)
 
             # 设置每列的宽度
             column_widths = [10, 14, 14]
