@@ -23,6 +23,25 @@
         "description":"万能风格碎片（Rank A）与万能风格碎片（Rank S）\n可使用「万能碎片转换」功能转换为碎片点数\n希望将万能风格碎片（Rank SS）转换为碎片点数时，请联系客服\nA=>1 PiecePoint，S=>10 PiecePoint，SS<=>250 PiecePoint", 
         "price":"", 
         "location":"万能碎片转换"
+    },
+
+    "水晶（Rank A）":{
+        "path":"./持有物/道具/ThumbnailCrystal_A.png", 
+        "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
+        "price":"", 
+        "location":"转换剩余的风格碎片"
+    },
+    "水晶（Rank S）":{
+        "path":"./持有物/道具/ThumbnailCrystal_S.png", 
+        "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
+        "price":"", 
+        "location":"转换剩余的风格碎片"
+    },
+    "水晶（Rank SS）":{
+        "path":"./持有物/道具/ThumbnailCrystal_SS.png", 
+        "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
+        "price":"", 
+        "location":"转换剩余的风格碎片"
     }
 
 } 

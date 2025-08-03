@@ -73,8 +73,15 @@
 
     "风格强化教材":{
         "path":"./持有物/成长素材/ThumbnailExpBookStyleA.png", 
-        "description":"可将SLv.提升1级的道具。", 
+        "description":"可将风格等级提升1级的道具\n无法超过风格等级上限", 
+        "price":"", 
+        "location":""
+    },
+    "风格强化教材Ⅱ":{
+        "path":"./持有物/成长素材/ThumbnailExpBookStyleB.png", 
+        "description":"可将风格等级提升至10级的道具", 
         "price":"", 
         "location":""
     }
+
 } 

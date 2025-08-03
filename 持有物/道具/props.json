@@ -79,25 +79,6 @@
         "description":"消耗体力、完成战斗、累计登录或阅读剧情", 
         "price":"", 
         "location":"每周任务"
-    },
-
-    "水晶（Rank A）":{
-        "path":"./持有物/道具/ThumbnailCrystal_A.png", 
-        "description":"收集的「水晶」可以在水晶兑换所兑换指定道具", 
-        "price":"", 
-        "location":"风格碎片转换"
-    },
-    "水晶（Rank S）":{
-        "path":"./持有物/道具/ThumbnailCrystal_S.png", 
-        "description":"收集的「水晶」可以在水晶兑换所兑换指定道具", 
-        "price":"", 
-        "location":"风格碎片转换"
-    },
-    "水晶（Rank SS）":{
-        "path":"./持有物/道具/ThumbnailCrystal_SS.png", 
-        "description":"收集的「水晶」可以在水晶兑换所兑换指定道具", 
-        "price":"", 
-        "location":"风格碎片转换"
     }
 
 } 
