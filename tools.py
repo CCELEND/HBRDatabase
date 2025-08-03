@@ -340,3 +340,29 @@ def convert_hex_string_to_escape(hex_string):
         result += f'\\x{byte}'
     
     return result
+
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+def init_chrome_driver(chrome_options):
+
+    # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
+    try:
+        chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
+        service = Service(executable_path=chromedriver_path)
+        
+    except Exception as e:
+        messagebox.showinfo("信息", f"进入 ChromeDriverManager 模式\n需要等待自动安装")
+        service = Service(executable_path=ChromeDriverManager().install())
+
+    try:
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+    except Exception as e:
+        if "chrome not found" in str(e).lower():
+            messagebox.showerror("错误", "Chrome 未安装或路径不正确！")
+            return None
+        else:
+            messagebox.showerror("错误", f"浏览器启动失败: {str(e)}")
+            return None
+
+    return driver

@@ -1,8 +1,6 @@
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+from tools import init_chrome_driver
 
 def load_hbr_quest():
     try:
@@ -16,14 +14,19 @@ def load_hbr_quest():
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
+        # # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
+        # try:
+        #     chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
+        #     service = Service(executable_path=chromedriver_path)
+        #     driver = webdriver.Chrome(service=service, options=chrome_options)
+        # except:
+        #     service = Service(executable_path=ChromeDriverManager().install())
+        #     driver = webdriver.Chrome(service=service, options=chrome_options)
+
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        try:
-            chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
-            service = Service(executable_path=chromedriver_path)
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-        except:
-            service = Service(executable_path=ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = init_chrome_driver(chrome_options)
+        if driver == None:
+            return
 
         driver.set_window_size(1160, 820)
         driver.get("https://hbr.quest/")

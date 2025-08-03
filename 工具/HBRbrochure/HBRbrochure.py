@@ -1,14 +1,10 @@
-
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.chrome import ChromeDriverManager
 import pathlib
-from tkinter import messagebox
 
+from tools import init_chrome_driver
 import HBRbrochure.role_info
 import HBRbrochure.brochure
 
@@ -140,14 +136,9 @@ def get_hbr_brochure():
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        try:
-            chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
-            service = Service(executable_path=chromedriver_path)
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-        except:
-            messagebox.showinfo("信息", f"进入 ChromeDriverManager 模式\n需要等待自动安装")
-            service = Service(executable_path=ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = init_chrome_driver(chrome_options)
+        if driver == None:
+            return
 
         driver.set_window_size(1160, 820)
         # 打开 game.bilibili.com
