@@ -27,7 +27,7 @@ def equipment_process_index(seed, cur_index):
     career_entry_str = get_property(real, career_entry)
     charm_entry_str = get_property(real, charm_entry)
     spct_list = spct_str.split()
-    return str(cur_index), spct_list+["职能类型变化"]+[career_entry_str+"的初始SP+3", charm_entry_str, str(real)]
+    return str(cur_index), spct_list+["初始SP+3"]+[career_entry_str, charm_entry_str, str(real)]
 
 def parallel_process_indexes(fun, seed, start_index, end_index, 
                           chunk_size=10, max_workers=None):
