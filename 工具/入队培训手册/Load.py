@@ -1,8 +1,6 @@
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from webdriver_manager.chrome import ChromeDriverManager
+from tools import init_chrome_driver
 
 import pathlib
 
@@ -23,14 +21,19 @@ def load_game_bilibili_com():
         data_dir = f"{script_directory}\\工具\\HBRbrochure\\chrome_user_data"
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
+        # # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
+        # try:
+        #     chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
+        #     service = Service(executable_path=chromedriver_path)
+        #     driver = webdriver.Chrome(service=service, options=chrome_options)
+        # except:
+        #     service = Service(executable_path=ChromeDriverManager().install())
+        #     driver = webdriver.Chrome(service=service, options=chrome_options)
+
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        try:
-            chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
-            service = Service(executable_path=chromedriver_path)
-            driver = webdriver.Chrome(service=service, options=chrome_options)
-        except:
-            service = Service(executable_path=ChromeDriverManager().install())
-            driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver = init_chrome_driver(chrome_options)
+        if driver == None:
+            return
 
         driver.set_window_size(1160, 820)
         driver.get("https://game.bilibili.com/tool/hbr/#/")
