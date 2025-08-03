@@ -231,7 +231,7 @@ def save_index_equipments_to_file(index_equipments):
 
     # 将字典转换为 DataFrame
     df = pd.DataFrame.from_dict(index_equipments, orient='index', 
-        columns=['第一词条', 'DP', '智慧', '通常攻击攻击力', '攻击属性变化', '体力', '精神', '属性', '初始SP', '吊饰' ,'真实随机值'])
+        columns=['第一词条', 'DP', '智慧', '通常攻击攻击力', '攻击属性', '体力', '精神', '职能类型', '初始SP', '吊饰' ,'真实随机值'])
     df.reset_index(inplace=True)
     df.rename(columns={'index': '索引'}, inplace=True)
 
@@ -260,7 +260,7 @@ def save_index_equipments_to_file(index_equipments):
                         worksheet.cell(row=idx + 2, column=5).fill = blue_fill
 
             # 设置每列的宽度
-            column_widths = [10, 14, 12, 12, 22, 16, 12, 12, 14, 20, 12, 14]
+            column_widths = [10, 14, 12, 12, 22, 16, 12, 12, 16, 20, 12, 14]
             for i, width in enumerate(column_widths, start=1):
                 worksheet.column_dimensions[get_column_letter(i)].width = width
 
