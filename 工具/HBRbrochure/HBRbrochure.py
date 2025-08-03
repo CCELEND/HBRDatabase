@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import pathlib
+from tkinter import messagebox
 
 import HBRbrochure.role_info
 import HBRbrochure.brochure
@@ -144,6 +145,7 @@ def get_hbr_brochure():
             service = Service(executable_path=chromedriver_path)
             driver = webdriver.Chrome(service=service, options=chrome_options)
         except:
+            messagebox.showinfo("信息", f"进入 ChromeDriverManager 模式\n需要等待自动安装")
             service = Service(executable_path=ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
 
