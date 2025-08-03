@@ -26,19 +26,19 @@
     },
 
     "水晶（Rank A）":{
-        "path":"./持有物/道具/ThumbnailCrystal_A.png", 
+        "path":"./持有物/碎片/ThumbnailCrystal_A.png", 
         "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
         "price":"", 
         "location":"转换剩余的风格碎片"
     },
     "水晶（Rank S）":{
-        "path":"./持有物/道具/ThumbnailCrystal_S.png", 
+        "path":"./持有物/碎片/ThumbnailCrystal_S.png", 
         "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
         "price":"", 
         "location":"转换剩余的风格碎片"
     },
     "水晶（Rank SS）":{
-        "path":"./持有物/道具/ThumbnailCrystal_SS.png", 
+        "path":"./持有物/碎片/ThumbnailCrystal_SS.png", 
         "description":"可在水晶兑换所中使用的道具\n※无法用于风格的上限突破", 
         "price":"", 
         "location":"转换剩余的风格碎片"
