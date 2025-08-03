@@ -81,13 +81,13 @@
         "path":"./持有物/饰品材料/ThumbnailSynthesisSoulSmall.png", 
         "description":"可在合成饰品时\n获得10000魂之经验值", 
         "price":"", 
-        "location":"主线剧情第五章中篇"
+        "location":"主线剧情第五章中篇\n兑换所"
     },
     "魂之辉片":{
         "path":"./持有物/饰品材料/ThumbnailSynthesisSoul.png", 
         "description":"可在合成饰品时\n获得50000魂之经验值", 
         "price":"", 
-        "location":"主线剧情第五章中篇"
+        "location":"主线剧情第五章中篇\n兑换所"
     }
 
 } 
