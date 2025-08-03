@@ -231,12 +231,14 @@ def save_index_equipments_to_file(index_equipments):
 
     # 将字典转换为 DataFrame
     df = pd.DataFrame.from_dict(index_equipments, orient='index', 
-        columns=['第一词条', 'DP', '智慧', '通常攻击攻击力', '体力', '精神', '初始SP', '吊饰' ,'真实随机值'])
+        columns=['第一词条', 'DP', '智慧', '通常攻击攻击力', '属性', '体力', '精神', '属性', '初始SP', '吊饰' ,'真实随机值'])
     df.reset_index(inplace=True)
     df.rename(columns={'index': '索引'}, inplace=True)
 
     # 定义黄色填充样式
     yellow_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+    # 定义蓝色填充样式
+    blue_fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
 
     excel_file_path = './工具/GetEntriesGUILocal/index_equipments.xlsx'
     try:
@@ -250,9 +252,15 @@ def save_index_equipments_to_file(index_equipments):
                 if row['DP'] == "DP+1200":
                     for col in range(1, len(df.columns) + 1):  # +1 因为 openpyxl 是 1-indexed
                         worksheet.cell(row=idx + 2, column=col).fill = yellow_fill
+                else:
+                    if row['第一词条'] == "第一词条+15%":
+                        worksheet.cell(row=idx + 2, column=2).fill = blue_fill
+
+                    if row['通常攻击攻击力'] == "通常攻击攻击力+200％":
+                        worksheet.cell(row=idx + 2, column=5).fill = blue_fill
 
             # 设置每列的宽度
-            column_widths = [10, 14, 12, 12, 22, 12, 12, 20, 12, 14]
+            column_widths = [10, 14, 12, 12, 22, 14, 12, 12, 14, 20, 12, 14]
             for i, width in enumerate(column_widths, start=1):
                 worksheet.column_dimensions[get_column_letter(i)].width = width
 
