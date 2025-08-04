@@ -252,7 +252,13 @@ def save_index_equipments_to_file(index_equipments):
 
     # 将字典转换为 DataFrame
     df = pd.DataFrame.from_dict(index_equipments, orient='index', 
-        columns=['第一词条', 'DP', '智慧', '通常攻击攻击力', '攻击属性', '体力', '精神', '属性', '职能类型初始SP', '吊饰' ,'真实随机值'])
+        columns=[   '第一词条', 'DP', '智慧', 
+                    '通常攻击攻击力', '攻击属性', '体力', '精神', 
+                    '属性', '职能类型初始SP', 
+                    '吊饰' ,
+                    '真实随机值'
+                ]
+    )
     df.reset_index(inplace=True)
     df.rename(columns={'index': '索引'}, inplace=True)
 
