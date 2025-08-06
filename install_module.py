@@ -24,7 +24,8 @@ def install_modules():
                 "--trusted-host", mirror["host"]
             ]
             
-            subprocess.check_call(pip_args, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            # subprocess.check_call(pip_args, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.check_call(pip_args)
             messagebox.showinfo("提示", "依赖模块已成功安装")
             return True
             
