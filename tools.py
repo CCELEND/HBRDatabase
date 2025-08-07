@@ -348,7 +348,7 @@ def init_chrome_driver(chrome_options):
 
     # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
     try:
-        chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
+        chromedriver_path = "./工具/chrome/chromedriver-win64/chromedriver.exe"
         service = Service(executable_path=chromedriver_path)
         
     except Exception as e:

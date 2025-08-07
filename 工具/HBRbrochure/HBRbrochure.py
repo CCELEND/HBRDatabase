@@ -132,7 +132,7 @@ def get_hbr_brochure():
 
         # 设置用户数据目录以保存登录状态
         script_directory = pathlib.Path().absolute()
-        data_dir = f"{script_directory}\\工具\\HBRbrochure\\chrome_user_data"
+        data_dir = f"{script_directory}\\工具\\chrome\\chrome_user_data"
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver

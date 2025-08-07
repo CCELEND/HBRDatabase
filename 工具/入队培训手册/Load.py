@@ -18,17 +18,8 @@ def load_game_bilibili_com():
 
         # 设置用户数据目录以保存登录状态
         script_directory = pathlib.Path().absolute()
-        data_dir = f"{script_directory}\\工具\\HBRbrochure\\chrome_user_data"
+        data_dir = f"{script_directory}\\工具\\chrome\\chrome_user_data"
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
-
-        # # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        # try:
-        #     chromedriver_path = "./工具/HBRbrochure/chromedriver-win64/chromedriver.exe"
-        #     service = Service(executable_path=chromedriver_path)
-        #     driver = webdriver.Chrome(service=service, options=chrome_options)
-        # except:
-        #     service = Service(executable_path=ChromeDriverManager().install())
-        #     driver = webdriver.Chrome(service=service, options=chrome_options)
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
         driver = init_chrome_driver(chrome_options)
