@@ -228,6 +228,11 @@ def delete_all_files_and_subdirs(directory):
         messagebox.showerror("错误", f"[-] 清空目录时发生错误: {e}")
         return False
 
+def delete_old_file_and_subdirs():
+    delete_webp_files("./")
+    delete_mp3_files("./")
+    delete_all_files_and_subdirs("./工具/HBRbrochure/chromedriver-win64")
+    delete_all_files_and_subdirs("./工具/HBRbrochure/chrome_user_data")
 
 def delete_file(file):
     if not os.path.isfile(file):

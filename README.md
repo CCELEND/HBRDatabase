@@ -44,13 +44,13 @@
 2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
 >第一次获取时需要登录，后续会自动登录    
 >需要安装最新版本的 chrome 浏览器，登录之后可能会出现没有数据的情况，刷新一下网页即可  
->如果图鉴数据错误，就删除目录：./工具/HBRbrochure/chrome_user_data 再重新运行    
+>如果图鉴数据错误，就删除目录：./工具/chrome/chrome_user_data 再重新运行    
 3. 伤害模拟：通过添加的技能与填写的能力值来计算出最终伤害。炽焰天穹伤害计算器  
 >需要点击浏览器的拓展程序来运行  
 4. hbr-tool：包含一些便利的工具（日文）  
 5. hbr-axletool：一个 HBR 的排轴工具网站  
 6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备  
-7. 资源和攻略网站：hbr.quest、入队培训手册、gamekee、game8
+7. 资源和攻略网站：hbr.quest、o.hbr.quest、入队培训手册、gamekee、game8
 
 ### 音乐
 
