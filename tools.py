@@ -10,6 +10,9 @@ import re
 import shutil
 from pathlib import Path
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def get_version():
     version = read_txt_file("./关于/version.txt", "text")
     return version
@@ -185,9 +188,11 @@ def delete_webp_files(directory: str) -> None:
                 # 删除文件
                 webp_file.unlink()
             except PermissionError:
-                messagebox.showerror("错误", f"[-] 没有权限删除 {webp_file}")
+                logger.error(f"没有权限删除 {webp_file}")
+                messagebox.showerror("错误", f"没有权限删除 {webp_file}")
             except Exception as e:
-                messagebox.showerror("错误", f"[-] 删除 {webp_file} 时出错: {e}")
+                logger.error(f"删除 {webp_file} 时出错: {e}")
+                messagebox.showerror("错误", f"删除 {webp_file} 时出错: {e}")
 
 
 def delete_mp3_files(directory: str) -> None:
@@ -213,9 +218,11 @@ def delete_mp3_files(directory: str) -> None:
                 # 删除文件
                 mp3_file.unlink()
             except PermissionError:
-                messagebox.showerror("错误", f"[-] 没有权限删除 {mp3_file}")
+                logger.error(f"没有权限删除 {mp3_file}")
+                messagebox.showerror("错误", f"没有权限删除 {mp3_file}")
             except Exception as e:
-                messagebox.showerror("错误", f"[-] 删除 {mp3_file} 时出错: {e}")
+                logger.error(f"删除 {mp3_file} 时出错: {e}")
+                messagebox.showerror("错误", f"删除 {mp3_file} 时出错: {e}")
 
 def delete_all_files_and_subdirs(directory):
     if not os.path.isdir(directory):
@@ -225,7 +232,8 @@ def delete_all_files_and_subdirs(directory):
         shutil.rmtree(directory)
         return True
     except Exception as e:
-        messagebox.showerror("错误", f"[-] 清空目录时发生错误: {e}")
+        logger.error(f"清空目录时发生错误: {e}")
+        messagebox.showerror("错误", f"清空目录时发生错误: {e}")
         return False
 
 def delete_old_file_and_subdirs():
@@ -242,7 +250,8 @@ def delete_file(file):
         os.remove(file)
         return True
     except Exception as e:
-        messagebox.showerror("错误", f"[-] 删除文件时发生错误: {e}")
+        logger.error(f"删除文件时发生错误: {e}")
+        messagebox.showerror("错误", f"删除文件时发生错误: {e}")
         return False
 
 
@@ -264,16 +273,19 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
     
     # 检查文件是否存在
     if not file_path.exists():
+        logger.error(f"文件不存在: {file_path}\n{e}")
         messagebox.showerror("错误", f"文件不存在: {file_path}\n{e}")
         return None
     
     # 检查是否为文件
     if not file_path.is_file():
+        logger.error(f"不是有效的文件: {file_path}\n{e}")
         messagebox.showerror("错误", f"不是有效的文件: {file_path}\n{e}")
         return None
     
     # 检查文件是否可读
     if not os.access(file_path, os.R_OK):
+        logger.error(f"文件不可读: {file_path}\n{e}")
         messagebox.showerror("错误", f"文件不可读: {file_path}\n{e}")
         return None
     
@@ -292,9 +304,11 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.readlines()
     except UnicodeDecodeError:
+        logger.error(f"文件不是有效的UTF-8编码: {file_path}\n{e}")
         messagebox.showerror("错误", f"文件不是有效的UTF-8编码: {file_path}\n{e}")
         return None
     except Exception as e:
+        logger.error(f"读取文件时发生意外错误: {file_path}\n{e}")
         messagebox.showerror("错误", f"读取文件时发生意外错误: {file_path}\n{e}")
         return None
 
@@ -332,10 +346,12 @@ def convert_hex_escape_to_string(hex_escape_string):
 def convert_hex_string_to_escape(hex_string):
     # 确保输入是有效的十六进制字符串（只包含0-9和a-f或A-F）
     if not re.match(r'^[0-9a-fA-F]+$', hex_string):
+        logger.error("输入必须是有效的十六进制字符串")
         raise ValueError("输入必须是有效的十六进制字符串")
     
     # 确保十六进制字符串长度是偶数
     if len(hex_string) % 2 != 0:
+        logger.error("十六进制字符串长度必须是偶数")
         raise ValueError("十六进制字符串长度必须是偶数")
     
     # 将每两个字符作为一组，转换为\xHH格式
@@ -357,6 +373,7 @@ def init_chrome_driver(chrome_options):
         service = Service(executable_path=chromedriver_path)
         
     except Exception as e:
+        logger.info("进入 ChromeDriverManager 模式\n需要等待自动安装")
         messagebox.showinfo("信息", f"进入 ChromeDriverManager 模式\n需要等待自动安装")
         service = Service(executable_path=ChromeDriverManager().install())
 
@@ -364,9 +381,11 @@ def init_chrome_driver(chrome_options):
         driver = webdriver.Chrome(service=service, options=chrome_options)
     except Exception as e:
         if "chrome not found" in str(e).lower():
+            logger.error("Chrome 未安装或路径不正确！")
             messagebox.showerror("错误", "Chrome 未安装或路径不正确！")
             return None
         else:
+            logger.error(f"浏览器启动失败: {str(e)}")
             messagebox.showerror("错误", f"浏览器启动失败: {str(e)}")
             return None
 
