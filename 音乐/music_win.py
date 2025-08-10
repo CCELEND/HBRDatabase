@@ -9,6 +9,9 @@ from music_list import ExpandableList
 from music_player import FLACPlayerApp
 import music_player
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 
 # 窗口关闭处理
 def music_win_closing(parent_frame):
@@ -50,6 +53,7 @@ def creat_music_win():
         music_player.PlayerApp = FLACPlayerApp(music_player.play_info_frame, 1, 0)
     except Exception as e:
         messagebox.showerror("错误", f"请重试：{str(e)}")
+        logger.error(str(e))
         music_win_frame.destroy()
         return
 

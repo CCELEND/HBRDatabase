@@ -75,6 +75,10 @@ from 工具.入队培训手册.Load import load_game_bilibili_com
 sys.path.append(os.path.abspath("./关于"))
 from 关于.about_win import creat_about_win
 
+sys.path.append(os.path.abspath("./日志"))
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # 占位函数
 def update_output(text):
     print(text)
