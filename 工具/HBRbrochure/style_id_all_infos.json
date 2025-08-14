@@ -333,6 +333,9 @@
     "1007403":{
         "style_name":"急速消失的烽火", "character_role":"防御者", "element_type":"暗", "weapon_type":"打"
     },
+    "1007404":{
+        "style_name":"秘密的咖啡时间", "character_role":"防御者", "element_type":"光", "weapon_type":"打"
+    },
     "1007503":{
         "style_name":"刀光凛冽", "character_role":"攻击者", "element_type":"暗", "weapon_type":"斩"
     },
@@ -344,6 +347,9 @@
     },
     "1007603":{
         "style_name":"特别之日鬼舞狂刀", "character_role":"破坏者", "element_type":"暗", "weapon_type":"打"
+    },
+    "1007604":{
+        "style_name":"初夏风中纵情疾驰", "character_role":"破盾者", "element_type":"雷", "weapon_type":"打"
     },
 
 
