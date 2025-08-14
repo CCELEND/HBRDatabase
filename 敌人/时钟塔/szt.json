@@ -1016,9 +1016,89 @@
         {
             "img_path":"./敌人/时钟塔/ordinary.png",
             "name":"DarkBird",
-            "border":"420",
+            "border":"430",
             "DP":"4,300,000","HP":"2,700,000",
             "weakness":"突-50、光-100","resist":"打+50"
+        }
+    }
+},
+
+"HELL-48F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-48F",
+    "enemys":
+    {
+        "暗影·诗纪[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·诗纪[]",
+            "border":"430",
+            "DP":"2,100,000","HP":"14,000,000",
+            "weakness":"斩-150、暗-150","resist":""
+        }
+    }
+},
+
+"HELL-49F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-49F",
+    "enemys":
+    {
+        "ShrimpCrab":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ShrimpCrab",
+            "border":"430",
+            "DP":"570,000","HP":"2,700,000",
+            "weakness":"突-75","resist":"斩+75、打+75"
+        },
+        "LightBulb":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"LightBulb",
+            "border":"430",
+            "DP":"700,000","HP":"3,700,000",
+            "weakness":"暗-100","resist":""
+        }
+    }
+},
+
+"HELL-50F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-50F",
+    "enemys":
+    {
+        "暗影·真希[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·真希[]",
+            "border":"430",
+            "DP":"950,000","HP":"9,500,000",
+            "weakness":"打-150","resist":"斩+75、突+75"
+        }
+    }
+},
+
+"HELL-51F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-51F",
+    "enemys":
+    {
+        "AcidSerpent":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"AcidSerpent",
+            "border":"430",
+            "DP":"1,900,000","HP":"10,900,000",
+            "weakness":"突打-50、冰-150","resist":""
         }
     }
 }
