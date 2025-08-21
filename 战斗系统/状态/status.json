@@ -185,6 +185,22 @@
         "type":"增益",
         "series":"元素暴击率上升"
     },
+    "元素暴击率上升":{
+        "name":"元素暴击率上升",
+        "path":"./战斗系统/状态/ElementCriticalRateUp.png",
+        "effect":"","description":"",
+        "stack":"2",
+        "type":"增益",
+        "series":"元素暴击率上升"
+    },
+    "元素暴击伤害上升":{
+        "name":"元素暴击伤害上升",
+        "path":"./战斗系统/状态/ElementCriticalDamageUp.png",
+        "effect":"","description":"",
+        "stack":"2",
+        "type":"增益",
+        "series":"元素暴击伤害上升"
+    },
     "暴击伤害上升":{
         "name":"暴击伤害上升",
         "path":"./战斗系统/状态/CriticalDamageUp.webp",
