@@ -224,3 +224,29 @@ def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity):
     bg_label.place(relwidth=1, relheight=1)
 
     return bg_photo
+
+
+
+
+# 已打开的窗口字典，键：名，值：窗口句柄
+open_wins = {}
+
+def win_open_manage(open_win_frame, open_win):
+    open_wins[open_win] = open_win_frame
+
+
+# 关闭窗口时，清除列表中对应的窗口名，并销毁窗口
+def win_close_manage(open_win_frame):
+
+    open_win = open_win_frame.title()
+    while open_win in open_wins:
+        del open_wins[open_win]
+
+    open_win_frame.destroy()  # 销毁窗口
+
+
+def is_win_exist(win_frame):
+    if win_frame.winfo_exists():
+        return True
+    else:
+        return False

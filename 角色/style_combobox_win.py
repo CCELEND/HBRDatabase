@@ -11,6 +11,8 @@ from 角色.style_proc import on_debuff_combo_select
 from 角色.style_proc import on_mindeye_combo_select
 from 角色.style_proc import on_percentage_combo_select
 
+# from 角色.style_active_skill_change_win import is_skill_change
+
 skill_options = [
     "Skill Lv.1", "Skill Lv.2", "Skill Lv.3", "Skill Lv.4", "Skill Lv.5", "Skill Lv.6", "Skill Lv.7", "Skill Lv.8", "Skill Lv.9", "Skill Lv.10", 
     "Skill Lv.11", "Skill Lv.12", "Skill Lv.13", 
@@ -19,13 +21,13 @@ skill_options = [
 
 # 新建并绑定技能等级选择框
 def bind_lv_combo_lab(parent_frame, active_skill, lv_combo_labs, lv_combo_texts):
-    lv_combo_name = active_skill.name
-    lv_combo_row = 1 + len(active_skill.effects)
+    # lv_combo_name = active_skill.name
+
     level_max = int(active_skill.level_max)
 
     lv_combo = ttk.Combobox(parent_frame, 
         values=skill_options[:level_max], style="Custom.TCombobox")
-    lv_combo.grid(row=lv_combo_row, column=0, sticky="nswe", padx=10, pady=(5,10))
+    lv_combo.grid(row=0, column=0, sticky="nswe", padx=10, pady=(5,10))
     lv_combo.configure(state="readonly")
     lv_combo.set("Skill Lv.1")
 

@@ -362,6 +362,13 @@ def convert_hex_string_to_escape(hex_string):
     
     return result
 
+# 返回列表不是数字元素的第一个下标
+def get_list_not_isinstance_index(a):
+    index = None
+    for index, item in enumerate(a):
+        if not isinstance(item, (int, float)):
+            return index
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager

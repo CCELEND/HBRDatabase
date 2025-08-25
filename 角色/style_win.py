@@ -8,6 +8,7 @@ from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
+from 角色.style_career_win import creat_career_frame
 from 角色.style_active_skill_win import creat_active_skill_frame
 from 角色.style_passive_skill_win import creat_passive_skill_frame
 from 角色.style_growth_ability_win import creat_growth_ability_frame
@@ -25,41 +26,31 @@ def load_resources():
     战斗系统.状态.status_info.get_all_statu_obj()
     战斗系统.属性.attributes_info.get_all_attribute_obj()
 
-# 职能 frame
-def creat_career_frame(parent_frame, style):
-
-    career = 战斗系统.职业.careers_info.careers[style.career]
-    career_frame = ttk.LabelFrame(parent_frame, text=style.career)
-    career_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
-    career_frame.grid_rowconfigure(0, weight=1)
-
-    career_photo = get_photo(career.path, (200, 40))
-    career_canvas = create_canvas_with_image(career_frame, 
-        career_photo, 240, 40, 20, 0, 0, 0)
-
 def show_style(scrollbar_frame_obj, style):
 
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
 
+    parent_frame = scrollbar_frame_obj.scrollable_frame
+
     # 职业
-    creat_career_frame(scrollbar_frame_obj.scrollable_frame, style)
+    creat_career_frame(parent_frame, 0, style)
 
     # 主动技能
-    creat_active_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
+    creat_active_skill_frame(parent_frame, 1, style)
 
     # 被动技能
-    creat_passive_skill_frame(scrollbar_frame_obj.scrollable_frame, style)
+    creat_passive_skill_frame(parent_frame, 2, style)
 
     # 宝珠强化
     if style.growth_ability:
-        creat_growth_ability_frame(scrollbar_frame_obj.scrollable_frame, style)
-        growth_status_row = 4
+        creat_growth_ability_frame(parent_frame, 3, style)
+        growth_status_frame_row = 4
     else:
-        growth_status_row = 3
+        growth_status_frame_row = 3
 
     # 成长状态
-    creat_growth_status_frame(scrollbar_frame_obj.scrollable_frame, style, growth_status_row)
+    creat_growth_status_frame(parent_frame, growth_status_frame_row, style)
 
     scrollbar_frame_obj.update_canvas()
 
