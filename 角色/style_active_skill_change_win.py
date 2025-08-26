@@ -30,8 +30,16 @@ def active_skill_change_proc(row_frame, change_effects_infos, active_skill):
         desc_frame_desc_lab = desc_frame.nametowidget("desc_frame_desc_lab")
         desc_frame_desc_lab.config(text=desc)
 
+        desc_frame_sp_use_lab = desc_frame.nametowidget("desc_frame_sp_use_lab")
+        if sp_cost:
+            # 有SP消耗时才处理显示
+            uses_text = max_uses if max_uses else "∞"
+            text = f"SP{sp_cost}\n{uses_text}"
+            desc_frame_sp_use_lab.config(text=text)
+
         if name:
             row_frame.config(text=name)
+
 
     # 遍历 effect_frames 销毁之前的 effect_frame
     effect_frames = row_frame.nametowidget("effect_frames")
@@ -76,9 +84,11 @@ def creat_active_skill_change_frame(parent_frame, active_skill):
     # 默认的切换技能列表
     default_change_effects = []
     default_change_effects_infos = active_skill.switch[default_change_name]
-    desc_index = get_list_not_isinstance_index(change_effects_infos)
+    desc_index = get_list_not_isinstance_index(default_change_effects_infos)
     for default_effects_index in default_change_effects_infos[:desc_index]:
+        print(default_effects_index)
         default_change_effects.append(active_skill.effects[default_effects_index])
 
     # print(default_change_effects)
+    # print(default_change_effects_infos)
     return default_change_effects

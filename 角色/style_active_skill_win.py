@@ -2,17 +2,11 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-# from canvas_events import get_photo, create_canvas_with_image
 
-# from 角色.style_info import is_skill_effect
-# from 角色.style_text import output_attack_skill, output_skill_effect
 from 角色.style_combobox_win import creat_lv_combo_lab, bind_lv_combo_lab
 from 角色.style_active_skill_change_win import creat_active_skill_change_frame, is_skill_change
 
 from 角色.style_effect_win import set_effect_frames
-
-import 战斗系统.属性.attributes_info
-import 战斗系统.状态.status_info
 
 # 主动技能描述 frame
 def creat_desc_frame(row_frame, desc_frame_row, active_skill):
@@ -90,6 +84,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
             effect_frames_row += 1
         else:
             show_effects = active_skill.effects
+
 
         # 技能效果 frames
         effect_frames = ttk.Frame(row_frame, name="effect_frames")
