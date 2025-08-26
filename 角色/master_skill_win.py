@@ -139,7 +139,7 @@ def creat_master_skill_win(event, parent_frame, role):
             return "break"
         del open_master_wins[open_master_win]
 
-    master_win_frame = creat_Toplevel(open_master_win, 812, 300, 350, 280)
+    master_win_frame = creat_Toplevel(open_master_win, 812, 300, 560, 510)
     set_window_expand(master_win_frame, rowspan=1, columnspan=2)
     set_window_icon(master_win_frame, get_team_logo_path(role.team))
     scrollbar_frame_obj = ScrollbarFrameWin(master_win_frame, columnspan=2)
