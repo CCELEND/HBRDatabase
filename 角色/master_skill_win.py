@@ -9,10 +9,12 @@ from scrollbar_frame_win import ScrollbarFrameWin
 from 角色.master_skill_info import MasterSkillEffect
 from 角色.style_text import output_skill_effect, output_attack_skill
 import 战斗系统.状态.status_info
+import 战斗系统.属性.attributes_info
 
 # 加载资源文件
 def load_resources():
     战斗系统.状态.status_info.get_all_statu_obj()
+    战斗系统.属性.attributes_info.get_all_attribute_obj()
 
 
 # 大师技能描述 frame
