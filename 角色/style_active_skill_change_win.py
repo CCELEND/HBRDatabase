@@ -67,11 +67,11 @@ def creat_active_skill_change_frame(parent_frame, active_skill):
         change_effects_infos = active_skill.switch[change_name]
 
         change_button = ttk.Button(change_button_frame, 
-            width=5, text=change_name, bootstyle="primary-outline",
+            text=change_name, bootstyle="primary-outline",
             command=lambda change_effects_infos=change_effects_infos: active_skill_change_proc(parent_frame, change_effects_infos, active_skill))
 
         change_button.grid(row=0, column=i, padx=(10,0), sticky="nsew")
-        change_button_frame.grid_columnconfigure(i, weight=1)
+        # change_button_frame.grid_columnconfigure(i, weight=1)
 
     # 默认的切换技能列表
     default_change_effects = []
