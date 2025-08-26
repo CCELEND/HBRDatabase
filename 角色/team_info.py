@@ -44,6 +44,10 @@ def creat_team(team_info, roles):
 
     return team
 
+
+def get_team_logo_path(team_name):
+    return f"./角色/{team_name}/{team_name.lower()}.ico"
+
 # 获得 team 对象
 def get_team_obj(team_name):
     global teams

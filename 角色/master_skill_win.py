@@ -3,11 +3,12 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image
-from window import set_window_expand, creat_Toplevel, set_window_top
+from window import set_window_expand, creat_Toplevel, set_window_top, set_window_icon
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.master_skill_info import MasterSkillEffect
 from 角色.style_text import output_skill_effect, output_attack_skill
+from 角色.team_info import get_team_logo_path
 import 战斗系统.状态.status_info
 import 战斗系统.属性.attributes_info
 
@@ -140,6 +141,7 @@ def creat_master_skill_win(event, parent_frame, role):
 
     master_win_frame = creat_Toplevel(open_master_win, 812, 300, 350, 280)
     set_window_expand(master_win_frame, rowspan=1, columnspan=2)
+    set_window_icon(master_win_frame, get_team_logo_path(role.team))
     scrollbar_frame_obj = ScrollbarFrameWin(master_win_frame, columnspan=2)
 
     open_master_wins[open_master_win] = master_win_frame
