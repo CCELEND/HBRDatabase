@@ -130,7 +130,7 @@ def creat_master_skill_win(event, parent_frame, role):
     # 大师技能对象
     master_skill = role.master_skill
 
-    open_master_win = master_skill.name
+    open_master_win = master_skill.name+"-大师技能"
     # 重复打开时，窗口置顶并直接返回
     if open_master_win in open_master_wins:
         # 判断窗口是否存在
