@@ -10,6 +10,46 @@ from 角色.style_info import is_skill_effect
 import 战斗系统.属性.attributes_info
 import 战斗系统.状态.status_info
 
+def set_effect_frames(effect_frames, show_effects):
+
+    main_effect_lv_combo_lab = []
+    main_effect_lv_combo_text = []
+    lv_combo_labs = []
+    lv_combo_texts = []
+    main_effect_flag = False
+
+    for effect_frame_row, skill in enumerate(show_effects):
+
+        desc_lab, text, is_attack_skill = creat_effect_frame(effect_frames, effect_frame_row, skill)
+        if is_attack_skill:
+            lv_combo_labs.append(desc_lab)
+            lv_combo_texts.append(text)
+        else:
+            main_effect_lv_combo_lab.append(desc_lab)
+            main_effect_lv_combo_text.append(text)
+            # 主效果（暗忍触发）
+            if skill.main_effect:
+                main_effect_flag = True
+
+    if main_effect_flag or not lv_combo_labs:
+        lv_combo_labs.append(main_effect_lv_combo_lab[0])
+        lv_combo_texts.append(main_effect_lv_combo_text[0])
+
+    return lv_combo_labs, lv_combo_texts
+
+def delete_all_effect_frame(effect_frames):
+    for effect_frame in effect_frames.winfo_children():
+        effect_frame.destroy()
+
+
+def delete_effect_frame(effect_frames, effect_frame_row):
+    for effect_frame in effect_frames.winfo_children():
+        # 获取组件的布局信息
+        grid_info = effect_frame.grid_info()
+        # 检查组件是否在目标行
+        if "row" in grid_info and grid_info["row"] == effect_frame_row:
+            effect_frame.destroy()
+
 # 创建技能效果 frame
 def creat_effect_frame(effect_frames, effect_frame_row, skill):
     

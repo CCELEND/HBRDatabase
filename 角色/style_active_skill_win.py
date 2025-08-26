@@ -2,14 +2,14 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from canvas_events import get_photo, create_canvas_with_image
+# from canvas_events import get_photo, create_canvas_with_image
 
-from 角色.style_info import is_skill_effect
-from 角色.style_text import output_attack_skill, output_skill_effect
-from 角色.style_combobox_win import bind_lv_combo_lab
+# from 角色.style_info import is_skill_effect
+# from 角色.style_text import output_attack_skill, output_skill_effect
+from 角色.style_combobox_win import creat_lv_combo_lab, bind_lv_combo_lab
 from 角色.style_active_skill_change_win import creat_active_skill_change_frame, is_skill_change
 
-from 角色.style_effect_win import creat_effect_frame
+from 角色.style_effect_win import set_effect_frames
 
 import 战斗系统.属性.attributes_info
 import 战斗系统.状态.status_info
@@ -81,21 +81,15 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
         # 主动技能的描述 frame
         creat_desc_frame(row_frame, 0, active_skill)
 
+
         effect_frames_row = 1
         # 判断是否存在切换技能
         if is_skill_change(active_skill):
             # 创建技能切换按钮 frame
-            show_effects = creat_active_skill_change_frame(row_frame, 1, active_skill)
+            show_effects = creat_active_skill_change_frame(row_frame, active_skill)
             effect_frames_row += 1
         else:
             show_effects = active_skill.effects
-
-
-        main_effect_lv_combo_lab = []
-        main_effect_lv_combo_text = []
-        lv_combo_labs = []
-        lv_combo_texts = []
-        main_effect_flag = False
 
         # 技能效果 frames
         effect_frames = ttk.Frame(row_frame, name="effect_frames")
@@ -103,22 +97,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
         effect_frames.grid_rowconfigure(0, weight=1)  # 确保行填充
         effect_frames.grid_columnconfigure(0, weight=1) # 列填充
 
-        for effect_frame_row, skill in enumerate(show_effects):
-
-            desc_lab, text, is_attack_skill = creat_effect_frame(effect_frames, effect_frame_row, skill)
-            if is_attack_skill:
-                lv_combo_labs.append(desc_lab)
-                lv_combo_texts.append(text)
-            else:
-                main_effect_lv_combo_lab.append(desc_lab)
-                main_effect_lv_combo_text.append(text)
-                # 主效果（暗忍触发）
-                if skill.main_effect:
-                    main_effect_flag = True
-
-        if main_effect_flag or not lv_combo_labs:
-            lv_combo_labs.append(main_effect_lv_combo_lab[0])
-            lv_combo_texts.append(main_effect_lv_combo_text[0])
+        lv_combo_labs, lv_combo_texts = set_effect_frames(effect_frames, show_effects)
 
         # 新建并绑定技能等级选择框
         lv_combo_row = effect_frames_row + 1
@@ -127,4 +106,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
         lv_combo_lab_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
         lv_combo_lab_frame.grid_columnconfigure(0, weight=1) # 列填充
         lv_combo_lab_frame.grid_columnconfigure(1, weight=3) # 列填充
-        bind_lv_combo_lab(lv_combo_lab_frame, active_skill, lv_combo_labs, lv_combo_texts)
+
+        level_max = int(active_skill.level_max)
+        lv_combo = creat_lv_combo_lab(lv_combo_lab_frame, level_max)
+        bind_lv_combo_lab(lv_combo, lv_combo_labs, lv_combo_texts)
