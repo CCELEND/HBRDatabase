@@ -91,3 +91,8 @@ def creat_role_obj(role_path):
     all_roles[role_name] = role
 
     return role
+
+
+def get_role_master_img(role):
+    photo_path = f"./角色/{role.team}/{role.en}/{role.en}Q.png"
+    return photo_path

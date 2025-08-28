@@ -8,6 +8,7 @@ from window import set_window_expand, set_window_icon, creat_Toplevel, set_windo
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.team_info import get_team_obj, get_all_team_obj
+from 角色.role_info import get_role_master_img
 from 角色.style_win import creat_style_skill_win, creat_style_right_menu
 from 角色.master_skill_win import creat_master_skill_win
 
@@ -97,7 +98,47 @@ def bind_style_canvas(parent_frame, team, style, x, y):
         creat_style_right_menu, parent_frame=parent_frame, team=team, style=style)
 
 
+# 绑定大师技能 canvas 的事件
+def bind_master_skill_canvas(parent_frame, role, x, y):
+
+    photo_path = get_role_master_img(role)
+
+    # 创建一个 Frame 并禁用自动调整大小
+    outer_frame = ttk.Frame(parent_frame, width=140, height=134)  # 预留边框空间
+    outer_frame.grid_propagate(False)  # 禁止自动调整大小
+    outer_frame.grid(row=x, column=y, sticky="nsew")
+
+    photo = get_photo(photo_path, (90, 90))
+    canvas = create_canvas_with_image(outer_frame, 
+        photo, 130, 130, 20, 20, 0, 0)
+    
+    mouse_bind_canvas_events2(canvas)
+
+    bind_canvas_events(canvas, 
+        creat_master_skill_win, parent_frame=outer_frame, role=role)
+
+
+
 def show_rarity(frame, role, team, row=2):
+
+    if role.master_skill:
+        # 创建 MasterSkillframe 并设置 row
+        # 创建一个 Frame 并禁用自动调整大小
+        MasterSkillframe = ttk.Frame(frame)
+        MasterSkillframe.grid_propagate(False)  # 禁止自动调整大小
+        MasterSkillframe.configure(height=145)
+        MasterSkillframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
+
+        photo = get_photo("./角色/iconMasterSkill.png", (120, 120))
+        canvasMasterSkill = create_canvas_with_image(MasterSkillframe, 
+            photo, 134, 134, 5, 5, 0, 0)
+        
+        mouse_bind_canvas_events2(canvasMasterSkill)
+
+        bind_canvas_events(canvasMasterSkill, 
+            creat_master_skill_win, parent_frame=MasterSkillframe, role=role)
+
+        row += 1     
 
     if role.Astyles:
         # 创建 RarityAframe 并设置 row
@@ -153,33 +194,33 @@ def creat_team_desc_frame(parent_frame, team):
 def creat_weapon_master_skill_frame(parent_frame, role):
 
     weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
-    if role.master_skill:
-        weapon_master_skill_frame = ttk.Frame(parent_frame)
-        weapon_master_skill_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
-        weapon_master_skill_frame.grid_rowconfigure(0, weight=1)
-        weapon_master_skill_frame.grid_rowconfigure(1, weight=1)
+    # if role.master_skill:
+    #     weapon_master_skill_frame = ttk.Frame(parent_frame)
+    #     weapon_master_skill_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
+    #     weapon_master_skill_frame.grid_rowconfigure(0, weight=1)
+    #     weapon_master_skill_frame.grid_rowconfigure(1, weight=1)
 
-        weapon_photo = get_photo(weapon.path, (60, 60))
-        weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
-            weapon_photo, 104, 100, 20, 30, 0, 0)
+    #     weapon_photo = get_photo(weapon.path, (60, 60))
+    #     weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
+    #         weapon_photo, 104, 100, 20, 30, 0, 0)
 
-        master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 80))
-        master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
-            master_skill_photo, 100, 100, 10, 16, 1, 0)
+    #     master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 80))
+    #     master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
+    #         master_skill_photo, 100, 100, 10, 16, 1, 0)
 
-        # mouse_bind_canvas_events(master_skill_canvas)
-        mouse_bind_canvas_events2(master_skill_canvas)
+    #     # mouse_bind_canvas_events(master_skill_canvas)
+    #     mouse_bind_canvas_events2(master_skill_canvas)
         
-        bind_canvas_events(master_skill_canvas, 
-            creat_master_skill_win, parent_frame=parent_frame, role=role)
-    else:
-        weapon_frame = ttk.Frame(parent_frame)
-        weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
-        weapon_frame.grid_rowconfigure(0, weight=1)
+    #     bind_canvas_events(master_skill_canvas, 
+    #         creat_master_skill_win, parent_frame=parent_frame, role=role)
+    # else:
+    weapon_frame = ttk.Frame(parent_frame)
+    weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
+    weapon_frame.grid_rowconfigure(0, weight=1)
 
-        weapon_photo = get_photo(weapon.path, (60, 60))
-        weapon_canvas = create_canvas_with_image(weapon_frame, 
-            weapon_photo, 100, 200, 20, 90, 0, 2)
+    weapon_photo = get_photo(weapon.path, (60, 60))
+    weapon_canvas = create_canvas_with_image(weapon_frame, 
+        weapon_photo, 100, 200, 20, 90, 0, 2)
 
 def show_team(scrollbar_frame_obj, team):
 

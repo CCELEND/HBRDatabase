@@ -5,11 +5,12 @@ from tkinter import scrolledtext
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from 角色.team_info import get_all_team_obj
-from 角色.team_win import bind_style_canvas
+from 角色.team_info import get_all_team_obj, get_role_by_master_name
+from 角色.team_win import bind_style_canvas, bind_master_skill_canvas
 import 角色.team_info
 
 from 搜索.search_processing import on_select, get_filtered_styles, keyword_processing
+from 搜索.search_processing_master import get_filtered_master_skills
 
 # 创建选项的 frame
 def creat_select_frame(label_content, options, selected_values,
@@ -72,11 +73,40 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     # 关键词处理
     keyword_list = keyword_processing(key_word_str)
 
+    # 清除之前的组件
+    scrollbar_frame_obj.destroy_components()
+
+    if selected_values_dir["大师技能"]:
+        filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
+        column_count = 0
+        for i, master_skill in enumerate(filtered_master_skills):
+            role = get_role_by_master_name(master_skill.name)
+
+            master_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=master_skill.name)
+            # 设置LabelFrame的最小高度
+            master_skill_frame.grid_propagate(False)
+            master_skill_frame.configure(height=170)
+            bind_master_skill_canvas(master_skill_frame, role, 0, 0)
+
+            # 计算行和列的位置
+            row = i // 6  # 每6个换行
+            column = i % 6  # 列位置
+            master_skill_frame.grid(row=row, column=column, padx=(10,0), pady=(0,10), sticky="nesw")  # 设置间距
+            master_skill_frame.grid_rowconfigure(0, weight=1)
+            master_skill_frame.grid_columnconfigure(0, weight=1)
+
+            column_count += 1  # 更新列计数器
+            if column_count == 6:  # 如果已经到达第6列，重置列计数器并增加行
+                column_count = 0
+
+        scrollbar_frame_obj.update_canvas()
+        return "break"
+
     # 获取筛选的风格列表
     filtered_styles = get_filtered_styles(selected_values_dir, keyword_list)
 
-    # 清除之前的组件
-    scrollbar_frame_obj.destroy_components()
+    # # 清除之前的组件
+    # scrollbar_frame_obj.destroy_components()
 
     column_count = 0
     for i, style in enumerate(filtered_styles):
@@ -126,7 +156,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 获取全部队伍对象
     get_all_team_obj()
 
-    search_win_frame = creat_Toplevel("搜索", 715, 485, x=190, y=210)
+    search_win_frame = creat_Toplevel("搜索", 715, 540, x=190, y=210) #715, 485
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
@@ -189,6 +219,15 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
         skill_options, skill_selected_values,
         role_search_frame, 2, 1)
 
+    master_skill_options = [
+        "ALL", 
+        "大师技能"
+    ]
+    master_skill_selected_values = []
+    master_skill_frame = creat_select_frame("大师技能", 
+        master_skill_options, master_skill_selected_values,
+        role_search_frame, 3, 0)
+
 
     # 关键词标签
     key_word_label = ttk.Label(search_win_frame, text="关键词")
@@ -208,6 +247,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     selected_values_dir["武器属性"] = weapon_attribute_selected_values
     selected_values_dir["元素属性"] = element_attribute_selected_values
     selected_values_dir["技能"] = skill_selected_values
+    selected_values_dir["大师技能"] = master_skill_selected_values
 
     # 创建搜索按钮
     search_button = ttk.Button(search_win_frame, 
@@ -217,8 +257,8 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     search_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
 
 
-    search_win_frame.maxsize(715, 485)
-    search_win_frame.minsize(715, 485)
+    search_win_frame.maxsize(715, 540)
+    search_win_frame.minsize(715, 540)
 
     open_search_wins["搜索"] = search_win_frame
     # 窗口关闭时清理

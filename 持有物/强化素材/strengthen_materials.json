@@ -139,6 +139,14 @@
         "location":"异时层\n高分挑战120,000"
     },
 
+    "拉普拉斯六花晶":{
+        "path":"./持有物/强化素材/ThumbnailMaterial_Lv8.png",
+        "description":"用于习得大师技能的素材",
+        "price":"", 
+        "location":"恒星扫荡战线\n压制战"
+    },
+
+
     "宝珠（斩属性）":{
         "path":"./持有物/强化素材/ThumbnailHoju_Slash.png",
         "description":"可在宝珠迷宫获得的风格强化素材",

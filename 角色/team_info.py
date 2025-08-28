@@ -112,3 +112,10 @@ def get_all_team_obj():
                 print(f"加载队伍：{team_name} 时出错: {e}")
 
 
+def get_role_by_master_name(name):
+    for team in teams.values():
+        for role in team.roles:
+            if not role.master_skill:
+                continue
+            if role.master_skill.name == name:
+                return role
