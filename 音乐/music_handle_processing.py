@@ -37,6 +37,7 @@ album_cover_paths={
     "Love_Song_from_the_Water":"./音乐/下载/Love_Song_from_the_Water/Love_Song_from_the_Water.jpg",
     "麻枝准_やなぎなぎ":"./音乐/下载/麻枝准_やなぎなぎ/",
     "麻枝准_rionos":"./音乐/下载/麻枝准_rionos/",
+    "佐々木恵梨":"./音乐/下载/佐々木恵梨/",
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
     "Stargazer":"./音乐/下载/Stargazer/",
     "Summer_Pockets_Original_Sound_Track":"./音乐/下载/Summer_Pockets_Original_Sound_Track/Summer_Pockets_Original_Sound_Track.jpg",
@@ -49,6 +50,8 @@ def get_album_cover_path(all_albun_name, file_name):
         return album_cover_paths["麻枝准_やなぎなぎ"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "麻枝准_rionos":
         return album_cover_paths["麻枝准_rionos"] + file_name.replace("flac", "jpg")
+    elif all_albun_name == "佐々木恵梨":
+        return album_cover_paths["佐々木恵梨"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "She_is_Legend":
         file_name = file_name.replace("03.陽のさす向こうへ", "02.春眠旅団")
         file_name = file_name.replace("11.World We Changed", "02.春眠旅団")

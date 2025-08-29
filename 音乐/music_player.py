@@ -18,6 +18,7 @@ music_dir = {
     "Love_Song_from_the_Water":"Love_Song_from_the_Water",
     "麻枝准_やなぎなぎ":"麻枝准_やなぎなぎ",
     "麻枝准_rionos":"麻枝准_rionos",
+    "佐々木恵梨":"佐々木恵梨",
     "She_is_Legend":"She_is_Legend",
     "Stargazer":"Stargazer",
     "Summer_Pockets_Original_Sound_Track":"Summer_Pockets_Original_Sound_Track",
