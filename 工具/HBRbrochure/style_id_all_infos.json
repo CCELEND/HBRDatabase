@@ -256,6 +256,9 @@
     "1005203":{
         "style_name":"击碎无彩色", "character_role":"增益者", "element_type":"暗", "weapon_type":"突"
     },
+    "1005205":{
+        "style_name":"满溢的情感", "character_role":"增益者", "element_type":"火", "weapon_type":"突"
+    },
     "1005303":{
         "style_name":"末日要干嘛？", "character_role":"减益者", "element_type":"无", "weapon_type":"斩"
     },
@@ -277,7 +280,9 @@
     "1005605":{
         "style_name":"冲锋！突刺！金枪鱼！", "character_role":"减益者", "element_type":"暗", "weapon_type":"打"
     },
-
+    "1005606":{
+        "style_name":"献给大海的爱意", "character_role":"减益者", "element_type":"火", "weapon_type":"打"
+    },
 
     "1006103":{
         "style_name":"无止境慈爱的守护者", "character_role":"治疗者", "element_type":"火", "weapon_type":"打"
