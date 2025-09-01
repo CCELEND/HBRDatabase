@@ -55,6 +55,15 @@
         "type":"回复",
         "series":"回复技能使用次数" 
     },
+    "技能次数上限提升":{
+        "name":"技能次数上限提升",
+        "path":"./战斗系统/状态/HealSkillUsedCount.webp",
+        "effect":"增加技能次数上限（限定次数的技能除外）","description":"（限定次数的技能除外）",
+        "stack":"-",
+        "type":"回复",
+        "series":"技能次数上限提升" 
+    },
+
 
 
     "充能":{
@@ -72,6 +81,14 @@
         "stack":"2",
         "type":"增益",
         "series":"攻击上升"
+    },
+    "所有攻击上升":{
+        "name":"所有攻击上升",
+        "path":"./战斗系统/状态/AttackUp.webp",
+        "effect":"","description":"普通攻击和技能攻击上升",
+        "stack":"2",
+        "type":"增益",
+        "series":"所有攻击上升"
     },
     "斩攻击上升":{
         "name":"斩攻击上升",
