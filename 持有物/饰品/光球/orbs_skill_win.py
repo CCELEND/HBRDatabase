@@ -3,7 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image
-from window import set_window_expand, creat_Toplevel, set_window_top, set_window_icon
+from window import set_window_expand, creat_Toplevel, set_window_icon
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
@@ -81,18 +81,6 @@ def creat_orb_skill_frame(scrollbar_frame_obj, orb_skill):
         desc_lab = ttk.Label(effect_frame, text=text, justify="left", font=("Monospace", 10, "bold"))
         desc_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=0)
 
-
-
-# # 已打开的光球窗口字典，键：风格名，值：窗口句柄
-# open_orb_wins = {}
-# # 关闭窗口时，清除风格名列表中对应的风格名，并销毁窗口
-# def orb_win_closing(parent_frame):
-
-#     open_orb_win = parent_frame.title()
-#     while open_orb_win in open_orb_wins:
-#         del open_orb_wins[open_orb_win]
-
-#     parent_frame.destroy()  # 销毁窗口
 
 def creat_orb_skill_win(event, parent_frame, orb):
 
