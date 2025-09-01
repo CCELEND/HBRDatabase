@@ -5,8 +5,6 @@ from 修复.http_client import send_hashes_to_server, download_files_from_server
 import 修复.http_client
 
 def repair_reset():
-    if 修复.http_client.is_updating:
-        return
         
     current_file_hashes = calculate_file_hashes("./")
     server_url = "http://47.96.235.36:65433"
