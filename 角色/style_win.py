@@ -3,9 +3,10 @@ import os
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from canvas_events import get_photo, create_canvas_with_image, ArtworkDisplayerHeight
+from canvas_events import ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_expand, set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.style_career_win import creat_career_frame
@@ -64,27 +65,6 @@ def get_style_win_name(style):
 
     return style_win_name
 
-
-# 已打开的风格窗口字典，键：风格名，值：窗口句柄
-open_style_wins = {}
-# 关闭窗口时，清除风格名列表中对应的风格名，并销毁窗口
-def style_win_closing(parent_frame):
-
-    open_style_win = parent_frame.title()
-    while open_style_win in open_style_wins:
-        del open_style_wins[open_style_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
-# 清除所有打开的窗口
-# 遍历时不能修改字典元素，遍历条件应改为列表
-def clean_up_open_style_wins():
-    for open_style_win in list(open_style_wins.keys()):
-        style_win_frame = open_style_wins[open_style_win]
-        del open_style_wins[open_style_win]
-        style_win_frame.destroy()  # 销毁窗口
-
-
 def creat_style_skill_win(event, parent_frame, team, style):
 
     # 初始化资源文件
@@ -92,24 +72,24 @@ def creat_style_skill_win(event, parent_frame, team, style):
 
     open_style_win = get_style_win_name(style)
     # 重复打开时，窗口置顶并直接返回
-    if open_style_win in open_style_wins:
-        # 判断窗口是否存在
-        if open_style_wins[open_style_win].winfo_exists():
-            set_window_top(open_style_wins[open_style_win])
-            return "break"
-        del open_style_wins[open_style_win]
+    if is_win_open(open_style_win, __name__):
+        win_set_top(open_style_win, __name__)
+        return "break"
 
     style_win_frame = creat_Toplevel(open_style_win, 812, 880, 650, 70) #780
     set_window_icon(style_win_frame, team.logo_path)
     set_window_expand(style_win_frame, rowspan=1, columnspan=2)
     scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2)
 
-    open_style_wins[open_style_win] = style_win_frame
+    win_open_manage(style_win_frame, __name__)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    style_win_frame.bind("<Button-1>", lambda event: set_window_top(style_win_frame))
+    style_win_frame.bind("<Button-1>", 
+        lambda event: win_set_top(open_style_win, __name__))
     # 窗口关闭时清理
-    style_win_frame.protocol("WM_DELETE_WINDOW", lambda: style_win_closing(style_win_frame))
+    style_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(style_win_frame, __name__))
+
 
     show_style(scrollbar_frame_obj, style)
 
@@ -143,22 +123,19 @@ def show_style_animation(parent_frame, team, style):
 
         open_style_win = get_style_win_name(style) + "-animation"
         # 重复打开时，窗口置顶并直接返回
-        if open_style_win in open_style_wins:
-            # 判断窗口是否存在
-            if open_style_wins[open_style_win].winfo_exists():
-                set_window_top(open_style_wins[open_style_win])
-                return "break"
-            del open_style_wins[open_style_win]
+        if is_win_open(open_style_win, __name__):
+            win_set_top(open_style_win, __name__)
+            return "break"
 
         style_animation_win_frame = creat_Toplevel(open_style_win, 1366, 768, x=300, y=120)
         set_window_icon(style_animation_win_frame, team.logo_path)
-        open_style_wins[open_style_win] = style_animation_win_frame
+        win_open_manage(style_animation_win_frame, __name__)
 
         player = VideoPlayerWithScrollbar(style_animation_win_frame, 1366, 768, animation_path)
 
         # 窗口关闭时清理
         style_animation_win_frame.protocol("WM_DELETE_WINDOW", 
-            lambda: (player.destroy(), style_win_closing(style_animation_win_frame)))
+            lambda: (win_close_manage(style_animation_win_frame, __name__, player)))
     else:
         return
 
@@ -170,22 +147,19 @@ def show_style_artwork(parent_frame, team, style):
     if os.path.exists(artwork_path):
         open_style_win = get_style_win_name(style) + "-artwork"
         # 重复打开时，窗口置顶并直接返回
-        if open_style_win in open_style_wins:
-            # 判断窗口是否存在
-            if open_style_wins[open_style_win].winfo_exists():
-                set_window_top(open_style_wins[open_style_win])
-                return "break"
-            del open_style_wins[open_style_win]
+        if is_win_open(open_style_win, __name__):
+            win_set_top(open_style_win, __name__)
+            return "break"
 
         style_artwork_win_frame = creat_Toplevel(open_style_win, 1366, 769, x=300, y=120)
         set_window_icon(style_artwork_win_frame, team.logo_path)
-        open_style_wins[open_style_win] = style_artwork_win_frame
+        win_open_manage(style_artwork_win_frame, __name__)
 
         displayer = ImageViewerWithScrollbar(style_artwork_win_frame, 1366, 769, artwork_path)
 
         # 窗口关闭时清理
         style_artwork_win_frame.protocol("WM_DELETE_WINDOW", 
-            lambda: (displayer.destroy(), style_win_closing(style_artwork_win_frame)))
+            lambda: (win_close_manage(style_artwork_win_frame, __name__, displayer)))
 
     else:
         return
@@ -201,22 +175,19 @@ def show_style_artwork_3d(parent_frame, team, style):
 
         open_style_win = get_style_win_name(style) + "-artwork-3d"
         # 重复打开时，窗口置顶并直接返回
-        if open_style_win in open_style_wins:
-            # 判断窗口是否存在
-            if open_style_wins[open_style_win].winfo_exists():
-                set_window_top(open_style_wins[open_style_win])
-                return "break"
-            del open_style_wins[open_style_win]
+        if is_win_open(open_style_win, __name__):
+            win_set_top(open_style_win, __name__)
+            return "break"
 
         style_artwork_3d_win_frame = creat_Toplevel(open_style_win, x=770, y=150)
         set_window_icon(style_artwork_3d_win_frame, team.logo_path)
-        open_style_wins[open_style_win] = style_artwork_3d_win_frame
+        win_open_manage(style_artwork_3d_win_frame, __name__)
 
         displayer = ArtworkDisplayerHeight(style_artwork_3d_win_frame, artwork_3d_path, 710, 0)
-
+        
         # 窗口关闭时清理
         style_artwork_3d_win_frame.protocol("WM_DELETE_WINDOW", 
-            lambda: (style_win_closing(style_artwork_3d_win_frame)))
+            lambda: (win_close_manage(style_artwork_3d_win_frame, __name__, displayer)))
 
     else:
         return

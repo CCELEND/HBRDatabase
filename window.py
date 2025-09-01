@@ -231,22 +231,40 @@ def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity):
 # 已打开的窗口字典，键：名，值：窗口句柄
 open_wins = {}
 
-def win_open_manage(open_win_frame, open_win):
-    open_wins[open_win] = open_win_frame
+def win_open_manage(open_win_frame, module):
+    open_win_name = f"{module}_{open_win_frame.title()}"
+    open_wins[open_win_name] = open_win_frame
 
 
 # 关闭窗口时，清除列表中对应的窗口名，并销毁窗口
-def win_close_manage(open_win_frame):
+def win_close_manage(open_win_frame, module, class_resources = None):
 
-    open_win = open_win_frame.title()
-    while open_win in open_wins:
-        del open_wins[open_win]
+    # print(open_wins)
 
+    open_win_name = f"{module}_{open_win_frame.title()}"
+    while open_win_name in open_wins:
+        del open_wins[open_win_name]
+
+    if class_resources: class_resources.destroy() # 释放类资源
     open_win_frame.destroy()  # 销毁窗口
+
+# 关闭并清除所有打开的窗口
+# 遍历时不能修改字典元素，遍历条件应改为列表
+def win_close_all():
+    for open_win_name in list(open_wins.keys()):
+        win_frame = open_wins[open_win_name]
+        del open_wins[open_win_name]
+        win_frame.destroy()  # 销毁窗口
+
+def win_set_top(open_win_name, module):
+    open_win_name = f"{module}_{open_win_name}"
+    set_window_top(open_wins[open_win_name])
+
+
+def is_win_open(open_win_name, module):
+    open_win_name = f"{module}_{open_win_name}"
+    return True if open_win_name in open_wins else False
 
 
 def is_win_exist(win_frame):
-    if win_frame.winfo_exists():
-        return True
-    else:
-        return False
+    return True if win_frame.winfo_exists() else False

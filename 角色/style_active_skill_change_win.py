@@ -86,7 +86,7 @@ def creat_active_skill_change_frame(parent_frame, active_skill):
     default_change_effects_infos = active_skill.switch[default_change_name]
     desc_index = get_list_not_isinstance_index(default_change_effects_infos)
     for default_effects_index in default_change_effects_infos[:desc_index]:
-        print(default_effects_index)
+        # print(default_effects_index)
         default_change_effects.append(active_skill.effects[default_effects_index])
 
     # print(default_change_effects)

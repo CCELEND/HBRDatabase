@@ -4,7 +4,8 @@ from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_expand, set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.team_info import get_team_obj, get_all_team_obj
@@ -26,37 +27,24 @@ def creat_role_right_menu(event, parent_frame, role, team):
     
     right_click_menu.post(event.x_root, event.y_root)
 
-
-# 已打开的角色窗口字典，键：角色名，值：窗口句柄
-open_role_wins = {}
-#关闭窗口时，清除角色窗口字典中的句柄，并销毁窗口
-def role_win_closing(parent_frame, displayer):
-
-    open_role_win = parent_frame.title()
-    while open_role_win in open_role_wins:
-        del open_role_wins[open_role_win]
-
-    parent_frame.destroy()  # 销毁窗口
-    displayer.destroy() # 释放类资源
-
 # 显示全身画
 def show_role_full_img(event, parent_frame, role, team):
 
     open_role_win = role.name+"-full"
     # 重复打开时，窗口置顶并直接返回
-    if open_role_win in open_role_wins:
-        set_window_top(open_role_wins[open_role_win])
+    if is_win_open(open_role_win, __name__):
+        win_set_top(open_role_win, __name__)
         return "break"
 
     role_full_img_frame = creat_Toplevel(open_role_win, x=770, y=100)
     set_window_icon(role_full_img_frame, team.logo_path)
-    open_role_wins[open_role_win] = role_full_img_frame
+    win_open_manage(role_full_img_frame, __name__)
 
     role_full_path = role.img_path.replace("Profile", "")
     displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840)
 
     # 窗口关闭时清理
-    role_full_img_frame.protocol("WM_DELETE_WINDOW", lambda: role_win_closing(role_full_img_frame, displayer))
+    role_full_img_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(role_full_img_frame, displayer))
 
     return "break"  # 阻止事件冒泡
 
@@ -65,13 +53,13 @@ def show_role_img(event, parent_frame, role, team):
 
     open_role_win = role.name
     # 重复打开时，窗口置顶并直接返回
-    if open_role_win in open_role_wins:
-        set_window_top(open_role_wins[open_role_win])
+    if is_win_open(open_role_win, __name__):
+        win_set_top(open_role_win, __name__)
         return "break"
 
     role_img_frame = creat_Toplevel(open_role_win, 444, 508, 600, 200)
     set_window_icon(role_img_frame, team.logo_path)
-    open_role_wins[open_role_win] = role_img_frame
+    win_open_manage(role_img_frame, __name__)
 
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
 
@@ -191,29 +179,9 @@ def creat_team_desc_frame(parent_frame, team):
 
 
 # 武器和大师技能 frame
-def creat_weapon_master_skill_frame(parent_frame, role):
+def creat_weapon_frame(parent_frame, role):
 
     weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
-    # if role.master_skill:
-    #     weapon_master_skill_frame = ttk.Frame(parent_frame)
-    #     weapon_master_skill_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
-    #     weapon_master_skill_frame.grid_rowconfigure(0, weight=1)
-    #     weapon_master_skill_frame.grid_rowconfigure(1, weight=1)
-
-    #     weapon_photo = get_photo(weapon.path, (60, 60))
-    #     weapon_canvas = create_canvas_with_image(weapon_master_skill_frame, 
-    #         weapon_photo, 104, 100, 20, 30, 0, 0)
-
-    #     master_skill_photo = get_photo("./角色/iconMasterSkill.png", (80, 80))
-    #     master_skill_canvas = create_canvas_with_image(weapon_master_skill_frame, 
-    #         master_skill_photo, 100, 100, 10, 16, 1, 0)
-
-    #     # mouse_bind_canvas_events(master_skill_canvas)
-    #     mouse_bind_canvas_events2(master_skill_canvas)
-        
-    #     bind_canvas_events(master_skill_canvas, 
-    #         creat_master_skill_win, parent_frame=parent_frame, role=role)
-    # else:
     weapon_frame = ttk.Frame(parent_frame)
     weapon_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
     weapon_frame.grid_rowconfigure(0, weight=1)
@@ -261,32 +229,21 @@ def show_team(scrollbar_frame_obj, team):
         label = ttk.Label(desc_frame, text=role.description, anchor="w", font=("Monospace", 10, "bold"))
         label.grid(row=0, column=1, sticky="nswe", padx=10, pady=10)
 
-        creat_weapon_master_skill_frame(desc_frame, role)
+        creat_weapon_frame(desc_frame, role)
 
         show_rarity(frame, role, team)
 
     scrollbar_frame_obj.update_canvas()
-
-# 已打开的队伍窗口字典，键：队伍名，值：窗口句柄
-open_team_wins = {}
-
-#关闭窗口时，清除队伍窗口字典中的句柄，并销毁窗口
-def team_win_closing(parent_frame):
-
-    open_team_win = parent_frame.title()
-    while open_team_win in open_team_wins:
-        del open_team_wins[open_team_win]
-
-    parent_frame.destroy()  # 销毁窗口
 
 
 # 创建队伍窗口
 def creat_team_win(parent_frame, team_name):
 
     # 重复打开时，窗口置顶并直接返回
-    if team_name in open_team_wins:
-        set_window_top(open_team_wins[team_name])
+    if is_win_open(team_name, __name__):
+        win_set_top(team_name, __name__)
         return
+
 
     # 获取全部队伍对象
     get_all_team_obj()
@@ -300,13 +257,12 @@ def creat_team_win(parent_frame, team_name):
     set_window_icon(team_win_frame, team.logo_path)
     set_window_expand(team_win_frame, rowspan=1, columnspan=2)
     scrollbar_frame_obj = ScrollbarFrameWin(team_win_frame, columnspan=2)
-
-    open_team_wins[team_name] = team_win_frame
+    win_open_manage(team_win_frame, __name__)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    team_win_frame.bind("<Button-1>", lambda event: set_window_top(team_win_frame))
+    team_win_frame.bind("<Button-1>", lambda event: win_set_top(team_name, __name__))
     # 窗口关闭时清理
-    team_win_frame.protocol("WM_DELETE_WINDOW", lambda: team_win_closing(team_win_frame))
+    team_win_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(team_win_frame, __name__))
 
     show_team(scrollbar_frame_obj, team)
 
