@@ -99,16 +99,6 @@ def bind_jewelry_type_canvas(parent_frame, jewelry_type_json, x, y):
         creat_jewelrys_win, parent_frame=parent_frame, 
         jewelry_type_json=jewelry_type_json)
 
-# open_jewelry_wins = {}
-# #关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-# def jewelry_win_closing(parent_frame):
-
-#     open_jewelry_win = parent_frame.title()
-#     while open_jewelry_win in open_jewelry_wins:
-#         del open_jewelry_wins[open_jewelry_win]
-
-#     parent_frame.destroy()  # 销毁窗口
-
 # 创建饰品窗口
 def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
 
