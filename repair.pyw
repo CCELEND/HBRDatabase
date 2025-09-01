@@ -2,7 +2,6 @@
 from tkinter import messagebox
 from 修复.hash import calculate_file_hashes
 from 修复.http_client import send_hashes_to_server, download_files_from_server
-import 修复.http_client
 
 def repair_reset():
         
