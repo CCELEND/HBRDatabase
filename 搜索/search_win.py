@@ -1,5 +1,6 @@
 
 from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from tkinter import scrolledtext
 
 import ttkbootstrap as ttk
@@ -133,25 +134,14 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     return "break"  # 阻止事件冒泡
 
 
-
-# 已打开的窗口字典，键：名，值：窗口句柄
-open_search_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def search_win_closing(parent_frame):
-
-    open_search_win = parent_frame.title()
-    while open_search_win in open_search_wins:
-        del open_search_wins[open_search_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 # 创建搜索窗口
 def creat_search_win(parent_frame, scrollbar_frame_obj):
 
     # 重复打开时，窗口置顶并直接返回
-    if "搜索" in open_search_wins:
-        set_window_top(open_search_wins["搜索"])
-        return "break"  # 阻止事件冒泡
+    # 重复打开时，窗口置顶并直接返回
+    if is_win_open("搜索", __name__):
+        win_set_top("搜索", __name__)
+        return "break"
 
     # 获取全部队伍对象
     get_all_team_obj()
@@ -260,8 +250,8 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     search_win_frame.maxsize(715, 540)
     search_win_frame.minsize(715, 540)
 
-    open_search_wins["搜索"] = search_win_frame
+    win_open_manage(search_win_frame, __name__)
     # 窗口关闭时清理
-    search_win_frame.protocol("WM_DELETE_WINDOW", lambda: search_win_closing(search_win_frame))
+    search_win_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(search_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡

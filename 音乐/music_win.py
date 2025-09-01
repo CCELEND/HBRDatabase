@@ -2,7 +2,8 @@
 from tkinter import messagebox
 from tkinter import ttk
 
-from window import set_window_icon, set_window_top, creat_Toplevel
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from tools import load_json
 
 from music_list import ExpandableList
@@ -12,30 +13,15 @@ import music_player
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-
-# 窗口关闭处理
-def music_win_closing(parent_frame):
-    open_music_win = parent_frame.title()
-    while open_music_win in open_music_wins:
-        del open_music_wins[open_music_win]
-
-    # 窗口关闭时清理资源
-    music_player.PlayerApp.on_close()
-    parent_frame.destroy()  # 销毁窗口
-
-open_music_wins = {}
 def creat_music_win():
     # 重复打开时，窗口置顶并直接返回
-    if "音乐" in open_music_wins:
-        # 判断窗口是否存在
-        if open_music_wins["音乐"].winfo_exists():
-            set_window_top(open_music_wins["音乐"])
-            return "break"
-        del open_music_wins["音乐"]
+    if is_win_open("音乐", __name__):
+        win_set_top("音乐", __name__)
+        return "break"
 
     music_win_frame = creat_Toplevel("音乐", 850, 575, x=190, y=140)
     set_window_icon(music_win_frame, "./音乐/Sound.ico")
-
+    
     music_win_frame.grid_rowconfigure(0, weight=1)
     music_win_frame.grid_columnconfigure(0, weight=7, minsize=350)
     music_win_frame.grid_columnconfigure(1, weight=10, minsize=500)
@@ -62,8 +48,11 @@ def creat_music_win():
     music_win_frame.maxsize(850, 575)
     music_win_frame.minsize(850, 575)
 
-    open_music_wins["音乐"] = music_win_frame
+    win_open_manage(music_win_frame, __name__)
 
     # 窗口关闭时清理
-    music_win_frame.protocol("WM_DELETE_WINDOW", lambda: music_win_closing(music_win_frame))
+    music_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: (music_player.PlayerApp.on_close(), 
+        win_close_manage(music_win_frame, __name__))
+    )
 
