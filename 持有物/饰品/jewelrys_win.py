@@ -5,6 +5,7 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 饰品.jewelrys_info import get_jewelrys_obj, load_type_resources
@@ -98,15 +99,15 @@ def bind_jewelry_type_canvas(parent_frame, jewelry_type_json, x, y):
         creat_jewelrys_win, parent_frame=parent_frame, 
         jewelry_type_json=jewelry_type_json)
 
-open_jewelry_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def jewelry_win_closing(parent_frame):
+# open_jewelry_wins = {}
+# #关闭窗口时，清除窗口字典中的句柄，并销毁窗口
+# def jewelry_win_closing(parent_frame):
 
-    open_jewelry_win = parent_frame.title()
-    while open_jewelry_win in open_jewelry_wins:
-        del open_jewelry_wins[open_jewelry_win]
+#     open_jewelry_win = parent_frame.title()
+#     while open_jewelry_win in open_jewelry_wins:
+#         del open_jewelry_wins[open_jewelry_win]
 
-    parent_frame.destroy()  # 销毁窗口
+#     parent_frame.destroy()  # 销毁窗口
 
 # 创建饰品窗口
 def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
@@ -114,12 +115,9 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
     jewelry_win_name = jewelry_type_json['name']
 
     # 重复打开时，窗口置顶并直接返回
-    if jewelry_win_name in open_jewelry_wins:
-        # 判断窗口是否存在
-        if open_jewelry_wins[jewelry_win_name].winfo_exists():
-            set_window_top(open_jewelry_wins[jewelry_win_name])
-            return "break"
-        del open_jewelry_wins[jewelry_win_name]
+    if is_win_open(jewelry_win_name, __name__):
+        win_set_top(jewelry_win_name, __name__)
+        return "break"
 
     jewelrys = get_jewelrys_obj(jewelry_type_json)
 
@@ -129,15 +127,17 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
     set_window_icon(jewelry_win_frame, logo_path)
     set_window_expand(jewelry_win_frame, rowspan=1, columnspan=2)
 
-    open_jewelry_wins[jewelry_win_name] = jewelry_win_frame
+    win_open_manage(jewelry_win_frame, __name__)
 
     scrollbar_frame_obj = ScrollbarFrameWin(jewelry_win_frame, columnspan=2)
     show_jewelrys(scrollbar_frame_obj, jewelrys)
 
+
     # 绑定鼠标点击事件到父窗口，点击置顶
-    jewelry_win_frame.bind("<Button-1>", lambda event: set_window_top(jewelry_win_frame))
+    jewelry_win_frame.bind("<Button-1>", win_set_top(jewelry_win_frame, __name__))
     # 窗口关闭时清理
-    jewelry_win_frame.protocol("WM_DELETE_WINDOW", lambda: jewelry_win_closing(jewelry_win_frame))
+    jewelry_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(jewelry_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 
