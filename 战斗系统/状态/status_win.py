@@ -4,8 +4,8 @@ from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
-from window import set_window_icon_webp, creat_Toplevel, set_window_top
-
+from window import set_window_icon_webp, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 状态.status_info import get_all_statu_obj
 import 状态.status_info
@@ -21,26 +21,12 @@ def bind_statu_canvas(parent_frame, statu, x, y):
         creat_statu_win, parent_frame=parent_frame, 
         statu=statu)
 
-open_statu_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def statu_win_closing(parent_frame):
-
-    open_statu_win = parent_frame.title()
-    while open_statu_win in open_statu_wins:
-        del open_statu_wins[open_statu_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_statu_win(event, parent_frame, statu):
 
     # 重复打开时，窗口置顶并直接返回
-    if statu.name in open_statu_wins:
-        # 判断窗口是否存在
-        if open_statu_wins[statu.name].winfo_exists():
-            set_window_top(open_statu_wins[statu.name])
-            return "break"
-        del open_statu_wins[statu.name]
-
+    if is_win_open(statu.name, __name__):
+        win_set_top(statu.name, __name__)
+        return "break"
 
     statu_win_frame = creat_Toplevel(statu.name, 540, 200, 730, 350)
     # 配置 statu_win_frame 的布局
@@ -48,7 +34,8 @@ def creat_statu_win(event, parent_frame, statu):
     statu_win_frame.grid_columnconfigure(0, weight=1)  # 列
 
     set_window_icon_webp(statu_win_frame, statu.path)
-    open_statu_wins[statu.name] = statu_win_frame
+    # open_statu_wins[statu.name] = statu_win_frame
+    win_open_manage(statu_win_frame, __name__)
 
     statu_frame = ttk.LabelFrame(statu_win_frame, text=statu.name)
     statu_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
@@ -67,10 +54,12 @@ def creat_statu_win(event, parent_frame, statu):
     stack_label = ttk.Label(statu_frame, text=statu.stack, anchor="center")
     stack_label.grid(row=0, column=1, sticky="nsew")
 
+
     # 绑定鼠标点击事件到父窗口，点击置顶
-    statu_win_frame.bind("<Button-1>", lambda event: set_window_top(statu_win_frame))
+    statu_win_frame.bind("<Button-1>", win_set_top(statu_win_frame, __name__))
     # 窗口关闭时清理
-    statu_win_frame.protocol("WM_DELETE_WINDOW", lambda: statu_win_closing(statu_win_frame))
+    statu_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(statu_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 
@@ -137,3 +126,151 @@ def show_statu(scrollbar_frame_obj):
 
     scrollbar_frame_obj.update_canvas()
     return "break"  # 阻止事件冒泡
+
+
+
+# def show_statu(scrollbar_frame_obj) -> str:
+#     """
+#     展示状态信息到滚动框架中
+    
+#     功能：
+#     1. 获取所有状态对象
+#     2. 清除之前的组件
+#     3. 按照类型、系列和具体状态层级展示UI组件
+#     4. 更新画布并阻止事件冒泡
+    
+#     Args:
+#         scrollbar_frame_obj: 滚动框架对象，用于承载状态UI组件
+        
+#     Returns:
+#         str: 返回"break"以阻止事件冒泡
+#     """
+#     # 获取所有状态对象
+#     get_all_statu_obj()
+    
+#     # 清除之前的组件
+#     scrollbar_frame_obj.destroy_components()
+    
+#     # 列数配置常量，集中管理便于修改
+#     COLUMN_CONFIG = {
+#         '增益': {'series': 3, 'statu': {'special': 3, 'default': 4}},
+#         '减益': {'series': 4, 'statu': {'special': 3, 'default': 4}},
+#         '其他': {'series': 5, 'statu': {'special': 3, 'default': 4}},
+#         '异常': {'series': None, 'statu': {'special': 3, 'default': 4}},
+#         'default': {'series': None, 'statu': None}
+#     }
+    
+#     # 特殊系列列表
+#     SPECIAL_SERIES = ["技能效果强化", "对HP百分比伤害", "减益，异常移除", '强击破', 'EShield']
+    
+#     # 遍历所有状态类型
+#     for type_num, status_type in enumerate(状态.status_info.statu_categories):
+#         # 创建类型框架
+#         type_frame = ttk.LabelFrame(
+#             scrollbar_frame_obj.scrollable_frame, 
+#             text=f"{status_type}类型状态"
+#         )
+#         type_frame.grid(
+#             row=type_num, 
+#             column=0, 
+#             columnspan=6, 
+#             padx=10, 
+#             pady=(0, 10), 
+#             sticky="nsew"
+#         )
+        
+#         series_column_count = 0
+#         # 遍历该类型下的所有系列
+#         for series_num, series in enumerate(状态.status_info.statu_categories[status_type]):
+#             series_frame = create_series_frame(
+#                 type_frame, 
+#                 series, 
+#                 status_type, 
+#                 series_num, 
+#                 series_column_count,
+#                 COLUMN_CONFIG
+#             )
+            
+#             # 更新系列列计数
+#             if status_type in COLUMN_CONFIG and COLUMN_CONFIG[status_type]['series']:
+#                 series_column_count = set_frame_newline(
+#                     series_frame, 
+#                     series_num, 
+#                     COLUMN_CONFIG[status_type]['series'], 
+#                     series_column_count
+#                 )
+            
+#             # 处理该系列下的所有状态
+#             process_series_statuses(
+#                 series_frame, 
+#                 status_type, 
+#                 series, 
+#                 SPECIAL_SERIES,
+#                 COLUMN_CONFIG
+#             )
+    
+#     # 更新画布
+#     scrollbar_frame_obj.update_canvas()
+#     return "break"  # 阻止事件冒泡
+
+
+# def create_series_frame(parent, series_name, status_type, series_num, column_count, column_config):
+#     """创建系列框架并设置布局"""
+#     series_frame = ttk.LabelFrame(parent, text=series_name)
+    
+#     # 根据类型设置不同的布局
+#     if status_type in column_config and column_config[status_type]['series']:
+#         series_frame.grid(
+#             row=column_count // column_config[status_type]['series'],
+#             column=column_count % column_config[status_type]['series'],
+#             padx=(5, 0),
+#             pady=(0, 5),
+#             sticky="nesw"
+#         )
+#     else:
+#         series_frame.grid(
+#             row=0,
+#             column=series_num,
+#             padx=(5, 0),
+#             sticky="nesw"
+#         )
+    
+#     return series_frame
+
+
+# def process_series_statuses(series_frame, status_type, series, special_series, column_config):
+#     """处理系列下的所有状态项"""
+#     status_items = 状态.status_info.statu_categories[status_type][series]
+#     statu_column_count = 0
+    
+#     for statu_num, statu_name in enumerate(status_items):
+#         statu = status_items[statu_name]
+        
+#         # 处理单个状态项
+#         if len(status_items) == 1:
+#             bind_statu_canvas(series_frame, statu, 0, 0)
+#         else:
+#             statu_frame = ttk.LabelFrame(series_frame, text=statu_name)
+#             bind_statu_canvas(statu_frame, statu, 0, 0)
+            
+#             # 根据类型和系列设置状态项布局
+#             if status_type in ['增益', '减益', '其他', '异常']:
+#                 # 确定每行列数
+#                 columns = (column_config[status_type]['statu']['special'] 
+#                           if series in special_series 
+#                           else column_config[status_type]['statu']['default'])
+                
+#                 statu_column_count = set_frame_newline(
+#                     statu_frame, 
+#                     statu_num, 
+#                     columns, 
+#                     statu_column_count
+#                 )
+#             else:
+#                 statu_frame.grid(
+#                     row=0, 
+#                     column=statu_num, 
+#                     padx=5, 
+#                     pady=(0, 5), 
+#                     sticky="nesw"
+#                 )

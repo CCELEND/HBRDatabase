@@ -4,7 +4,8 @@ from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
-from window import set_window_icon_webp, creat_Toplevel, set_window_top
+from window import set_window_icon_webp, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 职业.careers_info import get_all_career_obj
 import 职业.careers_info
@@ -20,26 +21,12 @@ def bind_career_canvas(parent_frame, career, x, y):
         creat_career_win, parent_frame=parent_frame, 
         career=career)
 
-open_career_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def career_win_closing(parent_frame):
-
-    open_career_win = parent_frame.title()
-    while open_career_win in open_career_wins:
-        del open_career_wins[open_career_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_career_win(event, parent_frame, career):
 
     # 重复打开时，窗口置顶并直接返回
-    if career.name in open_career_wins:
-        # 判断窗口是否存在
-        if open_career_wins[career.name].winfo_exists():
-            set_window_top(open_career_wins[career.name])
-            return "break"
-        del open_career_wins[career.name]
-
+    if is_win_open(career.name, __name__):
+        win_set_top(career.name, __name__)
+        return "break"
 
     career_win_frame = creat_Toplevel(career.name, 540, 200, 300, 280)
     # 配置 career_win_frame 的布局
@@ -47,7 +34,7 @@ def creat_career_win(event, parent_frame, career):
     career_win_frame.grid_columnconfigure(0, weight=1)  # 列
 
     set_window_icon_webp(career_win_frame, career.path)
-    open_career_wins[career.name] = career_win_frame
+    win_open_manage(career_win_frame, __name__)
 
     career_frame = ttk.LabelFrame(career_win_frame, text=career.name)
     career_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
@@ -59,9 +46,10 @@ def creat_career_win(event, parent_frame, career):
     desc_label.grid(row=0, column=0, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    career_win_frame.bind("<Button-1>", lambda event: set_window_top(career_win_frame))
+    career_frame.bind("<Button-1>", win_set_top(career_frame, __name__))
     # 窗口关闭时清理
-    career_win_frame.protocol("WM_DELETE_WINDOW", lambda: career_win_closing(career_win_frame))
+    career_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(career_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 

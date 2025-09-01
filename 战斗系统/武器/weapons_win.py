@@ -4,7 +4,8 @@ from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
-from window import set_window_icon_webp, creat_Toplevel, set_window_top
+from window import set_window_icon_webp, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 武器.weapons_info import get_all_weapon_obj
 import 武器.weapons_info
@@ -20,26 +21,12 @@ def bind_weapon_canvas(parent_frame, weapon, x, y):
         creat_weapon_win, parent_frame=parent_frame, 
         weapon=weapon)
 
-open_weapon_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def weapon_win_closing(parent_frame):
-
-    open_weapon_win = parent_frame.title()
-    while open_weapon_win in open_weapon_wins:
-        del open_weapon_wins[open_weapon_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_weapon_win(event, parent_frame, weapon):
 
     # 重复打开时，窗口置顶并直接返回
-    if weapon.name in open_weapon_wins:
-        # 判断窗口是否存在
-        if open_weapon_wins[weapon.name].winfo_exists():
-            set_window_top(open_weapon_wins[weapon.name])
-            return "break"
-        del open_weapon_wins[weapon.name]
-
+    if is_win_open(weapon.name, __name__):
+        win_set_top(weapon.name, __name__)
+        return "break"
 
     weapon_win_frame = creat_Toplevel(weapon.name, 540, 200, 300, 280)
     # 配置 weapon_win_frame 的布局
@@ -47,7 +34,7 @@ def creat_weapon_win(event, parent_frame, weapon):
     weapon_win_frame.grid_columnconfigure(0, weight=1)  # 列
 
     set_window_icon_webp(weapon_win_frame, weapon.path)
-    open_weapon_wins[weapon.name] = weapon_win_frame
+    win_open_manage(weapon_win_frame, __name__)
 
     weapon_frame = ttk.LabelFrame(weapon_win_frame, text=weapon.name)
     weapon_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
@@ -63,9 +50,10 @@ def creat_weapon_win(event, parent_frame, weapon):
     hit_label.grid(row=0, column=1, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    weapon_win_frame.bind("<Button-1>", lambda event: set_window_top(weapon_win_frame))
+    weapon_frame.bind("<Button-1>", win_set_top(weapon_frame, __name__))
     # 窗口关闭时清理
-    weapon_win_frame.protocol("WM_DELETE_WINDOW", lambda: weapon_win_closing(weapon_win_frame))
+    weapon_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(weapon_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 

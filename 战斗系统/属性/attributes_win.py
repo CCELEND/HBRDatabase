@@ -4,7 +4,8 @@ from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
-from window import set_window_icon_webp, creat_Toplevel, set_window_top
+from window import set_window_icon_webp, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 属性.attributes_info import get_all_attribute_obj
 import 属性.attributes_info
@@ -20,26 +21,12 @@ def bind_attribute_canvas(parent_frame, attribute, x, y):
         creat_attribute_win, parent_frame=parent_frame, 
         attribute=attribute)
 
-open_attribute_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def attribute_win_closing(parent_frame):
-
-    open_attribute_win = parent_frame.title()
-    while open_attribute_win in open_attribute_wins:
-        del open_attribute_wins[open_attribute_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_attribute_win(event, parent_frame, attribute):
 
     # 重复打开时，窗口置顶并直接返回
-    if attribute.name in open_attribute_wins:
-        # 判断窗口是否存在
-        if open_attribute_wins[attribute.name].winfo_exists():
-            set_window_top(open_attribute_wins[attribute.name])
-            return "break"
-        del open_attribute_wins[attribute.name]
-
+    if is_win_open(attribute.name, __name__):
+        win_set_top(attribute.name, __name__)
+        return "break"
 
     attribute_win_frame = creat_Toplevel(attribute.name, 540, 200, 300, 280)
     # 配置 attribute_win_frame 的布局
@@ -47,7 +34,7 @@ def creat_attribute_win(event, parent_frame, attribute):
     attribute_win_frame.grid_columnconfigure(0, weight=1)  # 列
 
     set_window_icon_webp(attribute_win_frame, attribute.path)
-    open_attribute_wins[attribute.name] = attribute_win_frame
+    win_open_manage(attribute_win_frame, __name__)
 
     attribute_frame = ttk.LabelFrame(attribute_win_frame, text=attribute.name)
     attribute_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
@@ -59,9 +46,10 @@ def creat_attribute_win(event, parent_frame, attribute):
     info_label.grid(row=0, column=0, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    attribute_win_frame.bind("<Button-1>", lambda event: set_window_top(attribute_win_frame))
+    attribute_frame.bind("<Button-1>", win_set_top(attribute_frame, __name__))
     # 窗口关闭时清理
-    attribute_win_frame.protocol("WM_DELETE_WINDOW", lambda: attribute_win_closing(attribute_win_frame))
+    attribute_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(attribute_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 

@@ -5,7 +5,6 @@ from window import set_window_expand, set_window_icon, creat_Toplevel
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 
-
 # 创建关于窗口
 def creat_about_win(parent_frame):
 
