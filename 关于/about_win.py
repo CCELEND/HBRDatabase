@@ -1,25 +1,17 @@
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
-from window import set_window_expand, set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_expand, set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
-# 已打开的窗口字典，键：名，值：窗口句柄
-open_about_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def about_win_closing(parent_frame):
 
-    open_about_win = parent_frame.title()
-    while open_about_win in open_about_wins:
-        del open_about_wins[open_about_win]
-
-    parent_frame.destroy()  # 销毁窗口
 
 # 创建关于窗口
 def creat_about_win(parent_frame):
 
     # 重复打开时，窗口置顶并直接返回
-    if "关于 HBRDatabase" in open_about_wins:
-        set_window_top(open_about_wins["关于 HBRDatabase"])
+    if is_win_open("关于 HBRDatabase", __name__):
+        win_set_top("关于 HBRDatabase", __name__)
         return
 
     about_win_frame = creat_Toplevel("关于 HBRDatabase", 730, 540, x=180, y=170)
@@ -59,12 +51,11 @@ def creat_about_win(parent_frame):
     info_frame.grid_rowconfigure(0, weight=1)
     info_frame.grid_columnconfigure(0, weight=1)
 
-
-    open_about_wins["关于 HBRDatabase"] = about_win_frame
+    win_open_manage(about_win_frame, __name__)
     # 绑定鼠标点击事件到父窗口，点击置顶
-    about_win_frame.bind("<Button-1>", lambda event: set_window_top(about_win_frame))
+    about_win_frame.bind("<Button-1>", lambda event: win_set_top(about_win_frame, __name__))
     # 窗口关闭时清理
-    about_win_frame.protocol("WM_DELETE_WINDOW", lambda: about_win_closing(about_win_frame))
+    about_win_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(about_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 
