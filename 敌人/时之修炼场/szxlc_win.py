@@ -5,7 +5,8 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 时之修炼场.szxlc_info import szxlcs, get_all_szxlc_obj
@@ -31,38 +32,26 @@ def bind_szxlc_canvas(parent_frame, szxlc, x, y):
             creat_szxlc_win, parent_frame=parent_frame, 
             szxlc=szxlc)
 
-open_szxlc_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def szxlc_win_closing(parent_frame):
-
-    open_szxlc_win = parent_frame.title()
-    while open_szxlc_win in open_szxlc_wins:
-        del open_szxlc_wins[open_szxlc_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_szxlc_win(event, parent_frame, szxlc):
 
     # 重复打开时，窗口置顶并直接返回
-    if szxlc.name in open_szxlc_wins:
-        # 判断窗口是否存在
-        if open_szxlc_wins[szxlc.name].winfo_exists():
-            set_window_top(open_szxlc_wins[szxlc.name])
-            return "break"
-        del open_szxlc_wins[szxlc.name]
+    if is_win_open(szxlc.name, __name__):
+        win_set_top(szxlc.name, __name__)
+        return "break"
 
 
     szxlc_win_frame = creat_Toplevel(szxlc.name, 600, 840, 230, 110)
     set_window_icon(szxlc_win_frame, szxlc.logo_path)
-    open_szxlc_wins[szxlc.name] = szxlc_win_frame
+    win_open_manage(szxlc_win_frame, __name__)
 
     # 创建 ImageViewerWithScrollbar 实例
     szxlc_image_viewer = ImageViewerWithScrollbar(szxlc_win_frame, 600, 840, szxlc.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    szxlc_win_frame.bind("<Button-1>", lambda event: set_window_top(szxlc_win_frame))
+    szxlc_win_frame.bind("<Button-1>", win_set_top(szxlc_win_frame, __name__))
     # 窗口关闭时清理
-    szxlc_win_frame.protocol("WM_DELETE_WINDOW", lambda: szxlc_win_closing(szxlc_win_frame))
+    szxlc_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(szxlc_win_frame, __name__, szxlc_image_viewer))
 
     return "break"  # 阻止事件冒泡
 

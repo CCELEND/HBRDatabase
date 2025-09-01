@@ -5,7 +5,8 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 恒星战.hxz_info import hxzs, get_all_hxz_obj
@@ -21,40 +22,28 @@ def load_resources():
         return
     hxzs_json = load_json("./敌人/恒星战/hxz.json")
 
-open_hxz_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def hxz_win_closing(parent_frame):
-
-    open_hxz_win = parent_frame.title()
-    while open_hxz_win in open_hxz_wins:
-        del open_hxz_wins[open_hxz_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_hxz_win(event, parent_frame, hxz):
 
     # 重复打开时，窗口置顶并直接返回
-    if hxz.name in open_hxz_wins:
-        # 判断窗口是否存在
-        if open_hxz_wins[hxz.name].winfo_exists():
-            set_window_top(open_hxz_wins[hxz.name])
-            return "break"
-        del open_hxz_wins[hxz.name]
+    if is_win_open(hxz.name, __name__):
+        win_set_top(hxz.name, __name__)
+        return "break"
 
     if "攻略" in hxz.name:
         hxz_win_frame = creat_Toplevel(hxz.name, 600, 840, 180, 140)
     else:
         hxz_win_frame = creat_Toplevel(hxz.name, 1280, 720, 180, 140)
     set_window_icon(hxz_win_frame, hxz.logo_path)
-    open_hxz_wins[hxz.name] = hxz_win_frame
+    win_open_manage(hxz_win_frame, __name__)
 
     # 创建 ImageViewerWithScrollbar 实例
     hxz_image_viewer = ImageViewerWithScrollbar(hxz_win_frame, 1280, 720, hxz.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    hxz_win_frame.bind("<Button-1>", lambda event: set_window_top(hxz_win_frame))
+    hxz_win_frame.bind("<Button-1>", win_set_top(hxz_win_frame, __name__))
     # 窗口关闭时清理
-    hxz_win_frame.protocol("WM_DELETE_WINDOW", lambda: hxz_win_closing(hxz_win_frame))
+    hxz_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(hxz_win_frame, __name__, hxz_image_viewer))
 
     return "break"  # 阻止事件冒泡
 

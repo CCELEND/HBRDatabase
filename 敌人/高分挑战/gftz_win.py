@@ -8,7 +8,8 @@ from typing import Dict, Any
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 高分挑战.gftz_info import gftzs, get_all_gftz_obj
@@ -39,40 +40,28 @@ def bind_gftz_canvas(parent_frame, gftz, x, y):
             creat_gftz_win, parent_frame=parent_frame, 
             gftz=gftz)
 
-open_gftz_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def gftz_win_closing(parent_frame):
-
-    open_gftz_win = parent_frame.title()
-    while open_gftz_win in open_gftz_wins:
-        del open_gftz_wins[open_gftz_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_gftz_win(event, parent_frame, gftz):
 
     # 重复打开时，窗口置顶并直接返回
-    if gftz.name in open_gftz_wins:
-        # 判断窗口是否存在
-        if open_gftz_wins[gftz.name].winfo_exists():
-            set_window_top(open_gftz_wins[gftz.name])
-            return "break"
-        del open_gftz_wins[gftz.name]
+    if is_win_open(gftz.name, __name__):
+        win_set_top(gftz.name, __name__)
+        return "break"
 
     if "攻略" in gftz.name:
         gftz_win_frame = creat_Toplevel(gftz.name, 600, 840, 180, 140)
     else:
         gftz_win_frame = creat_Toplevel(gftz.name, 1280, 715, 180, 140)
     set_window_icon(gftz_win_frame, gftz.logo_path)
-    open_gftz_wins[gftz.name] = gftz_win_frame
+    win_open_manage(gftz_win_frame, __name__)
 
     # 创建 ImageViewerWithScrollbar 实例
     gftz_image_viewer = ImageViewerWithScrollbar(gftz_win_frame, 1280, 715, gftz.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    gftz_win_frame.bind("<Button-1>", lambda event: set_window_top(gftz_win_frame))
+    gftz_win_frame.bind("<Button-1>", win_set_top(gftz_win_frame, __name__))
     # 窗口关闭时清理
-    gftz_win_frame.protocol("WM_DELETE_WINDOW", lambda: gftz_win_closing(gftz_win_frame))
+    gftz_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(gftz_win_frame, __name__, gftz_image_viewer))
 
     return "break"  # 阻止事件冒泡
 

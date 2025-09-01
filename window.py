@@ -256,9 +256,13 @@ def win_close_all():
         del open_wins[open_win_name]
         win_frame.destroy()  # 销毁窗口
 
-def win_set_top(open_win_name, module):
-    open_win_name = f"{module}_{open_win_name}"
-    set_window_top(open_wins[open_win_name])
+def win_set_top(open_win, module):
+    if isinstance(open_win, str):
+        open_win_name = f"{module}_{open_win}"
+        set_window_top(open_wins[open_win_name])
+    else:
+        open_win_name = f"{module}_{open_win.title()}"
+        set_window_top(open_wins[open_win_name])
 
 
 def is_win_open(open_win_name, module):

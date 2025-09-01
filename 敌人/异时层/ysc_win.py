@@ -6,7 +6,8 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 异时层.ysc_info import yscs, get_all_ysc_obj
@@ -29,37 +30,27 @@ def bind_ysc_enemy_canvas(parent_frame, ysc, x, y):
         creat_ysc_enemy_win, parent_frame=parent_frame, 
         ysc=ysc)
 
-open_ysc_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def ysc_win_closing(parent_frame):
-
-    open_ysc_win = parent_frame.title()
-    while open_ysc_win in open_ysc_wins:
-        del open_ysc_wins[open_ysc_win]
-
-    parent_frame.destroy()  # 销毁窗口
 
 def creat_ysc_enemy_win(event, parent_frame, ysc):
 
     # 重复打开时，窗口置顶并直接返回
-    if ysc.name in open_ysc_wins:
-        # 判断窗口是否存在
-        if open_ysc_wins[ysc.name].winfo_exists():
-            set_window_top(open_ysc_wins[ysc.name])
-            return "break"
-        del open_ysc_wins[ysc.name]
+    if is_win_open(ysc.name, __name__):
+        win_set_top(ysc.name, __name__)
+        return "break"
         
     ysc_win_frame = creat_Toplevel(ysc.name, 600, 840, 200, 120)
     set_window_icon(ysc_win_frame, ysc.logo_path)
-    open_ysc_wins[ysc.name] = ysc_win_frame
+    win_open_manage(ysc_win_frame, __name__)
 
     # 创建 ImageViewerWithScrollbar 实例
     ysc_image_viewer = ImageViewerWithScrollbar(ysc_win_frame, 600, 840, ysc.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    ysc_win_frame.bind("<Button-1>", lambda event: set_window_top(ysc_win_frame))
+    ysc_win_frame.bind("<Button-1>", win_set_top(ysc_win_frame, __name__))
     # 窗口关闭时清理
-    ysc_win_frame.protocol("WM_DELETE_WINDOW", lambda: ysc_win_closing(ysc_win_frame))
+    ysc_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(ysc_win_frame, __name__, ysc_image_viewer))
+
 
     return "break"  # 阻止事件冒泡
 

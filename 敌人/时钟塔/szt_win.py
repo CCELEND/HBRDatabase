@@ -7,7 +7,8 @@ from typing import Dict, Any
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 时钟塔.szt_info import szts, get_all_szt_obj
@@ -102,30 +103,16 @@ def creat_attributes_img_value(info_frames, attribute_value_dir, up_photo, down_
         value_label.grid(row=1, column=0, sticky="nsew")
 
 
-open_szt_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def szt_win_closing(parent_frame):
-
-    open_szt_win = parent_frame.title()
-    while open_szt_win in open_szt_wins:
-        del open_szt_wins[open_szt_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
-
 def creat_szt_win(event, parent_frame, szt):
 
     # 重复打开时，窗口置顶并直接返回
-    if szt.name in open_szt_wins:
-        # 判断窗口是否存在
-        if open_szt_wins[szt.name].winfo_exists():
-            set_window_top(open_szt_wins[szt.name])
-            return "break"
-        del open_szt_wins[szt.name]
+    if is_win_open(szt.name, __name__):
+        win_set_top(szt.name, __name__)
+        return "break"
 
     szt_win_frame = creat_Toplevel(szt.name, x=200,y=250)
     set_window_icon(szt_win_frame, szt.logo_path)
-    open_szt_wins[szt.name] = szt_win_frame
+    win_open_manage(szt_win_frame, __name__)
 
     # 获取 up_down 图对象
     up_photo = get_photo("./战斗系统/状态/IconUp.webp", (20, 20))
@@ -204,9 +191,10 @@ def creat_szt_win(event, parent_frame, szt):
 
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    szt_win_frame.bind("<Button-1>", lambda event: set_window_top(szt_win_frame))
+    szt_win_frame.bind("<Button-1>", win_set_top(szt.name, __name__))
     # 窗口关闭时清理
-    szt_win_frame.protocol("WM_DELETE_WINDOW", lambda: szt_win_closing(szt_win_frame))
+    szt_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(szt_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 

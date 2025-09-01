@@ -6,7 +6,8 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 
 from tools import load_json
@@ -33,40 +34,30 @@ def bind_gqboss_canvas(parent_frame, gqboss, x, y):
             creat_gqboss_win, parent_frame=parent_frame, 
             gqboss=gqboss)
 
-open_gqboss_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def gqboss_win_closing(parent_frame):
-
-    open_gqboss_win = parent_frame.title()
-    while open_gqboss_win in open_gqboss_wins:
-        del open_gqboss_wins[open_gqboss_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_gqboss_win(event, parent_frame, gqboss):
 
+    print(gqboss.name)
+
     # 重复打开时，窗口置顶并直接返回
-    if gqboss.name in open_gqboss_wins:
-        # 判断窗口是否存在
-        if open_gqboss_wins[gqboss.name].winfo_exists():
-            set_window_top(open_gqboss_wins[gqboss.name])
-            return "break"
-        del open_gqboss_wins[gqboss.name]
+    if is_win_open(gqboss.name, __name__):
+        win_set_top(gqboss.name, __name__)
+        return "break"
 
     if "攻略" in gqboss.name:
         gqboss_win_frame = creat_Toplevel(gqboss.name, 600, 840, 230, 110)
     else:
         gqboss_win_frame = creat_Toplevel(gqboss.name, 600, 840, 230, 110)
     set_window_icon(gqboss_win_frame, gqboss.logo_path)
-    open_gqboss_wins[gqboss.name] = gqboss_win_frame
+    win_open_manage(gqboss_win_frame, __name__)
 
     # 创建 ImageViewerWithScrollbar 实例
     gqboss_image_viewer = ImageViewerWithScrollbar(gqboss_win_frame, 600, 840, gqboss.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    gqboss_win_frame.bind("<Button-1>", lambda event: set_window_top(gqboss_win_frame))
+    gqboss_win_frame.bind("<Button-1>", win_set_top(gqboss_win_frame, __name__))
     # 窗口关闭时清理
-    gqboss_win_frame.protocol("WM_DELETE_WINDOW", lambda: gqboss_win_closing(gqboss_win_frame))
+    gqboss_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(gqboss_win_frame, __name__, gqboss_image_viewer))
 
     return "break"  # 阻止事件冒泡
 

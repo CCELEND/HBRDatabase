@@ -5,7 +5,8 @@ from ttkbootstrap.constants import *
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
 from canvas_events import mouse_bind_canvas_events
 from canvas_events import ImageViewerWithScrollbar
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from tools import load_json
 from 主线.zx_info import zxs, get_all_zx_obj
@@ -31,38 +32,28 @@ def bind_zx_canvas(parent_frame, zx, x, y):
             creat_zx_win, parent_frame=parent_frame, 
             zx=zx)
 
-open_zx_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def zx_win_closing(parent_frame):
-
-    open_zx_win = parent_frame.title()
-    while open_zx_win in open_zx_wins:
-        del open_zx_wins[open_zx_win]
-
-    parent_frame.destroy()  # 销毁窗口
 
 def creat_zx_win(event, parent_frame, zx):
 
     # 重复打开时，窗口置顶并直接返回
-    if zx.name in open_zx_wins:
-        # 判断窗口是否存在
-        if open_zx_wins[zx.name].winfo_exists():
-            set_window_top(open_zx_wins[zx.name])
-            return "break"
-        del open_zx_wins[zx.name]
+    if is_win_open(zx.name, __name__):
+        win_set_top(zx.name, __name__)
+        return "break"
 
 
     zx_win_frame = creat_Toplevel(zx.name, 600, 840, 200, 120)
     set_window_icon(zx_win_frame, zx.logo_path)
-    open_zx_wins[zx.name] = zx_win_frame
+    win_open_manage(zx_win_frame, __name__)
+
 
     # 创建 ImageViewerWithScrollbar 实例
     zx_image_viewer = ImageViewerWithScrollbar(zx_win_frame, 600, 840, zx.guide_path)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    zx_win_frame.bind("<Button-1>", lambda event: set_window_top(zx_win_frame))
+    zx_win_frame.bind("<Button-1>", win_set_top(zx_win_frame, __name__))
     # 窗口关闭时清理
-    zx_win_frame.protocol("WM_DELETE_WINDOW", lambda: zx_win_closing(zx_win_frame))
+    zx_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(zx_win_frame, __name__, zx_image_viewer))
 
     return "break"  # 阻止事件冒泡
 
