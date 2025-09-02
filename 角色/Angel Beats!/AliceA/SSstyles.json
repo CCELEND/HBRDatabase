@@ -9,7 +9,8 @@
       "SS",
       "攻击者",
       "斩",
-      "光"
+      "光",
+      {"1020103":"AliceADefault_R3"}
     ],
     "ActiveSkills": [
       [
@@ -172,7 +173,8 @@
       "SS",
       "攻击者",
       "斩",
-      "冰"
+      "冰",
+      {"1020104":"AliceAOnePiece_R3"}
     ],
     "ActiveSkills": [
       [

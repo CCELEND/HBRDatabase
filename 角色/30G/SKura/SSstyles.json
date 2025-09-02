@@ -11,7 +11,8 @@
         "SS",
         "破坏者",
         "斩",
-        "光"
+        "光",
+        {"1004603":"SKuraDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -81,7 +82,8 @@
         "SS",
         "破坏者",
         "斩",
-        "暗"
+        "暗",
+        {"1004605":"SKuraLandlady_R3"}
     ],
     "ActiveSkills":[
     [

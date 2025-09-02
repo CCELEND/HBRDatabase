@@ -11,7 +11,8 @@
         "SS",
         "增益者",
         "突",
-        "雷"
+        "雷",
+        {"1002403":"SHiguchiDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -81,7 +82,8 @@
         "SS",
         "增益者",
         "突",
-        null
+        null,
+        {"1002404":"SHiguchiGrace_R3"}
     ],
     "ActiveSkills":[
     [

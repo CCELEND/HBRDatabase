@@ -9,7 +9,8 @@
             "SS",
             "攻击者",
             "斩",
-            "暗"
+            "暗",
+            {"1007503":"INatsumeDefault_R3"}
         ],
         "ActiveSkills": [
             
@@ -130,7 +131,8 @@
       "SS",
       "攻击者",
       "斩",
-      null
+      null,
+      {"1007504":"INatsumeButterfly_R3"}
     ],
     "ActiveSkills": [
         [
@@ -374,7 +376,8 @@
       "SS",
       "攻击者",
       "斩",
-      "雷"
+      "雷",
+      {"1007505":"INatsumeNeat_R3"}
     ],
     "ActiveSkills":[
     [

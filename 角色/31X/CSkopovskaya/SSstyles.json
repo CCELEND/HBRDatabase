@@ -9,7 +9,8 @@
       "SS",
       "减益者",
       "突",
-      "暗"
+      "暗",
+      {"1008603":"CSkopovskayaDefault_R3"}
     ],
     "ActiveSkills": [
       [
@@ -153,7 +154,8 @@
       "SS",
       "减益者",
       "突",
-      "雷"
+      "雷",
+      {"1008604":"CSkopovskayaVampire_R3"}
     ],
     "ActiveSkills": [
       [
@@ -313,7 +315,8 @@
       "SS",
       "增益者",
       "突",
-      "暗"
+      "暗",
+      {"1008605":"CSkopovskayaBride_R3"}
     ],
     "ActiveSkills": [
       [

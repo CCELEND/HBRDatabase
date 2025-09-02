@@ -9,7 +9,8 @@
             "SS",
             "治疗者",
             "突",
-            null
+            null,
+            {"1005403":"RMurohushiDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -114,7 +115,8 @@
             "SS",
             "治疗者",
             "突",
-            null
+            null,
+            {"1005405":"RMurohushiRace_R3"}
         ],
         "ActiveSkills": [
             [

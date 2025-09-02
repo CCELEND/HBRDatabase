@@ -9,7 +9,8 @@
             "SS",
             "治疗者",
             "突",
-            null
+            null,
+            {"1007103":"MYanagiDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -158,7 +159,8 @@
             "SS",
             "治疗者",
             "突",
-            null
+            null,
+            {"1007104":"MYanagiPunk_R3"}
         ],
         "ActiveSkills": [
             [

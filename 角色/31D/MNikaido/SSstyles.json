@@ -10,7 +10,8 @@
             "SS",
             "攻击者",
             "打",
-            "暗"
+            "暗",
+            {"1005103":"MNikaidoDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -245,7 +246,8 @@
             "SS",
             "攻击者",
             "打",
-            "冰"
+            "冰",
+            {"1005104":"MNikaidoXmas2023_R3"}
         ],
         "ActiveSkills": [
             

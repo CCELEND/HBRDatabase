@@ -9,7 +9,8 @@
       "SS",
       "防御者",
       "打",
-      null
+      null,
+      {"1008403":"VBalakrishnanDefault_R3"}
     ],
     "ActiveSkills": [
       
@@ -157,7 +158,8 @@
       "SS",
       "治疗者",
       "打",
-      null
+      null,
+      {"1008405":"VBalakrishnanTradition_R3"}
     ],
     "ActiveSkills": [
       

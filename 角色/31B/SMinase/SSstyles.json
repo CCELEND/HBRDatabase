@@ -11,7 +11,8 @@
         "SS",
         "破盾者",
         "斩",
-        "雷"
+        "雷",
+        {"1002303":"SMinaseDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -109,7 +110,8 @@
         "SS",
         "攻击者",
         "斩",
-        "冰"
+        "冰",
+        {"1002304":"SMinaseSwim2022_R3"}
     ],
     "ActiveSkills":[
     [

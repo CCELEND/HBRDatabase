@@ -11,7 +11,8 @@
         "SS",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1001103":"RKayamoriDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -76,7 +77,8 @@
         "SS",
         "攻击者",
         "斩",
-        "火"
+        "火",
+        {"1001104":"RKayamoriDefault_R3a"}
     ],
     "ActiveSkills":[
     [
@@ -153,7 +155,8 @@
         "SS",
         "攻击者",
         "斩",
-        "光"
+        "光",
+        {"1001105":"RKayamoriGothic_R3"}
     ],
     "ActiveSkills":[
     [
@@ -217,7 +220,8 @@
         "SS",
         "攻击者",
         "斩",
-        "雷"
+        "雷",
+        {"1001107":"RKayamoriAnniv2023_R3"}
     ],
     "ActiveSkills":[
     [
@@ -292,7 +296,8 @@
         "SS",
         "攻击者",
         "斩",
-        "火暗"
+        "火暗",
+        {"1001108":"RKayamoriCombat2023_R3"}
     ],
     "ActiveSkills":[
     [

@@ -11,7 +11,8 @@
         "SS",
         "减益者",
         "突",
-        "光"
+        "光",
+        {"1004303":"MKiryuDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -81,7 +82,8 @@
         "SS",
         "减益者",
         "突",
-        "雷"
+        "雷",
+        {"1004304":"MKiryuGothic_R3"}
     ],
     "ActiveSkills":[
     [
@@ -152,7 +154,8 @@
         "SS",
         "减益者",
         "突",
-        "冰"
+        "冰",
+        {"1004305":"MKiryuCerulean_R3"}
     ],
     "ActiveSkills":[
     [

@@ -9,7 +9,8 @@
             "SS",
             "破坏者",
             "斩",
-            "火"
+            "火",
+            {"1006203":"NiOhshimaDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -230,7 +231,8 @@
             "SS",
             "攻击者",
             "斩",
-            "光"
+            "光",
+            {"1006205":"NiOhshimaYukata2023_R3"}
         ],
         "ActiveSkills": [
             [

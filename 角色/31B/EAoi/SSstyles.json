@@ -11,7 +11,8 @@
         "SS",
         "防御者",
         "打",
-        null
+        null,
+        {"1002103":"EAoiDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -78,7 +79,8 @@
         "SS",
         "防御者",
         "打",
-        "雷"
+        "雷",
+        {"1002104":"EAoiWaitress_R3"}
     ],
     "ActiveSkills":[
     [
@@ -166,7 +168,8 @@
         "SS",
         "防御者",
         "打",
-        "火"
+        "火",
+        {"1002105":"EAoiNewYear2024_R3"}
     ],
     "ActiveSkills":[
     [

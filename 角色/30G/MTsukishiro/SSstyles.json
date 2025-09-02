@@ -11,7 +11,8 @@
         "SS",
         "攻击者",
         "打",
-        "暗"
+        "暗",
+        {"1004203":"MTsukishiroDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -79,7 +80,8 @@
         "SS",
         "攻击者",
         "打",
-        "光"
+        "光",
+        {"1004204":"MTsukishiroRugged_R3"}
     ],
     "ActiveSkills":[
     [

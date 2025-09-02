@@ -9,7 +9,8 @@
             "SS",
             "增益者",
             "突",
-            "暗"
+            "暗",
+            {"1005203":"IIshiiDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -146,7 +147,8 @@
             "SS",
             "增益者",
             "突",
-            "火"
+            "火",
+            {"1005205":"IIshiiCasual_R3"}
         ],
         "ActiveSkills": [
             [

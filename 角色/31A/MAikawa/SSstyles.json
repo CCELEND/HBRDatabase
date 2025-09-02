@@ -11,7 +11,8 @@
         "SS",
         "减益者",
         "打",
-        null
+        null,
+        {"1001303":"MAikawaDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -78,7 +79,8 @@
         "SS",
         "减益者",
         "打",
-        "光"
+        "光",
+        {"1001305":"MAikawaPrecious_R3"}
     ],
     "ActiveSkills":[
     [
@@ -145,7 +147,8 @@
         "SS",
         "减益者",
         "打",
-        "火"
+        "火",
+        {"1001306":"MAikawaMaiden_R3"}
     ],
     "ActiveSkills":[
     [
@@ -224,7 +227,8 @@
             "SS",
             "减益者",
             "打",
-            "暗"
+            "暗",
+            {"1001307":"MAikawaSuite_R3"}
         ],
         "ActiveSkills": [
             
@@ -367,7 +371,8 @@
         "SS",
         "减益者",
         "打",
-        "雷"
+        "雷",
+        {"1001308":"MAikawaSwim2024_R3"}
     ],
     "ActiveSkills":[
     [

@@ -11,7 +11,8 @@
         "SS",
         "破盾者",
         "突",
-        null
+        null,
+        {"1001203":"YIzumiDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -84,12 +85,13 @@
         "./角色/31A/YIzumi/YIzumiYukata2022_R3_Thumbnail.webp",
         "31A","和泉由希",
         "夏椿、闪耀的夜明星",
-        ["浴衣由希","火yuki","烟花"],
+        ["浴衣由希","火yuki","烟花","火由希"],
         "拥有对DP+50%火属性必杀技的BREAKER",
         "SS",
         "破盾者",
         "突",
-        "火"
+        "火",
+        {"1001204":"YIzumiYukata2022_R3"}
     ],
     "ActiveSkills":[
     [
@@ -156,7 +158,8 @@
         "SS",
         "破盾者",
         "突",
-        "雷"
+        "雷",
+        {"1001205":"YIzumiAnniv2023_R3"}
     ],
     "ActiveSkills":[
     [
@@ -234,7 +237,8 @@
         "SS",
         "破盾者",
         "突",
-        "光"
+        "光",
+        {"1001207":"YIzumiBeauty_R3"}
     ],
     "ActiveSkills":[
     [
@@ -302,7 +306,8 @@
         "SS",
         "破盾者",
         "突",
-        "暗"
+        "暗",
+        {"1001208":"YIzumiSnowWhite_R3"}
     ],
     "ActiveSkills":[
     [

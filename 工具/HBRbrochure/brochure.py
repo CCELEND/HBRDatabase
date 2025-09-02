@@ -7,8 +7,10 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
-from HBRbrochure.mapping import GetBrochureIdByStyleId
+# from HBRbrochure.mapping import GetBrochureIdByStyleId
 import HBRbrochure.mapping
+
+from 角色.style_info import get_en_by_id
 
 def switch_cn(driver):
     try:
@@ -42,7 +44,8 @@ def click_brochure(driver, my_style_infos):
     try:
         for style_id in my_style_infos:
             try:
-                brochure_id = GetBrochureIdByStyleId(style_id)
+                # brochure_id = GetBrochureIdByStyleId(style_id)
+                brochure_id = get_en_by_id(style_id)
             except KeyError:
                 print("[-] Missing mapping, please modify the style_id_brochure_id.json file, style ID: " + style_id)
                 continue

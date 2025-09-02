@@ -7,6 +7,7 @@ import pathlib
 from tools import init_chrome_driver
 import HBRbrochure.role_info
 import HBRbrochure.brochure
+from 角色.team_info import get_all_team_obj
 
 def list_newline(you_list, how_projects_newline):
     for i in range(0, len(you_list), how_projects_newline):
@@ -112,6 +113,9 @@ def switch_to_brochure(driver, style_infos):
 def get_hbr_brochure():
 
     try:
+
+        # 获取全部队伍对象
+        get_all_team_obj()
 
         # 加载资源文件
         HBRbrochure.role_info.load_resources()

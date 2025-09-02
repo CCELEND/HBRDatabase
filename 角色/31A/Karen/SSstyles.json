@@ -11,7 +11,8 @@
         "SS",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1001503":"KarenDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -88,7 +89,8 @@
         "SS",
         "破坏者",
         "斩",
-        "火"
+        "火",
+        {"1001504":"KarenRedWolf_R3"}
     ],
     "ActiveSkills":[
     [
@@ -197,7 +199,8 @@
         "SS",
         "破坏者",
         "斩",
-        "光"
+        "光",
+        {"1001505":"KarenSuite_R3"}
     ],
     "ActiveSkills":[
     [
@@ -273,7 +276,8 @@
         "SS",
         "破坏者",
         "斩",
-        "暗"
+        "暗",
+        {"1001507":"KarenSwim2024_R3"}
     ],
     "ActiveSkills":[
     [

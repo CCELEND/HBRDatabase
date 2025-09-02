@@ -9,7 +9,8 @@
             "SS",
             "治疗者",
             "突",
-            null
+            null,
+            {"1006603":"MuOhshimaDefault_R3"}
         ],
         "ActiveSkills": [
             
@@ -136,7 +137,8 @@
       "SS",
       "治疗者",
       "突",
-      null
+      null,
+      {"1006605":"MuOhshimaFurisode2024_R3"}
     ],
     "ActiveSkills": [
       [

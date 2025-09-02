@@ -9,7 +9,8 @@
       "SS",
       "增益者",
       "斩",
-      null
+      null,
+      {"1008203":"LShanhuaDefault_R3"}
     ],
     "ActiveSkills": [
       [
@@ -111,7 +112,8 @@
       "SS",
       "增益者",
       "斩",
-      "雷"
+      "雷",
+      {"1008204":"LShanhuaNoble_R3"}
     ],
     "ActiveSkills": [
       
@@ -234,7 +236,8 @@
       "SS",
       "减益者",
       "斩",
-      null
+      null,
+      {"1008205":"LShanhuaSuspicious_R3"}
     ],
     "ActiveSkills": [
       

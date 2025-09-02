@@ -11,7 +11,8 @@
         "SS",
         "破坏者",
         "突",
-        null
+        null,
+        {"1002603":"ByakkoDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -77,7 +78,8 @@
         "SS",
         "破坏者",
         "突",
-        "雷"
+        "雷",
+        {"1002604":"ByakkoBeast_R3"}
     ],
     "ActiveSkills":[
     [

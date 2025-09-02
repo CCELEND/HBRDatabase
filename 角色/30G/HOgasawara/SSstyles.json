@@ -11,7 +11,8 @@
         "SS",
         "破盾者",
         "突",
-        null
+        null,
+        {"1004503":"HOgasawaraDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -119,7 +120,8 @@
         "SS",
         "攻击者",
         "突",
-        "暗"
+        "暗",
+        {"1004504":"HOgasawaraCutieMaid_R3"}
     ],
     "ActiveSkills":[
     [
@@ -215,7 +217,8 @@
         "SS",
         "破盾者",
         "突",
-        "雷"
+        "雷",
+        {"1004505":"HOgasawaraNightdress_R3"}
     ],
     "ActiveSkills":[
     [
@@ -283,7 +286,8 @@
         "SS",
         "减益者",
         "突",
-        "冰"
+        "冰",
+        {"1004507":"HOgasawaraHighSchoolLife_R3"}
     ],
     "ActiveSkills":[
     [

@@ -11,7 +11,8 @@
         "SS",
         "防御者",
         "打",
-        null
+        null,
+        {"1004403":"CSugaharaDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -91,7 +92,8 @@
         "SS",
         "防御者",
         "打",
-        "暗"
+        "暗",
+        {"1004404":"CSugaharaPurity_R3"}
     ],
     "ActiveSkills":[
     [
@@ -158,7 +160,8 @@
         "SS",
         "增益者",
         "打",
-        "冰"
+        "冰",
+        {"1004406":"CSugaharaExcellency_R3"}
     ],
     "ActiveSkills":[
     [

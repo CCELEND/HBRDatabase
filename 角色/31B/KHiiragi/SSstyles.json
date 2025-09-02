@@ -11,7 +11,8 @@
         "SS",
         "减益者",
         "斩",
-        null
+        null,
+        {"1002503":"KHiiragiDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -89,7 +90,8 @@
         "SS",
         "减益者",
         "斩",
-        "冰"
+        "冰",
+        {"1002504":"KHiiragiBloody_R3"}
     ],
     "ActiveSkills":[
     [
@@ -157,7 +159,8 @@
         "SS",
         "增益者",
         "斩",
-        null
+        null,
+        {"1002505":"KHiiragiWaitress_R3"}
     ],
     "ActiveSkills":[
     [

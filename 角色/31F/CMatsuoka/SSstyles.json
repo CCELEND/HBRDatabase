@@ -11,7 +11,8 @@
             "SS",
             "防御者",
             "打",
-            "暗"
+            "暗",
+            {"1007403":"CMatsuokaDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -161,7 +162,8 @@
             "SS",
             "防御者",
             "打",
-            "光"
+            "光",
+            {"1007404":"CMatsuokaCasual_R3"}
         ],
         "ActiveSkills": [
             [

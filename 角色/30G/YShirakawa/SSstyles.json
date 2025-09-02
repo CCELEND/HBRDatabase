@@ -11,7 +11,8 @@
         "SS",
         "攻击者",
         "斩",
-        "光"
+        "光",
+        {"1004103":"YShirakawaDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -80,7 +81,8 @@
         "SS",
         "破坏者",
         "斩",
-        "雷"
+        "雷",
+        {"1004104":"YShirakawaBloom_R3"}
     ],
     "ActiveSkills":[
     [
@@ -149,7 +151,8 @@
         "SS",
         "攻击者",
         "斩",
-        "暗"
+        "暗",
+        {"1004106":"YShirakawaSwim2023_R3"}
     ],
     "ActiveSkills":[
     [
@@ -232,7 +235,8 @@
         "SS",
         "攻击者",
         "斩",
-        "冰"
+        "冰",
+        {"1004107":"YShirakawaSocial_R3"}
     ],
     "ActiveSkills":[
     [

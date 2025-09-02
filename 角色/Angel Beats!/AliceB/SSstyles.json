@@ -9,7 +9,8 @@
       "SS",
       "破坏者",
       "突",
-      "火"
+      "火",
+      {"1020203":"AliceBDefault_R3"}
     ],
     "ActiveSkills": [
       [
@@ -156,7 +157,8 @@
       "SS",
       "破盾者",
       "突",
-      "冰"
+      "冰",
+      {"1020204":"AliceBBlazerUniform_R3"}
     ],
     "ActiveSkills": [
       [

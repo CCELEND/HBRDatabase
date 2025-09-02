@@ -9,7 +9,8 @@
             "SS",
             "减益者",
             "打",
-            null
+            null,
+            {"1005603":"AMizuharaDefault_R3"}
         ],
         "ActiveSkills": [
             [
@@ -128,7 +129,8 @@
             "SS",
             "减益者",
             "打",
-            "暗"
+            "暗",
+            {"1005605":"AMizuharaPirates_R3"}
         ],
         "ActiveSkills": [
             [
@@ -250,7 +252,8 @@
             "SS",
             "减益者",
             "打",
-            "火"
+            "火",
+            {"1005606":"AMizuharaJellyfish_R3"}
         ],
         "ActiveSkills": [
             [

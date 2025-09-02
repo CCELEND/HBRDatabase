@@ -9,7 +9,8 @@
       "SS",
       "破盾者",
       "突",
-      null
+      null,
+      {"1008303":"IRedmayneDefault_R3"}
     ],
     "ActiveSkills": [
       [
@@ -155,7 +156,8 @@
       "SS",
       "破盾者",
       "突",
-      null
+      null,
+      {"1008304":"IRedmaynePhantom_R3"}
     ],
     "ActiveSkills": [
       [

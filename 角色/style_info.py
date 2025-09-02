@@ -202,6 +202,7 @@ class Style:
         team_name = None, role_name = None, name = None, nicknames = None, description = None, rarity = None, 
         career = None, 
         weapon_attribute = None, element_attribute = None,
+        id_en = None,
         active_skills = None, passive_skills = None, 
         growth_ability = None, status_growth = None):
         self.path = path                        # 风格头像路径
@@ -214,6 +215,7 @@ class Style:
         self.career = career                    # 职业 攻击者
         self.weapon_attribute = weapon_attribute    # 武器属性 斩 突 打
         self.element_attribute = element_attribute  # 元素属性
+        self.id_en = id_en                      # 风格ID：英文字典
 
         self.active_skills = active_skills      # 主动技能列表
         self.passive_skills = passive_skills    # 被动技能列表
@@ -250,6 +252,8 @@ style_categories = {
         "火暗":{},
         "无": {}
     },
+    "id":{},
+    "en":{},
     "all":{}
 }
 
@@ -274,6 +278,12 @@ def set_style_category(style):
     else:
         style_categories["element_attribute"]["无"][style.name] = style
 
+    if style.id_en:
+        style_id = next(iter(style.id_en.keys()))
+        style_en = next(iter(style.id_en.values()))
+        style_categories["id"][style_id]  = style
+        style_categories["en"][style_en] = style
+
     style_categories["all"][style.name]  = style
 
 
@@ -281,7 +291,24 @@ def set_style_category(style):
 def create_style(data):
 
     style_info = data['style_info']
-    style_path, style_team_name, style_role_name, style_name, style_nicknames, style_description, style_rarity, style_career, style_weapon_attribute, style_element_attribute = style_info
+    style_fields = [
+        'path',               # 路径
+        'team_name',          # 队伍名称
+        'role_name',          # 角色名称
+        'name',               # 风格名称
+        'nicknames',          # 昵称列表
+        'description',        # 描述信息
+        'rarity',             # 稀有度
+        'career',             # 职业
+        'weapon_attribute',   # 武器属性
+        'element_attribute',  # 元素属性
+        'id_en'               # 风格ID：英文字典
+    ]
+    # style_info_data = dict(zip(style_fields, style_info))
+    style_info_data = {}
+    for i, field in enumerate(style_fields):
+        style_info_data[field] = style_info[i] if i < len(style_info) else ''
+
     # 主动技能列表
     activeskills = []
     for active_skill_list in data['ActiveSkills']:
@@ -341,16 +368,17 @@ def create_style(data):
     statusgrowth = data['status_growth'] if 'status_growth' in data else None
 
     style = Style(
-        style_path,
-        style_team_name,
-        style_role_name,
-        style_name,
-        style_nicknames,
-        style_description,
-        style_rarity,
-        style_career,
-        style_weapon_attribute,
-        style_element_attribute,
+        style_info_data['path'],
+        style_info_data['team_name'],
+        style_info_data['role_name'],
+        style_info_data['name'],
+        style_info_data['nicknames'],
+        style_info_data['description'],
+        style_info_data['rarity'],
+        style_info_data['career'],
+        style_info_data['weapon_attribute'],
+        style_info_data['element_attribute'],
+        style_info_data['id_en'],
 
         activeskills,
         passiveskills,
@@ -383,3 +411,11 @@ def is_skill_effect(skill):
         return True
     else:
         return False
+
+def get_en_by_id(style_id):
+    style = style_categories['id'][style_id]
+    return next(iter(style.id_en.values()))
+
+def get_id_by_en(style_en):
+    style = style_categories['en'][style_en]
+    return next(iter(style.id_en.keys()))

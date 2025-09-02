@@ -11,7 +11,8 @@
         "SS",
         "减益者",
         "突",
-        null
+        null,
+        {"1003303":"MTenneDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -78,7 +79,8 @@
         "SS",
         "减益者",
         "突",
-        "冰"
+        "冰",
+        {"1003304":"MTenneAnimal_R3"}
     ],
     "ActiveSkills":[
     [
@@ -145,7 +147,8 @@
         "SS",
         "减益者",
         "突",
-        "光"
+        "光",
+        {"1003305":"MTenneWizard_R3"}
     ],
     "ActiveSkills":[
     [

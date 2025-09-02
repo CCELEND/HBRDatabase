@@ -10,7 +10,8 @@
             "SS",
             "减益者",
             "斩",
-            "火"
+            "火",
+            {"1006503":"IrOhshimaDefault_R3"}
         ],
         "ActiveSkills": [
         	[
@@ -141,7 +142,8 @@
             "SS",
             "减益者",
             "斩",
-            null
+            null,
+            {"1006504":"IrOhshimaYukata2023_R3"}
         ],
         "ActiveSkills": [
         	[

@@ -11,7 +11,8 @@
         "SS",
         "增益者",
         "打",
-        null
+        null,
+        {"1003203":"SSakurabaDefault_R3"}
     ],
     "ActiveSkills":[
 
@@ -113,7 +114,8 @@
         "SS",
         "防御者",
         "打",
-        "冰"
+        "冰",
+        {"1003204":"SSakurabaNewYear2023_R3"}
     ],
     "ActiveSkills":[
     [
@@ -180,7 +182,8 @@
         "SS",
         "防御者",
         "打",
-        "火"
+        "火",
+        {"1003206":"SSakurabaBride_R3"}
     ],
     "ActiveSkills":[
     [

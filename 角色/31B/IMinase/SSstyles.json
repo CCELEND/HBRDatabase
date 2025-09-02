@@ -11,7 +11,8 @@
         "SS",
         "攻击者",
         "突",
-        "雷"
+        "雷",
+        {"1002203":"IMinaseDefault_R3"}
     ],
     "ActiveSkills":[
     [
@@ -87,7 +88,8 @@
         "SS",
         "攻击者",
         "突",
-        "火"
+        "火",
+        {"1002204":"IMinaseNewYear2024_R3"}
     ],
     "ActiveSkills":[
     [
