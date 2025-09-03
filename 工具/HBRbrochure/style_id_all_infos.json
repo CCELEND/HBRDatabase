@@ -94,6 +94,9 @@
     "1002105":{
         "style_name":"闪耀·究极偶像", "character_role":"防御者", "element_type":"火", "weapon_type":"打"
     },
+    "1002107":{
+        "style_name":"响彻·Battlecry", "character_role":"指挥者", "element_type":"无", "weapon_type":"打"
+    },
     "1002203":{
         "style_name":"嬉笑间坠入爱河", "character_role":"攻击者", "element_type":"雷", "weapon_type":"突"
     },
@@ -111,6 +114,9 @@
     },
     "1002404":{
         "style_name":"宇宙浩瀚，星光璀璨", "character_role":"增益者", "element_type":"无", "weapon_type":"突"
+    },
+    "1002406":{
+        "style_name":"拂晓的净化", "character_role":"治疗者", "element_type":"暗", "weapon_type":"突"
     },
     "1002503":{
         "style_name":"苍蓝夜曲", "character_role":"减益者", "element_type":"无", "weapon_type":"斩"
