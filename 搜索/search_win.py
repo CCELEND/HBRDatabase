@@ -146,7 +146,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 获取全部队伍对象
     get_all_team_obj()
 
-    search_win_frame = creat_Toplevel("搜索", 715, 540, x=190, y=210) #715, 485
+    search_win_frame = creat_Toplevel("搜索", 715, 570, x=190, y=210) #715, 485
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
@@ -164,7 +164,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     career_options = [
         "ALL", 
         "攻击者", "破盾者", "破坏者", "治疗者", 
-        "增益者", "减益者", "防御者"
+        "增益者", "减益者", "防御者", "指挥者"
     ]
     career_selected_values = []
     career_frame = creat_select_frame("职能", 
@@ -247,8 +247,8 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     search_button.grid(row=3, column=0, columnspan=2, padx=5, pady=10)
 
 
-    search_win_frame.maxsize(715, 540)
-    search_win_frame.minsize(715, 540)
+    # search_win_frame.maxsize(715, 540)
+    # search_win_frame.minsize(715, 540)
 
     win_open_manage(search_win_frame, __name__)
     # 窗口关闭时清理
