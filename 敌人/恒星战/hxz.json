@@ -35,6 +35,15 @@
     "logo_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.ico",
     "name":"栖息于峡谷的幽鬼#4",
     "guide_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/4.jpg"
+},
+
+"沙海中蠢动的歌女#5":
+{
+    "img_path":"./敌人/恒星战/沙海中蠢动的歌女#5/hxz5.png",
+    "img_path_enemy":"./敌人/恒星战/沙海中蠢动的歌女#5/DimensionBattleCentralTop_006.png",
+    "logo_path":"./敌人/恒星战/沙海中蠢动的歌女#5/DimensionBattleCentralTop_006.ico",
+    "name":"沙海中蠢动的歌女#5",
+    "guide_path":"./敌人/恒星战/沙海中蠢动的歌女#5/5.jpg"
 }
 
 }
