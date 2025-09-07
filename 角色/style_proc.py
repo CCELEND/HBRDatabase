@@ -1,6 +1,9 @@
 
 import re
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # 提取范围值列表
 def extract_skill_numbers(text, type):
     # 添加 re.DOTALL 以匹配换行符
@@ -192,7 +195,8 @@ def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "攻击")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 
@@ -233,7 +237,8 @@ def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "防御上升")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 # 不同等级时的连击数上升数值处理
@@ -253,7 +258,8 @@ def on_hit_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "连击数上升")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 # 不同等级时的增益数值处理
@@ -273,7 +279,8 @@ def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "上升")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 # 不同等级时的心眼数值处理
@@ -293,7 +300,8 @@ def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "心眼")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 # 不同等级时的减益值处理
@@ -313,7 +321,8 @@ def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "下降")
 
         desc_lab["text"] = new_text
-    except:
+    except Exception as e:
+        logger.error(str(e))
         return
 
 
@@ -355,5 +364,7 @@ def on_percentage_combo_select(event, desc_lab, lv1_skill_strength):
         new_text = write_percentage_numbers_back(lv1_skill_strength, lv_percentage)
 
         desc_lab["text"] = new_text
-    except:
+    # except:
+    except Exception as e:
+        logger.error(str(e))
         return

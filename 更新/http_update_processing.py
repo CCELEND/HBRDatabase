@@ -5,6 +5,9 @@ from tkinter import messagebox
 from http_client import send_hashes_to_server, download_files_from_server
 import http_client
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def http_update_data():
 
     if http_client.is_updating:
@@ -22,5 +25,6 @@ def http_update_data():
         download_files_from_server(server_url, response['files_to_download'])
     else:
         messagebox.showerror("错误", f"错误响应：{response.content}\n请重试")
+        logger.error(f"错误响应：{response.content}\n请重试")
 
 

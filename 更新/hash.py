@@ -5,6 +5,9 @@ from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 """
 比较两个哈希字典，返回差异字典
 :param dict1: 第一个哈希字典
@@ -101,6 +104,7 @@ def calculate_file_hashes(directory):
                 file_hashes[key] = file_hash
             except Exception as e:
                 messagebox.showerror("错误", f"计算文件：{key}的哈希值时出错：{e}")
+                logger.error(f"计算文件：{key}的哈希值时出错：{e}")
 
     return file_hashes
 

@@ -3,6 +3,9 @@ from 角色.role_info import creat_role_obj
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # 队伍
 class Team:
     def __init__(self, logo_path = None, 
@@ -109,7 +112,8 @@ def get_all_team_obj():
             try:
                 future.result()  # 获取结果（如果有异常会抛出）
             except Exception as e:
-                print(f"加载队伍：{team_name} 时出错: {e}")
+                # print(f"加载队伍：{team_name} 时出错: {e}")
+                logger.error(f"加载队伍：{team_name} 时出错: {e}")
 
 
 def get_role_by_master_name(name):
