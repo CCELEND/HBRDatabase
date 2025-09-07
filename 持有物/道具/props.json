@@ -74,6 +74,14 @@
         "location":"技术模拟战"
     },
 
+    "讨伐证":{
+        "path":"./持有物/道具/ThumbnailBattle_Medal.png", 
+        "description":"可以在恒星扫荡战线获得的道具\n可在「讨伐证兑换所」中兑换新饰品", 
+        "price":"", 
+        "location":"恒星扫荡战线"
+    },
+
+
     "每周任务点数":{
         "path":"./持有物/道具/ThumbnailWeeklyPoint.png", 
         "description":"消耗体力、完成战斗、累计登录或阅读剧情", 
