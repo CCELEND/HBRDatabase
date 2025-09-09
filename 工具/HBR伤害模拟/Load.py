@@ -1,4 +1,5 @@
 
+import pathlib
 from selenium.webdriver.chrome.options import Options
 from tools import delete_all_files_and_subdirs, delete_file
 
@@ -31,14 +32,23 @@ def load_hbr_damage_simulation():
         # chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
         # chrome_options.add_argument('--load-extension=./工具/HBR伤害模拟/1.3.0_0')
 
+        
+        # 启用开发者模式
+        # chrome_options.add_argument("--auto-open-devtools-for-tabs")
+        
+        # 插件目录的绝对路径
+        extension_path = os.path.abspath('./工具/HBR伤害模拟/1.4.1_0')
+        # 加载未打包的扩展程序
+        chrome_options.add_argument(f"--load-extension={extension_path}")
+
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
         driver = init_chrome_driver(chrome_options)
         if driver == None:
             return
 
         driver.set_window_size(1160, 820)
-        driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
-        # driver.get("chrome://extensions/")
+        # driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
+        driver.get("chrome://extensions/")
 
     except Exception as e:
         print(f"[-] {e}")
