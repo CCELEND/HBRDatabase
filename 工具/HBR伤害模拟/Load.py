@@ -21,11 +21,11 @@ def load_hbr_damage_simulation():
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
         chrome_options.add_experimental_option("useAutomationExtension", False)
 
-        # 插件绝对路径
-        extension_path = os.path.abspath('./工具/HBR伤害模拟/1.4.1_0')
-        chrome_options.add_argument(f'--load-extension={extension_path}')
-        # 添加开发者模式参数
-        chrome_options.add_argument('--disable-extensions-except=' + extension_path)
+        # # 插件绝对路径
+        # extension_path = os.path.abspath('./工具/HBR伤害模拟/1.4.1_0')
+        # chrome_options.add_argument(f'--load-extension={extension_path}')
+        # # 添加开发者模式参数
+        # chrome_options.add_argument('--disable-extensions-except=' + extension_path)
 
         # 加载插件
         # chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
@@ -37,8 +37,8 @@ def load_hbr_damage_simulation():
             return
 
         driver.set_window_size(1160, 820)
-        # driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
-        driver.get("chrome://extensions/")
+        driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
+        # driver.get("chrome://extensions/")
 
     except Exception as e:
         print(f"[-] {e}")
