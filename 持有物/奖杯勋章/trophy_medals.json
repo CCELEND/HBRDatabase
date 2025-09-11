@@ -114,13 +114,13 @@
         "price":"", 
         "location":"恒星扫荡战线#5"
     },
-    "相克歌女者之证":{
+    "克制歌女者之证":{
         "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension06_Silver.png", 
         "description":"通关X层级时\n可在恒星扫荡战线#5获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#5"
     },
-    "歼灭歌女者之证":{
+    "消灭歌女者之证":{
         "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension06_Gold.png", 
         "description":"在10回合内通关X层级时\n可在恒星扫荡战线#5获得的勋章", 
         "price":"", 
