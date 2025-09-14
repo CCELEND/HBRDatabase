@@ -419,3 +419,16 @@ def get_en_by_id(style_id):
 def get_id_by_en(style_en):
     style = style_categories['en'][style_en]
     return next(iter(style.id_en.keys()))
+
+
+def is_id_in_style_categories(style_id):
+    if style_id in style_categories['id']:
+        return True
+    else:
+        return False
+
+def is_en_in_style_categories(style_en):
+    if style_en in style_categories['en']:
+        return True
+    else:
+        return False

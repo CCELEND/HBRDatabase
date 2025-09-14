@@ -1,6 +1,6 @@
 import re
 
-from tools import list_val_in_another, is_parentstring, output_string, list_is
+from tools import list_val_in_another, is_parentstring, output_string, list_is, check_dict_in_list
 
 from 角色.style_info import is_skill_effect
 import 角色.team_info
@@ -48,9 +48,11 @@ def should_include(role, style, keyword_list):
     
     checks = [
         list_val_in_another(role.nicknames, keyword_list),
+        is_parentstring(role.en.upper(), keyword_list),
         list_val_in_another(style.nicknames, keyword_list),
         is_parentstring(style.role_name, keyword_list),
-        is_parentstring(style.name, keyword_list)
+        is_parentstring(style.name, keyword_list),
+        check_dict_in_list(style.id_en, keyword_list)
     ]
     
     return any(checks)

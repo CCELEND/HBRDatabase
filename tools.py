@@ -107,6 +107,23 @@ def list_val_in_another(list1, list2):
 def list_is(list, string):
     return (len(list) == 1 and list[0] == string)
 
+# 检查字典的键或值是否存在于指定列表中
+def check_dict_in_list(input_dict, check_list, check_keys=True, check_values=True):
+    if not input_dict: return False
+    
+    # 检查键
+    if check_keys:
+        for key in input_dict.keys():
+            if key in check_list: return True
+    
+    # 检查值
+    if check_values:
+        for value in input_dict.values():
+            if value.upper() in check_list: return True
+
+    return False
+
+
 # 检查目录是否存在，如果不存在则创建
 def creat_directory(file_name):
     # 获取目录路径
