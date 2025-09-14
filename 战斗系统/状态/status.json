@@ -758,6 +758,14 @@
         "type":"减益",
         "series":"退避" 
     },
+    "倒下回合数上升":{
+        "name":"倒下回合数上升",
+        "path":"./战斗系统/状态/Recoil.png",
+        "effect":"","description":"无法行动",
+        "stack":"-",
+        "type":"减益",
+        "series":"倒下回合数上升" 
+    },
     "DP伤害":{
         "name":"DP伤害",
         "path":"./战斗系统/状态/SelfDamage.webp",
