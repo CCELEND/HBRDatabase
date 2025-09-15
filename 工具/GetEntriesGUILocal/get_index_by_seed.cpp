@@ -352,6 +352,7 @@ int main() {
     DWORD pid = find_process_id(process_name);
     if (!pid) {
         fprintf(stderr, "    [-] Process %ls not found!\n", process_name);
+        system("pause");
         return 1;
     }
 
@@ -361,6 +362,7 @@ int main() {
     ProcessTreeNode* process_tree = build_process_tree(pid);
     if (!process_tree) {
         fprintf(stderr, "    [-] Failed to build process tree\n");
+        system("pause");
         return 1;
     }
 
@@ -369,6 +371,7 @@ int main() {
     if (!suspend_process_tree(process_tree)) {
         fprintf(stderr, "    [-] Failed to suspend process tree\n");
         free_process_tree(process_tree);
+        system("pause");
         return 1;
     }
 
