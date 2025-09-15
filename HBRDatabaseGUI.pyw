@@ -207,7 +207,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
 
-        ("o.hbr.quest(v5.10)", load_o_hbr_quest),
+        ("o.hbr.quest（v5.10）", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
         ("入队培训手册", load_game_bilibili_com),
         ("gamekee", load_gamekee_hbr),
