@@ -63,6 +63,7 @@ from 工具.DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
 from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
 from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
 from 工具.hbr_tool.Load import load_hbr_tool
+from 工具.hbr_tool_old_damage_calculator.Load import load_hbr_tool_old_damage_calculator
 from 工具.hbr_axletool.Load import load_hbr_axletool
 from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
 from 工具.词条计算器.Load import load_entry_calculator
@@ -201,11 +202,12 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("风格图鉴获取", get_hbr_brochure),
         ("伤害模拟", load_hbr_damage_simulation),
         ("hbr-tool", load_hbr_tool),
+        ("hbr-tool伤害计算", load_hbr_tool_old_damage_calculator),
         ("hbr-axletool", load_hbr_axletool),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
 
-        ("o.hbr.quest", load_o_hbr_quest),
+        ("o.hbr.quest(v5.10)", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
         ("入队培训手册", load_game_bilibili_com),
         ("gamekee", load_gamekee_hbr),
