@@ -13,6 +13,43 @@ constexpr size_t MAX_PID_LEN = 16;
 const uint64_t SEARCH_START = 0x10000000000;
 const uint64_t SEARCH_END = 0x30000000000;
 
+
+// 检查是否以管理员权限运行
+static BOOL IsRunAsAdmin() {
+    BOOL isAdmin = FALSE;
+    HANDLE hToken = NULL;
+
+    // 打开当前进程的访问令牌
+    if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
+        // 获取提升类型信息
+        TOKEN_ELEVATION elevation{};
+        DWORD dwSize = sizeof(TOKEN_ELEVATION);
+
+        if (GetTokenInformation(hToken, TokenElevation, &elevation, sizeof(elevation), &dwSize)) {
+            isAdmin = elevation.TokenIsElevated;
+        }
+        CloseHandle(hToken);
+    }
+
+    return isAdmin;
+}
+
+// 请求管理员权限重新启动程序
+static void RequestAdminRights() {
+    WCHAR szPath[MAX_PATH];
+    if (GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath))) {
+        SHELLEXECUTEINFO sei = { sizeof(sei) };
+        sei.lpVerb = L"runas";  // 请求管理员权限
+        sei.lpFile = szPath;
+        sei.hwnd = NULL;
+        sei.nShow = SW_NORMAL;
+
+        if (ShellExecuteEx(&sei)) {
+            exit(0);  // 成功启动管理员模式进程，退出当前进程
+        }
+    }
+}
+
 // 进程树节点结构
 typedef struct ProcessTreeNode {
     DWORD pid;
@@ -309,7 +346,7 @@ static void search_process_memory_fast(DWORD pid, uint64_t known_random_seed, ui
         //        search_start, search_end, search_end - search_start);
 
         // 直接搜索这个区域
-        if (search_memory_region_by_seed(hProcess, search_start, search_end, 
+        if (search_memory_region_by_seed(hProcess, search_start, search_end,
             known_random_seed, known_change_seed)) {
             break;
         }
@@ -321,6 +358,22 @@ static void search_process_memory_fast(DWORD pid, uint64_t known_random_seed, ui
 }
 
 int main() {
+
+    // 检查管理员权限
+    if (!IsRunAsAdmin()) {
+        printf("[-] 程序需要以管理员权限运行！\n");
+        printf("[*] 正在请求管理员权限...\n");
+
+        RequestAdminRights();
+
+        // 如果请求失败，手动以管理员身份运行
+        printf("[-] 管理员权限请求失败，请手动以管理员身份运行程序。\n");
+        system("pause");
+        return 1;
+    }
+
+    printf("[+] 程序以管理员权限运行\n");
+
     const WCHAR* process_name = L"HeavenBurnsRed.exe";
 
     // 从控制台读取seed值（支持十进制和十六进制）
