@@ -381,7 +381,8 @@ int main() {
     uint64_t known_change_seed = 0;
     char input[64];
 
-    printf("[*] Please enter the value of RandomMainAbility_seed (supported formats: decimal or hexadecimal starting with 0x): ");
+    printf("\n(supported formats: decimal or hexadecimal starting with 0x)\n");
+    printf("[*] Please enter the value of RandomMainAbility_seed: ");
     if (fgets(input, sizeof(input), stdin)) {
         if (input[0] == '0' && (input[1] == 'x' || input[1] == 'X')) {
             known_random_seed = strtoull(input + 2, NULL, 16);
@@ -390,8 +391,7 @@ int main() {
             known_random_seed = strtoull(input, NULL, 10);
         }
     }
-
-    printf("[*] Please enter the ChangeAbility_seed value (supported formats: decimal or hexadecimal prefixed with 0x): ");
+    printf("[*] Please enter the ChangeAbility_seed value: ");
     if (fgets(input, sizeof(input), stdin)) {
         if (input[0] == '0' && (input[1] == 'x' || input[1] == 'X')) {
             known_change_seed = strtoull(input + 2, NULL, 16);
@@ -401,7 +401,7 @@ int main() {
         }
     }
 
-    printf("[*] Looking for process: %ls\n", process_name);
+    printf("\n[*] Looking for process: %ls\n", process_name);
     DWORD pid = find_process_id(process_name);
     if (!pid) {
         fprintf(stderr, "    [-] Process %ls not found!\n", process_name);
@@ -420,7 +420,7 @@ int main() {
     }
 
     // 暂停进程树
-    printf("[*] Suspending process tree...\n");
+    printf("\n[*] Suspending process tree...\n");
     if (!suspend_process_tree(process_tree)) {
         fprintf(stderr, "    [-] Failed to suspend process tree!\n");
         free_process_tree(process_tree);
@@ -429,11 +429,11 @@ int main() {
     }
 
     // 搜索内存
-    printf("[*] Searching process memory...\n");
+    printf("\n[*] Searching process memory...\n");
     search_process_memory_fast(pid, known_random_seed, known_change_seed);
 
     // 恢复进程树
-    printf("[*] Resuming process tree...\n");
+    printf("\n[*] Resuming process tree...\n");
     if (!resume_process_tree(process_tree)) {
         fprintf(stderr, "    [-] Failed to resume process tree!\n");
     }
