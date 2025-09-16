@@ -361,18 +361,18 @@ int main() {
 
     // 检查管理员权限
     if (!IsRunAsAdmin()) {
-        printf("[-] 程序需要以管理员权限运行！\n");
-        printf("[*] 正在请求管理员权限...\n");
+        printf("[-] The program needs to be run with administrator privileges!\n");
+        printf("[*] Requesting administrator permission...\n");
 
         RequestAdminRights();
 
         // 如果请求失败，手动以管理员身份运行
-        printf("[-] 管理员权限请求失败，请手动以管理员身份运行程序。\n");
+        printf("[-] The request for administrator privileges failed. Please manually run the program as an administrator.\n");
         system("pause");
         return 1;
     }
 
-    printf("[+] 程序以管理员权限运行\n");
+    printf("[+] The program runs with administrator privileges.\n");
 
     const WCHAR* process_name = L"HeavenBurnsRed.exe";
 
@@ -381,7 +381,7 @@ int main() {
     uint64_t known_change_seed = 0;
     char input[64];
 
-    printf("[*] 请输入 RandomMainAbility_seed 值 (支持10进制或0x开头的16进制): ");
+    printf("[*] Please enter the value of RandomMainAbility_seed (supported formats: decimal or hexadecimal starting with 0x): ");
     if (fgets(input, sizeof(input), stdin)) {
         if (input[0] == '0' && (input[1] == 'x' || input[1] == 'X')) {
             known_random_seed = strtoull(input + 2, NULL, 16);
@@ -391,7 +391,7 @@ int main() {
         }
     }
 
-    printf("[*] 请输入 ChangeAbility_seed 值 (支持10进制或0x开头的16进制): ");
+    printf("[*] Please enter the ChangeAbility_seed value (supported formats: decimal or hexadecimal prefixed with 0x): ");
     if (fgets(input, sizeof(input), stdin)) {
         if (input[0] == '0' && (input[1] == 'x' || input[1] == 'X')) {
             known_change_seed = strtoull(input + 2, NULL, 16);
@@ -414,7 +414,7 @@ int main() {
     // 构建进程树
     ProcessTreeNode* process_tree = build_process_tree(pid);
     if (!process_tree) {
-        fprintf(stderr, "    [-] Failed to build process tree\n");
+        fprintf(stderr, "    [-] Failed to build process tree!\n");
         system("pause");
         return 1;
     }
@@ -422,7 +422,7 @@ int main() {
     // 暂停进程树
     printf("[*] Suspending process tree...\n");
     if (!suspend_process_tree(process_tree)) {
-        fprintf(stderr, "    [-] Failed to suspend process tree\n");
+        fprintf(stderr, "    [-] Failed to suspend process tree!\n");
         free_process_tree(process_tree);
         system("pause");
         return 1;
@@ -435,7 +435,7 @@ int main() {
     // 恢复进程树
     printf("[*] Resuming process tree...\n");
     if (!resume_process_tree(process_tree)) {
-        fprintf(stderr, "    [-] Failed to resume process tree\n");
+        fprintf(stderr, "    [-] Failed to resume process tree!\n");
     }
 
     // 清理资源
