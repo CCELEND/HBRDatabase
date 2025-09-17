@@ -38,7 +38,9 @@
 * 控制获取数据数，修改 DataCount，这里默认是获取300条数据  
 	DataCount=300  
 >如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系。  
->根据 seed 获取对应 index，管理员模式运行 ./工具/GetEntriesGUILocal/get_index_by_seed.exe，仅支持炽焰天穹PC端。
+>根据 seed 获取对应 index，管理员模式运行 ./工具/GetEntriesGUILocal/get_index_by_seed.exe，仅支持炽焰天穹PC端。    
+>seed_tools：可以自动获取seed和index，管理员模式运行 ./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe，仅支持炽焰天穹PC端。  
+>运行 get_index_by_seed.exe、seed_tools.exe 时，如果炽焰天穹PC端处于时修状态，需要结束刷图再重新打开PC端，否则无法获取 seed 和 index！
 2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
 >第一次获取时需要登录，后续会自动登录    
 >需要安装最新版本的 chrome 浏览器，登录之后可能会出现没有数据的情况，刷新一下网页即可  
