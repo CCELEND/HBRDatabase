@@ -1,27 +1,27 @@
 
 # include "ProcessTreeNode_.h"
 
-// »ùÓÚ NtSuspendProcess
-// ¶¨Òå NtSuspendProcess ºÍ NtResumeProcess µÄº¯ÊıÖ¸ÕëÀàĞÍ
+// åŸºäº NtSuspendProcess
+// å®šä¹‰ NtSuspendProcess å’Œ NtResumeProcess çš„å‡½æ•°æŒ‡é’ˆç±»å‹
 typedef NTSTATUS(NTAPI* PFN_NtSuspendProcess)(HANDLE ProcessHandle);
 typedef NTSTATUS(NTAPI* PFN_NtResumeProcess)(HANDLE ProcessHandle);
 
-// È«¾Öº¯ÊıÖ¸Õë£¬´æ´¢¶¯Ì¬¼ÓÔØµÄAPIµØÖ·
+// å…¨å±€å‡½æ•°æŒ‡é’ˆï¼Œå­˜å‚¨åŠ¨æ€åŠ è½½çš„APIåœ°å€
 static PFN_NtSuspendProcess g_pNtSuspendProcess = NULL;
 static PFN_NtResumeProcess g_pNtResumeProcess = NULL;
 
-// ³õÊ¼»¯ NtSuspendProcess ºÍ NtResumeProcess
+// åˆå§‹åŒ– NtSuspendProcess å’Œ NtResumeProcess
 static BOOL InitUndocumentedAPIs() {
-    // ¼ÓÔØ ntdll.dll
+    // åŠ è½½ ntdll.dll
     HMODULE hNtdll = LoadLibraryW(L"ntdll.dll");
     if (hNtdll == NULL) {
         fprintf(stderr, "[-] LoadLibrary ntdll.dll failed (Error: %lu)\n", GetLastError());
         return FALSE;
     }
 
-    // »ñÈ¡ NtSuspendProcess µØÖ·
+    // è·å– NtSuspendProcess åœ°å€
     g_pNtSuspendProcess = (PFN_NtSuspendProcess)GetProcAddress(hNtdll, "NtSuspendProcess");
-    // »ñÈ¡ NtResumeProcess µØÖ·
+    // è·å– NtResumeProcess åœ°å€
     g_pNtResumeProcess = (PFN_NtResumeProcess)GetProcAddress(hNtdll, "NtResumeProcess");
 
     if (g_pNtSuspendProcess == NULL || g_pNtResumeProcess == NULL) {
@@ -32,33 +32,33 @@ static BOOL InitUndocumentedAPIs() {
 
     return TRUE;
 }
-// ÔİÍ£½ø³ÌÊ÷
+// æš‚åœè¿›ç¨‹æ ‘
 static BOOL suspend_process_tree_nt(ProcessTreeNode* node) {
     if (!node) return FALSE;
-    if (g_pNtSuspendProcess == NULL) return FALSE; // È·±£APIÒÑ³õÊ¼»¯
+    if (g_pNtSuspendProcess == NULL) return FALSE; // ç¡®ä¿APIå·²åˆå§‹åŒ–
 
     BOOL success = TRUE;
 
-    // µİ¹éÔİÍ£ËùÓĞ×Ó½ø³Ì
+    // é€’å½’æš‚åœæ‰€æœ‰å­è¿›ç¨‹
     for (size_t i = 0; i < node->child_count; i++) {
         if (!suspend_process_tree_nt(node->children[i])) {
             success = FALSE;
         }
     }
 
-    // ´ò¿ª½ø³Ì£¨½öĞè PROCESS_SUSPEND_RESUME È¨ÏŞ£¬±È PROCESS_ALL_ACCESS ¸ü°²È«£©
+    // æ‰“å¼€è¿›ç¨‹ï¼ˆä»…éœ€ PROCESS_SUSPEND_RESUME æƒé™ï¼Œæ¯” PROCESS_ALL_ACCESS æ›´å®‰å…¨ï¼‰
     HANDLE hProcess = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, node->pid);
     if (hProcess) {
-        // µ÷ÓÃ NtSuspendProcess ÔİÍ£½ø³Ì
+        // è°ƒç”¨ NtSuspendProcess æš‚åœè¿›ç¨‹
         NTSTATUS status = g_pNtSuspendProcess(hProcess);
-        if (status >= 0) { // NTSTATUS >=0 ±íÊ¾³É¹¦
+        if (status >= 0) { // NTSTATUS >=0 è¡¨ç¤ºæˆåŠŸ
             printf("    [+] Suspended process (NT) : %d\n", node->pid);
         }
         else {
             fprintf(stderr, "    [-] Failed to suspend process (NT): %d (NTSTATUS: 0x%X)\n", node->pid, status);
             success = FALSE;
         }
-        CloseHandle(hProcess); // ÊÍ·Å¾ä±ú
+        CloseHandle(hProcess); // é‡Šæ”¾å¥æŸ„
     }
     else {
         fprintf(stderr, "    [-] Failed to open process: %d (Error: %lu)\n", node->pid, GetLastError());
@@ -67,14 +67,14 @@ static BOOL suspend_process_tree_nt(ProcessTreeNode* node) {
 
     return success;
 }
-// »Ö¸´½ø³ÌÊ÷
+// æ¢å¤è¿›ç¨‹æ ‘
 static BOOL resume_process_tree_nt(ProcessTreeNode* node) {
     if (!node) return FALSE;
     if (g_pNtResumeProcess == NULL) return FALSE;
 
     BOOL success = TRUE;
 
-    // ÏÈ»Ö¸´¸¸½ø³Ì£¬ÔÙµİ¹é»Ö¸´×Ó½ø³Ì
+    // å…ˆæ¢å¤çˆ¶è¿›ç¨‹ï¼Œå†é€’å½’æ¢å¤å­è¿›ç¨‹
     HANDLE hProcess = OpenProcess(PROCESS_SUSPEND_RESUME, FALSE, node->pid);
     if (hProcess) {
         NTSTATUS status = g_pNtResumeProcess(hProcess);
@@ -92,7 +92,7 @@ static BOOL resume_process_tree_nt(ProcessTreeNode* node) {
         success = FALSE;
     }
 
-    // »Ö¸´×Ó½ø³Ì
+    // æ¢å¤å­è¿›ç¨‹
     for (size_t i = 0; i < node->child_count; i++) {
         if (!resume_process_tree_nt(node->children[i])) {
             success = FALSE;

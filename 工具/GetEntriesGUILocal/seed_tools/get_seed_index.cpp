@@ -1,7 +1,7 @@
 #include "get_seed_index.h"
 
 
-// ÌØÕ÷×Ö½ÚĞòÁĞ
+// ç‰¹å¾å­—èŠ‚åºåˆ—
 const unsigned char pattern[] = {
     0x4C, 0x00, 0x6F, 0x00, 0x74, 0x00, 0x74, 0x00,
     0x65, 0x00, 0x72, 0x00, 0x79, 0x00, 0x46, 0x00,
@@ -10,7 +10,7 @@ const unsigned char pattern[] = {
 };
 const size_t pattern_size = sizeof(pattern);
 
-// ÄÚ´æÌØÕ÷ĞòÁĞÆ¥Åä
+// å†…å­˜ç‰¹å¾åºåˆ—åŒ¹é…
 static size_t find_pattern_in_buffer(const unsigned char* buffer, size_t buffer_size,
     const unsigned char* pattern, size_t pattern_size) {
     if (buffer_size < pattern_size) return -1;
@@ -22,7 +22,7 @@ static size_t find_pattern_in_buffer(const unsigned char* buffer, size_t buffer_
     }
     return -1;
 }
-// ËÑË÷ÄÚ´æÇøÓò
+// æœç´¢å†…å­˜åŒºåŸŸ
 int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr)
 {
     if (start_addr >= end_addr || end_addr - start_addr > 0x10000000) {
@@ -45,7 +45,7 @@ int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr
         SIZE_T bytes_read;
         SIZE_T read_size = (SIZE_T)min(BUFFER_SIZE, (size_t)(end_addr - current_addr));
 
-        // ¼ì²é¶ÁÈ¡ÊÇ·ñ³É¹¦
+        // æ£€æŸ¥è¯»å–æ˜¯å¦æˆåŠŸ
         if (!ReadProcessMemory(hProcess, (LPCVOID)current_addr, buffer, read_size, &bytes_read)
             || bytes_read == 0) {
             current_addr += BUFFER_SIZE;
@@ -58,7 +58,7 @@ int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr
             continue;
         }
 
-        // ÕÒµ½ÌØÕ÷ĞòÁĞºó´¦Àí
+        // æ‰¾åˆ°ç‰¹å¾åºåˆ—åå¤„ç†
         uint64_t pattern_addr = current_addr + offset;
         printf("[+] Found pattern at address: 0x%llx\n", pattern_addr);
         printf("    [+] RandomMainAbility_seed addr: 0x%llx\n", pattern_addr - 0x204);
@@ -67,7 +67,7 @@ int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr
         uint64_t RandomMainAbility_seed = 0, RandomMainAbility_index = 0;
         uint64_t ChangeAbility_seed = 0, ChangeAbility_index = 0;
 
-        // ¶ÁÈ¡ RandomMainAbility Êı¾İ
+        // è¯»å– RandomMainAbility æ•°æ®
         BOOL readRandomSuccess = ReadProcessMemory(hProcess, (LPCVOID)(pattern_addr - 0x204),
             &RandomMainAbility_seed, sizeof(uint64_t), NULL);
         readRandomSuccess &= ReadProcessMemory(hProcess, (LPCVOID)(pattern_addr - 0x204 + 8),
@@ -82,7 +82,7 @@ int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr
                 GetLastError());
         }
 
-        // ¶ÁÈ¡ ChangeAbility Êı¾İ
+        // è¯»å– ChangeAbility æ•°æ®
         BOOL readChangeSuccess = ReadProcessMemory(hProcess, (LPCVOID)(pattern_addr - 0x104),
             &ChangeAbility_seed, sizeof(uint64_t), NULL);
         readChangeSuccess &= ReadProcessMemory(hProcess, (LPCVOID)(pattern_addr - 0x104 + 8),

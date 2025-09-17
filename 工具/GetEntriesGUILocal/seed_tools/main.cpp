@@ -15,14 +15,14 @@
 
  
 
-// ¼ì²éÊÇ·ñÒÔ¹ÜÀíÔ±È¨ÏŞÔËĞĞ
+// æ£€æŸ¥æ˜¯å¦ä»¥ç®¡ç†å‘˜æƒé™è¿è¡Œ
 static BOOL IsRunAsAdmin() {
     BOOL isAdmin = FALSE;
     HANDLE hToken = NULL;
 
-    // ´ò¿ªµ±Ç°½ø³ÌµÄ·ÃÎÊÁîÅÆ
+    // æ‰“å¼€å½“å‰è¿›ç¨‹çš„è®¿é—®ä»¤ç‰Œ
     if (OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken)) {
-        // »ñÈ¡ÌáÉıÀàĞÍĞÅÏ¢
+        // è·å–æå‡ç±»å‹ä¿¡æ¯
         TOKEN_ELEVATION elevation{};
         DWORD dwSize = sizeof(TOKEN_ELEVATION);
 
@@ -35,23 +35,23 @@ static BOOL IsRunAsAdmin() {
     return isAdmin;
 }
 
-// ÇëÇó¹ÜÀíÔ±È¨ÏŞÖØĞÂÆô¶¯³ÌĞò
+// è¯·æ±‚ç®¡ç†å‘˜æƒé™é‡æ–°å¯åŠ¨ç¨‹åº
 static void RequestAdminRights() {
     WCHAR szPath[MAX_PATH];
     if (GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath))) {
         SHELLEXECUTEINFO sei = { sizeof(sei) };
-        sei.lpVerb = L"runas";  // ÇëÇó¹ÜÀíÔ±È¨ÏŞ
+        sei.lpVerb = L"runas";  // è¯·æ±‚ç®¡ç†å‘˜æƒé™
         sei.lpFile = szPath;
         sei.hwnd = NULL;
         sei.nShow = SW_NORMAL;
 
         if (ShellExecuteEx(&sei)) {
-            exit(0);  // ³É¹¦Æô¶¯¹ÜÀíÔ±Ä£Ê½½ø³Ì£¬ÍË³öµ±Ç°½ø³Ì
+            exit(0);  // æˆåŠŸå¯åŠ¨ç®¡ç†å‘˜æ¨¡å¼è¿›ç¨‹ï¼Œé€€å‡ºå½“å‰è¿›ç¨‹
         }
     }
 }
 
-// ÊÍ·Å½ø³ÌÊ÷
+// é‡Šæ”¾è¿›ç¨‹æ ‘
 static void free_process_tree(ProcessTreeNode* node)
 {
     if (!node) return;
@@ -65,7 +65,7 @@ static void free_process_tree(ProcessTreeNode* node)
 }
 
 
-// ¹¹½¨½ø³ÌÊ÷
+// æ„å»ºè¿›ç¨‹æ ‘
 static ProcessTreeNode* build_process_tree(DWORD pid)
 {
     ProcessTreeNode* root = create_process_node(pid);
@@ -77,7 +77,7 @@ static ProcessTreeNode* build_process_tree(DWORD pid)
         return NULL;
     }
 
-    // µÚÒ»´Î±éÀú£ºÊÕ¼¯ËùÓĞ½ø³ÌĞÅÏ¢
+    // ç¬¬ä¸€æ¬¡éå†ï¼šæ”¶é›†æ‰€æœ‰è¿›ç¨‹ä¿¡æ¯
     DWORD processes[1024]{};
     DWORD parent_pids[1024]{};
     size_t process_count = 0;
@@ -85,7 +85,7 @@ static ProcessTreeNode* build_process_tree(DWORD pid)
     PROCESSENTRY32 pe{};
     pe.dwSize = sizeof(PROCESSENTRY32);
 
-    // ÊÕ¼¯½ø³ÌĞÅÏ¢
+    // æ”¶é›†è¿›ç¨‹ä¿¡æ¯
     if (!Process32First(hSnapshot, &pe)) {
         CloseHandle(hSnapshot);
         free(root);
@@ -99,11 +99,11 @@ static ProcessTreeNode* build_process_tree(DWORD pid)
         process_count++;
     } while (Process32Next(hSnapshot, &pe));
 
-    // ¹¹½¨½ø³ÌÊ÷£¬Ö»´¦ÀíÖ±½Ó×Ó½ø³Ì
+    // æ„å»ºè¿›ç¨‹æ ‘ï¼Œåªå¤„ç†ç›´æ¥å­è¿›ç¨‹
     for (size_t i = 0; i < process_count; i++) {
         if (parent_pids[i] != pid) continue;
 
-        // ÖØĞÂ·ÖÅä×Ó½ÚµãÊı×é
+        // é‡æ–°åˆ†é…å­èŠ‚ç‚¹æ•°ç»„
         ProcessTreeNode** new_children = (ProcessTreeNode**)realloc(
             root->children, (root->child_count + 1) * sizeof(ProcessTreeNode*));
 
@@ -122,14 +122,14 @@ static ProcessTreeNode* build_process_tree(DWORD pid)
     return root;
 }
 
-// ÔİÍ£½ø³ÌÊ÷
+// æš‚åœè¿›ç¨‹æ ‘
 static BOOL suspend_process_tree(ProcessTreeNode* node)
 {
     if (!node) return FALSE;
 
     BOOL success = TRUE;
 
-    // ÏÈÔİÍ£×Ó½ø³Ì
+    // å…ˆæš‚åœå­è¿›ç¨‹
     for (size_t i = 0; i < node->child_count; i++)
     {
         if (!suspend_process_tree(node->children[i])) {
@@ -137,7 +137,7 @@ static BOOL suspend_process_tree(ProcessTreeNode* node)
         }
     }
 
-    // ÔİÍ£µ±Ç°½ø³Ì
+    // æš‚åœå½“å‰è¿›ç¨‹
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, node->pid);
     if (hProcess) {
         if (!DebugActiveProcess(node->pid)) {
@@ -157,13 +157,13 @@ static BOOL suspend_process_tree(ProcessTreeNode* node)
     return success;
 }
 
-// »Ö¸´½ø³ÌÊ÷
+// æ¢å¤è¿›ç¨‹æ ‘
 static BOOL resume_process_tree(ProcessTreeNode* node) {
     if (!node) return FALSE;
 
     BOOL success = TRUE;
 
-    // »Ö¸´µ±Ç°½ø³Ì
+    // æ¢å¤å½“å‰è¿›ç¨‹
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, node->pid);
     if (hProcess) {
         if (!DebugActiveProcessStop(node->pid)) {
@@ -180,7 +180,7 @@ static BOOL resume_process_tree(ProcessTreeNode* node) {
         success = FALSE;
     }
 
-    // »Ö¸´×Ó½ø³Ì
+    // æ¢å¤å­è¿›ç¨‹
     for (size_t i = 0; i < node->child_count; i++) {
         if (!resume_process_tree(node->children[i])) {
             success = FALSE;
@@ -191,7 +191,7 @@ static BOOL resume_process_tree(ProcessTreeNode* node) {
 }
 
 
-// ²éÕÒ½ø³ÌID
+// æŸ¥æ‰¾è¿›ç¨‹ID
 static DWORD find_process_id(const WCHAR* process_name) {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
@@ -212,7 +212,7 @@ static DWORD find_process_id(const WCHAR* process_name) {
 }
 
 
-// ËÑË÷½ø³ÌÄÚ´æ-¿ìËÙ¶¨Î»Ë½ÓĞÌá½»ÄÚ´æÇøÓò
+// æœç´¢è¿›ç¨‹å†…å­˜-å¿«é€Ÿå®šä½ç§æœ‰æäº¤å†…å­˜åŒºåŸŸ
 static void search_process_memory_fast(DWORD pid, 
     uint64_t known_random_seed, uint64_t known_change_seed, 
     size_t flag) {
@@ -233,7 +233,7 @@ static void search_process_memory_fast(DWORD pid,
             break;
         }
 
-        // ¼ì²éÄÚ´æÊôĞÔÊÇ·ñÂú×ãÌõ¼ş
+        // æ£€æŸ¥å†…å­˜å±æ€§æ˜¯å¦æ»¡è¶³æ¡ä»¶
         if (mbi.State != MEM_COMMIT ||
             mbi.Type != MEM_PRIVATE ||
             !(mbi.Protect & PAGE_READWRITE)) {
@@ -245,30 +245,30 @@ static void search_process_memory_fast(DWORD pid,
         uint64_t region_end = region_start + mbi.RegionSize;
         uint64_t region_size = mbi.RegionSize;
 
-        // ¼ì²éÊÇ·ñÔÚËÑË÷·¶Î§ÄÚ
+        // æ£€æŸ¥æ˜¯å¦åœ¨æœç´¢èŒƒå›´å†…
         if (region_end <= SEARCH_START || region_start >= SEARCH_END) {
             addr = region_end;
             continue;
         }
 
-        // ¼ì²éÇøÓò´óĞ¡ÊÇ·ñºÏÀí
+        // æ£€æŸ¥åŒºåŸŸå¤§å°æ˜¯å¦åˆç†
         if (region_size <= 0x10000 || region_size >= 0x10000000) {
             addr = region_end;
             continue;
         }
 
-        // ¼ÆËãÊµ¼ÊËÑË÷·¶Î§£¨´¦Àí²¿·ÖÖØµşµÄÇé¿ö£©
+        // è®¡ç®—å®é™…æœç´¢èŒƒå›´ï¼ˆå¤„ç†éƒ¨åˆ†é‡å çš„æƒ…å†µï¼‰
         uint64_t search_start = max(region_start, SEARCH_START);
         uint64_t search_end = min(region_end, SEARCH_END);
 
         // printf("[+] Searching private committed region: 0x%llx - 0x%llx (size: 0x%llx)\n",
         //        search_start, search_end, search_end - search_start);
 
-        // Ö±½ÓËÑË÷Õâ¸öÇøÓò»ñÈ¡seedºÍindex
+        // ç›´æ¥æœç´¢è¿™ä¸ªåŒºåŸŸè·å–seedå’Œindex
         if (flag == 0 && search_memory_region(hProcess, search_start, search_end)) {
             break;
         }
-        // Ö±½ÓËÑË÷Õâ¸öÇøÓò¸ù¾İseed»ñÈ¡index
+        // ç›´æ¥æœç´¢è¿™ä¸ªåŒºåŸŸæ ¹æ®seedè·å–index
         if (flag == 1 && search_memory_region_by_seed(hProcess, search_start, search_end,
             known_random_seed, known_change_seed)) {
             break;
@@ -287,12 +287,12 @@ int main() {
     //setlocale(LC_ALL, "zh_CN.UTF-8");
     const wchar_t* art[] = {
         L"+==============================================================================================+",
-        L"|    ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨[     ¨€¨€¨€¨€¨€¨€¨€¨€¨[  ¨€¨€¨€¨€¨€¨€¨[   ¨€¨€¨€¨€¨€¨€¨[  ¨€¨€¨[      ¨€¨€¨€¨€¨€¨€¨€¨[    |",
-        L"|    ¨€¨€¨X¨T¨T¨T¨T¨a ¨€¨€¨X¨T¨T¨T¨T¨a ¨€¨€¨X¨T¨T¨T¨T¨a ¨€¨€¨X¨T¨T¨€¨€¨[    ¨^¨T¨T¨€¨€¨X¨T¨T¨a ¨€¨€¨X¨T¨T¨T¨€¨€¨[ ¨€¨€¨X¨T¨T¨T¨€¨€¨[ ¨€¨€¨U      ¨€¨€¨X¨T¨T¨T¨T¨a    |",
-        L"|    ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨[   ¨€¨€¨€¨€¨€¨[   ¨€¨€¨U  ¨€¨€¨U       ¨€¨€¨U    ¨€¨€¨U   ¨€¨€¨U ¨€¨€¨U   ¨€¨€¨U ¨€¨€¨U      ¨€¨€¨€¨€¨€¨€¨€¨[    |",
-        L"|    ¨^¨T¨T¨T¨T¨€¨€¨U ¨€¨€¨X¨T¨T¨a   ¨€¨€¨X¨T¨T¨a   ¨€¨€¨U  ¨€¨€¨U       ¨€¨€¨U    ¨€¨€¨U   ¨€¨€¨U ¨€¨€¨U   ¨€¨€¨U ¨€¨€¨U      ¨^¨T¨T¨T¨T¨€¨€¨U    |",
-        L"|    ¨€¨€¨€¨€¨€¨€¨€¨U ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨X¨a       ¨€¨€¨U    ¨^¨€¨€¨€¨€¨€¨€¨X¨a ¨^¨€¨€¨€¨€¨€¨€¨X¨a ¨€¨€¨€¨€¨€¨€¨€¨[ ¨€¨€¨€¨€¨€¨€¨€¨U    |",
-        L"|    ¨^¨T¨T¨T¨T¨T¨T¨a ¨^¨T¨T¨T¨T¨T¨T¨a ¨^¨T¨T¨T¨T¨T¨T¨a ¨^¨T¨T¨T¨T¨T¨a        ¨^¨T¨a     ¨^¨T¨T¨T¨T¨T¨a   ¨^¨T¨T¨T¨T¨T¨a  ¨^¨T¨T¨T¨T¨T¨T¨a ¨^¨T¨T¨T¨T¨T¨T¨a    |",
+        L"|    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—     â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—  â–ˆâ–ˆâ•—      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—    |",
+        L"|    â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•”â•â•â•â•â• â–ˆâ–ˆâ•”â•â•â–ˆâ–ˆâ•—    â•šâ•â•â–ˆâ–ˆâ•”â•â•â• â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•— â–ˆâ–ˆâ•”â•â•â•â–ˆâ–ˆâ•— â–ˆâ–ˆâ•‘      â–ˆâ–ˆâ•”â•â•â•â•â•    |",
+        L"|    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘       â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•‘      â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•—    |",
+        L"|    â•šâ•â•â•â•â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•”â•â•â•   â–ˆâ–ˆâ•‘  â–ˆâ–ˆâ•‘       â–ˆâ–ˆâ•‘    â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•‘   â–ˆâ–ˆâ•‘ â–ˆâ–ˆâ•‘      â•šâ•â•â•â•â–ˆâ–ˆâ•‘    |",
+        L"|    â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘ â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â•       â–ˆâ–ˆâ•‘    â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â•šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•”â• â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•— â–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ•‘    |",
+        L"|    â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•        â•šâ•â•     â•šâ•â•â•â•â•â•   â•šâ•â•â•â•â•â•  â•šâ•â•â•â•â•â•â• â•šâ•â•â•â•â•â•â•    |",
         L"+==============================================================================================+"
     };
 
@@ -302,14 +302,14 @@ int main() {
     }
     printf("\n");
 
-    // ¼ì²é¹ÜÀíÔ±È¨ÏŞ
+    // æ£€æŸ¥ç®¡ç†å‘˜æƒé™
     if (!IsRunAsAdmin()) {
         printf("[-] The program needs to be run with administrator privileges!\n");
         printf("[*] Requesting administrator permission...\n");
 
         RequestAdminRights();
 
-        // Èç¹ûÇëÇóÊ§°Ü£¬ÊÖ¶¯ÒÔ¹ÜÀíÔ±Éí·İÔËĞĞ
+        // å¦‚æœè¯·æ±‚å¤±è´¥ï¼Œæ‰‹åŠ¨ä»¥ç®¡ç†å‘˜èº«ä»½è¿è¡Œ
         printf("[-] The request for administrator privileges failed. Please manually run the program as an administrator.\n");
         system("pause");
         return 1;
@@ -335,7 +335,7 @@ int main() {
     if (choice == 1) {
         int c;
         while ((c = getchar()) != '\n' && c != EOF);
-        // ´Ó¿ØÖÆÌ¨¶ÁÈ¡seedÖµ£¨Ö§³ÖÊ®½øÖÆºÍÊ®Áù½øÖÆ£©
+        // ä»æ§åˆ¶å°è¯»å–seedå€¼ï¼ˆæ”¯æŒåè¿›åˆ¶å’Œåå…­è¿›åˆ¶ï¼‰
         get_RandomMainAbility_seed_ChangeAbility_seed(known_random_seed, known_change_seed);
     }
 
@@ -350,7 +350,7 @@ int main() {
 
     printf("[+] Found %ls with PID: %d\n", process_name, pid);
 
-    // ¹¹½¨½ø³ÌÊ÷
+    // æ„å»ºè¿›ç¨‹æ ‘
     ProcessTreeNodeEx* process_tree = build_process_tree_ex(pid);
     if (!process_tree) {
         fprintf(stderr, "    [-] Failed to build process tree!\n");
@@ -358,7 +358,7 @@ int main() {
         return 1;
     }
 
-    // ÔİÍ£½ø³ÌÊ÷
+    // æš‚åœè¿›ç¨‹æ ‘
     printf("\n[*] Suspending process tree...\n");
     if (!suspend_process_tree_ex(process_tree)) {
         fprintf(stderr, "    [-] Failed to suspend process tree!\n");
@@ -367,7 +367,7 @@ int main() {
         return 1;
     }
 
-    // ËÑË÷ÄÚ´æ
+    // æœç´¢å†…å­˜
     printf("\n[*] Searching process memory...\n");
     if (choice == 0) {
         search_process_memory_fast(pid, known_random_seed, known_change_seed, 0); 
@@ -376,13 +376,13 @@ int main() {
         search_process_memory_fast(pid, known_random_seed, known_change_seed, 1);
     }
 
-    // »Ö¸´½ø³ÌÊ÷
+    // æ¢å¤è¿›ç¨‹æ ‘
     printf("\n[*] Resuming process tree...\n");
     if (!resume_process_tree_ex(process_tree)) {
         fprintf(stderr, "    [-] Failed to resume process tree!\n");
     }
 
-    // ÇåÀí×ÊÔ´
+    // æ¸…ç†èµ„æº
     free_process_tree_ex(process_tree);
 
     printf("[*] Operation completed. Press any key to exit...\n");

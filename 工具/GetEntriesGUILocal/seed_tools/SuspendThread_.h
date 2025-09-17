@@ -2,26 +2,26 @@
 
 # include "ProcessTreeNode_.h"
 
-// ±éÀúÖ¸¶¨PIDµÄËùÓĞÏß³Ì£¬»ñÈ¡Ïß³ÌIDÁĞ±í
+// éå†æŒ‡å®šPIDçš„æ‰€æœ‰çº¿ç¨‹ï¼Œè·å–çº¿ç¨‹IDåˆ—è¡¨
 static DWORD enum_process_threads(DWORD pid, DWORD* threads, DWORD max_threads);
 
-// ÔİÍ£µ¥¸öÏß³Ì£¬²¢¼ÇÂ¼Ô­¹ÒÆğ¼ÆÊı
+// æš‚åœå•ä¸ªçº¿ç¨‹ï¼Œå¹¶è®°å½•åŸæŒ‚èµ·è®¡æ•°
 static BOOL suspend_single_thread(DWORD tid, DWORD* original_suspend_count);
 
-// »Ö¸´µ¥¸öÏß³Ìµ½ÔİÍ£Ç°µÄ¹ÒÆğ¼ÆÊı×´Ì¬
+// æ¢å¤å•ä¸ªçº¿ç¨‹åˆ°æš‚åœå‰çš„æŒ‚èµ·è®¡æ•°çŠ¶æ€
 static BOOL resume_single_thread(DWORD tid, DWORD original_suspend_count);
 
-// ´´½¨À©Õ¹½ø³ÌÊ÷½Úµã
+// åˆ›å»ºæ‰©å±•è¿›ç¨‹æ ‘èŠ‚ç‚¹
 static ProcessTreeNodeEx* create_process_node_ex(DWORD pid);
 
-// µİ¹é¹¹½¨½ø³ÌÊ÷
+// é€’å½’æ„å»ºè¿›ç¨‹æ ‘
 ProcessTreeNodeEx* build_process_tree_ex(DWORD root_pid);
 
-// µİ¹éÔİÍ£½ø³ÌÊ÷ÖĞËùÓĞ½ø³ÌµÄËùÓĞÏß³Ì
+// é€’å½’æš‚åœè¿›ç¨‹æ ‘ä¸­æ‰€æœ‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
 BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node);
 
-// µİ¹é»Ö¸´½ø³ÌÊ÷ÖĞËùÓĞ½ø³ÌµÄËùÓĞÏß³Ì
+// é€’å½’æ¢å¤è¿›ç¨‹æ ‘ä¸­æ‰€æœ‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
 BOOL resume_process_tree_ex(ProcessTreeNodeEx* node);
 
-// µİ¹éÊÍ·ÅÀ©Õ¹½ø³ÌÊ÷
+// é€’å½’é‡Šæ”¾æ‰©å±•è¿›ç¨‹æ ‘
 void free_process_tree_ex(ProcessTreeNodeEx* node);

@@ -13,11 +13,11 @@ constexpr size_t MAX_PID_LEN = 16;
 const uint64_t SEARCH_START = 0x10000000000;
 const uint64_t SEARCH_END = 0x30000000000;
 
-// Ïß³ÌÏà¹Ø³£Á¿
-constexpr DWORD MAX_THREADS_PER_PROCESS = 1024; // µ¥¸ö½ø³Ì×î´óÖ§³ÖÏß³ÌÊı
+// çº¿ç¨‹ç›¸å…³å¸¸é‡
+constexpr DWORD MAX_THREADS_PER_PROCESS = 1024; // å•ä¸ªè¿›ç¨‹æœ€å¤§æ”¯æŒçº¿ç¨‹æ•°
 
 
-// ½ø³ÌÊ÷½Úµã½á¹¹
+// è¿›ç¨‹æ ‘èŠ‚ç‚¹ç»“æ„
 typedef struct ProcessTreeNode {
     DWORD pid;
     struct ProcessTreeNode** children;
@@ -25,14 +25,14 @@ typedef struct ProcessTreeNode {
 } ProcessTreeNode;
 
 
-// À©Õ¹ºóµÄ½ø³ÌÊ÷½Úµã£¨Ôö¼ÓÏß³ÌĞÅÏ¢´æ´¢£©
+// æ‰©å±•åçš„è¿›ç¨‹æ ‘èŠ‚ç‚¹ï¼ˆå¢åŠ çº¿ç¨‹ä¿¡æ¯å­˜å‚¨ï¼‰
 typedef struct ProcessTreeNodeEx {
     DWORD pid;
     struct ProcessTreeNodeEx** children;
     size_t child_count;
-    DWORD* thread_ids;         // ¸Ã½ø³ÌµÄËùÓĞÏß³ÌID
-    DWORD* original_suspend_counts; // Ã¿¸öÏß³ÌµÄÔ­¹ÒÆğ¼ÆÊı
-    DWORD thread_count;        // Ïß³ÌÊıÁ¿
+    DWORD* thread_ids;         // è¯¥è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹ID
+    DWORD* original_suspend_counts; // æ¯ä¸ªçº¿ç¨‹çš„åŸæŒ‚èµ·è®¡æ•°
+    DWORD thread_count;        // çº¿ç¨‹æ•°é‡
 } ProcessTreeNodeEx;
 
 ProcessTreeNode* create_process_node(DWORD pid);

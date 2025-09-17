@@ -1,6 +1,6 @@
 #include "ProcessTreeNode_.h"
 
-// ´´½¨½ø³ÌÊ÷½Úµã
+// åˆ›å»ºè¿›ç¨‹æ ‘èŠ‚ç‚¹
 ProcessTreeNode* create_process_node(DWORD pid)
 {
     ProcessTreeNode* node = (ProcessTreeNode*)malloc(sizeof(ProcessTreeNode));
@@ -12,7 +12,7 @@ ProcessTreeNode* create_process_node(DWORD pid)
     return node;
 }
 
-// ´´½¨À©Õ¹½ø³Ì½Úµã
+// åˆ›å»ºæ‰©å±•è¿›ç¨‹èŠ‚ç‚¹
 ProcessTreeNodeEx* create_process_node_ex(DWORD pid) 
 {
     ProcessTreeNodeEx* node = (ProcessTreeNodeEx*)malloc(sizeof(ProcessTreeNodeEx));

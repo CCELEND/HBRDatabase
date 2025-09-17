@@ -1,20 +1,20 @@
 # include "SuspendThread_.h"
 
 /**
- * @brief ±éÀúÖ¸¶¨PIDµÄËùÓĞÏß³Ì£¬»ñÈ¡Ïß³ÌIDÁĞ±í
- * @param pid Ä¿±ê½ø³ÌID
- * @param threads Êä³ö²ÎÊı£º´æ´¢Ïß³ÌIDµÄÊı×é
- * @param max_threads Êı×é×î´óÈİÁ¿£¨±ÜÃâÔ½½ç£©
- * @return Êµ¼Ê»ñÈ¡µÄÏß³ÌÊıÁ¿£¬0±íÊ¾Ê§°Ü
+ * @brief éå†æŒ‡å®šPIDçš„æ‰€æœ‰çº¿ç¨‹ï¼Œè·å–çº¿ç¨‹IDåˆ—è¡¨
+ * @param pid ç›®æ ‡è¿›ç¨‹ID
+ * @param threads è¾“å‡ºå‚æ•°ï¼šå­˜å‚¨çº¿ç¨‹IDçš„æ•°ç»„
+ * @param max_threads æ•°ç»„æœ€å¤§å®¹é‡ï¼ˆé¿å…è¶Šç•Œï¼‰
+ * @return å®é™…è·å–çš„çº¿ç¨‹æ•°é‡ï¼Œ0è¡¨ç¤ºå¤±è´¥
  */
 static DWORD enum_process_threads(DWORD pid, DWORD* threads, DWORD max_threads) {
-    // Èë²ÎĞ£Ñé£¬²»Âú×ãÔòÖ±½Ó·µ»Ø
+    // å…¥å‚æ ¡éªŒï¼Œä¸æ»¡è¶³åˆ™ç›´æ¥è¿”å›
     if (pid == 0 || threads == NULL || max_threads == 0) {
         fprintf(stderr, "    [-] Invalid parameter for enum_process_threads\n");
         return 0;
     }
 
-    // ´´½¨Ïß³Ì¿ìÕÕ£¬Ê§°ÜÔòÖ±½Ó·µ»Ø
+    // åˆ›å»ºçº¿ç¨‹å¿«ç…§ï¼Œå¤±è´¥åˆ™ç›´æ¥è¿”å›
     HANDLE hThreadSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
     if (hThreadSnapshot == INVALID_HANDLE_VALUE) {
         fprintf(stderr, "    [-] CreateToolhelp32Snapshot (thread) failed (PID: %d, Error: %lu)\n",
@@ -23,10 +23,10 @@ static DWORD enum_process_threads(DWORD pid, DWORD* threads, DWORD max_threads) 
     }
 
     THREADENTRY32 thread_entry = { 0 };
-    thread_entry.dwSize = sizeof(THREADENTRY32); // ³õÊ¼»¯½á¹¹Ìå´óĞ¡
+    thread_entry.dwSize = sizeof(THREADENTRY32); // åˆå§‹åŒ–ç»“æ„ä½“å¤§å°
     DWORD thread_count = 0;
 
-    // ³¢ÊÔ»ñÈ¡µÚÒ»¸öÏß³ÌĞÅÏ¢£¬Ê§°ÜÔòÊÍ·Å×ÊÔ´²¢·µ»Ø
+    // å°è¯•è·å–ç¬¬ä¸€ä¸ªçº¿ç¨‹ä¿¡æ¯ï¼Œå¤±è´¥åˆ™é‡Šæ”¾èµ„æºå¹¶è¿”å›
     if (!Thread32First(hThreadSnapshot, &thread_entry)) {
         fprintf(stderr, "    [-] Thread32First failed (PID: %d, Error: %lu)\n",
             pid, GetLastError());
@@ -34,35 +34,35 @@ static DWORD enum_process_threads(DWORD pid, DWORD* threads, DWORD max_threads) 
         return 0;
     }
 
-    // ±éÀúËùÓĞÏß³Ì
+    // éå†æ‰€æœ‰çº¿ç¨‹
     do {
-        // É¸Ñ¡Ä¿±ê½ø³ÌµÄÏß³Ì
+        // ç­›é€‰ç›®æ ‡è¿›ç¨‹çš„çº¿ç¨‹
         if (thread_entry.th32OwnerProcessID != pid) continue;
 
 
-        // ¼ì²éÊÇ·ñ³¬³ö×î´óÏß³ÌÊıÏŞÖÆ
+        // æ£€æŸ¥æ˜¯å¦è¶…å‡ºæœ€å¤§çº¿ç¨‹æ•°é™åˆ¶
         if (thread_count >= max_threads) {
             fprintf(stderr, "    [-] Too many threads (PID: %d, max: %lu), skip remaining\n",
                 pid, max_threads);
             break;
         }
 
-        // ¼ÇÂ¼Ïß³ÌID
+        // è®°å½•çº¿ç¨‹ID
         threads[thread_count++] = thread_entry.th32ThreadID;
 
     } while (Thread32Next(hThreadSnapshot, &thread_entry));
 
-    // ÊÍ·Å×ÊÔ´²¢·µ»Ø½á¹û
+    // é‡Šæ”¾èµ„æºå¹¶è¿”å›ç»“æœ
     CloseHandle(hThreadSnapshot);
     return thread_count;
 }
 
 
 /**
- * @brief ÔİÍ£µ¥¸öÏß³Ì£¬²¢¼ÇÂ¼Ô­¹ÒÆğ¼ÆÊı
- * @param tid Ä¿±êÏß³ÌID
- * @param original_suspend_count Êä³ö²ÎÊı£º´æ´¢Ïß³ÌÔİÍ£Ç°µÄ¹ÒÆğ¼ÆÊı
- * @return TRUE£ºÔİÍ£³É¹¦£¬FALSE£ºÊ§°Ü
+ * @brief æš‚åœå•ä¸ªçº¿ç¨‹ï¼Œå¹¶è®°å½•åŸæŒ‚èµ·è®¡æ•°
+ * @param tid ç›®æ ‡çº¿ç¨‹ID
+ * @param original_suspend_count è¾“å‡ºå‚æ•°ï¼šå­˜å‚¨çº¿ç¨‹æš‚åœå‰çš„æŒ‚èµ·è®¡æ•°
+ * @return TRUEï¼šæš‚åœæˆåŠŸï¼ŒFALSEï¼šå¤±è´¥
  */
 static BOOL suspend_single_thread(DWORD tid, DWORD* original_suspend_count) {
     if (tid == 0 || original_suspend_count == NULL) {
@@ -70,10 +70,10 @@ static BOOL suspend_single_thread(DWORD tid, DWORD* original_suspend_count) {
         return FALSE;
     }
 
-    // ´ò¿ªÏß³Ì£ºĞè THREAD_SUSPEND_RESUME£¨ÔİÍ£/»Ö¸´È¨ÏŞ£©ºÍ THREAD_QUERY_INFORMATION£¨»ñÈ¡¹ÒÆğ¼ÆÊıÈ¨ÏŞ£©
+    // æ‰“å¼€çº¿ç¨‹ï¼šéœ€ THREAD_SUSPEND_RESUMEï¼ˆæš‚åœ/æ¢å¤æƒé™ï¼‰å’Œ THREAD_QUERY_INFORMATIONï¼ˆè·å–æŒ‚èµ·è®¡æ•°æƒé™ï¼‰
     HANDLE hThread = OpenThread(
         THREAD_SUSPEND_RESUME | THREAD_QUERY_INFORMATION,
-        FALSE, // ²»¼Ì³Ğ¾ä±ú
+        FALSE, // ä¸ç»§æ‰¿å¥æŸ„
         tid
     );
     if (hThread == NULL) {
@@ -82,30 +82,30 @@ static BOOL suspend_single_thread(DWORD tid, DWORD* original_suspend_count) {
         return FALSE;
     }
 
-    // ÔİÍ£Ïß³Ì£ºSuspendThread ·µ»Ø²Ù×÷Ç°µÄ¹ÒÆğ¼ÆÊı£¨0±íÊ¾Î´¹ÒÆğ£¬n±íÊ¾ÒÑ±»¹ÒÆğn´Î£©
+    // æš‚åœçº¿ç¨‹ï¼šSuspendThread è¿”å›æ“ä½œå‰çš„æŒ‚èµ·è®¡æ•°ï¼ˆ0è¡¨ç¤ºæœªæŒ‚èµ·ï¼Œnè¡¨ç¤ºå·²è¢«æŒ‚èµ·næ¬¡ï¼‰
     DWORD suspend_count = SuspendThread(hThread);
-    if (suspend_count == (DWORD)-1) { // Ê§°Ü·µ»Ø -1£¨¼´0xFFFFFFFF£©
+    if (suspend_count == (DWORD)-1) { // å¤±è´¥è¿”å› -1ï¼ˆå³0xFFFFFFFFï¼‰
         fprintf(stderr, "    [-] SuspendThread failed (TID: %lu, Error: %lu)\n",
             tid, GetLastError());
         CloseHandle(hThread);
         return FALSE;
     }
 
-    // ¼ÇÂ¼Ô­¹ÒÆğ¼ÆÊı£¨ºóĞø»Ö¸´Ê±Ğè»¹Ô­µ½¸ÃÖµ£©
+    // è®°å½•åŸæŒ‚èµ·è®¡æ•°ï¼ˆåç»­æ¢å¤æ—¶éœ€è¿˜åŸåˆ°è¯¥å€¼ï¼‰
     *original_suspend_count = suspend_count;
     //printf("        [+] Suspended thread (TID: %lu) | Original suspend count: %lu\n",
     //    tid, suspend_count);
 
-    CloseHandle(hThread); // ÊÍ·ÅÏß³Ì¾ä±ú
+    CloseHandle(hThread); // é‡Šæ”¾çº¿ç¨‹å¥æŸ„
     return TRUE;
 }
 
 
 /**
- * @brief »Ö¸´µ¥¸öÏß³Ìµ½ÔİÍ£Ç°µÄ¹ÒÆğ¼ÆÊı×´Ì¬
- * @param tid Ä¿±êÏß³ÌID
- * @param original_suspend_count Ïß³ÌÔİÍ£Ç°µÄ¹ÒÆğ¼ÆÊı£¨ÓÉ suspend_single_thread ¼ÇÂ¼£©
- * @return TRUE£º»Ö¸´³É¹¦£¬FALSE£ºÊ§°Ü
+ * @brief æ¢å¤å•ä¸ªçº¿ç¨‹åˆ°æš‚åœå‰çš„æŒ‚èµ·è®¡æ•°çŠ¶æ€
+ * @param tid ç›®æ ‡çº¿ç¨‹ID
+ * @param original_suspend_count çº¿ç¨‹æš‚åœå‰çš„æŒ‚èµ·è®¡æ•°ï¼ˆç”± suspend_single_thread è®°å½•ï¼‰
+ * @return TRUEï¼šæ¢å¤æˆåŠŸï¼ŒFALSEï¼šå¤±è´¥
  */
 static BOOL resume_single_thread(DWORD tid, DWORD original_suspend_count) {
     if (tid == 0) {
@@ -124,21 +124,21 @@ static BOOL resume_single_thread(DWORD tid, DWORD original_suspend_count) {
         return FALSE;
     }
 
-    // ²½Öè1£º»ñÈ¡µ±Ç°Ïß³ÌµÄ¹ÒÆğ¼ÆÊı£¨ĞèÏÈÔİÍ£Ò»´Î»ñÈ¡£¬ÔÙ³·Ïú¸Ã´ÎÔİÍ££©
-    DWORD current_suspend_count = SuspendThread(hThread); // ÔİÍ£Ò»´Î£¬·µ»Ø²Ù×÷Ç°µÄ¼ÆÊı
+    // æ­¥éª¤1ï¼šè·å–å½“å‰çº¿ç¨‹çš„æŒ‚èµ·è®¡æ•°ï¼ˆéœ€å…ˆæš‚åœä¸€æ¬¡è·å–ï¼Œå†æ’¤é”€è¯¥æ¬¡æš‚åœï¼‰
+    DWORD current_suspend_count = SuspendThread(hThread); // æš‚åœä¸€æ¬¡ï¼Œè¿”å›æ“ä½œå‰çš„è®¡æ•°
     if (current_suspend_count == (DWORD)-1) {
         fprintf(stderr, "    [-] Get suspend count failed (TID: %lu, Error: %lu)\n",
             tid, GetLastError());
         CloseHandle(hThread);
         return FALSE;
     }
-    ResumeThread(hThread); // ³·Ïú¸Õ²ÅµÄÔİÍ££¬»Ö¸´µ½²Ù×÷Ç°µÄ¼ÆÊı
+    ResumeThread(hThread); // æ’¤é”€åˆšæ‰çš„æš‚åœï¼Œæ¢å¤åˆ°æ“ä½œå‰çš„è®¡æ•°
 
-    // ¼ÆËãĞèÒª»Ö¸´µÄ´ÎÊı£¨µ±Ç°¹ÒÆğ¼ÆÊı - Ô­¹ÒÆğ¼ÆÊı£©
+    // è®¡ç®—éœ€è¦æ¢å¤çš„æ¬¡æ•°ï¼ˆå½“å‰æŒ‚èµ·è®¡æ•° - åŸæŒ‚èµ·è®¡æ•°ï¼‰
     DWORD need_resume_count = current_suspend_count - original_suspend_count;
     if (need_resume_count > 0) {
         for (DWORD i = 0; i < need_resume_count; i++) {
-            ResumeThread(hThread); // Ã¿´Îµ÷ÓÃ¼õÉÙ1¸ö¹ÒÆğ¼ÆÊı
+            ResumeThread(hThread); // æ¯æ¬¡è°ƒç”¨å‡å°‘1ä¸ªæŒ‚èµ·è®¡æ•°
         }
         //printf("        [+] Resumed thread (TID: %lu) | Restored suspend count: %lu\n",
         //    tid, original_suspend_count);
@@ -154,9 +154,9 @@ static BOOL resume_single_thread(DWORD tid, DWORD original_suspend_count) {
 
 
 /**
- * @brief ´´½¨À©Õ¹½ø³ÌÊ÷½Úµã£¨º¬Ïß³ÌĞÅÏ¢´æ´¢£©
- * @param pid Ä¿±ê½ø³ÌID
- * @return ½ÚµãÖ¸Õë£º³É¹¦·µ»Ø·ÇNULL£¬Ê§°Ü·µ»ØNULL
+ * @brief åˆ›å»ºæ‰©å±•è¿›ç¨‹æ ‘èŠ‚ç‚¹ï¼ˆå«çº¿ç¨‹ä¿¡æ¯å­˜å‚¨ï¼‰
+ * @param pid ç›®æ ‡è¿›ç¨‹ID
+ * @return èŠ‚ç‚¹æŒ‡é’ˆï¼šæˆåŠŸè¿”å›éNULLï¼Œå¤±è´¥è¿”å›NULL
  */
 static ProcessTreeNodeEx* create_process_node_ex(DWORD pid) {
     ProcessTreeNodeEx* node = (ProcessTreeNodeEx*)malloc(sizeof(ProcessTreeNodeEx));
@@ -165,7 +165,7 @@ static ProcessTreeNodeEx* create_process_node_ex(DWORD pid) {
         return NULL;
     }
 
-    // ³õÊ¼»¯½Úµã³ÉÔ±
+    // åˆå§‹åŒ–èŠ‚ç‚¹æˆå‘˜
     node->pid = pid;
     node->children = NULL;
     node->child_count = 0;
@@ -177,110 +177,110 @@ static ProcessTreeNodeEx* create_process_node_ex(DWORD pid) {
 }
 
 /**
- * @brief µİ¹éÊÍ·ÅÀ©Õ¹½ø³ÌÊ÷£¨º¬Ïß³ÌĞÅÏ¢£©
- * @param node ½ø³ÌÊ÷¸ù½Úµã
+ * @brief é€’å½’é‡Šæ”¾æ‰©å±•è¿›ç¨‹æ ‘ï¼ˆå«çº¿ç¨‹ä¿¡æ¯ï¼‰
+ * @param node è¿›ç¨‹æ ‘æ ¹èŠ‚ç‚¹
  */
 void free_process_tree_ex(ProcessTreeNodeEx* node) {
     if (node == NULL) return;
 
-    // µİ¹éÊÍ·ÅËùÓĞ×Ó½Úµã
+    // é€’å½’é‡Šæ”¾æ‰€æœ‰å­èŠ‚ç‚¹
     for (size_t i = 0; i < node->child_count; i++) {
         free_process_tree_ex(node->children[i]);
     }
-    free(node->children); // ÊÍ·Å×Ó½ÚµãÊı×é
+    free(node->children); // é‡Šæ”¾å­èŠ‚ç‚¹æ•°ç»„
 
-    // ÊÍ·ÅÏß³ÌĞÅÏ¢Êı×é
+    // é‡Šæ”¾çº¿ç¨‹ä¿¡æ¯æ•°ç»„
     free(node->thread_ids);
     free(node->original_suspend_counts);
 
-    free(node); // ÊÍ·Åµ±Ç°½Úµã
+    free(node); // é‡Šæ”¾å½“å‰èŠ‚ç‚¹
 }
 
 
 /**
- * @brief µİ¹é¹¹½¨½ø³ÌÊ÷£¨º¬Ã¿¸ö½ø³ÌµÄÏß³ÌĞÅÏ¢£©
- * @param root_pid ½ø³ÌÊ÷¸ù½ÚµãPID£¨Ä¿±êÖ÷½ø³ÌPID£©
- * @return ½ø³ÌÊ÷¸ù½ÚµãÖ¸Õë£º³É¹¦·µ»Ø·ÇNULL£¬Ê§°Ü·µ»ØNULL
+ * @brief é€’å½’æ„å»ºè¿›ç¨‹æ ‘ï¼ˆå«æ¯ä¸ªè¿›ç¨‹çš„çº¿ç¨‹ä¿¡æ¯ï¼‰
+ * @param root_pid è¿›ç¨‹æ ‘æ ¹èŠ‚ç‚¹PIDï¼ˆç›®æ ‡ä¸»è¿›ç¨‹PIDï¼‰
+ * @return è¿›ç¨‹æ ‘æ ¹èŠ‚ç‚¹æŒ‡é’ˆï¼šæˆåŠŸè¿”å›éNULLï¼Œå¤±è´¥è¿”å›NULL
  */
 ProcessTreeNodeEx* build_process_tree_ex(DWORD root_pid) {
-    // ´´½¨µ±Ç°½ø³Ì½Úµã£¨ÌáÇ°·µ»ØÎŞĞ§½Úµã£©
+    // åˆ›å»ºå½“å‰è¿›ç¨‹èŠ‚ç‚¹ï¼ˆæå‰è¿”å›æ— æ•ˆèŠ‚ç‚¹ï¼‰
     ProcessTreeNodeEx* root_node = create_process_node_ex(root_pid);
     if (root_node == NULL) {
         fprintf(stderr, "    [-] Create root node failed (PID: %d)\n", root_pid);
         return NULL;
     }
 
-    // Îªµ±Ç°½Úµã»ñÈ¡²¢³õÊ¼»¯Ïß³ÌĞÅÏ¢
+    // ä¸ºå½“å‰èŠ‚ç‚¹è·å–å¹¶åˆå§‹åŒ–çº¿ç¨‹ä¿¡æ¯
     DWORD threads[MAX_THREADS_PER_PROCESS] = { 0 };
     DWORD thread_count = enum_process_threads(root_pid, threads, MAX_THREADS_PER_PROCESS);
 
-    // ½öµ±Ïß³ÌÊı > 0 Ê±£¬²Å·ÖÅäÄÚ´æ´æ´¢Ïß³ÌĞÅÏ¢
+    // ä»…å½“çº¿ç¨‹æ•° > 0 æ—¶ï¼Œæ‰åˆ†é…å†…å­˜å­˜å‚¨çº¿ç¨‹ä¿¡æ¯
     if (thread_count > 0) {
-        // ·ÖÅäÏß³ÌIDºÍ¹ÒÆğ¼ÆÊıÊı×é£¨Á½¸öÊı×éĞèÍ¬Ê±³É¹¦£¬·ñÔòÊÍ·ÅÒÑ·ÖÅä×ÊÔ´£©
+        // åˆ†é…çº¿ç¨‹IDå’ŒæŒ‚èµ·è®¡æ•°æ•°ç»„ï¼ˆä¸¤ä¸ªæ•°ç»„éœ€åŒæ—¶æˆåŠŸï¼Œå¦åˆ™é‡Šæ”¾å·²åˆ†é…èµ„æºï¼‰
         root_node->thread_ids = (DWORD*)malloc(thread_count * sizeof(DWORD));
         root_node->original_suspend_counts = (DWORD*)malloc(thread_count * sizeof(DWORD));
 
-        // ÄÚ´æ·ÖÅäÊ§°Ü£ºÊÍ·ÅËùÓĞÒÑ·ÖÅä×ÊÔ´£¬·µ»ØNULL
+        // å†…å­˜åˆ†é…å¤±è´¥ï¼šé‡Šæ”¾æ‰€æœ‰å·²åˆ†é…èµ„æºï¼Œè¿”å›NULL
         if (root_node->thread_ids == NULL || root_node->original_suspend_counts == NULL) {
             fprintf(stderr, "    [-] Malloc thread info failed (PID: %d)\n", root_pid);
-            free(root_node->thread_ids);    // ¼´Ê¹ÎªNULL£¬freeÒ²°²È«
+            free(root_node->thread_ids);    // å³ä½¿ä¸ºNULLï¼Œfreeä¹Ÿå®‰å…¨
             free(root_node->original_suspend_counts);
-            free_process_tree_ex(root_node); // ÊÍ·ÅÕû¸ö¸ù½Úµã
+            free_process_tree_ex(root_node); // é‡Šæ”¾æ•´ä¸ªæ ¹èŠ‚ç‚¹
             return NULL;
         }
 
-        // ¸´ÖÆÏß³ÌIDµ½½Úµã£¬³õÊ¼»¯Ïß³ÌÊı
+        // å¤åˆ¶çº¿ç¨‹IDåˆ°èŠ‚ç‚¹ï¼Œåˆå§‹åŒ–çº¿ç¨‹æ•°
         memcpy(root_node->thread_ids, threads, thread_count * sizeof(DWORD));
         root_node->thread_count = thread_count;
         //printf("    [+] Process (PID: %d) has %lu threads\n", root_pid, thread_count);
     }
     //else {
-    //    // Ïß³ÌÊıÎª0£¨Ã¶¾ÙÊ§°Ü»òÎŞÏß³Ì£©£¬ÎŞĞè·ÖÅäÄÚ´æ
+    //    // çº¿ç¨‹æ•°ä¸º0ï¼ˆæšä¸¾å¤±è´¥æˆ–æ— çº¿ç¨‹ï¼‰ï¼Œæ— éœ€åˆ†é…å†…å­˜
     //    printf("    [+] Process (PID: %d) has no threads (or enum failed)\n", root_pid);
     //}
 
-    // ´´½¨½ø³Ì¿ìÕÕ£¨Ê§°ÜÔòÇåÀí¸ù½Úµã²¢·µ»Ø£©
+    // åˆ›å»ºè¿›ç¨‹å¿«ç…§ï¼ˆå¤±è´¥åˆ™æ¸…ç†æ ¹èŠ‚ç‚¹å¹¶è¿”å›ï¼‰
     HANDLE hProcessSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hProcessSnapshot == INVALID_HANDLE_VALUE) {
         fprintf(stderr, "    [-] Create process snapshot failed (PID: %d, Error: %lu)\n",
             root_pid, GetLastError());
-        free_process_tree_ex(root_node); // ÇåÀíÒÑ´´½¨µÄ¸ù½Úµã
+        free_process_tree_ex(root_node); // æ¸…ç†å·²åˆ›å»ºçš„æ ¹èŠ‚ç‚¹
         return NULL;
     }
 
-    // ±éÀúÏµÍ³½ø³Ì£¬µİ¹é¹¹½¨×Ó½ø³ÌÊ÷
+    // éå†ç³»ç»Ÿè¿›ç¨‹ï¼Œé€’å½’æ„å»ºå­è¿›ç¨‹æ ‘
     PROCESSENTRY32 process_entry = { 0 };
-    process_entry.dwSize = sizeof(PROCESSENTRY32); // ³õÊ¼»¯½á¹¹Ìå´óĞ¡
+    process_entry.dwSize = sizeof(PROCESSENTRY32); // åˆå§‹åŒ–ç»“æ„ä½“å¤§å°
 
-    // ³¢ÊÔ»ñÈ¡µÚÒ»¸ö½ø³ÌĞÅÏ¢£ºÊ§°ÜÔòÇåÀí¿ìÕÕºÍ¸ù½Úµã
+    // å°è¯•è·å–ç¬¬ä¸€ä¸ªè¿›ç¨‹ä¿¡æ¯ï¼šå¤±è´¥åˆ™æ¸…ç†å¿«ç…§å’Œæ ¹èŠ‚ç‚¹
     if (!Process32First(hProcessSnapshot, &process_entry)) {
         fprintf(stderr, "    [-] Process32First failed (PID: %d, Error: %lu)\n",
             root_pid, GetLastError());
-        CloseHandle(hProcessSnapshot);   // ÊÍ·Å¿ìÕÕ¾ä±ú
-        free_process_tree_ex(root_node); // ÇåÀí¸ù½Úµã
+        CloseHandle(hProcessSnapshot);   // é‡Šæ”¾å¿«ç…§å¥æŸ„
+        free_process_tree_ex(root_node); // æ¸…ç†æ ¹èŠ‚ç‚¹
         return NULL;
     }
 
-    // ±éÀúËùÓĞ½ø³Ì
+    // éå†æ‰€æœ‰è¿›ç¨‹
     do {
-        // Ìø¹ı£ºµ±Ç°½ø³Ì²»ÊÇ¸ù½ÚµãµÄ×Ó½ø³Ì£¨¸¸PID²»Æ¥Åä£©
+        // è·³è¿‡ï¼šå½“å‰è¿›ç¨‹ä¸æ˜¯æ ¹èŠ‚ç‚¹çš„å­è¿›ç¨‹ï¼ˆçˆ¶PIDä¸åŒ¹é…ï¼‰
         if (process_entry.th32ParentProcessID != root_pid) continue;
 
-        // µİ¹é´´½¨×Ó½ø³Ì½Úµã£¨º¬×Ó½ø³ÌµÄÏß³ÌĞÅÏ¢£©
+        // é€’å½’åˆ›å»ºå­è¿›ç¨‹èŠ‚ç‚¹ï¼ˆå«å­è¿›ç¨‹çš„çº¿ç¨‹ä¿¡æ¯ï¼‰
         ProcessTreeNodeEx* child_node = build_process_tree_ex(process_entry.th32ProcessID);
-        // Ìø¹ı£º×Ó½Úµã´´½¨Ê§°Ü£¨ÎŞĞè´¦Àí£¬¼ÌĞø±éÀúÏÂÒ»¸ö½ø³Ì£©
+        // è·³è¿‡ï¼šå­èŠ‚ç‚¹åˆ›å»ºå¤±è´¥ï¼ˆæ— éœ€å¤„ç†ï¼Œç»§ç»­éå†ä¸‹ä¸€ä¸ªè¿›ç¨‹ï¼‰
         if (child_node == NULL) {
             fprintf(stderr, "    [-] Create child node failed (Child PID: %d, Parent PID: %d)\n",
                 process_entry.th32ProcessID, root_pid);
             continue;
         }
 
-        // À©Õ¹×Ó½ø³ÌÊı×é£¨realloc ÖØĞÂ·ÖÅäÄÚ´æ£©
+        // æ‰©å±•å­è¿›ç¨‹æ•°ç»„ï¼ˆrealloc é‡æ–°åˆ†é…å†…å­˜ï¼‰
         ProcessTreeNodeEx** new_children = (ProcessTreeNodeEx**)realloc(
             root_node->children,
             (root_node->child_count + 1) * sizeof(ProcessTreeNodeEx*)
         );
-        // ÄÚ´æ·ÖÅäÊ§°Ü£ºÊÍ·Åµ±Ç°×Ó½Úµã£¬¼ÌĞø±éÀú£¨²»Ó°ÏìÆäËû×Ó½ø³Ì£©
+        // å†…å­˜åˆ†é…å¤±è´¥ï¼šé‡Šæ”¾å½“å‰å­èŠ‚ç‚¹ï¼Œç»§ç»­éå†ï¼ˆä¸å½±å“å…¶ä»–å­è¿›ç¨‹ï¼‰
         if (new_children == NULL) {
             fprintf(stderr, "    [-] Realloc child array failed (Child PID: %d, Parent PID: %d)\n",
                 process_entry.th32ProcessID, root_pid);
@@ -288,7 +288,7 @@ ProcessTreeNodeEx* build_process_tree_ex(DWORD root_pid) {
             continue;
         }
 
-        // ³É¹¦Ìí¼Ó×Ó½Úµãµ½¸ù½Úµã
+        // æˆåŠŸæ·»åŠ å­èŠ‚ç‚¹åˆ°æ ¹èŠ‚ç‚¹
         root_node->children = new_children;
         root_node->children[root_node->child_count++] = child_node;
         //printf("    [+] Added child process (PID: %d) to parent (PID: %d)\n",
@@ -296,30 +296,30 @@ ProcessTreeNodeEx* build_process_tree_ex(DWORD root_pid) {
 
     } while (Process32Next(hProcessSnapshot, &process_entry));
 
-    // ÇåÀí×ÊÔ´²¢·µ»Ø¸ù½Úµã
-    CloseHandle(hProcessSnapshot); // ÊÍ·Å½ø³Ì¿ìÕÕ¾ä±ú
+    // æ¸…ç†èµ„æºå¹¶è¿”å›æ ¹èŠ‚ç‚¹
+    CloseHandle(hProcessSnapshot); // é‡Šæ”¾è¿›ç¨‹å¿«ç…§å¥æŸ„
     return root_node;
 }
 
 
 
 /**
- * @brief µİ¹éÔİÍ£½ø³ÌÊ÷ÖĞËùÓĞ½ø³ÌµÄËùÓĞÏß³Ì
- * @param node ½ø³ÌÊ÷½Úµã£¨µ±Ç°Òª´¦ÀíµÄ½ø³Ì£©
- * @return BOOL£ºTRUE±íÊ¾µ±Ç°½Úµã¼°×Ó½ÚµãµÄÔİÍ£²Ù×÷ÒÑÖ´ĞĞ£¨¼´Ê¹²¿·ÖÏß³ÌÊ§°Ü£©£¬FALSE±íÊ¾½ÚµãÎŞĞ§
- * @note ÔİÍ£Ë³Ğò£ºÏÈµİ¹éÔİÍ£ËùÓĞ×Ó½ø³Ì ¡ú ÔÙÔİÍ£µ±Ç°½ø³ÌµÄÏß³Ì£¨±ÜÃâ×Ó½ø³Ì±»¸¸½ø³Ì»½ĞÑ£©
+ * @brief é€’å½’æš‚åœè¿›ç¨‹æ ‘ä¸­æ‰€æœ‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
+ * @param node è¿›ç¨‹æ ‘èŠ‚ç‚¹ï¼ˆå½“å‰è¦å¤„ç†çš„è¿›ç¨‹ï¼‰
+ * @return BOOLï¼šTRUEè¡¨ç¤ºå½“å‰èŠ‚ç‚¹åŠå­èŠ‚ç‚¹çš„æš‚åœæ“ä½œå·²æ‰§è¡Œï¼ˆå³ä½¿éƒ¨åˆ†çº¿ç¨‹å¤±è´¥ï¼‰ï¼ŒFALSEè¡¨ç¤ºèŠ‚ç‚¹æ— æ•ˆ
+ * @note æš‚åœé¡ºåºï¼šå…ˆé€’å½’æš‚åœæ‰€æœ‰å­è¿›ç¨‹ â†’ å†æš‚åœå½“å‰è¿›ç¨‹çš„çº¿ç¨‹ï¼ˆé¿å…å­è¿›ç¨‹è¢«çˆ¶è¿›ç¨‹å”¤é†’ï¼‰
  */
 BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
-    // ±ß½ç¼ì²é£º½ÚµãÎª¿ÕÖ±½Ó·µ»Ø
+    // è¾¹ç•Œæ£€æŸ¥ï¼šèŠ‚ç‚¹ä¸ºç©ºç›´æ¥è¿”å›
     if (node == NULL) {
         fprintf(stderr, "    [-] Invalid ProcessTreeNodeEx (NULL) in suspend_process_tree_ex\n");
         return FALSE;
     }
 
-    BOOL is_operation_executed = TRUE; // ±ê¼ÇÊÇ·ñÖ´ĞĞÁËÔİÍ£²Ù×÷£¨¼´Ê¹²¿·ÖÏß³ÌÊ§°Ü£©
+    BOOL is_operation_executed = TRUE; // æ ‡è®°æ˜¯å¦æ‰§è¡Œäº†æš‚åœæ“ä½œï¼ˆå³ä½¿éƒ¨åˆ†çº¿ç¨‹å¤±è´¥ï¼‰
     //printf("\n    [*] Starting to suspend process tree node: PID = %d\n", node->pid);
 
-    // µİ¹éÔİÍ£ËùÓĞ×Ó½ø³Ì
+    // é€’å½’æš‚åœæ‰€æœ‰å­è¿›ç¨‹
     if (node->child_count > 0) {
         //printf("    [*] Found %zu child processes for PID %d, suspending children first...\n",
         //    node->child_count, node->pid);
@@ -333,13 +333,13 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
                 continue;
             }
 
-            // µİ¹éµ÷ÓÃ£¬ÔİÍ£×Ó½ø³ÌµÄÏß³ÌÊ÷
+            // é€’å½’è°ƒç”¨ï¼Œæš‚åœå­è¿›ç¨‹çš„çº¿ç¨‹æ ‘
             //printf("    [*] Entering child process: PID = %d (parent PID: %d)\n",
             //    child_node->pid, node->pid);
             if (!suspend_process_tree_ex(child_node)) {
                 fprintf(stderr, "    [-] Failed to execute suspend for child PID %d (parent PID: %d)\n",
                     child_node->pid, node->pid);
-                is_operation_executed = FALSE; // ×Ó½ø³ÌÔİÍ£²Ù×÷Ö´ĞĞÊ§°Ü£¬±ê¼ÇÕûÌå×´Ì¬
+                is_operation_executed = FALSE; // å­è¿›ç¨‹æš‚åœæ“ä½œæ‰§è¡Œå¤±è´¥ï¼Œæ ‡è®°æ•´ä½“çŠ¶æ€
             }
             //else {
             //    printf("    [+] Completed suspending child process: PID = %d (parent PID: %d)\n",
@@ -351,7 +351,7 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
     //    printf("    [*] No child processes for PID %d, skip child suspension\n", node->pid);
     //}
 
-    // ÔİÍ£µ±Ç°½ø³ÌµÄËùÓĞÏß³Ì
+    // æš‚åœå½“å‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
     if (node->thread_count == 0) {
         //printf("    [*] No threads found for PID %d, skip thread suspension\n", node->pid);
         return is_operation_executed;
@@ -366,10 +366,10 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
     //printf("    [*] Starting to suspend %lu threads of PID %d...\n",
     //    node->thread_count, node->pid);
 
-    DWORD success_count = 0; // Í³¼Æ³É¹¦ÔİÍ£µÄÏß³ÌÊı
+    DWORD success_count = 0; // ç»Ÿè®¡æˆåŠŸæš‚åœçš„çº¿ç¨‹æ•°
     for (DWORD i = 0; i < node->thread_count; i++) {
         DWORD tid = node->thread_ids[i];
-        // µ÷ÓÃ¹¤¾ßº¯ÊıÔİÍ£µ¥¸öÏß³Ì£¬²¢¼ÇÂ¼Ô­¹ÒÆğ¼ÆÊıµ½½ÚµãµÄ original_suspend_counts Êı×é
+        // è°ƒç”¨å·¥å…·å‡½æ•°æš‚åœå•ä¸ªçº¿ç¨‹ï¼Œå¹¶è®°å½•åŸæŒ‚èµ·è®¡æ•°åˆ°èŠ‚ç‚¹çš„ original_suspend_counts æ•°ç»„
         if (suspend_single_thread(tid, &(node->original_suspend_counts[i]))) {
             success_count++;
         }
@@ -379,7 +379,7 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
         }
     }
 
-    // Êä³öµ±Ç°½ø³ÌµÄÔİÍ£½á¹ûÍ³¼Æ
+    // è¾“å‡ºå½“å‰è¿›ç¨‹çš„æš‚åœç»“æœç»Ÿè®¡
     if (success_count == node->thread_count) {
         //printf("    [+] Successfully suspended ALL %lu threads of PID %d\n",
         //    node->thread_count, node->pid);
@@ -387,7 +387,7 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
     else if (success_count > 0) {
         printf("    [!] Partially suspended threads of PID %d: %lu success, %lu failed\n",
             node->pid, success_count, node->thread_count - success_count);
-        is_operation_executed = FALSE; // ²¿·ÖÊ§°Ü£¬±ê¼ÇÕûÌå×´Ì¬
+        is_operation_executed = FALSE; // éƒ¨åˆ†å¤±è´¥ï¼Œæ ‡è®°æ•´ä½“çŠ¶æ€
     }
     else {
         fprintf(stderr, "    [-] FAILED to suspend ANY threads of PID %d\n", node->pid);
@@ -398,24 +398,24 @@ BOOL suspend_process_tree_ex(ProcessTreeNodeEx* node) {
 }
 
 /**
- * @brief µİ¹é»Ö¸´½ø³ÌÊ÷ÖĞËùÓĞ½ø³ÌµÄËùÓĞÏß³Ì
- * @param node ½ø³ÌÊ÷½Úµã£¨µ±Ç°Òª´¦ÀíµÄ½ø³Ì£©
- * @return BOOL£ºTRUE±íÊ¾»Ö¸´²Ù×÷ÒÑÖ´ĞĞ£¨¼´Ê¹²¿·ÖÏß³ÌÊ§°Ü£©£¬FALSE±íÊ¾½ÚµãÎŞĞ§
- * @note »Ö¸´Ë³Ğò£ºÏÈ»Ö¸´µ±Ç°½ø³ÌµÄÏß³Ì ¡ú ÔÙµİ¹é»Ö¸´ËùÓĞ×Ó½ø³Ì£¨ÓëÔİÍ£Ë³ĞòÏà·´£©
+ * @brief é€’å½’æ¢å¤è¿›ç¨‹æ ‘ä¸­æ‰€æœ‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
+ * @param node è¿›ç¨‹æ ‘èŠ‚ç‚¹ï¼ˆå½“å‰è¦å¤„ç†çš„è¿›ç¨‹ï¼‰
+ * @return BOOLï¼šTRUEè¡¨ç¤ºæ¢å¤æ“ä½œå·²æ‰§è¡Œï¼ˆå³ä½¿éƒ¨åˆ†çº¿ç¨‹å¤±è´¥ï¼‰ï¼ŒFALSEè¡¨ç¤ºèŠ‚ç‚¹æ— æ•ˆ
+ * @note æ¢å¤é¡ºåºï¼šå…ˆæ¢å¤å½“å‰è¿›ç¨‹çš„çº¿ç¨‹ â†’ å†é€’å½’æ¢å¤æ‰€æœ‰å­è¿›ç¨‹ï¼ˆä¸æš‚åœé¡ºåºç›¸åï¼‰
  */
 BOOL resume_process_tree_ex(ProcessTreeNodeEx* node) {
-    // ±ß½ç¼ì²é£º½ÚµãÎª¿ÕÖ±½Ó·µ»Ø
+    // è¾¹ç•Œæ£€æŸ¥ï¼šèŠ‚ç‚¹ä¸ºç©ºç›´æ¥è¿”å›
     if (node == NULL) {
         fprintf(stderr, "    [-] Invalid ProcessTreeNodeEx (NULL) in resume_process_tree_ex\n");
         return FALSE;
     }
 
-    BOOL is_operation_executed = TRUE; // ±ê¼ÇÊÇ·ñÖ´ĞĞÁË»Ö¸´²Ù×÷
+    BOOL is_operation_executed = TRUE; // æ ‡è®°æ˜¯å¦æ‰§è¡Œäº†æ¢å¤æ“ä½œ
     //printf("\n    [*] Starting to resume process tree node: PID = %d\n", node->pid);
 
-    // »Ö¸´µ±Ç°½ø³ÌµÄËùÓĞÏß³Ì
+    // æ¢å¤å½“å‰è¿›ç¨‹çš„æ‰€æœ‰çº¿ç¨‹
     if (node->thread_count > 0) {
-        // ¼ì²éÏß³ÌĞÅÏ¢ÊÇ·ñÓĞĞ§
+        // æ£€æŸ¥çº¿ç¨‹ä¿¡æ¯æ˜¯å¦æœ‰æ•ˆ
         if (node->thread_ids == NULL || node->original_suspend_counts == NULL) {
             fprintf(stderr, "    [-] Thread info (IDs/counts) is NULL for PID %d, cannot resume threads\n",
                 node->pid);
@@ -425,12 +425,12 @@ BOOL resume_process_tree_ex(ProcessTreeNodeEx* node) {
             //printf("    [*] Starting to resume %lu threads of PID %d...\n",
             //    node->thread_count, node->pid);
 
-            DWORD success_count = 0; // Í³¼Æ³É¹¦»Ö¸´µÄÏß³ÌÊı
+            DWORD success_count = 0; // ç»Ÿè®¡æˆåŠŸæ¢å¤çš„çº¿ç¨‹æ•°
             for (DWORD i = 0; i < node->thread_count; i++) {
                 DWORD tid = node->thread_ids[i];
                 DWORD original_count = node->original_suspend_counts[i];
 
-                // µ÷ÓÃ¹¤¾ßº¯Êı»Ö¸´µ¥¸öÏß³Ìµ½Ô­¹ÒÆğ¼ÆÊı
+                // è°ƒç”¨å·¥å…·å‡½æ•°æ¢å¤å•ä¸ªçº¿ç¨‹åˆ°åŸæŒ‚èµ·è®¡æ•°
                 if (resume_single_thread(tid, original_count)) {
                     success_count++;
                 }
@@ -440,7 +440,7 @@ BOOL resume_process_tree_ex(ProcessTreeNodeEx* node) {
                 }
             }
 
-            // Êä³öµ±Ç°½ø³ÌµÄ»Ö¸´½á¹ûÍ³¼Æ
+            // è¾“å‡ºå½“å‰è¿›ç¨‹çš„æ¢å¤ç»“æœç»Ÿè®¡
             if (success_count == node->thread_count) {
                 //printf("    [+] Successfully resumed ALL %lu threads of PID %d\n",
                 //    node->thread_count, node->pid);
@@ -460,7 +460,7 @@ BOOL resume_process_tree_ex(ProcessTreeNodeEx* node) {
     //    printf("    [*] No threads to resume for PID %d\n", node->pid);
     //}
 
-    // µİ¹é»Ö¸´ËùÓĞ×Ó½ø³Ì
+    // é€’å½’æ¢å¤æ‰€æœ‰å­è¿›ç¨‹
     if (node->child_count > 0) {
         //printf("    [*] Found %zu child processes for PID %d, resuming children...\n",
         //    node->child_count, node->pid);
@@ -473,7 +473,7 @@ BOOL resume_process_tree_ex(ProcessTreeNodeEx* node) {
                 continue;
             }
 
-            // µİ¹éµ÷ÓÃ£¬»Ö¸´×Ó½ø³ÌµÄÏß³ÌÊ÷
+            // é€’å½’è°ƒç”¨ï¼Œæ¢å¤å­è¿›ç¨‹çš„çº¿ç¨‹æ ‘
             //printf("    [*] Entering child process: PID = %d (parent PID: %d)\n",
             //    child_node->pid, node->pid);
             if (!resume_process_tree_ex(child_node)) {
