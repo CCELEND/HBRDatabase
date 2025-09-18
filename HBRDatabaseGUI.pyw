@@ -6,7 +6,7 @@ from ttkbootstrap.constants import *
 from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import delete_old_file_and_subdirs, run_admin
+from tools import delete_old_file_and_subdirs
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
@@ -232,7 +232,6 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     parent_frame.config(menu=menu_bar)
 
 if __name__ == "__main__":
-    run_admin()
 
     delete_old_file_and_subdirs()
 
