@@ -1,4 +1,5 @@
 import sys
+import ctypes
 import os
 import pathlib
 from PIL import Image
@@ -414,3 +415,18 @@ def init_chrome_driver(chrome_options):
             return None
 
     return driver
+
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+def run_admin():
+    if not is_admin():
+        # 重新以管理员权限运行脚本
+        ctypes.windll.shell32.ShellExecuteW(
+            None, "runas", sys.executable, " ".join(sys.argv), None, 1
+        )
+        sys.exit()

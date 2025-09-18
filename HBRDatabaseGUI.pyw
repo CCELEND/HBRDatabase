@@ -6,7 +6,7 @@ from ttkbootstrap.constants import *
 from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import delete_old_file_and_subdirs
+from tools import delete_old_file_and_subdirs, run_admin
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
@@ -57,6 +57,7 @@ sys.path.append(os.path.abspath("./音乐"))
 from 音乐.music_win import creat_music_win
 
 sys.path.append(os.path.abspath("./工具"))
+from 工具.GetEntriesGUILocal.seed_tools.Load import load_seed_tools
 from 工具.GetEntriesGUILocal.get_entries_win import creat_ct_win
 from 工具.DamageScoreCal.damage_score_cal_win import creat_dsc_win
 from 工具.DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
@@ -196,6 +197,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 工具菜单
     tool_menu = ttk.Menu(menu_bar, tearoff=0)
     menu_tool_calls = [
+        ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
         ("伤害分计算", creat_dsc_win),
         ("伤害分计算V2", creat_dsc_win_v2),
@@ -230,6 +232,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     parent_frame.config(menu=menu_bar)
 
 if __name__ == "__main__":
+    run_admin()
 
     delete_old_file_and_subdirs()
 
