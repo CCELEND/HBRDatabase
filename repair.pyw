@@ -3,6 +3,9 @@ from tkinter import messagebox
 from 修复.hash import calculate_file_hashes
 from 修复.http_client import send_hashes_to_server, download_files_from_server
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def repair_reset():
         
     current_file_hashes = calculate_file_hashes("./")
@@ -15,6 +18,7 @@ def repair_reset():
     if 'files_to_download' in response:
         download_files_from_server(server_url, response['files_to_download'])
     else:
+        logger.error(f"错误响应：{response.content}\n请重试")
         messagebox.showerror("错误", f"错误响应：{response.content}\n请重试")
 
 if __name__ == "__main__":

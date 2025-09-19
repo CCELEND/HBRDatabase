@@ -10,6 +10,9 @@ from urllib.parse import quote
 from window import set_window_icon, creat_window
 from tools import creat_directory
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 is_updating = False
         
 # 将文件哈希值字典发送到服务器
@@ -83,6 +86,7 @@ def download_files_with_progress(files_to_download, server_url):
                     # 检查是否是错误响应
                     if response.status_code != 200:
                         err_info = response.json()
+                        logger.error(f"{err_info.get('error', '未知错误')}")
                         messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
                         global is_updating
                         is_updating = False
@@ -108,6 +112,7 @@ def download_files_with_progress(files_to_download, server_url):
                                     progress_window.update()
             
             except Exception as e:
+                logger.error(f"'{file_name}' 下载失败\n请重试 {str(e)}")
                 messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
                 is_updating = False
                 progress_window.destroy()
