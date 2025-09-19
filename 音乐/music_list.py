@@ -6,6 +6,9 @@ from tkinter import messagebox
 import music_player
 from music_handle_processing import music_handle
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 currently_selected = ""
 
 try:
@@ -131,10 +134,12 @@ class ExpandableList_old:
 
                     music_handle(all_album_name, disc_name, file_name)
                 except Exception as e:
+                    logger.error(f"节点解析错误：{str(e)}")
                     # print(f"节点解析错误: {str(e)}")
                     messagebox.showerror("错误", f"节点解析错误：{str(e)}")
             else:
                 # print(f"未找到父节点: {file_name}")
+                logger.error(f"未找到父节点：{file_name}")
                 messagebox.showerror("错误", f"未找到父节点：{file_name}")
 
 # 鼠标悬停选项时提示
@@ -315,6 +320,8 @@ class ExpandableList:
 
                     music_handle(all_album_name, disc_name, file_name)
                 except Exception as e:
+                    logger.error(f"节点解析错误：{str(e)}")
                     messagebox.showerror("错误", f"节点解析错误：{str(e)}")
             else:
+                logger.error(f"未找到父节点：{file_name}")
                 messagebox.showerror("错误", f"未找到父节点：{file_name}")

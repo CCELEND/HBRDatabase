@@ -12,6 +12,9 @@ play_info_frame = None
 PlayerApp = None
 ost_name = ""
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 music_dir = {
     "OST1": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol1",
     "OST2": "HEAVEN_BURNS_RED_Original_Sound_Track_Vol2",
@@ -162,6 +165,7 @@ class FLACPlayerApp:
             self.frame.update_idletasks()  # 强制更新UI
 
         except Exception as e:
+            logger.error(f"无法加载文件: {e}")
             messagebox.showerror("错误", f"无法加载文件: {e}")
 
 

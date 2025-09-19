@@ -8,6 +8,9 @@ from tools import creat_directory
 from canvas_events import get_photo, create_canvas_with_image
 import music_player
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 server_url = "http://47.96.235.36:65431"
 
 def download_music_files_from_server(file_path_album):
@@ -21,6 +24,7 @@ def download_music_files_from_server(file_path_album):
 
     if response.content.startswith(b'{"error"'):
         err_info = response.content.decode('utf-8')
+        logger.error(f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
         messagebox.showerror("错误", f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
         return False
 
