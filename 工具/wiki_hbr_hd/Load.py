@@ -3,6 +3,9 @@
 from selenium.webdriver.chrome.options import Options
 from tools import init_chrome_driver
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def load_wiki_hbr_hd():
     try:
         # 设置 Chrome 选项
@@ -24,6 +27,7 @@ def load_wiki_hbr_hd():
         driver.get("https://wiki.hbr-hd.com/")
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 

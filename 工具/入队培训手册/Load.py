@@ -2,6 +2,9 @@
 from selenium.webdriver.chrome.options import Options
 from tools import init_chrome_driver
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 import pathlib
 
 def load_game_bilibili_com():
@@ -30,6 +33,7 @@ def load_game_bilibili_com():
         driver.get("https://game.bilibili.com/tool/hbr/#/")
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 

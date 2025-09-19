@@ -10,6 +10,9 @@ from ttkbootstrap.constants import *
 from window import set_window_icon, creat_Toplevel, set_window_top
 from window import show_context_menu, clear_text, edit_text
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 from decimal import Decimal, ROUND_HALF_UP, DecimalException
 
 threshold_value_text = None
@@ -27,6 +30,7 @@ def get_threshold_value():
 	try:
 		threshold_value = int(threshold_value_str, 0)
 	except Exception as e:
+		logger.error(str(e))
 		edit_text(output_text_v2, f"[-] {e}")
 		return -1
 
@@ -42,6 +46,7 @@ def get_damage_coefficient():
 	try:
 		damage_coefficient = float(damage_coefficient_str)
 	except Exception as e:
+		logger.error(str(e))
 		edit_text(output_text_v2, f"[-] {e}")
 		return -1
 
@@ -57,6 +62,7 @@ def get_input():
 	try:
 		input_val = int(input_text_v2_str, 0)
 	except Exception as e:
+		logger.error(str(e))
 		edit_text(output_text_v2, f"[-] {e}")
 		return -1
 
@@ -87,8 +93,10 @@ def damage_value():
 		# 使用 math.exp 计算e的幂
 		damage_value = Decimal(str(math.exp(exponent)))
 	except DecimalException as de:
+		logger.error(str(de))
 		raise ValueError(f"Decimal计算错误: {de}")
 	except Exception as e:
+		logger.error(str(e))
 		raise ValueError(f"计算错误: {e}")
 
 	edit_text(output_text_v2, int(damage_value))
@@ -117,6 +125,7 @@ def damage_reward():
 		log_damage = damage_value.ln()
 		log_threshold = threshold_value.ln()
 	except Exception as e:
+		logger.error(str(e))
 		raise ValueError(f"对数计算错误: {e}")
 
 	# 确保damage_value大于等于threshold_value，避免对数结果为负

@@ -10,6 +10,9 @@ from selenium.common.exceptions import NoSuchElementException
 # from HBRbrochure.mapping import GetBrochureIdByStyleId
 import HBRbrochure.mapping
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 from 角色.style_info import get_en_by_id
 
 def switch_cn(driver):
@@ -19,6 +22,7 @@ def switch_cn(driver):
         data_switch_element.click()
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 # 切换全屏
@@ -30,6 +34,7 @@ def switch_full_screen(driver):
         full_screen_element.click()
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 
@@ -38,6 +43,7 @@ def web_abbreviation(driver, zoom_percentage):
         driver.execute_script(f"document.body.style.zoom = '{zoom_percentage}%'")
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 def click_brochure(driver, my_style_infos):
@@ -63,6 +69,7 @@ def click_brochure(driver, my_style_infos):
                 style_element.click()
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 def download_brochure(driver):
@@ -72,6 +79,7 @@ def download_brochure(driver):
         download_element.click()
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 # 按下 esc 键
@@ -82,6 +90,7 @@ def press_esc(driver):
         actions.send_keys(Keys.ESCAPE).perform()
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 def get_brochure(driver, style_infos):
@@ -95,6 +104,7 @@ def get_brochure(driver, style_infos):
         )
         
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
     # 切换国服

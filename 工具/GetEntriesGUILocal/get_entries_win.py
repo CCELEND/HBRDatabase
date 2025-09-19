@@ -18,6 +18,9 @@ from collections import OrderedDict
 from window import set_window_icon, show_context_menu, set_window_top, creat_Toplevel
 from 工具.GetEntriesGUILocal.proc import parallel_process_indexes
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 index_wash_entries = {}
 index_wash_entries_lock = threading.Lock()  # 创建一个锁
 index_equipments = {}
@@ -103,6 +106,7 @@ def check_wash_entries(
 
     empty_variables_message = "以下变量为空: " + ", ".join(empty_variables) + "\n请修改配置文件 ./工具/GetEntriesGUILocal/config.ini"
     if empty_variables:
+        logger.error(str(empty_variables_message))
         messagebox.showerror("错误", empty_variables_message)
         return True
     else:
@@ -122,6 +126,7 @@ def check_equipments(
 
     empty_variables_message = "以下变量为空: " + ", ".join(empty_variables) + "\n请修改配置文件 ./工具/GetEntriesGUILocal/config.ini"
     if empty_variables:
+        logger.error(str(empty_variables_message))
         messagebox.showerror("错误", empty_variables_message)
         return True
     else:
@@ -132,7 +137,8 @@ def check_equipments(
 def get_index_wash_entries():
 
     if not os.path.exists("./工具/GetEntriesGUILocal/config.ini"):
-        messagebox.showerror("错误", "配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在")
+        logger.error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
+        messagebox.showerror("错误", "配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
         return
 
     config = configparser.ConfigParser()
@@ -177,6 +183,7 @@ def get_index_wash_entries():
 def get_index_equipments():
 
     if not os.path.exists("./工具/GetEntriesGUILocal/config.ini"):
+        logger.error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
         messagebox.showerror("错误", "配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
         return
 
@@ -278,6 +285,7 @@ def save_index_equipments_to_file(index_equipments):
 
         messagebox.showinfo("提示", "装备词条数据已保存至: \n./工具/GetEntriesGUILocal/index_equipments.xlsx")
     except Exception as e:
+        logger.error(f"{e}\n请关闭打开的 index_equipments.xlsx 并重试")
         messagebox.showerror("错误", f"{e}\n请关闭打开的 index_equipments.xlsx 并重试")
 
 def fill_index_wash_entries_color(df, worksheet):
@@ -313,6 +321,7 @@ def save_index_wash_entries_to_file(index_wash_entries):
 
         messagebox.showinfo("提示", "洗孔词条数据已保存至: \n./工具/GetEntriesGUILocal/index_wash_entries.xlsx")
     except Exception as e:
+        logger.error(f"{e}\n请关闭打开的 index_wash_entries.xlsx 并重试")
         messagebox.showerror("错误", f"{e}\n请关闭打开的 index_wash_entries.xlsx 并重试")
 
 

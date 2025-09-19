@@ -10,6 +10,9 @@ from ttkbootstrap.constants import *
 from window import set_window_icon, creat_Toplevel, set_window_top
 from window import show_context_menu, clear_text, edit_text
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 maximum_damage_limit_text = None
 input_text = None
 output_text = None
@@ -24,6 +27,7 @@ def get_maximum_damage_limit():
 	try:
 		maximum_damage_limit = int(maximum_damage_limit_str, 0)
 	except Exception as e:
+		logger.error(str(e))
 		edit_text(output_text, f"[-] {e}")
 		return -1
 
@@ -40,6 +44,7 @@ def get_input():
 	try:
 		input_val = int(input_text_str, 0)
 	except Exception as e:
+		logger.error(str(e))
 		edit_text(output_text, f"[-] {e}")
 		return -1
 

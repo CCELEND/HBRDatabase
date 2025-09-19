@@ -9,6 +9,9 @@ import HBRbrochure.role_info
 import HBRbrochure.brochure
 from 角色.team_info import get_all_team_obj
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def list_newline(you_list, how_projects_newline):
     for i in range(0, len(you_list), how_projects_newline):
         print(", ".join(map(str, you_list[i:i+how_projects_newline])))
@@ -42,6 +45,7 @@ def get_style_id(style_item_card_element):
         style_id = style_item_card_element.get_attribute('data-id')
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
     return style_id
@@ -70,6 +74,7 @@ def get_role_level(style_item_card_elements, i):
         maximum_level = span_elements[2].text
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")    
 
     return [current_level, maximum_level]
@@ -206,6 +211,7 @@ def get_hbr_brochure():
         switch_to_brochure(driver, my_style_infos)
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 

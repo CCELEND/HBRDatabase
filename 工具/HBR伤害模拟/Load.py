@@ -5,6 +5,8 @@ from tools import delete_all_files_and_subdirs, delete_file
 
 import os
 from tools import init_chrome_driver
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
 
 def load_hbr_damage_simulation():
     try:
@@ -51,6 +53,7 @@ def load_hbr_damage_simulation():
         driver.get("chrome://extensions/")
 
     except Exception as e:
+        logger.error(str(e))
         print(f"[-] {e}")
 
 

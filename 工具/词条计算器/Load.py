@@ -2,6 +2,9 @@
 from selenium.webdriver.chrome.options import Options
 from tools import init_chrome_driver
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 def load_entry_calculator():
     try:
         # 设置 Chrome 选项
@@ -24,5 +27,6 @@ def load_entry_calculator():
 
     except Exception as e:
         print(f"[-] {e}")
+        logger.error(str(e))
 
 
