@@ -6,6 +6,13 @@ from tkinter import Menu, messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
+def set_window_disable_maximize(parent_frame):
+    # Windows系统
+    parent_frame.wm_attributes("-toolwindow", True)
+
+def set_window_disable_size(parent_frame):
+    parent_frame.resizable(False, False)
+
 def set_global_bg(parent_frame, bg="#f0f0f0"):
     # 获取当前主题的颜色配置
     current_theme = parent_frame.style.theme_use()
