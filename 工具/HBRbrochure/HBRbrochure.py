@@ -193,6 +193,7 @@ def get_hbr_brochure():
                 my_style_infos[my_style_id]["maximum_level"] = maximum_level
                 my_style_infos[my_style_id]["limit_break_level"] = limit_break_level
             except KeyError:
+                logger.error(f"[-] Missing information on style ID, please modify the style_id_all_infos.json file, style ID:   {my_style_id}")
                 print("[-] Missing information on style ID, please modify the style_id_all_infos.json file, style ID: " + my_style_id)
                 continue
 

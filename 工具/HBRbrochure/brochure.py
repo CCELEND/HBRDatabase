@@ -53,6 +53,7 @@ def click_brochure(driver, my_style_infos):
                 # brochure_id = GetBrochureIdByStyleId(style_id)
                 brochure_id = get_en_by_id(style_id)
             except KeyError:
+                logger.error(f"[-] Missing mapping, please modify the style_id_brochure_id.json file, style ID: {style_id}")
                 print("[-] Missing mapping, please modify the style_id_brochure_id.json file, style ID: " + style_id)
                 continue
             limit_break_level = int(my_style_infos[style_id]["limit_break_level"])
@@ -61,6 +62,7 @@ def click_brochure(driver, my_style_infos):
             try:
                 style_element = driver.find_element(By.ID, brochure_id)
             except NoSuchElementException:
+                logger.error(f"[-] No such style element, ID:  {brochure_id}")
                 print("[-] No such style element, ID: " + brochure_id)
                 continue
 
