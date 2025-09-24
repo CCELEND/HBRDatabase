@@ -5,7 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pathlib
 
 from tools import init_chrome_driver
-import HBRbrochure.role_info
+# import HBRbrochure.role_info
 import HBRbrochure.brochure
 from 角色.team_info import get_all_team_obj
 
@@ -123,7 +123,7 @@ def get_hbr_brochure():
         get_all_team_obj()
 
         # 加载资源文件
-        HBRbrochure.role_info.load_resources()
+        # HBRbrochure.role_info.load_resources()
         # 当前脚本路径
         scriptDirectory = pathlib.Path().absolute()
 
@@ -188,7 +188,8 @@ def get_hbr_brochure():
             limit_break_levels[my_style_id] = limit_break_level
 
             try:
-                my_style_infos[my_style_id] = HBRbrochure.role_info.style_id_all_infos[my_style_id]
+                # my_style_infos[my_style_id] = HBRbrochure.role_info.style_id_all_infos[my_style_id]
+                my_style_infos[my_style_id] = {}
                 my_style_infos[my_style_id]["current_level"] = current_level
                 my_style_infos[my_style_id]["maximum_level"] = maximum_level
                 my_style_infos[my_style_id]["limit_break_level"] = limit_break_level
