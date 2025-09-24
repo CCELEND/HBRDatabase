@@ -8,7 +8,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
 # from HBRbrochure.mapping import GetBrochureIdByStyleId
-import HBRbrochure.mapping
+# import HBRbrochure.mapping
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -98,7 +98,7 @@ def press_esc(driver):
 def get_brochure(driver, style_infos):
 
     # 加载资源文件
-    HBRbrochure.mapping.load_resources()
+    # HBRbrochure.mapping.load_resources()
     try:
         # 等待立华奏加载完成 绝对不是因为我是一个奏厨（
         TachibanaKanadeElement = WebDriverWait(driver, 300).until(
