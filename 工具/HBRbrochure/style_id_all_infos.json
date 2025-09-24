@@ -29,6 +29,9 @@
     "1001208":{
         "style_name":"红玉待君来", "character_role":"破盾者", "element_type":"暗", "weapon_type":"突"
     },
+    "1001209":{
+        "style_name":"随侍公主", "character_role":"破盾者", "element_type":"火暗", "weapon_type":"突"
+    },
     "1001303":{
         "style_name":"窒息强击", "character_role":"减益者", "element_type":"无", "weapon_type":"打"
     },
@@ -303,7 +306,10 @@
         "style_name":"激情满满的温泉之旅", "character_role":"攻击者", "element_type":"光", "weapon_type":"斩"
     },
     "1006303":{
-        "style_name":"Realize Your Mind", "character_role":"攻击者", "element_type":"火", "weapon_type":"打"
+        "style_name":"Realize Your Mind", "character_role":"增益者", "element_type":"无", "weapon_type":"打"
+    },
+    "1006304":{
+        "style_name":"盛装的花样少女", "character_role":"攻击者", "element_type":"火", "weapon_type":"打"
     },
     "1006403":{
         "style_name":"慵懒破灭", "character_role":"增益者", "element_type":"火", "weapon_type":"突"
@@ -316,6 +322,9 @@
     },
     "1006504":{
         "style_name":"出浴后的朦胧天地", "character_role":"减益者", "element_type":"无", "weapon_type":"斩"
+    },
+    "1006505":{
+        "style_name":"Magic of Smile", "character_role":"减益者", "element_type":"光", "weapon_type":"斩"
     },
     "1006603":{
         "style_name":"危机棒极了", "character_role":"治疗者", "element_type":"无", "weapon_type":"突"
@@ -366,6 +375,9 @@
 
     "1008103":{
         "style_name":"摩天楼上的暗夜英雄", "character_role":"攻击者", "element_type":"雷", "weapon_type":"斩"
+    },
+    "1008105":{
+        "style_name":"Carnival with You", "character_role":"治疗者", "element_type":"火", "weapon_type":"斩"
     },
     "1008203":{
         "style_name":"吾若不勇，与无将同", "character_role":"增益者", "element_type":"无", "weapon_type":"斩"
