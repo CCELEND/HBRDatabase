@@ -15,7 +15,8 @@ import datetime
 import threading
 from collections import OrderedDict
 
-from window import set_window_icon, show_context_menu, set_window_top, creat_Toplevel
+from window import set_window_icon, show_context_menu, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from 工具.GetEntriesGUILocal.proc import parallel_process_indexes
 
 from 日志.advanced_logger import AdvancedLogger
@@ -325,25 +326,12 @@ def save_index_wash_entries_to_file(index_wash_entries):
         messagebox.showerror("错误", f"{e}\n请关闭打开的 index_wash_entries.xlsx 并重试")
 
 
-open_ct_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def ct_win_closing(parent_frame):
-
-    open_ct_win = parent_frame.title()
-    while open_ct_win in open_ct_wins:
-        del open_ct_wins[open_ct_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_ct_win():
 
     # 重复打开时，窗口置顶并直接返回
-    if '词条获取' in open_ct_wins:
-        # 判断窗口是否存在
-        if open_ct_wins['词条获取'].winfo_exists():
-            set_window_top(open_ct_wins['词条获取'])
-            return "break"
-        del open_ct_wins['词条获取']
+    if is_win_open('词条获取', __name__):
+        win_set_top('词条获取', __name__)
+        return "break"
 
     ct_win_frame = creat_Toplevel("词条获取", 700, 405)
     set_window_icon(ct_win_frame, "./工具/GetEntriesGUILocal/entries.ico")
@@ -405,9 +393,9 @@ def creat_ct_win():
         width=20, text="保存为 Excel 文件", command=save_to_file)
     save_file_button.grid(row=3, column=0, padx=(0,10), pady=(10,0))
 
-
-    open_ct_wins['词条获取'] = ct_win_frame
+    win_open_manage(ct_win_frame, __name__)
     # 窗口关闭时清理
-    ct_win_frame.protocol("WM_DELETE_WINDOW", lambda: ct_win_closing(ct_win_frame))
+    ct_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(ct_win_frame, __name__))
     return "break"  # 阻止事件冒泡
 

@@ -7,7 +7,8 @@ import math
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from window import set_window_icon, creat_Toplevel, set_window_top
+from window import set_window_icon, creat_Toplevel
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from window import show_context_menu, clear_text, edit_text
 
 from 日志.advanced_logger import AdvancedLogger
@@ -82,25 +83,13 @@ def damage_reward():
 	edit_text(output_text, int(damage_reward))
 
 
-open_dsc_wins = {}
-#关闭窗口时，清除窗口字典中的句柄，并销毁窗口
-def dsc_win_closing(parent_frame):
-
-	open_dsc_win = parent_frame.title()
-	while open_dsc_win in open_dsc_wins:
-		del open_dsc_wins[open_dsc_win]
-
-	parent_frame.destroy()  # 销毁窗口
-
 def creat_dsc_win():
 
-	# 重复打开时，窗口置顶并直接返回
-	if '伤害分计算' in open_dsc_wins:
-		# 判断窗口是否存在
-		if open_dsc_wins['伤害分计算'].winfo_exists():
-			set_window_top(open_dsc_wins['伤害分计算'])
-			return "break"
-		del open_dsc_wins['伤害分计算']
+    # 重复打开时，窗口置顶并直接返回
+	if is_win_open('伤害分计算', __name__):
+		win_set_top('伤害分计算', __name__)
+		return "break"
+
 
 	dsc_win_frame = creat_Toplevel("伤害分计算", 550, 400, 160, 160)
 	set_window_icon(dsc_win_frame, "./工具/DamageScoreCal/dsc.ico")
@@ -181,7 +170,8 @@ def creat_dsc_win():
 		command=lambda: clear_text(input_text, maximum_damage_limit_text, output_text))
 	clear_button.grid(row=2, column=0, columnspan=2, padx=5, pady=10)
 
-	open_dsc_wins['伤害分计算'] = dsc_win_frame
-	# 窗口关闭时清理
-	dsc_win_frame.protocol("WM_DELETE_WINDOW", lambda: dsc_win_closing(dsc_win_frame))
+	win_open_manage(dsc_win_frame, __name__)
+    # 窗口关闭时清理
+	dsc_win_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(dsc_win_frame, __name__))
+
 	return "break"  # 阻止事件冒泡
