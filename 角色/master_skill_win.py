@@ -4,6 +4,7 @@ from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image
 from window import set_window_expand, creat_Toplevel, set_window_top, set_window_icon
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
 from 角色.master_skill_info import MasterSkillEffect
@@ -111,17 +112,6 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     missions_lab.grid(row=missions_row, column=0, sticky="nsw", padx=5, pady=0)
 
 
-# 已打开的大师技能窗口字典，键：风格名，值：窗口句柄
-open_master_wins = {}
-# 关闭窗口时，清除风格名列表中对应的风格名，并销毁窗口
-def master_win_closing(parent_frame):
-
-    open_master_win = parent_frame.title()
-    while open_master_win in open_master_wins:
-        del open_master_wins[open_master_win]
-
-    parent_frame.destroy()  # 销毁窗口
-
 def creat_master_skill_win(event, parent_frame, role):
 
     # 初始化资源文件
@@ -132,24 +122,23 @@ def creat_master_skill_win(event, parent_frame, role):
 
     open_master_win = master_skill.name+"-大师技能"
     # 重复打开时，窗口置顶并直接返回
-    if open_master_win in open_master_wins:
-        # 判断窗口是否存在
-        if open_master_wins[open_master_win].winfo_exists():
-            set_window_top(open_master_wins[open_master_win])
-            return "break"
-        del open_master_wins[open_master_win]
+    if is_win_open(open_master_win, __name__):
+        win_set_top(open_master_win, __name__)
+        return "break"
 
     master_win_frame = creat_Toplevel(open_master_win, 812, 300, 560, 510)
     set_window_expand(master_win_frame, rowspan=1, columnspan=2)
     set_window_icon(master_win_frame, get_team_logo_path(role.team))
     scrollbar_frame_obj = ScrollbarFrameWin(master_win_frame, columnspan=2)
 
-    open_master_wins[open_master_win] = master_win_frame
+    win_open_manage(master_win_frame, __name__)
 
     # 绑定鼠标点击事件到父窗口，点击置顶
     master_win_frame.bind("<Button-1>", lambda event: set_window_top(master_win_frame))
     # 窗口关闭时清理
-    master_win_frame.protocol("WM_DELETE_WINDOW", lambda: master_win_closing(master_win_frame))
+    master_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(master_win_frame, __name__))
+
 
     creat_master_skill_frame(scrollbar_frame_obj, master_skill)
 
