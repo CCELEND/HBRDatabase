@@ -372,14 +372,33 @@ def creat_ct_win():
     buttons_frame.grid_rowconfigure(3, weight=1)
     buttons_frame.grid_columnconfigure(0, weight=1)  # 占满整列
 
+    # 计算词条是 CPU 密集型任务，会阻塞 Tkinter 的主事件循环，导致窗口冻结无响应。所以创建线程执行计算任务
+    def run_in_thread(func):
+        # 将函数在新线程中执行，并禁用按钮防止重复点击
+        # 禁用按钮
+        get_wash_entries_button.config(state="disabled")
+        get_index_equipments_button.config(state="disabled")
+        
+        def wrapper():
+            try:
+                func()  # 执行计算任务
+            finally:
+                # 任务完成后重新启用按钮
+                ct_win_frame.after(0, lambda: get_wash_entries_button.config(state="normal"))
+                ct_win_frame.after(0, lambda: get_index_equipments_button.config(state="normal"))
+        
+        # 创建并启动线程
+        thread = threading.Thread(target=wrapper, daemon=True)
+        thread.start()
+
 
     # 洗孔词条按钮
-    get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
-        width=20, text="获取洗孔词条", command=lambda: get_index_wash_entries())
-    get_index_equipments_button.grid(row=0, column=0, padx=(0,10), pady=(10,0))
+    get_wash_entries_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
+        width=20, text="获取洗孔词条", command=lambda: run_in_thread(get_index_wash_entries))
+    get_wash_entries_button.grid(row=0, column=0, padx=(0,10), pady=(10,0))
     # 装备词条按钮
     get_index_equipments_button = ttk.Button(buttons_frame, bootstyle="primary-outline",
-        width=20, text="获取装备词条", command=lambda: get_index_equipments())
+        width=20, text="获取装备词条", command=lambda: run_in_thread(get_index_equipments))
     get_index_equipments_button.grid(row=1, column=0, padx=(0,10), pady=(10,0))
 
 
