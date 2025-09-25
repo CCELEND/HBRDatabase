@@ -12,6 +12,10 @@ from 角色.team_info import get_all_team_obj
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
+import threading
+global chrome_driver
+chrome_driver = None
+
 def list_newline(you_list, how_projects_newline):
     for i in range(0, len(you_list), how_projects_newline):
         print(", ".join(map(str, you_list[i:i+how_projects_newline])))
@@ -115,12 +119,13 @@ def switch_to_brochure(driver, style_infos):
     HBRbrochure.brochure.get_brochure(driver, style_infos)
 
 
-def get_hbr_brochure():
+def run_browser_in_thread():
+    global chrome_driver
 
     try:
 
-        # 获取全部队伍对象
-        get_all_team_obj()
+        # # 获取全部队伍对象
+        # get_all_team_obj()
 
         # 加载资源文件
         # HBRbrochure.role_info.load_resources()
@@ -145,16 +150,16 @@ def get_hbr_brochure():
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        driver = init_chrome_driver(chrome_options)
-        if driver == None:
+        chrome_driver = init_chrome_driver(chrome_options)
+        if chrome_driver == None:
             return
 
-        driver.set_window_size(1160, 820)
+        chrome_driver.set_window_size(1160, 820)
         # 打开 game.bilibili.com
-        driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
+        chrome_driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
 
         # 等待 class 为 card-box 的元素加载完成
-        card_box_element = WebDriverWait(driver, 300).until(
+        card_box_element = WebDriverWait(chrome_driver, 300).until(
             EC.visibility_of_element_located((By.CLASS_NAME, "card-box"))
         )
 
@@ -210,10 +215,16 @@ def get_hbr_brochure():
         dir_newline(limit_break_levels, 6)
 
         # 打开并切换到新标签页
-        switch_to_brochure(driver, my_style_infos)
+        switch_to_brochure(chrome_driver, my_style_infos)
 
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
 
 
+def get_hbr_brochure():
+    # 获取全部队伍对象
+    get_all_team_obj()
+    # 启动独立线程执行浏览器操作
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread.start()

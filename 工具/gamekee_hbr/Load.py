@@ -5,7 +5,12 @@ from tools import init_chrome_driver
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-def load_gamekee_hbr():
+import threading
+global chrome_driver
+chrome_driver = None
+
+def run_browser_in_thread():
+    global chrome_driver
     try:
         # 设置 Chrome 选项
         chrome_options = Options()
@@ -19,15 +24,19 @@ def load_gamekee_hbr():
 
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        driver = init_chrome_driver(chrome_options)
-        if driver == None:
+        chrome_driver = init_chrome_driver(chrome_options)
+        if chrome_driver == None:
             return
 
-        driver.set_window_size(1160, 820)
-        driver.get("https://www.gamekee.com/hbr/")
+        chrome_driver.set_window_size(1160, 820)
+        chrome_driver.get("https://www.gamekee.com/hbr/")
 
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
 
 
+def load_gamekee_hbr():
+    # 启动独立线程执行浏览器操作
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread.start()

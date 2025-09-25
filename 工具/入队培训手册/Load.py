@@ -7,7 +7,12 @@ logger = AdvancedLogger.get_logger(__name__)
 
 import pathlib
 
-def load_game_bilibili_com():
+import threading
+global chrome_driver
+chrome_driver = None
+
+def run_browser_in_thread():
+    global chrome_driver
     try:
         # 设置 Chrome 选项
         chrome_options = Options()
@@ -25,15 +30,19 @@ def load_game_bilibili_com():
         chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
         # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        driver = init_chrome_driver(chrome_options)
-        if driver == None:
+        chrome_driver = init_chrome_driver(chrome_options)
+        if chrome_driver == None:
             return
 
-        driver.set_window_size(1160, 820)
-        driver.get("https://game.bilibili.com/tool/hbr/#/")
+        chrome_driver.set_window_size(1160, 820)
+        chrome_driver.get("https://game.bilibili.com/tool/hbr/#/")
 
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
 
 
+def load_game_bilibili_com():
+    # 启动独立线程执行浏览器操作
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread.start()

@@ -1,5 +1,3 @@
-
-import pathlib
 from selenium.webdriver.chrome.options import Options
 from tools import delete_all_files_and_subdirs, delete_file
 
@@ -8,52 +6,40 @@ from tools import init_chrome_driver
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-def load_hbr_damage_simulation():
+import threading
+global chrome_driver
+chrome_driver = None
+
+def run_browser_in_thread():
+    global chrome_driver
     try:
+        # 清理文件
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0'))
         delete_file(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0.crx'))
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.0_0'))
 
-        # 设置 Chrome 选项
+        # 设置Chrome选项
         chrome_options = Options()
-        # chrome_options.add_argument("--headless") # 无头模式
-
-        # 忽略 SSL 证书错误
         chrome_options.add_argument("--ignore-certificate-errors")  
-        # 禁用控制台日志输出，隐藏自动化标记
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
         chrome_options.add_experimental_option("useAutomationExtension", False)
-
-        # # 插件绝对路径
-        # extension_path = os.path.abspath('./工具/HBR伤害模拟/1.4.1_0')
-        # chrome_options.add_argument(f'--load-extension={extension_path}')
-        # # 添加开发者模式参数
-        # chrome_options.add_argument('--disable-extensions-except=' + extension_path)
-
-        # 加载插件
-        # chrome_options.add_extension('./工具/HBR伤害模拟/1.3.0_0.crx')
-        # chrome_options.add_argument('--load-extension=./工具/HBR伤害模拟/1.3.0_0')
-
         
-        # 启用开发者模式
-        # chrome_options.add_argument("--auto-open-devtools-for-tabs")
-        
-        # 插件目录的绝对路径
         extension_path = os.path.abspath('./工具/HBR伤害模拟/1.4.1_0')
-        # 加载未打包的扩展程序
         chrome_options.add_argument(f"--load-extension={extension_path}")
 
-        # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
-        driver = init_chrome_driver(chrome_options)
-        if driver == None:
+        # 初始化driver
+        chrome_driver = init_chrome_driver(chrome_options)
+        if chrome_driver is None:
             return
 
-        driver.set_window_size(1160, 820)
-        # driver.get("chrome://extensions/jiakmnjmdhncjjobkjlipbcdgjidgffa")
-        driver.get("chrome://extensions/")
+        chrome_driver.set_window_size(1160, 820)
+        chrome_driver.get("chrome://extensions/")
 
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
 
-
+def load_hbr_damage_simulation():
+    # 启动独立线程执行浏览器操作
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread.start()
