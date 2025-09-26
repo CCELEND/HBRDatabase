@@ -13,6 +13,15 @@ def set_window_disable_maximize(parent_frame):
 def set_window_disable_size(parent_frame):
     parent_frame.resizable(False, False)
 
+menu_icons = {}
+def load_menu_icon(path, name):
+    if not path:
+        return None
+    if name in menu_icons:
+        return menu_icons[name]
+    menu_icons[name] = ImageTk.PhotoImage(Image.open(path).resize((22, 22)))
+    return menu_icons[name]
+
 def set_global_bg(parent_frame, bg="#f0f0f0"):
     # 获取当前主题的颜色配置
     current_theme = parent_frame.style.theme_use()
@@ -279,3 +288,45 @@ def is_win_open(open_win_name, module):
 
 def is_win_exist(win_frame):
     return True if win_frame.winfo_exists() else False
+
+
+def get_ico_path_by_name(name):
+    if not name: return None 
+
+    infos = {
+        "31A":"./角色/31A/31a.ico", "31B":"./角色/31B/DioramaStamp31b.ico", 
+        "31C":"./角色/31C/DioramaStamp31c.ico", "30G":"./角色/30G/DioramaStamp30G.ico",
+        "31D":"./角色/31D/DioramaStamp31d.ico", "31E":"./角色/31E/DioramaStamp31e.ico", 
+        "31F":"./角色/31F/DioramaStamp31f.ico", "31X":"./角色/31X/DioramaStamp31x.ico", 
+        "Angel Beats!":"./角色/Angel Beats!/angelbeats.ico",
+        "司令部":"./角色/司令部/司令部.ico",
+        "主线道具":"./持有物/主线道具/ThumbnailFishingRod.png",
+        "道具":"./持有物/道具/ThumbnailHC.png",
+        "饰品":"./持有物/饰品/专武/Soul_png.png",
+        "饰品材料":"./持有物/饰品材料/ThumbnailDiamond.png",
+        "活动奖章":"./持有物/活动奖章/ThumbnailPremierMedal.png", 
+        "奖杯勋章":"./持有物/奖杯勋章/ThumbnailtrophyBlack.png", 
+        "成长素材":"./持有物/成长素材/StyleExp01.png",
+        "强化素材":"./持有物/强化素材/EternalDaphne.png",
+        "增幅器":"./持有物/增幅器/SeraphBooster1.png",
+        "芯片":"./持有物/芯片/SeraphArtifactChip1.png", 
+        "入场券":"./持有物/入场券/ThumbnailStoryHardModeTicket.png", 
+        "扭蛋材料":"./持有物/扭蛋材料/ThumbnailSSGachaTicket.png", 
+        "碎片":"./持有物/碎片/ImgIconItemL_StylePieceSS.png", 
+        "货币":"./持有物/货币/ThumbnailGP.png", 
+
+        "时钟塔":"./敌人/时钟塔/boss.ico", 
+        "主线":"./敌人/主线/亡骨之翎/亡骨之翎.ico",
+        "光球BOSS":"./敌人/光球BOSS/阿蒙之门B/阿蒙之门B.ico",
+        "时之修炼场":"./敌人/时之修炼场/灵魂星兽.ico",
+        "棱镜战":"./敌人/棱镜战/[幻影]深渊重锤/[幻影]深渊重锤.ico",
+        "宝石棱镜战":"./敌人/宝石棱镜战/[幻影]群山重锤/[幻影]群山重锤.ico",
+        "恒星扫荡战线":"./敌人/恒星战/DimensionBattleCentralTop_001.png",
+        "高分挑战":"./敌人/高分挑战/夏日的诅咒#1/gf1.ico",
+        "异时层":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.ico"
+
+    }
+    if name not in infos: return None
+    return infos[name]
+
+

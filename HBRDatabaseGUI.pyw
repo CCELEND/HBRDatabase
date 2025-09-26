@@ -5,6 +5,7 @@ from ttkbootstrap.constants import *
 
 from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
+from window import load_menu_icon, get_ico_path_by_name
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import delete_old_file_and_subdirs
 
@@ -86,8 +87,11 @@ def update_output(text):
     print(text)
 
 # 创建单个菜单项，并绑定命令
-def create_menu_item(menu, label, command, *args):
-    menu.add_command(label=label, command=lambda: command(*args))
+def create_menu_item(menu, label, image, command, *args):
+    if image:
+        menu.add_command(label=label, image=image, compound=ttk.LEFT, command=lambda: command(*args))
+    else:
+        menu.add_command(label=label, command=lambda: command(*args))
 
 # 创建菜单栏
 def create_menu(parent_frame, scrollbar_frame_obj):
@@ -107,7 +111,9 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X", "Angel Beats!"
     ]
     for team_name in team_names:
-        create_menu_item(team_menu, team_name, 
+        ico_path = get_ico_path_by_name(team_name)
+        icon = load_menu_icon(ico_path, team_name)
+        create_menu_item(team_menu, team_name, icon,
             creat_team_win, parent_frame, team_name)
     menu_bar.add_cascade(label="👤角色", menu=team_menu)
 
@@ -117,7 +123,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         "活动道具"
     ]
     for item_name in item_names:
-        create_menu_item(item_menu, item_name, update_output, item_name)
+        create_menu_item(item_menu, item_name, None, update_output, item_name)
 
     # 定义菜单项的名称和对应的回调函数
     menu_item_calls = [
@@ -138,7 +144,9 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     ]
     # 循环创建菜单项
     for item_call_name, callback in menu_item_calls:
-        create_menu_item(item_menu, item_call_name, callback, scrollbar_frame_obj)
+        ico_path = get_ico_path_by_name(item_call_name)
+        icon = load_menu_icon(ico_path, item_call_name)
+        create_menu_item(item_menu, item_call_name, icon, callback, scrollbar_frame_obj)
     menu_bar.add_cascade(label="📜持有物", menu=item_menu)
 
     # 敌人菜单
@@ -147,7 +155,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         "活动棱镜战","废域"
     ]
     for enemy_name in enemy_names:
-        create_menu_item(enemy_menu, enemy_name, update_output, enemy_name)
+        create_menu_item(enemy_menu, enemy_name, None, update_output, enemy_name)
 
     menu_enemy_calls = [
         ("时钟塔", show_szt_enemys),
@@ -162,7 +170,9 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     ]
     # 循环创建菜单项
     for enemy_call_name, callback in menu_enemy_calls:
-        create_menu_item(enemy_menu, enemy_call_name, callback, scrollbar_frame_obj)
+        ico_path = get_ico_path_by_name(enemy_call_name)
+        icon = load_menu_icon(ico_path, enemy_call_name)
+        create_menu_item(enemy_menu, enemy_call_name, icon, callback, scrollbar_frame_obj)
     # menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
     menu_bar.add_cascade(label="👾敌人", menu=enemy_menu)
     
@@ -181,9 +191,9 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 循环创建菜单项
     for battle_call_name, callback in menu_battle_calls:
         if battle_call_name in ['基础','Hit','乘区']:
-            create_menu_item(battle_menu, battle_call_name, callback, parent_frame)
+            create_menu_item(battle_menu, battle_call_name, None, callback, parent_frame)
         else:
-            create_menu_item(battle_menu, battle_call_name, callback, scrollbar_frame_obj)
+            create_menu_item(battle_menu, battle_call_name, None, callback, scrollbar_frame_obj)
     menu_bar.add_cascade(label="⚔战斗系统", menu=battle_menu)
 
     # 搜索菜单
@@ -217,7 +227,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     ]
     # 循环创建菜单项
     for tool_call_name, callback in menu_tool_calls:
-        create_menu_item(tool_menu, tool_call_name, callback)
+        create_menu_item(tool_menu, tool_call_name, None, callback)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
 
