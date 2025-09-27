@@ -294,7 +294,7 @@ def get_ico_path_by_name(name):
     if not name: return None 
 
     infos = {
-        "31A":"./角色/31A/31a.ico", "31B":"./角色/31B/DioramaStamp31b.ico", 
+        "31A":"./角色/31A/DioramaStamp31a.ico", "31B":"./角色/31B/DioramaStamp31b.ico", 
         "31C":"./角色/31C/DioramaStamp31c.ico", "30G":"./角色/30G/DioramaStamp30G.ico",
         "31D":"./角色/31D/DioramaStamp31d.ico", "31E":"./角色/31E/DioramaStamp31e.ico", 
         "31F":"./角色/31F/DioramaStamp31f.ico", "31X":"./角色/31X/DioramaStamp31x.ico", 
