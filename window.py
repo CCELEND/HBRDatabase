@@ -323,7 +323,13 @@ def get_ico_path_by_name(name):
         "宝石棱镜战":"./敌人/宝石棱镜战/[幻影]群山重锤/[幻影]群山重锤.ico",
         "恒星扫荡战线":"./敌人/恒星战/DimensionBattleCentralTop_001.png",
         "高分挑战":"./敌人/高分挑战/夏日的诅咒#1/gf1.ico",
-        "异时层":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.ico"
+        "异时层":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.ico",
+
+        "职业":"./战斗系统/职业/ADMIRAL.png",
+        "武器":"./战斗系统/武器/Sword.png",
+        "属性":"./战斗系统/属性/Fire.webp",
+        "效果、状态":"./战斗系统/状态/Charge.png"
+
 
     }
     if name not in infos: return None

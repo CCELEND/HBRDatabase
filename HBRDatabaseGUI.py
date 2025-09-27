@@ -191,9 +191,12 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     # 循环创建菜单项
     for battle_call_name, callback in menu_battle_calls:
         if battle_call_name in ['基础','Hit','乘区']:
-            create_menu_item(battle_menu, battle_call_name, None, callback, parent_frame)
+            icon = load_menu_icon("./战斗系统/help.ico", battle_call_name)
+            create_menu_item(battle_menu, battle_call_name, icon, callback, parent_frame)
         else:
-            create_menu_item(battle_menu, battle_call_name, None, callback, scrollbar_frame_obj)
+            ico_path = get_ico_path_by_name(battle_call_name)
+            icon = load_menu_icon(ico_path, battle_call_name)
+            create_menu_item(battle_menu, battle_call_name, icon, callback, scrollbar_frame_obj)
     menu_bar.add_cascade(label="⚔战斗系统", menu=battle_menu)
 
     # 搜索菜单
@@ -227,7 +230,8 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     ]
     # 循环创建菜单项
     for tool_call_name, callback in menu_tool_calls:
-        create_menu_item(tool_menu, tool_call_name, None, callback)
+        icon = load_menu_icon("./工具/w1.ico", tool_call_name)
+        create_menu_item(tool_menu, tool_call_name, icon, callback)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
 
