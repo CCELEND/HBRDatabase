@@ -87,6 +87,50 @@
         "description":"消耗体力、完成战斗、累计登录或阅读剧情", 
         "price":"", 
         "location":"每周任务"
+    },
+
+
+    "浮空摩托·核心":{
+        "path":"./持有物/道具/Conquest_Bike_Core.png", 
+        "description":"增加成员DP和全能力", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "摩托零件":{
+        "path":"./持有物/道具/Conquest_Bike_Parts.png", 
+        "description":"提升战斗优势", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "技术研究资料":{
+        "path":"./持有物/道具/Conquest_Bike_UnlockLevel.png", 
+        "description":"可提升浮空摩托性能上限的道具", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "铜块":{
+        "path":"./持有物/道具/Conquest_Bike_EXP_Bronze.png", 
+        "description":"可让浮空摩托获得少量强化的道具", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "辉银块":{
+        "path":"./持有物/道具/Conquest_Bike_EXP_Silver.png", 
+        "description":"可让浮空摩托获得不少强化的道具", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "煌黄金块":{
+        "path":"./持有物/道具/Conquest_Bike_EXP_Gold.png", 
+        "description":"可让浮空摩托获得大量强化的道具", 
+        "price":"", 
+        "location":"压制战"
+    },
+    "哈奇森浮岩块":{
+        "path":"./持有物/道具/Conquest_Bike_CapacityUp.png", 
+        "description":"可以改造摩托零件的道具", 
+        "price":"", 
+        "location":"压制战"
     }
 
 } 
