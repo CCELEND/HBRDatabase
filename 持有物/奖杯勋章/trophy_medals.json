@@ -163,5 +163,25 @@
         "description":"在15回合内通关X层级时\n可在恒星扫荡战线#7获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#7"
+    },
+
+    "不灭圆环贯穿者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension09_Bronze.png", 
+        "description":"通关B层级时\n可在恒星扫荡战线#8获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#8"
+    },
+    "不灭圆环粉碎者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension09_Silver.png", 
+        "description":"通关X层级时\n可在恒星扫荡战线#8获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#8"
+    },
+    "不灭圆环根绝者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension09_Gold.png", 
+        "description":"在20回合内通关X层级时\n可在恒星扫荡战线#8获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#8"
     }
+
 } 
