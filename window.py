@@ -327,7 +327,7 @@ def get_ico_path_by_name(name):
 
         "职业":"./战斗系统/职业/ADMIRAL.png",
         "武器":"./战斗系统/武器/Sword.png",
-        "属性":"./战斗系统/属性/Fire.webp",
+        "属性":"./战斗系统/属性/Fire.png",
         "效果、状态":"./战斗系统/状态/Charge.png"
 
 

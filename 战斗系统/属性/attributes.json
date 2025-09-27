@@ -1,6 +1,6 @@
 {
     "火":{
-        "path":"./战斗系统/属性/Fire.webp",
+        "path":"./战斗系统/属性/Fire.png",
         "name":"火",
         "en":"Fire",
         "description":"火元素属性"
@@ -25,7 +25,7 @@
     },
 
     "冰":{
-        "path":"./战斗系统/属性/Ice.webp",
+        "path":"./战斗系统/属性/Ice.png",
         "name":"冰",
         "en":"Ice",
         "description":"冰元素属性"
@@ -54,7 +54,7 @@
     },
 
     "雷":{
-        "path":"./战斗系统/属性/Thunder.webp",
+        "path":"./战斗系统/属性/Thunder.png",
         "name":"雷",
         "en":"Thunder",
         "description":"雷元素属性"
@@ -79,7 +79,7 @@
     },
 
     "光":{
-        "path":"./战斗系统/属性/Light.webp",
+        "path":"./战斗系统/属性/Light.png",
         "name":"光",
         "en":"Light",
         "description":"光元素属性"
@@ -104,7 +104,7 @@
     },
 
     "暗":{
-        "path":"./战斗系统/属性/Dark.webp",
+        "path":"./战斗系统/属性/Dark.png",
         "name":"暗",
         "en":"Dark",
         "description":"暗元素属性"
@@ -129,28 +129,28 @@
     },
 
     "无":{
-        "path":"./战斗系统/属性/Nonelement.webp",
+        "path":"./战斗系统/属性/Nonelement.png",
         "name":"无",
         "en":"Nonelement",
         "description":"无属性"
     },
 
     "斩":{
-        "path":"./战斗系统/属性/Slash.webp",
+        "path":"./战斗系统/属性/Slash.png",
         "name":"斩",
         "en":"Slash",
         "description":"斩武器属性"
     },
 
     "突":{
-        "path":"./战斗系统/属性/Stab.webp",
+        "path":"./战斗系统/属性/Stab.png",
         "name":"突",
         "en":"Stab",
         "description":"突武器属性"
     },
     
     "打":{
-        "path":"./战斗系统/属性/Strike.webp",
+        "path":"./战斗系统/属性/Strike.png",
         "name":"打",
         "en":"Strike",
         "description":"打武器属性"
