@@ -131,6 +131,101 @@
         "description":"可以改造摩托零件的道具", 
         "price":"", 
         "location":"压制战"
+    },
+
+    "暴击感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItemFire.png", 
+        "description":"用于「暴击冥想（暴击光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "复活感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItemIce.png", 
+        "description":"用于「修缮之光（复活光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "驱动感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItemThunder.png", 
+        "description":"用于「驱动增益（驱动光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "防护感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItemLight.png", 
+        "description":"用于「保护（防护光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "强攻感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItemDark.png", 
+        "description":"用于「攻击增进（强攻光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+
+
+    "集中感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem2_Fire.png", 
+        "description":"用于「专注（集中光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "填充感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem2_Ice.png", 
+        "description":"用于「点数援助（填充光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "治愈感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem2_Thunder.png", 
+        "description":"用于「自我复原（治愈光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "软化感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem2_Light.png", 
+        "description":"用于「软体化（软化光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "衰灭感质":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem2_Dark.png", 
+        "description":"用于「衰灭之力（衰灭光球）」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+
+    "加重感质（火）":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem3_Fire.png", 
+        "description":"用于「火焰重力子（加重光球（火））」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "加重感质（冰）":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem3_Ice.png", 
+        "description":"用于「冰霜重力子（加重光球（冰））」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "加重感质（雷）":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem3_Thunder.png", 
+        "description":"用于「雷电重力子（加重光球（雷））」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "加重感质（光）":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem3_Light.png", 
+        "description":"用于「明光重力子（加重光球（光））」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
+    },
+    "加重感质（暗）":{
+        "path":"./持有物/道具/ThumbnailSkillExperienceUpItem3_Dark.png", 
+        "description":"用于「暗黑重力子（加重光球（暗））」\n能提升技能熟练度1%的素材", 
+        "price":"", 
+        "location":"光球BOSS"
     }
+
 
 } 
