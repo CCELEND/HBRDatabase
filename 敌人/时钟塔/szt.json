@@ -1101,6 +1101,177 @@
             "weakness":"突打-50、冰-150","resist":""
         }
     }
+},
+
+"HELL-52F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-52F",
+    "enemys":
+    {
+        "SlimyDarkγ":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"SlimyDarkγ",
+            "border":"430",
+            "DP":"2,134,000","HP":"8,360,000",
+            "weakness":"斩-150、光-150","resist":"突+50"
+        }
+    }
+},
+
+"HELL-53F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-53F",
+    "enemys":
+    {
+        "IceBarrelWalker":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"IceBarrelWalker",
+            "border":"430",
+            "DP":"9,300,000","HP":"1,400,000",
+            "weakness":"斩-50、雷-100","resist":"突+75"
+        }
+    }
+},
+
+
+"HELL-54F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-54F",
+    "enemys":
+    {
+        "暗影·五十铃[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·五十铃[]",
+            "border":"430",
+            "DP":"760,000","HP":"16,000,000",
+            "weakness":"火-150","resist":""
+        }
+    }
+},
+
+"HELL-55F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-55F",
+    "enemys":
+    {
+        "暗影·三野里[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·三野里[]",
+            "border":"430",
+            "DP":"850,000","HP":"26,500,000",
+            "weakness":"打-150、火-150","resist":""
+        },
+        "暗影·五十铃2[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·五十铃2[]",
+            "border":"430",
+            "DP":"550,000","HP":"12,500,000",
+            "weakness":"火-150","resist":""
+        }
+    }
+},
+
+"HELL-56F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-56F",
+    "enemys":
+    {
+        "WhiteEye":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"WhiteEye",
+            "border":"430",
+            "DP":"11,650,000","HP":"900,000",
+            "weakness":"打-50、暗-100","resist":"斩+50"
+        }
+    }
+},
+
+
+"HELL-57F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-57F",
+    "enemys":
+    {
+        "OctopusTailβ":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"OctopusTailβ",
+            "border":"430",
+            "DP":"470,000","HP":"6,000,000",
+            "weakness":"突-50","resist":""
+        },
+
+        "DarkSlasher":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DarkSlasher",
+            "border":"430",
+            "DP":"900,000","HP":"17,500,000",
+            "weakness":"突-50、光-100","resist":""
+        },
+        "DarkSlasher2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DarkSlasher2",
+            "border":"430",
+            "DP":"900,000","HP":"17,500,000",
+            "weakness":"突-50、光-100","resist":""
+        }
+    }
+},
+
+"HELL-58F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-58F",
+    "enemys":
+    {
+        "暗影·天音[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·天音[]",
+            "border":"430",
+            "DP":"760,000","HP":"2,800,000",
+            "weakness":"突-150","resist":""
+        }
+    }
+},
+
+"HELL-59F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-59F",
+    "enemys":
+    {
+        "RedPillarGuardian":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"RedPillarGuardian",
+            "border":"430",
+            "DP":"2,000,000","HP":"52,000,000",
+            "weakness":"打-150、冰-150","resist":"斩+50"
+        }
+    }
 }
 
 }
