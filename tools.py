@@ -49,6 +49,7 @@ def comma_str_to_int(number_string):
 # 10000 转换为 10,000
 def int_to_comma_str(number):
     number_string = "{:,}".format(number)
+    return number_string
 
 # 判断空文件
 def is_file_empty(file_path):
@@ -57,8 +58,7 @@ def is_file_empty(file_path):
 # 加载 json 文件
 def load_json(json_path):
     try:
-        if is_file_empty(json_path):
-            return {}
+        if is_file_empty(json_path): return {}
 
         with open(json_path, 'r', encoding='utf-8') as file:
             json_dir = json.load(file)
