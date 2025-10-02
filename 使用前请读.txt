@@ -1,6 +1,6 @@
 ## 安装依赖
 
-* python3.8 以上  
+* python3.10 以上  
 * opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
 >运行 install_module.py 安装依赖模块
 
