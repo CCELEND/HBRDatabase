@@ -32,6 +32,7 @@ def download_music_files_from_server(file_path_album):
     with open(file_path_all, 'wb') as f:
         f.write(response.content)
 
+    messagebox.showinfo("信息", f"文件 '{file_path_album}' 下载成功")
     return True
 
 
