@@ -225,7 +225,43 @@
         "description":"用于「暗黑重力子（加重光球（暗））」\n能提升技能熟练度1%的素材", 
         "price":"", 
         "location":"光球BOSS"
-    }
+    },
 
+    "再来一回合":{
+        "path":"./持有物/道具/ArcadeCapsulePurple.png", 
+        "description":"将BOSS出现前的回合数延长1回合", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    },
+    "磁性抽取":{
+        "path":"./持有物/道具/ArcadeCapsuleRed.png", 
+        "description":"抽取3张卡", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    },
+    "龙卷风":{
+        "path":"./持有物/道具/ArcadeCapsuleGreen.png", 
+        "description":"令【左起第1张】卡回到卡组中", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    },
+    "加速":{
+        "path":"./持有物/道具/ArcadeCapsuleOrange.png", 
+        "description":"队伍的SP回复4点", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    },
+    "打气":{
+        "path":"./持有物/道具/ArcadeCapsuleYellow.png", 
+        "description":"实力+20%（1次)", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    },
+    "硬地球场":{
+        "path":"./持有物/道具/ArcadeCapsuleBlue.png", 
+        "description":"耐久+20%（1次)", 
+        "price":"", 
+        "location":"技术模拟战 奖章扭蛋"
+    }
 
 } 
