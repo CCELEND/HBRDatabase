@@ -404,7 +404,7 @@
     },
     "全状态值上升":{
         "name":"全状态值上升",
-        "path":"./战斗系统/状态/MemorySpirit.webp",
+        "path":"./战斗系统/状态/AllStatusUpValue.webp",
         "effect":"","description":"全状态值上升",
         "stack":"-",
         "type":"增益",
