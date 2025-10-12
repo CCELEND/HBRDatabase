@@ -1272,6 +1272,42 @@
             "weakness":"打-150、冰-150","resist":"斩+50"
         }
     }
+},
+
+"HELL-60F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-60F",
+    "enemys":
+    {
+        "暗影·吹雪[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·吹雪[]",
+            "border":"430",
+            "DP":"760,000","HP":"11,900,000",
+            "weakness":"斩-150","resist":""
+        }
+    }
+},
+
+"HELL-61F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-61F",
+    "enemys":
+    {
+        "KillingVeil ":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"KillingVeil ",
+            "border":"430",
+            "DP":"800,000","HP":"15,000,000",
+            "weakness":"斩-50、暗-50","resist":""
+        }
+    }
 }
 
 }
