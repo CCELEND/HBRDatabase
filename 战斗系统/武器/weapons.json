@@ -2,13 +2,13 @@
     "剑":{
         "name":"剑","en":"Sword",
         "path":"./战斗系统/武器/Sword.png",
-        "description":"剑（斩武器属性）","hit":"3"
+        "description":"剑（斩武器属性）\n特例：名义上立华奏的武器类型是Sword，\n但实质上普通攻击更接近双刀","hit":"3"
     },
 
     "双刀":{
         "name":"双刀","en":"DoubleSword",
         "path":"./战斗系统/武器/DoubleSword.png",
-        "description":"双刀（斩武器属性）\n（目前是茅森月歌和立华奏的武器）","hit":"2"
+        "description":"双刀（斩武器属性）\n目前是茅森月歌和立华奏的武器（伪双刀）","hit":"2"
     },
 
     "镰刀":{
