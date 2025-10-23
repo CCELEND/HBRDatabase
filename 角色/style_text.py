@@ -31,7 +31,7 @@ def output_skill_effect(turn_num, duration, target, effect_type,
     else:
         text += output_string(value)
 
-    if effect_type in ["连击数上升（大）", "连击数上升（小）"]:
+    if effect_type in ["连击数上升（大）", "连击数上升（小）", "连击数上升（特大）", "连击数上升（中）"]:
         text += "，" + description
 
     if IsActive:
