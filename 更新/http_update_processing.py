@@ -22,7 +22,7 @@ def http_update_data():
         response = send_hashes_to_server(server_url, current_file_hashes)
     except Exception as e:
         logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
-        messagebox.showerror(f"连接失败：{str(e)}\n请重试或联系开发者")
+        messagebox.showerror("错误", f"连接失败：{str(e)}\n请重试或联系开发者")
 
     # 下载服务器返回的需要更新的文件
     if 'files_to_download' in response:
