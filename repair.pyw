@@ -11,8 +11,12 @@ def repair_reset():
     current_file_hashes = calculate_file_hashes("./")
     server_url = "http://47.96.235.36:65433"
 
-    # 发送哈希值到服务器
-    response = send_hashes_to_server(server_url, current_file_hashes)
+    try:
+        # 发送哈希值到服务器
+        response = send_hashes_to_server(server_url, current_file_hashes)
+    except Exception as e:
+        logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
+        messagebox.showerror(f"连接失败：{str(e)}\n请重试或联系开发者")
 
     # 下载服务器返回的需要更新的文件
     if 'files_to_download' in response:
