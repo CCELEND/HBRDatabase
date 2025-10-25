@@ -44,6 +44,7 @@ from 敌人.宝石棱镜战.bsljz_win import show_bsljz_enemys
 from 敌人.异时层.ysc_win import show_ysc_enemys
 from 敌人.高分挑战.gftz_win import show_gftz_enemys
 from 敌人.恒星战.hxz_win import show_hxz_enemys
+from 敌人.遭遇战.zyz_win import show_zyz_enemys
 
 sys.path.append(os.path.abspath("./搜索"))
 from 搜索.search_win import creat_search_win
@@ -167,6 +168,7 @@ def create_menu(parent_frame, scrollbar_frame_obj):
         ("恒星扫荡战线", show_hxz_enemys),
         ("高分挑战", show_gftz_enemys),
         ("异时层", show_ysc_enemys),
+        ("遭遇战", show_zyz_enemys),
     ]
     # 循环创建菜单项
     for enemy_call_name, callback in menu_enemy_calls:

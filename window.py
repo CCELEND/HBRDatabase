@@ -324,6 +324,7 @@ def get_ico_path_by_name(name):
         "恒星扫荡战线":"./敌人/恒星战/DimensionBattleCentralTop_001.png",
         "高分挑战":"./敌人/高分挑战/夏日的诅咒#1/gf1.ico",
         "异时层":"./敌人/异时层/亡骨之翎Ω/亡骨之翎Ω.ico",
+        "遭遇战":"./敌人/遭遇战/遭遇战#1/zyz1.ico",
 
         "职业":"./战斗系统/职业/ADMIRAL.png",
         "武器":"./战斗系统/武器/Sword.png",
