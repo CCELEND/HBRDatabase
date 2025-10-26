@@ -282,16 +282,9 @@ class ExpandableList:
         
         item = self.tree.selection()[0]
 
-        # 清除之前的选中项高亮
-        if self.currently_selected_item:
-            self.tree.item(self.currently_selected_item, tags=('item',))  # 移除子节点选中样式
-
-        # 清除之前的父节点高亮
-        if self.currently_selected_parent:
-            self.tree.item(self.currently_selected_parent, tags=('category',))  # 恢复父节点默认样式
-
         # 节点类型判断（通过tags识别）
         if 'category' in self.tree.item(item, 'tags'):
+            # 如果是父节点被点击，只处理展开/折叠，不清除选中状态
             if self.tree.item(item, "open"):
                 self.tree.item(item, open=False)
                 self.tree.after(100, lambda: self.tree.yview_moveto(0))  # 折叠后滚动到顶
@@ -309,6 +302,14 @@ class ExpandableList:
                 try:
                     album_name, disc_name = parent_text.split(maxsplit=1)
                     all_album_name = music_player.music_dir[album_name]
+
+                    # 清除之前的选中项高亮
+                    if self.currently_selected_item:
+                        self.tree.item(self.currently_selected_item, tags=('item',))  # 移除子节点选中样式
+
+                    # 清除之前的父节点高亮
+                    if self.currently_selected_parent:
+                        self.tree.item(self.currently_selected_parent, tags=('category',))  # 恢复父节点默认样式
 
                     # 更新当前选中项
                     self.currently_selected_item = item
