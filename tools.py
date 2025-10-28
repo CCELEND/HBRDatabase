@@ -430,3 +430,35 @@ def run_admin():
             None, "runas", sys.executable, " ".join(sys.argv), None, 1
         )
         sys.exit()
+
+def format_hex_dump(hex_string, bytes_per_line=16):
+    
+    # 格式化十六进制输出
+    result = []
+    
+    # 将十六进制字符串分组，每2个字符代表一个字节
+    hex_bytes = [hex_string[i:i+2] for i in range(0, len(hex_string), 2)]
+    
+    for i in range(0, len(hex_bytes), bytes_per_line):
+        # 当前行的字节
+        line_bytes = hex_bytes[i:i+bytes_per_line]
+        
+        # 偏移量
+        offset = f"{i:08x}"
+        
+        # 十六进制部分
+        hex_part = ' '.join(f"{b:>2s}" for b in line_bytes)
+        # 填充不足的部分
+        hex_part += '   ' * (bytes_per_line - len(line_bytes))
+        
+        ascii_part = ''
+        for b in line_bytes:
+            byte_val = int(b, 16)
+            if 32 <= byte_val <= 126:  # 可打印ASCII字符
+                ascii_part += chr(byte_val)
+            else:
+                ascii_part += '.'
+        
+        result.append(f"{offset}  {hex_part}  |{ascii_part}|")
+    
+    return '\n'.join(result)
