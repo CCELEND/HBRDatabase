@@ -209,8 +209,8 @@ int main() {
     uint64_t known_change_seed = 0;
 
     if (choice == 1) {
-        // int c;
-        // while ((c = getchar()) != '\n' && c != EOF);
+        //int c;
+        //while ((c = getchar()) != '\n' && c != EOF);
         // 从控制台读取seed值（支持十进制和十六进制）
         get_RandomMainAbility_seed_ChangeAbility_seed(known_random_seed, known_change_seed);
     }
@@ -246,14 +246,14 @@ int main() {
     PVOID heapBase = GetMainHeapBase(pid);
     printf("0x%llx\n", (uint64_t)heapBase);
 
-    //// 搜索内存
-    //printf("\n[*] Searching process memory...\n");
-    //if (choice == 0) {
-    //    search_process_memory_fast(pid, known_random_seed, known_change_seed, 0); 
-    //}
-    //else {
-    //    search_process_memory_fast(pid, known_random_seed, known_change_seed, 1);
-    //}
+    // 搜索内存
+    printf("\n[*] Searching process memory...\n");
+    if (choice == 0) {
+        search_process_memory_fast(pid, known_random_seed, known_change_seed, 0); 
+    }
+    else {
+        search_process_memory_fast(pid, known_random_seed, known_change_seed, 1);
+    }
 
     // 恢复进程树
     printf("\n[*] Resuming process tree...\n");
