@@ -209,8 +209,8 @@ int main() {
     uint64_t known_change_seed = 0;
 
     if (choice == 1) {
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
+        // int c;
+        // while ((c = getchar()) != '\n' && c != EOF);
         // 从控制台读取seed值（支持十进制和十六进制）
         get_RandomMainAbility_seed_ChangeAbility_seed(known_random_seed, known_change_seed);
     }
