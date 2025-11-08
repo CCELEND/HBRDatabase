@@ -29,6 +29,12 @@
         "description":"用于异时层的入场道具", 
         "price":"", 
         "location":"异时层"
+    },
+    "遭遇战入场券":{
+        "path":"./持有物/入场券/ThumbnailWaveBattleTicket.png", 
+        "description":"用于遭遇战的入场道具", 
+        "price":"", 
+        "location":"遭遇战"
     }
 
 } 
