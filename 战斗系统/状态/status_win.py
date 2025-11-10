@@ -106,7 +106,7 @@ def show_statu(scrollbar_frame_obj):
                     bind_statu_canvas(statu_frame, statu, 0, 0)
 
                     if type in ['增益', '减益', '其他', '异常']:
-                        if series in ["技能效果强化", "对HP百分比伤害", "减益，异常移除", '强击破', 'EShield']:
+                        if series in ["技能效果强化", "对HP百分比伤害", "减益，异常移除", '强击破', 'EShield', '元素暴击伤害上升','元素攻击上升','元素暴击伤害上升','元素暴击率上升','连击数上升']:
                             statu_column_count = set_frame_newline(statu_frame, statu_num, 3, statu_column_count)
                         else: 
                             statu_column_count = set_frame_newline(statu_frame, statu_num, 4, statu_column_count)
