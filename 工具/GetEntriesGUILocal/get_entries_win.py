@@ -358,7 +358,7 @@ def creat_ct_win():
     global output_text
     # 输出框
     output_text = scrolledtext.ScrolledText(get_entries_frame, 
-        wrap=ttk.WORD, width=50, height=20)
+        wrap="word", width=50, height=20)
     output_text.grid(row=0, column=0, columnspan=3, padx=(10,0), pady=0, sticky="nsew")
     # 绑定鼠标右键点击事件到上下文菜单
     output_text.bind("<Button-3>", lambda event, tw=output_text: show_context_menu(event, tw))

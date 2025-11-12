@@ -224,7 +224,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     key_word_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
     # 关键词输入框
     key_word_text = scrolledtext.ScrolledText(search_win_frame, 
-        wrap=ttk.WORD, height=3)
+        wrap="word", height=3)
     key_word_text.grid(row=2, column=0, columnspan=2, padx=10, pady=0, sticky="nsew")
     # 绑定鼠标右键点击事件到上下文菜单
     key_word_text.bind("<Button-3>", 

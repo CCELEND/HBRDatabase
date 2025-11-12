@@ -120,7 +120,7 @@ def creat_dsc_win():
 	input_label.grid(row=0, column=0, padx=5, pady=0, sticky="w")
 	# 输入框
 	input_text = scrolledtext.ScrolledText(input_frame, 
-		wrap=ttk.WORD, width=50, height=3)
+		wrap="word", width=50, height=3)
 	input_text.grid(row=1, column=0, columnspan=2, padx=10, pady=0, sticky="nsew")
 	# 绑定鼠标右键点击事件到上下文菜单
 	input_text.bind("<Button-3>", lambda event, tw=input_text: show_context_menu(event, tw))
@@ -130,7 +130,7 @@ def creat_dsc_win():
 	maximum_damage_limit_label.grid(row=2, column=0, padx=5, pady=0, sticky="w")
 	# 输入框
 	maximum_damage_limit_text = scrolledtext.ScrolledText(input_frame, 
-		wrap=ttk.WORD, width=50, height=3)
+		wrap="word", width=50, height=3)
 	maximum_damage_limit_text.grid(row=3, column=0, columnspan=2, padx=10, pady=0, sticky="nsew")
 	# 绑定鼠标右键点击事件到上下文菜单
 	maximum_damage_limit_text.bind("<Button-3>", 
@@ -159,7 +159,7 @@ def creat_dsc_win():
 
 	# 输出框
 	output_text = scrolledtext.ScrolledText(output_frame, 
-		wrap=ttk.WORD, width=50, height=3, state=ttk.DISABLED)
+		wrap="word", width=50, height=3, state=ttk.DISABLED)
 	output_text.grid(row=1, column=0, padx=10, pady=0, sticky="nsew")
 	# 绑定鼠标右键点击事件到上下文菜单
 	output_text.bind("<Button-3>", lambda event, tw=output_text: show_context_menu(event, tw))
