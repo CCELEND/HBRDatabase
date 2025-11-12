@@ -6,6 +6,7 @@
 * python3.10 以上  
 * opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
 >运行 install_module.py 安装依赖模块
+>高版本 ttkbootstrap 会导致异常，需要卸载高版本 ttkbootstrap，再安装 ttkbootstrap==1.12.0
 
 ## 使用
 
