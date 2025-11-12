@@ -73,7 +73,7 @@ class FLACPlayerApp:
         file_frame = ttk.Frame(self.frame)
         file_frame.pack(pady=(0, 5), fill=ttk.X)
         self.file_label = ttk.Label(file_frame, text="未选择文件", width=50, anchor='w')
-        self.file_label.pack(side=ttk.LEFT, padx=5)
+        self.file_label.pack(side="left", padx=5)
 
         # 进度条 - 使用Canvas实现更精确的点击跳转
         self.progress_frame = ttk.Frame(self.frame)
@@ -107,26 +107,26 @@ class FLACPlayerApp:
         control_frame.pack(pady=10)
 
         self.play_btn = ttk.Button(control_frame, text="播放▶", command=self.play, state=ttk.DISABLED)
-        self.play_btn.pack(side=ttk.LEFT, padx=5)
+        self.play_btn.pack(side="left", padx=5)
 
         self.pause_btn = ttk.Button(control_frame, text="暂停⏸︎", command=self.pause, state=ttk.DISABLED)
-        self.pause_btn.pack(side=ttk.LEFT, padx=5)
+        self.pause_btn.pack(side="left", padx=5)
 
         self.stop_btn = ttk.Button(control_frame, text="停止⏹︎", command=self.stop, state=ttk.DISABLED)
-        self.stop_btn.pack(side=ttk.LEFT, padx=5)
+        self.stop_btn.pack(side="left", padx=5)
 
         #添加循环按钮
         self.loop_btn = ttk.Button(control_frame, text="循环◻", command=self.toggle_loop, state=ttk.DISABLED)
-        self.loop_btn.pack(side=ttk.LEFT, padx=5)
+        self.loop_btn.pack(side="left", padx=5)
 
         # 音量控制
         volume_frame = ttk.Frame(self.frame)
         volume_frame.pack()
-        ttk.Label(volume_frame, text="音量🔉").pack(side=ttk.LEFT)
+        ttk.Label(volume_frame, text="音量🔉").pack(side="left")
         self.volume_scale = ttk.Scale(volume_frame, from_=0, to=100, orient=ttk.HORIZONTAL,
                                      command=self.set_volume)
         self.volume_scale.set(50)  # 默认音量设为50%
-        self.volume_scale.pack(side=ttk.LEFT)
+        self.volume_scale.pack(side="left")
 
     # 选择音频文件
     def select_file(self):
