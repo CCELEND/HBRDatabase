@@ -40,7 +40,7 @@ def show_capsuletoys(scrollbar_frame_obj):
         # 获取 item 图对象
         item_photo = get_photo(capsuletoys_json[capsuletoy_name]["path"], item_size)
 
-        capsuletoy_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=capsuletoy_name)
+        capsuletoy_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=capsuletoy_name)
 
         # Canvas
         canvas = create_canvas_with_image(capsuletoy_frame, base_photo, 

@@ -4,7 +4,7 @@ from ttkbootstrap.constants import *
 
 # 成长状态
 def creat_growth_status_frame(parent_frame, growth_status_frame_row, style):
-    growth_status_frame = ttk.LabelFrame(parent_frame, text="成长状态")
+    growth_status_frame = ttk.Labelframe(parent_frame, text="成长状态")
     growth_status_frame.grid(row=growth_status_frame_row, column=0, 
         columnspan=4, padx=10, pady=(5,10), sticky="nsew")
     growth_status_frame.grid_rowconfigure(0, weight=1)

@@ -72,7 +72,7 @@ def show_ysc_enemys(scrollbar_frame_obj):
         # 异时层敌人对象
         ysc = yscs[ysc_name]
 
-        ysc_enemy_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=ysc_name)
+        ysc_enemy_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=ysc_name)
         bind_ysc_enemy_canvas(ysc_enemy_frame, ysc, 0, 0)
 
         # 计算行和列的位置

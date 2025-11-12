@@ -13,7 +13,7 @@ def creat_career_frame(parent_frame, career_frame_row, style):
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"
 
     career = 战斗系统.职业.careers_info.careers[style.career]
-    career_frame = ttk.LabelFrame(parent_frame, text=style.career+"-"+element_attribute)
+    career_frame = ttk.Labelframe(parent_frame, text=style.career+"-"+element_attribute)
     career_frame.grid(row=career_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     career_frame.grid_rowconfigure(0, weight=1)
 

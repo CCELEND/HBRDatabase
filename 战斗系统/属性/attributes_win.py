@@ -36,7 +36,7 @@ def creat_attribute_win(event, parent_frame, attribute):
     set_window_icon_webp(attribute_win_frame, attribute.path)
     win_open_manage(attribute_win_frame, __name__)
 
-    attribute_frame = ttk.LabelFrame(attribute_win_frame, text=attribute.name)
+    attribute_frame = ttk.Labelframe(attribute_win_frame, text=attribute.name)
     attribute_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 attribute_frame 的布局
     attribute_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
@@ -67,7 +67,7 @@ def show_attribute(scrollbar_frame_obj):
         attribute = 属性.attributes_info.attributes[attribute_name]
 
         # 属性
-        attribute_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=attribute_name)
+        attribute_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=attribute_name)
         bind_attribute_canvas(attribute_frame, attribute, 0, 0)
 
         # 计算行和列的位置

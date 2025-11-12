@@ -79,7 +79,7 @@ def show_gqboss_enemys(scrollbar_frame_obj):
         # 光球BOSS敌人对象
         gqboss = gqbosss[gqboss_name]
 
-        gqboss_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=gqboss_name)
+        gqboss_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=gqboss_name)
         bind_gqboss_canvas(gqboss_frame, gqboss, 0, 0)
 
         # 计算行和列的位置

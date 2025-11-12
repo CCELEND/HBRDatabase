@@ -9,7 +9,7 @@ import 战斗系统.状态.status_info
 
 # 被动技能
 def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
-    passive_skill_frame = ttk.LabelFrame(parent_frame, text="天赋")
+    passive_skill_frame = ttk.Labelframe(parent_frame, text="天赋")
     passive_skill_frame.grid(row=passive_skill_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     passive_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 passive_skill_frame 的每一列权重
@@ -17,8 +17,8 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
         passive_skill_frame.grid_columnconfigure(col_index, weight=1)
 
     for i, passive_skill in enumerate(style.passive_skills):
-        # 使用 LabelFrame 作为每一行的容器
-        row_frame = ttk.LabelFrame(passive_skill_frame, text="[Auto]"+passive_skill.name)
+        # 使用 Labelframe 作为每一行的容器
+        row_frame = ttk.Labelframe(passive_skill_frame, text="[Auto]"+passive_skill.name)
         row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重

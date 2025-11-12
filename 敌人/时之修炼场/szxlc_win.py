@@ -73,7 +73,7 @@ def show_szxlc_enemys(scrollbar_frame_obj):
         # 时之修炼场敌人对象
         szxlc = szxlcs[szxlc_name]
 
-        szxlc_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=szxlc_name)
+        szxlc_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=szxlc_name)
         bind_szxlc_canvas(szxlc_frame, szxlc, 0, 0)
 
         # 计算行和列的位置

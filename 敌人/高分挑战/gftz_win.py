@@ -91,7 +91,7 @@ class GFTZCreator:
                     gftz = self.gftzs[gftz_name]
                     
                     # 创建框架
-                    gftz_frame = ttk.LabelFrame(self.scrollable_frame, text=gftz_name)
+                    gftz_frame = ttk.Labelframe(self.scrollable_frame, text=gftz_name)
                     bind_gftz_canvas(gftz_frame, gftz, 0, 0)
                     
                     # 计算位置

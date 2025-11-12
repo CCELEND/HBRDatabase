@@ -18,7 +18,7 @@ def creat_select_frame(label_content, options, selected_values,
     parent_frame, row, column):
 
     # 创建标签
-    label_frame = ttk.LabelFrame(parent_frame, text=label_content)
+    label_frame = ttk.Labelframe(parent_frame, text=label_content)
     label_frame.grid(row=row, column=column, padx=(10,0), pady=(0,5), sticky="nesw")
 
     # 创建 Frame 用于容纳水平排列的多选按钮
@@ -83,8 +83,8 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         for i, master_skill in enumerate(filtered_master_skills):
             role = get_role_by_master_name(master_skill.name)
 
-            master_skill_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=master_skill.name)
-            # 设置LabelFrame的最小高度
+            master_skill_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=master_skill.name)
+            # 设置Labelframe的最小高度
             master_skill_frame.grid_propagate(False)
             master_skill_frame.configure(height=170)
             bind_master_skill_canvas(master_skill_frame, role, 0, 0)
@@ -113,8 +113,8 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     for i, style in enumerate(filtered_styles):
         team = 角色.team_info.teams[style.team_name]
 
-        style_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=style.name)
-        # 设置LabelFrame的最小高度
+        style_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=style.name)
+        # 设置Labelframe的最小高度
         style_frame.grid_propagate(False)
         style_frame.configure(height=170)
         bind_style_canvas(style_frame, team, style, 0, 0)
@@ -150,7 +150,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
-    role_search_frame = ttk.LabelFrame(search_win_frame, text="角色、风格")
+    role_search_frame = ttk.Labelframe(search_win_frame, text="角色、风格")
     role_search_frame.grid(row=0, column=0, columnspan=2, padx=10, sticky="nsew")
 
     rarity_options = [

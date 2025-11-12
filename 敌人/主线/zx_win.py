@@ -75,7 +75,7 @@ def show_zx_enemys(scrollbar_frame_obj):
         # 主线敌人对象
         zx = zxs[zx_name]
 
-        zx_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=zx_name)
+        zx_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=zx_name)
         bind_zx_canvas(zx_frame, zx, 0, 0)
 
         # 计算行和列的位置

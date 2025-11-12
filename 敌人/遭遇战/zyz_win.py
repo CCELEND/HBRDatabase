@@ -72,7 +72,7 @@ def show_zyz_enemys(scrollbar_frame_obj):
         # 遭遇战敌人对象
         zyz = zyzs[zyz_name]
 
-        zyz_enemy_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=zyz_name)
+        zyz_enemy_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=zyz_name)
         bind_zyz_enemy_canvas(zyz_enemy_frame, zyz, 0, 0)
 
         # 计算行和列的位置

@@ -59,7 +59,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
     )
 
     # 主动技能、被动
-    active_skill_frame = ttk.LabelFrame(parent_frame, text="主动技能 / 被动技能")
+    active_skill_frame = ttk.Labelframe(parent_frame, text="主动技能 / 被动技能")
     active_skill_frame.grid(row=active_skill_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
@@ -68,7 +68,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
 
     # 主动、被动技能列表
     for i, active_skill in enumerate(style.active_skills):
-        row_frame = ttk.LabelFrame(active_skill_frame, text=active_skill.name)
+        row_frame = ttk.Labelframe(active_skill_frame, text=active_skill.name)
         row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew") #5
         row_frame.grid_rowconfigure(0, weight=1)
         # 配置 row_frame 的每一列权重

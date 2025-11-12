@@ -37,7 +37,7 @@ def creat_statu_win(event, parent_frame, statu):
     # open_statu_wins[statu.name] = statu_win_frame
     win_open_manage(statu_win_frame, __name__)
 
-    statu_frame = ttk.LabelFrame(statu_win_frame, text=statu.name)
+    statu_frame = ttk.Labelframe(statu_win_frame, text=statu.name)
     statu_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 statu_frame 的布局
     statu_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
@@ -84,13 +84,13 @@ def show_statu(scrollbar_frame_obj):
 
     for type_num, type in enumerate(状态.status_info.statu_categories):
         # 状态类型
-        type_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=type+"类型状态")
+        type_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=type+"类型状态")
         type_frame.grid(row=type_num, column=0, columnspan=6, padx=10, pady=(0,10), sticky="nsew") #
 
         series_column_count = 0
         for series_num, series in enumerate(状态.status_info.statu_categories[type]):
             # 所属系列
-            series_frame = ttk.LabelFrame(type_frame, text=series)
+            series_frame = ttk.Labelframe(type_frame, text=series)
             series_frame.grid(row=series_num, column=0, padx=(5,0), pady=(0,5), sticky="nesw")  # 设置间距
 
             statu_column_count = 0
@@ -102,7 +102,7 @@ def show_statu(scrollbar_frame_obj):
                 if len(状态.status_info.statu_categories[type][series]) == 1:
                     bind_statu_canvas(series_frame, statu, 0, 0)
                 else:
-                    statu_frame = ttk.LabelFrame(series_frame, text=statu_name)
+                    statu_frame = ttk.Labelframe(series_frame, text=statu_name)
                     bind_statu_canvas(statu_frame, statu, 0, 0)
 
                     if type in ['增益', '减益', '其他', '异常']:
@@ -166,7 +166,7 @@ def show_statu(scrollbar_frame_obj):
 #     # 遍历所有状态类型
 #     for type_num, status_type in enumerate(状态.status_info.statu_categories):
 #         # 创建类型框架
-#         type_frame = ttk.LabelFrame(
+#         type_frame = ttk.Labelframe(
 #             scrollbar_frame_obj.scrollable_frame, 
 #             text=f"{status_type}类型状态"
 #         )
@@ -216,7 +216,7 @@ def show_statu(scrollbar_frame_obj):
 
 # def create_series_frame(parent, series_name, status_type, series_num, column_count, column_config):
 #     """创建系列框架并设置布局"""
-#     series_frame = ttk.LabelFrame(parent, text=series_name)
+#     series_frame = ttk.Labelframe(parent, text=series_name)
     
 #     # 根据类型设置不同的布局
 #     if status_type in column_config and column_config[status_type]['series']:
@@ -250,7 +250,7 @@ def show_statu(scrollbar_frame_obj):
 #         if len(status_items) == 1:
 #             bind_statu_canvas(series_frame, statu, 0, 0)
 #         else:
-#             statu_frame = ttk.LabelFrame(series_frame, text=statu_name)
+#             statu_frame = ttk.Labelframe(series_frame, text=statu_name)
 #             bind_statu_canvas(statu_frame, statu, 0, 0)
             
 #             # 根据类型和系列设置状态项布局

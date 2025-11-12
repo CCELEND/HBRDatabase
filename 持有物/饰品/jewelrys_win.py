@@ -34,8 +34,8 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
     for i, jewelry_name in enumerate(jewelrys):
         jewelry = jewelrys[jewelry_name]
 
-        # 使用 LabelFrame 作为每一行的容器
-        row_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry.name)
+        # 使用 Labelframe 作为每一行的容器
+        row_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=jewelry.name)
         row_frame.grid(row=i, column=0, columnspan=6, padx=10, pady=(0,10), sticky="nsew")
         row_frame.grid_columnconfigure(0, weight=1)  # 让 inner_frame 适应 row_frame
      
@@ -147,7 +147,7 @@ def show_jewelrys_type(scrollbar_frame_obj):
         jewelry_type_json = 饰品.jewelrys_info.jewelrys_type_json[jewelry_type_name]
 
         # 饰品类型
-        jewelry_type_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=jewelry_type_name)
+        jewelry_type_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=jewelry_type_name)
         bind_jewelry_type_canvas(jewelry_type_frame, jewelry_type_json, 0, 0)
 
         # 计算行和列的位置

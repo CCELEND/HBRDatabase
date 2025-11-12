@@ -36,7 +36,7 @@ def creat_career_win(event, parent_frame, career):
     set_window_icon_webp(career_win_frame, career.path)
     win_open_manage(career_win_frame, __name__)
 
-    career_frame = ttk.LabelFrame(career_win_frame, text=career.name)
+    career_frame = ttk.Labelframe(career_win_frame, text=career.name)
     career_frame.grid(row=0, column=0, padx=10, pady=(5, 10), sticky="nsew")
     # 配置 career_frame 的布局
     career_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
@@ -67,7 +67,7 @@ def show_career(scrollbar_frame_obj):
         career = 职业.careers_info.careers[career_name]
 
         # 职业
-        career_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=career_name)
+        career_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=career_name)
         bind_career_canvas(career_frame, career, 0, 0)
 
         # 计算行和列的位置

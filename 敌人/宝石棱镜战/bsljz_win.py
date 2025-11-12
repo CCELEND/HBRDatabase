@@ -74,7 +74,7 @@ def show_bsljz_enemys(scrollbar_frame_obj):
         # 宝石棱镜战敌人对象
         bsljz = bsljzs[bsljz_name]
 
-        bsljz_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=bsljz_name)
+        bsljz_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=bsljz_name)
         bind_bsljz_canvas(bsljz_frame, bsljz, 0, 0)
 
         # 计算行和列的位置

@@ -124,8 +124,8 @@ def creat_szt_win(event, parent_frame, szt):
 
     for i, enemy in enumerate(szt.enemys):
 
-        # 使用 LabelFrame 作为每一行的容器
-        row_frame = ttk.LabelFrame(szt_win_frame, text=enemy.name)
+        # 使用 Labelframe 作为每一行的容器
+        row_frame = ttk.Labelframe(szt_win_frame, text=enemy.name)
         row_frame.grid(row=i, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
         row_frame.grid_columnconfigure(0, weight=1)  # 让 inner_frame 适应 row_frame
 
@@ -226,7 +226,7 @@ class sztCreator:
                     enemy = szt.enemys[0]
 
                     # 创建框架
-                    szt_frame = ttk.LabelFrame(self.scrollable_frame, text=enemy.name+"#"+szt_name)
+                    szt_frame = ttk.Labelframe(self.scrollable_frame, text=enemy.name+"#"+szt_name)
                     bind_szt_canvas(szt_frame, szt, 0, 0)
                     
                     # 计算位置

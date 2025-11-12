@@ -9,7 +9,7 @@ import 持有物.强化素材.strengthen_materials
 # 宝珠强化
 def creat_growth_ability_frame(parent_frame, growth_ability_frame_row, style):
     
-    growth_ability_frame = ttk.LabelFrame(parent_frame, text="强化")
+    growth_ability_frame = ttk.Labelframe(parent_frame, text="强化")
     growth_ability_frame.grid(row=growth_ability_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     growth_ability_frame.grid_rowconfigure(0, weight=1)
     growth_ability_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列

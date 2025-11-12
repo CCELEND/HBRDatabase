@@ -46,7 +46,7 @@ def creat_orb_skill_frame(scrollbar_frame_obj, orb_skill):
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
 
-    row_frame = ttk.LabelFrame(scrollbar_frame_obj.scrollable_frame, text=orb_skill.name)
+    row_frame = ttk.Labelframe(scrollbar_frame_obj.scrollable_frame, text=orb_skill.name)
     row_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew") #5
     row_frame.grid_rowconfigure(0, weight=1)
     # 配置 row_frame 的每一列权重
