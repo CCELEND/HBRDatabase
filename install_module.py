@@ -10,9 +10,9 @@ def install_modules():
     ]
     
     packages = [
-        "ttkbootstrap==1.12.0", "opencv-python", "pillow", "requests", 
-        "pygame", "numpy", "pandas", "openpyxl", 
-        "selenium", "webdriver-manager"
+        "ttkbootstrap==1.12.0", "opencv_python==4.11.0.86", "pillow==11.1.0", "Requests==2.32.3", 
+        "pygame==2.6.1", "numpy==2.1.3", "pandas==2.2.3", "openpyxl==3.1.5", 
+        "selenium==4.33.0", "webdriver-manager==4.0.2"
     ]
     
     for mirror in mirrors:
