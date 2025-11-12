@@ -10,7 +10,7 @@ def install_modules():
     ]
     
     packages = [
-        "ttkbootstrap", "opencv-python", "pillow", "requests", 
+        "ttkbootstrap==1.12.0", "opencv-python", "pillow", "requests", 
         "pygame", "numpy", "pandas", "openpyxl", 
         "selenium", "webdriver-manager"
     ]
