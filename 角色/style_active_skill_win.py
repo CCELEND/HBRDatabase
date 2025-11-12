@@ -34,7 +34,10 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
 
     # 技能消耗SP和使用次数
     if active_skill.max_uses:
-        text = "SP" + active_skill.sp_cost + '\n' + active_skill.max_uses
+        if active_skill.sp_cost.isdigit():
+            text = "SP" + active_skill.sp_cost + '\n' + active_skill.max_uses
+        else:
+            text = active_skill.sp_cost + '\n' + active_skill.max_uses
     else:
         text = "SP" + active_skill.sp_cost + '\n' + "∞"
     sp_use_lab = ttk.Label(desc_frame, text=text, 
