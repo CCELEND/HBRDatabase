@@ -90,7 +90,8 @@ def update_output(text):
 # 创建单个菜单项，并绑定命令
 def create_menu_item(menu, label, image, command, *args):
     if image:
-        menu.add_command(label=label, image=image, compound=ttk.LEFT, command=lambda: command(*args))
+        # menu.add_command(label=label, image=image, compound=ttk.LEFT, command=lambda: command(*args))
+        menu.add_command(label=label, image=image, compound="left", command=lambda: command(*args))
     else:
         menu.add_command(label=label, command=lambda: command(*args))
 
