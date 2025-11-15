@@ -12,7 +12,7 @@ def get_basic_info():
     print(f"操作系统版本：{platform.release()}")  # Windows 10/11 的版本号
     print(f"操作系统详细版本：{platform.version()}")  # 版本描述
     print(f"主机名：{platform.node()}")  # 计算机名称
-    print(f"硬件架构：{platform.machine()}")  # 如 x86_64（64位）
+    print(f"硬件架构：{platform.machine()}")
     print(f"Python 版本：{sys.version.split()[0]}")  # Python 解释器版本
     print(f"Python 路径：{sys.executable}")  # Python 解释器位置
 
