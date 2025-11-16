@@ -2,8 +2,10 @@ import os
 import sys
 import platform
 import psutil
+import subprocess
 
 # pip install psutil
+# pip install pipreqs
 
 def get_basic_info():
     # 获取基本系统信息
@@ -82,6 +84,23 @@ def get_network_info():
     print(f"\n总网络流量：接收{net_io.bytes_recv/(1024**3):.2f}GB，发送{net_io.bytes_sent/(1024**3):.2f}GB")
 
 
+def get_py_info():
+    # 获取python模块信息
+    print("\n===== python模块信息 =====") 
+    # pipreqs ./ --encoding=utf8 --print
+    args = ["pipreqs", "./", "--encoding=utf8", "--print"
+    ]
+    # subprocess.check_call(args)
+    result = subprocess.run(
+        args,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        text=True,
+        check=True
+    )
+    print(result.stdout)
+
+
 if __name__ == "__main__":
     import socket
     get_basic_info()
@@ -89,4 +108,5 @@ if __name__ == "__main__":
     get_memory_info()
     get_disk_info()
     get_network_info()
-    input()
+    get_py_info()
+    input("按任意键继续...\n")
