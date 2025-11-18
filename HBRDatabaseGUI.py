@@ -7,7 +7,7 @@ from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from window import load_menu_icon, get_ico_path_by_name
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import delete_old_file_and_subdirs
+from tools import delete_old_file_and_subdirs, is_admin
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
@@ -249,10 +249,15 @@ def create_menu(parent_frame, scrollbar_frame_obj):
 
 if __name__ == "__main__":
 
+    if is_admin():
+        root_win_name = "HBRDatabase - 以管理员身份运行"
+    else:
+        root_win_name = "HBRDatabase"
+
     delete_old_file_and_subdirs()
 
     # 创建主窗口
-    root = creat_window("HBRDatabase", 1160, 717, 440, 50)#1160
+    root = creat_window(root_win_name, 1160, 717, 440, 50)#1160
     set_global_bg(root)
     set_window_icon(root, "./favicon.ico")
     set_window_expand(root, rowspan=1, columnspan=6)
