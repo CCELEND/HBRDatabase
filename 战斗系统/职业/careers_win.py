@@ -46,10 +46,10 @@ def creat_career_win(event, parent_frame, career):
     desc_label.grid(row=0, column=0, sticky="nsew")
 
     # 绑定鼠标点击事件到父窗口，点击置顶
-    career_frame.bind("<Button-1>", win_set_top(career_frame, __name__))
+    career_win_frame.bind("<Button-1>", win_set_top(career_win_frame, __name__))
     # 窗口关闭时清理
-    career_frame.protocol("WM_DELETE_WINDOW", 
-        lambda: win_close_manage(career_frame, __name__))
+    career_win_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(career_win_frame, __name__))
 
     return "break"  # 阻止事件冒泡
 
