@@ -164,7 +164,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     career_options = [
         "ALL", 
         "攻击者", "破盾者", "破坏者", "治疗者", 
-        "增益者", "减益者", "防御者", "指挥者"
+        "增益者", "减益者", "防御者", "指挥者", "驰骋者"
     ]
     career_selected_values = []
     career_frame = creat_select_frame("职能", 

@@ -1,10 +1,11 @@
 
 {
-    "img_path":".webp",
-    "name":"",
-    "en":"",
-    "nicknames":[""],
-    "description":"",
-    "team":"",
-    "weapon_attribute":"斩突打"
+    "img_path":"./角色/司令部/NNanase/NNanaseProfile.webp",
+    "name":"七濑七海",
+    "en":"NNanase",
+    "nicknames":["nanami"],
+    "description":"CV：内田秀\n所属队伍：司令部 生日：- 身高：148cm 出生地：-\n负责照顾茅森等人的军官少女。年纪看起来很小，但入队资历比茅森等人早很多。\n以作战参谋的身分辅佐手冢。手冢肯定她天生的分析能力，相当尊重她的意见。\n擅长冷静地处理业务。",
+    "team":"司令部",
+    "weapon_attribute":"突",
+    "weapon":"摩托"
 }
