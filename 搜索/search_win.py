@@ -146,7 +146,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 获取全部队伍对象
     get_all_team_obj()
 
-    search_win_frame = creat_Toplevel("搜索", 715, 570, x=190, y=210) #715, 485
+    search_win_frame = creat_Toplevel("搜索", 730, 570, x=190, y=210) #715, 485
     set_window_icon(search_win_frame, "./搜索/search.ico")
     set_window_expand(search_win_frame, rowspan=1, columnspan=2)
 
@@ -175,7 +175,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
         "ALL", 
         "31A", "31B", "31C", "30G", 
         "31D", "31E", "31F", "31X", 
-        "Angel Beats!"
+        "Angel Beats!", "司令部"
     ]
     team_selected_values = []
     team_frame = creat_select_frame("队伍", 
