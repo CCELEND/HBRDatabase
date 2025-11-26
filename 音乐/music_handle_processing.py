@@ -53,6 +53,7 @@ album_cover_paths={
 }
 def get_album_cover_path(all_albun_name, file_name):
     if all_albun_name == "麻枝准_やなぎなぎ":
+        file_name = file_name.replace("29.Sailing Ship", "Welcome to the Dying Season")
         return album_cover_paths["麻枝准_やなぎなぎ"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "麻枝准_rionos":
         return album_cover_paths["麻枝准_rionos"] + file_name.replace("flac", "jpg")
