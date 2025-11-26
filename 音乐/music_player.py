@@ -71,17 +71,17 @@ class FLACPlayerApp:
     def create_widgets(self):
 
         file_frame = ttk.Frame(self.frame)
-        file_frame.pack(pady=(0, 5), fill=ttk.X)
+        file_frame.pack(pady=(0, 5), fill='x')
         self.file_label = ttk.Label(file_frame, text="未选择文件", width=50, anchor='w')
         self.file_label.pack(side="left", padx=5)
 
         # 进度条 - 使用Canvas实现更精确的点击跳转
         self.progress_frame = ttk.Frame(self.frame)
-        self.progress_frame.pack(pady=10, fill=ttk.X, padx=20)
+        self.progress_frame.pack(pady=10, fill='x', padx=20)
 
         # 实际进度显示
         self.progress_canvas = ttk.Canvas(self.progress_frame, height=20)
-        self.progress_canvas.pack(fill=ttk.X)
+        self.progress_canvas.pack(fill='x')
         self.progress_canvas.update()
         width = self.progress_canvas.winfo_width()
 
@@ -106,24 +106,24 @@ class FLACPlayerApp:
         control_frame = ttk.Frame(self.frame)
         control_frame.pack(pady=10)
 
-        self.play_btn = ttk.Button(control_frame, text="播放▶", command=self.play, state=ttk.DISABLED)
+        self.play_btn = ttk.Button(control_frame, text="播放▶", command=self.play, state='disabled')
         self.play_btn.pack(side="left", padx=5)
 
-        self.pause_btn = ttk.Button(control_frame, text="暂停⏸︎", command=self.pause, state=ttk.DISABLED)
+        self.pause_btn = ttk.Button(control_frame, text="暂停⏸︎", command=self.pause, state='disabled')
         self.pause_btn.pack(side="left", padx=5)
 
-        self.stop_btn = ttk.Button(control_frame, text="停止⏹︎", command=self.stop, state=ttk.DISABLED)
+        self.stop_btn = ttk.Button(control_frame, text="停止⏹︎", command=self.stop, state='disabled')
         self.stop_btn.pack(side="left", padx=5)
 
         #添加循环按钮
-        self.loop_btn = ttk.Button(control_frame, text="循环◻", command=self.toggle_loop, state=ttk.DISABLED)
+        self.loop_btn = ttk.Button(control_frame, text="循环◻", command=self.toggle_loop, state='disabled')
         self.loop_btn.pack(side="left", padx=5)
 
         # 音量控制
         volume_frame = ttk.Frame(self.frame)
         volume_frame.pack()
         ttk.Label(volume_frame, text="音量🔉").pack(side="left")
-        self.volume_scale = ttk.Scale(volume_frame, from_=0, to=100, orient=ttk.HORIZONTAL,
+        self.volume_scale = ttk.Scale(volume_frame, from_=0, to=100, orient='horizontal',
                                      command=self.set_volume)
         self.volume_scale.set(50)  # 默认音量设为50%
         self.volume_scale.pack(side="left")
@@ -145,8 +145,8 @@ class FLACPlayerApp:
             pygame.mixer.music.load(file_path)
             self.current_file = file_path
             self.file_label.config(text=os.path.basename(file_path))
-            # self.play_btn.config(state=ttk.NORMAL)
-            # self.loop_btn.config(state=ttk.NORMAL)
+            # self.play_btn.config(state='normal')
+            # self.loop_btn.config(state='normal')
 
             # 获取音频长度
             sound = pygame.mixer.Sound(file_path)
@@ -159,8 +159,8 @@ class FLACPlayerApp:
             self.frame.after(0, lambda: (
                 self.update_progress_display(0),
                 self.update_time_display(0, self.duration),
-                self.play_btn.config(state=ttk.NORMAL),
-                self.loop_btn.config(state=ttk.NORMAL)
+                self.play_btn.config(state='normal'),
+                self.loop_btn.config(state='normal')
             ))
 
             self.frame.update_idletasks()  # 强制更新UI
@@ -220,9 +220,9 @@ class FLACPlayerApp:
 
             # 使用 after(0) 确保 UI 更新在主线程执行
             self.frame.after(0, lambda: (
-                self.play_btn.config(state=ttk.DISABLED),
-                self.pause_btn.config(state=ttk.NORMAL),
-                self.stop_btn.config(state=ttk.NORMAL)
+                self.play_btn.config(state='disabled'),
+                self.pause_btn.config(state='normal'),
+                self.stop_btn.config(state='normal')
             ))
 
 
@@ -243,8 +243,8 @@ class FLACPlayerApp:
             # 保存当前位置
             self.current_position = self.get_current_pos()
             self.seek_time = time.time()  # 更新seek_time
-            self.play_btn.config(state=ttk.NORMAL)
-            self.pause_btn.config(state=ttk.DISABLED)
+            self.play_btn.config(state='normal')
+            self.pause_btn.config(state='disabled')
 
     # 停止播放
     def stop(self):
@@ -263,9 +263,9 @@ class FLACPlayerApp:
         self.frame.after(0, lambda: (
             self.update_progress_display(0),
             self.update_time_display(0, self.duration),
-            self.play_btn.config(state=ttk.NORMAL),
-            self.pause_btn.config(state=ttk.DISABLED),
-            self.stop_btn.config(state=ttk.DISABLED)
+            self.play_btn.config(state='normal'),
+            self.pause_btn.config(state='disabled'),
+            self.stop_btn.config(state='disabled')
         ))
 
     # 设置音量

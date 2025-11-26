@@ -20,7 +20,7 @@ output_text = None
 
 # 获取伤害上限
 def get_maximum_damage_limit():
-	maximum_damage_limit_str = maximum_damage_limit_text.get("1.0", ttk.END)
+	maximum_damage_limit_str = maximum_damage_limit_text.get("1.0", 'end')
 	maximum_damage_limit_str = maximum_damage_limit_str.strip()
 	if maximum_damage_limit_str == "":
 		return 300000
@@ -36,7 +36,7 @@ def get_maximum_damage_limit():
 
 
 def get_input():
-	input_text_str = input_text.get("1.0", ttk.END)
+	input_text_str = input_text.get("1.0", 'end')
 	input_text_str = input_text_str.strip()
 	if input_text_str == "":
 		clear_text(output_text)
@@ -159,7 +159,7 @@ def creat_dsc_win():
 
 	# 输出框
 	output_text = scrolledtext.ScrolledText(output_frame, 
-		wrap="word", width=50, height=3, state=ttk.DISABLED)
+		wrap="word", width=50, height=3, state='disabled')
 	output_text.grid(row=1, column=0, padx=10, pady=0, sticky="nsew")
 	# 绑定鼠标右键点击事件到上下文菜单
 	output_text.bind("<Button-3>", lambda event, tw=output_text: show_context_menu(event, tw))

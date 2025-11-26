@@ -65,25 +65,25 @@ def clear_entries():
 # 清空输入输出框及字典
 def clear_text(*text_widgets):
     for text_widget in text_widgets:
-        if text_widget.cget('state') == ttk.DISABLED:
-            text_widget.config(state=ttk.NORMAL)
-            text_widget.delete("1.0", ttk.END)
-            text_widget.config(state=ttk.DISABLED)
+        if text_widget.cget('state') == 'disabled':
+            text_widget.config(state='normal')
+            text_widget.delete("1.0", 'end')
+            text_widget.config(state='disabled')
         else:
-            text_widget.delete("1.0", ttk.END)
+            text_widget.delete("1.0", 'end')
 
     clear_entries()
 
 # 编辑文本框
 def edit_text(text_widget, data):
-    if text_widget.cget('state') == ttk.DISABLED:
-        text_widget.config(state=ttk.NORMAL)
-        text_widget.delete("1.0", ttk.END)
-        text_widget.insert(ttk.END, data)
-        text_widget.config(state=ttk.DISABLED)
+    if text_widget.cget('state') == 'disabled':
+        text_widget.config(state='normal')
+        text_widget.delete("1.0", 'end')
+        text_widget.insert('end', data)
+        text_widget.config(state='disabled')
     else:
-        text_widget.delete("1.0", ttk.END)
-        text_widget.insert(ttk.END, data)
+        text_widget.delete("1.0", 'end')
+        text_widget.insert('end', data)
 
 
 def print_dir(dir_data):

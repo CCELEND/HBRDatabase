@@ -68,7 +68,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 
     set_window_top(search_win_frame)
     # 获取关键词
-    key_word_str = key_word_text.get("1.0", ttk.END)
+    key_word_str = key_word_text.get("1.0", 'end')
     key_word_str = key_word_str.strip()
 
     # 关键词处理

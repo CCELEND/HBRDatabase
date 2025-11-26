@@ -23,7 +23,7 @@ output_text_v2 = None
 
 # 获取伤害阈值
 def get_threshold_value():
-	threshold_value_str = threshold_value_text.get("1.0", ttk.END)
+	threshold_value_str = threshold_value_text.get("1.0", 'end')
 	threshold_value_str = threshold_value_str.strip()
 	if threshold_value_str == "":
 		return 42000000
@@ -39,7 +39,7 @@ def get_threshold_value():
 
 # 获取伤害分系数
 def get_damage_coefficient():
-	damage_coefficient_str = damage_coefficient_text.get("1.0", ttk.END)
+	damage_coefficient_str = damage_coefficient_text.get("1.0", 'end')
 	damage_coefficient_str = damage_coefficient_str.strip()
 	if damage_coefficient_str == "":
 		return 0.47
@@ -54,7 +54,7 @@ def get_damage_coefficient():
 	return damage_coefficient
 
 def get_input():
-	input_text_v2_str = input_text_v2.get("1.0", ttk.END)
+	input_text_v2_str = input_text_v2.get("1.0", 'end')
 	input_text_v2_str = input_text_v2_str.strip()
 	if input_text_v2_str == "":
 		clear_text(output_text_v2)
@@ -226,7 +226,7 @@ def creat_dsc_win_v2():
 
 	# 输出框
 	output_text_v2 = scrolledtext.ScrolledText(output_frame, 
-		wrap="word", width=50, height=3, state=ttk.DISABLED)
+		wrap="word", width=50, height=3, state='disabled')
 	output_text_v2.grid(row=1, column=0, padx=10, pady=0, sticky="nsew")
 	# 绑定鼠标右键点击事件到上下文菜单
 	output_text_v2.bind("<Button-3>", lambda event, tw=output_text_v2: show_context_menu(event, tw))
