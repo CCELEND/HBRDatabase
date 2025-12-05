@@ -1,3 +1,150 @@
+# import sys
+# import json
+# import requests
+# from tkinter import messagebox
+# import tkinter as tk
+# from tkinter import ttk
+# from threading import Thread
+# from urllib.parse import quote
+
+# from window import set_window_icon, creat_window
+# from tools import creat_directory
+
+# from 日志.advanced_logger import AdvancedLogger
+# logger = AdvancedLogger.get_logger(__name__)
+
+# is_updating = False
+        
+# # 将文件哈希值字典发送到服务器
+# def send_hashes_to_server(server_url, client_file_hashes):
+#     headers = {'Content-Type': 'application/json'}
+#     response = requests.post(server_url, data=json.dumps(client_file_hashes), headers=headers, timeout=5)
+#     return response.json()
+
+# def download_files_with_progress(files_to_download, server_url):
+
+#     global is_updating
+#     # 创建进度窗口
+#     progress_window = creat_window("修复", 600, 166, 440, 50)
+#     set_window_icon(progress_window, "./修复/net.ico")
+    
+#     # 进度条
+#     progress = ttk.Progressbar(progress_window, orient="horizontal", 
+#                              length=500, mode="determinate")
+#     progress.pack(pady=20, padx=20)
+    
+#     # 状态标签
+#     status_var = tk.StringVar()
+#     status_var.set("正在下载修复资源...")
+#     status_label = tk.Label(progress_window, textvariable=status_var)
+#     status_label.pack()
+    
+#     # 进度百分比
+#     percent_var = tk.StringVar()
+#     percent_var.set("0%")
+#     percent_label = tk.Label(progress_window, textvariable=percent_var)
+#     percent_label.pack()
+    
+#     # 当前文件标签
+#     file_var = tk.StringVar()
+#     file_var.set("")
+#     file_label = tk.Label(progress_window, textvariable=file_var)
+#     file_label.pack(pady=10)
+    
+#     def check_completion():
+#         if progress['value'] < progress['maximum']:
+#             progress_window.after(100, check_completion)
+#         else:
+#             global is_updating
+#             is_updating = False
+#             status_var.set("修复完成！")
+#             messagebox.showinfo("提示", "成功修复与重置")
+#             progress_window.destroy()  # 先销毁窗口
+#             progress_window.quit()  # 停止主循环
+#             sys.exit()
+    
+#     def download_thread():
+#         total_files = len(files_to_download)
+#         progress['maximum'] = total_files * 100  # 每个文件100单位
+        
+#         for i, file_name in enumerate(files_to_download):
+#             try:
+#                 file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
+#                 progress_window.update()
+                
+#                 # 创建目录
+#                 creat_directory(file_name)
+                
+#                 # 编码特殊字符
+#                 encoded_name = quote(file_name)
+#                 url = f"{server_url}/download/{encoded_name}"
+                
+#                 # 流式下载
+#                 with requests.get(url, stream=True) as response:
+#                     response.raise_for_status()
+                    
+#                     # 检查是否是错误响应
+#                     if response.status_code != 200:
+#                         err_info = response.json()
+#                         logger.error(f"{err_info.get('error', '未知错误')}")
+#                         messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
+#                         global is_updating
+#                         is_updating = False
+#                         progress_window.destroy()
+#                         break
+                    
+#                     total_size = int(response.headers.get('content-length', 0))
+#                     downloaded = 0
+                    
+#                     # 保存文件
+#                     with open(file_name, 'wb') as f:
+#                         for chunk in response.iter_content(chunk_size=8192):
+#                             if chunk:  # 过滤掉保持连接的空白块
+#                                 f.write(chunk)
+#                                 downloaded += len(chunk)
+                                
+#                                 # 更新进度
+#                                 if total_size > 0:
+#                                     file_progress = int(downloaded / total_size * 100)
+#                                     overall_progress = i * 100 + file_progress
+#                                     progress['value'] = overall_progress
+#                                     percent_var.set(f"{int(overall_progress / total_files)}%")
+#                                     progress_window.update()
+            
+#             except Exception as e:
+#                 logger.error(f"'{file_name}' 下载失败\n请重试 {str(e)}")
+#                 messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
+#                 is_updating = False
+#                 progress_window.destroy()
+#                 break
+#             else:
+#                 # 完成一个文件，增加进度
+#                 progress['value'] = (i + 1) * 100
+#                 percent_var.set(f"{int((i + 1) / total_files * 100)}%")
+#                 progress_window.update()
+        
+#         # 下载完成后检查状态
+#         check_completion()
+    
+#     # 在新线程中执行下载
+#     Thread(target=download_thread, daemon=True).start()
+
+#     progress_window.mainloop()
+
+
+# # 从服务器下载文件
+# def download_files_from_server(server_url, files_to_download):
+#     if files_to_download:
+#         global is_updating
+#         is_updating = True
+#         download_files_with_progress(files_to_download, server_url)
+
+#     else:
+#         messagebox.showinfo("提示", "未发现资源完整性冲突")
+#         
+
+
+
 import sys
 import json
 import requests
@@ -9,21 +156,18 @@ from urllib.parse import quote
 
 from window import set_window_icon, creat_window
 from tools import creat_directory
-
 from 日志.advanced_logger import AdvancedLogger
-logger = AdvancedLogger.get_logger(__name__)
 
+logger = AdvancedLogger.get_logger(__name__)
 is_updating = False
-        
+
 # 将文件哈希值字典发送到服务器
 def send_hashes_to_server(server_url, client_file_hashes):
     headers = {'Content-Type': 'application/json'}
     response = requests.post(server_url, data=json.dumps(client_file_hashes), headers=headers, timeout=5)
     return response.json()
 
-def download_files_with_progress(files_to_download, server_url):
-
-    global is_updating
+def create_progress_window():
     # 创建进度窗口
     progress_window = creat_window("修复", 600, 166, 440, 50)
     set_window_icon(progress_window, "./修复/net.ico")
@@ -47,98 +191,133 @@ def download_files_with_progress(files_to_download, server_url):
     
     # 当前文件标签
     file_var = tk.StringVar()
-    file_var.set("")
     file_label = tk.Label(progress_window, textvariable=file_var)
     file_label.pack(pady=10)
     
-    def check_completion():
-        if progress['value'] < progress['maximum']:
-            progress_window.after(100, check_completion)
-        else:
+    return progress_window, progress, status_var, percent_var, file_var
+
+def handle_download_completion(progress_window, progress, status_var):
+    # 下载完成后
+    if progress['value'] >= progress['maximum']:
+        global is_updating
+        is_updating = False
+        status_var.set("修复完成！")
+        messagebox.showinfo("提示", "成功修复与重置")
+        progress_window.destroy()
+        progress_window.quit()
+        sys.exit()
+    else:
+        progress_window.after(100, lambda: handle_download_completion(
+            progress_window, progress, status_var
+        ))
+
+def download_single_file(file_name, i, total_files, server_url, 
+                          progress, percent_var, file_var, progress_window):
+    # 下载单个文件
+    try:
+        file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
+        progress_window.update()
+        
+        # 创建目录
+        creat_directory(file_name)
+        
+        # 编码特殊字符并下载
+        encoded_name = quote(file_name)
+        url = f"{server_url}/download/{encoded_name}"
+        
+        perform_download(file_name, url, i, total_files, 
+                         progress, percent_var, progress_window)
+        return True
+        
+    except Exception as e:
+        handle_download_error(file_name, e)
+        return False
+
+def perform_download(file_name, url, file_index, total_files, 
+                     progress, percent_var, progress_window):
+    # 执行文件下载
+    with requests.get(url, stream=True) as response:
+        response.raise_for_status()
+        
+        # 检查是否是错误响应
+        if response.status_code != 200:
+            err_info = response.json()
+            logger.error(f"{err_info.get('error', '未知错误')}")
+            messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
             global is_updating
             is_updating = False
-            status_var.set("修复完成！")
-            messagebox.showinfo("提示", "成功修复与重置")
-            progress_window.destroy()  # 先销毁窗口
-            progress_window.quit()  # 停止主循环
-            sys.exit()
+            return
+        
+        total_size = int(response.headers.get('content-length', 0))
+        downloaded = 0
+        
+        # 保存文件
+        with open(file_name, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:  # 过滤掉保持连接的空白块
+                    f.write(chunk)
+                    downloaded += len(chunk)
+                    update_progress(file_index, total_files, downloaded, 
+                        total_size, progress, percent_var, progress_window)
+
+def update_progress(file_index, total_files, downloaded, total_size,
+                    progress, percent_var, progress_window):
+    # 更新进度显示
+    if total_size > 0:
+        file_progress = int(downloaded / total_size * 100)
+        overall_progress = file_index * 100 + file_progress
+        progress['value'] = overall_progress
+        percent_var.set(f"{int(overall_progress / total_files)}%")
+        progress_window.update()
+
+def handle_download_error(file_name, error):
+    # 处理下载错误
+    logger.error(f"'{file_name}' 下载失败\n请重试 {str(error)}")
+    messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(error)}")
+    global is_updating
+    is_updating = False
+
+def download_thread(files_to_download, server_url, progress_window, 
+                    progress, status_var, percent_var, file_var):
+    # 下载线程
+    total_files = len(files_to_download)
+    progress['maximum'] = total_files * 100  # 每个文件100单位
     
-    def download_thread():
-        total_files = len(files_to_download)
-        progress['maximum'] = total_files * 100  # 每个文件100单位
+    for i, file_name in enumerate(files_to_download):
+        success = download_single_file(file_name, i, total_files, server_url,
+                                progress, percent_var, file_var, progress_window)
         
-        for i, file_name in enumerate(files_to_download):
-            try:
-                file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
-                progress_window.update()
-                
-                # 创建目录
-                creat_directory(file_name)
-                
-                # 编码特殊字符
-                encoded_name = quote(file_name)
-                url = f"{server_url}/download/{encoded_name}"
-                
-                # 流式下载
-                with requests.get(url, stream=True) as response:
-                    response.raise_for_status()
-                    
-                    # 检查是否是错误响应
-                    if response.status_code != 200:
-                        err_info = response.json()
-                        logger.error(f"{err_info.get('error', '未知错误')}")
-                        messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
-                        global is_updating
-                        is_updating = False
-                        progress_window.destroy()
-                        break
-                    
-                    total_size = int(response.headers.get('content-length', 0))
-                    downloaded = 0
-                    
-                    # 保存文件
-                    with open(file_name, 'wb') as f:
-                        for chunk in response.iter_content(chunk_size=8192):
-                            if chunk:  # 过滤掉保持连接的空白块
-                                f.write(chunk)
-                                downloaded += len(chunk)
-                                
-                                # 更新进度
-                                if total_size > 0:
-                                    file_progress = int(downloaded / total_size * 100)
-                                    overall_progress = i * 100 + file_progress
-                                    progress['value'] = overall_progress
-                                    percent_var.set(f"{int(overall_progress / total_files)}%")
-                                    progress_window.update()
-            
-            except Exception as e:
-                logger.error(f"'{file_name}' 下载失败\n请重试 {str(e)}")
-                messagebox.showerror("错误", f"'{file_name}' 下载失败\n请重试 {str(e)}")
-                is_updating = False
-                progress_window.destroy()
-                break
-            else:
-                # 完成一个文件，增加进度
-                progress['value'] = (i + 1) * 100
-                percent_var.set(f"{int((i + 1) / total_files * 100)}%")
-                progress_window.update()
+        if not success:
+            progress_window.destroy()
+            return
         
-        # 下载完成后检查状态
-        check_completion()
+        # 完成一个文件，增加进度
+        progress['value'] = (i + 1) * 100
+        percent_var.set(f"{int((i + 1) / total_files * 100)}%")
+        progress_window.update()
+    
+    # 下载完成后检查状态
+    handle_download_completion(progress_window, progress, status_var)
+
+def download_files_with_progress(files_to_download, server_url):
+    global is_updating
+    is_updating = True
+    
+    # 创建进度窗口
+    progress_window, progress, status_var, percent_var, file_var = create_progress_window()
     
     # 在新线程中执行下载
-    Thread(target=download_thread, daemon=True).start()
-
+    Thread(target=download_thread, args=(
+        files_to_download, server_url, progress_window,
+        progress, status_var, percent_var, file_var
+    ), daemon=True).start()
+    
     progress_window.mainloop()
-
 
 # 从服务器下载文件
 def download_files_from_server(server_url, files_to_download):
-    if files_to_download:
-        global is_updating
-        is_updating = True
-        download_files_with_progress(files_to_download, server_url)
-
-    else:
+    if not files_to_download:
         messagebox.showinfo("提示", "未发现资源完整性冲突")
-        
+        return
+    
+    download_files_with_progress(files_to_download, server_url)
