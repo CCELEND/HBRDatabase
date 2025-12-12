@@ -20,7 +20,7 @@ def creat_about_win(parent_frame):
     # 创建 Labelframe
     ver_frame = ttk.Labelframe(about_win_frame, text="🧰版本")
     ver_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=(5,0), sticky="nsew")
-    describe = "HBRDatabase1.80 (build-190b1cfa) [main ee370a5]"
+    describe = "HBRDatabase1.82 (build-4e87acc5) [main ee370a5]"
     # 设置了标签的字体为 Monospace 大小为 10，加粗
     label = ttk.Label(ver_frame, text=describe, anchor="center", font=("Monospace", 10, "bold"))
     label.grid(row=0, column=0, sticky="nsew", padx=5, pady=5)
