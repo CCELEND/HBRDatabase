@@ -44,7 +44,9 @@ def show_role_full_img(event, parent_frame, role, team):
     displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840)
 
     # 窗口关闭时清理
-    role_full_img_frame.protocol("WM_DELETE_WINDOW", lambda: win_close_manage(role_full_img_frame, displayer))
+    role_full_img_frame.protocol("WM_DELETE_WINDOW", 
+        lambda: win_close_manage(role_full_img_frame, __name__, displayer)
+    )
 
     return "break"  # 阻止事件冒泡
 
