@@ -14,7 +14,7 @@ def is_skill_change(active_skill):
         return False
 
 # 技能切换按钮触发
-def active_skill_change_proc(row_frame, change_effects_infos, active_skill):
+def active_skill_change_proc(scrollbar_frame_obj, row_frame, change_effects_infos, active_skill):
 
     # 获取切换技能效果信息列表的描述索引
     desc_index = get_list_not_isinstance_index(change_effects_infos)
@@ -58,9 +58,12 @@ def active_skill_change_proc(row_frame, change_effects_infos, active_skill):
     bind_lv_combo_lab(lv_combo, lv_combo_labs, lv_combo_texts)
     lv_combo.set("Skill Lv.1")
 
+    # effect_frames 重新设置会导致布局改变，需要重新刷新滚动条
+    scrollbar_frame_obj.update_canvas()
+
 
 # 创建切换技能按钮并绑定点击处理函数
-def creat_active_skill_change_frame(parent_frame, active_skill):
+def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill):
 
     change_button_frame = ttk.Frame(parent_frame)
     change_button_frame.grid(row=1, column=0, columnspan=4, pady=5, sticky="nsew")
@@ -76,7 +79,8 @@ def creat_active_skill_change_frame(parent_frame, active_skill):
 
         change_button = ttk.Button(change_button_frame, 
             text=change_name, bootstyle="primary-outline",
-            command=lambda change_effects_infos=change_effects_infos: active_skill_change_proc(parent_frame, change_effects_infos, active_skill))
+            command=lambda change_effects_infos=change_effects_infos: active_skill_change_proc(scrollbar_frame_obj, 
+                parent_frame, change_effects_infos, active_skill))
 
         change_button.grid(row=0, column=i, padx=(10,0), sticky="nsew")
         # change_button_frame.grid_columnconfigure(i, weight=1)

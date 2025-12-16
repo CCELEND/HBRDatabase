@@ -38,7 +38,7 @@ def show_style(scrollbar_frame_obj, style):
     creat_career_frame(parent_frame, 0, style)
 
     # 主动技能
-    creat_active_skill_frame(parent_frame, 1, style)
+    creat_active_skill_frame(scrollbar_frame_obj, parent_frame, 1, style)
 
     # 被动技能
     creat_passive_skill_frame(parent_frame, 2, style)

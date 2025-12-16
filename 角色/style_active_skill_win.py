@@ -43,7 +43,7 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
 
 
 # 主动技能
-def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
+def creat_active_skill_frame(scrollbar_frame_obj, parent_frame, active_skill_frame_row, style):
 
     # combos = {}
     # 创建自定义样式
@@ -80,7 +80,7 @@ def creat_active_skill_frame(parent_frame, active_skill_frame_row, style):
         # 判断是否存在切换技能
         if is_skill_change(active_skill):
             # 创建技能切换按钮 frame
-            show_effects = creat_active_skill_change_frame(row_frame, active_skill)
+            show_effects = creat_active_skill_change_frame(scrollbar_frame_obj, row_frame, active_skill)
             effect_frames_row += 1
         else:
             show_effects = active_skill.effects
