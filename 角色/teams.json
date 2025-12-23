@@ -368,6 +368,21 @@
             "id":"10204",
             "en":"BiancaA",
             "path":"./角色/Angel Beats!/BiancaA"
+        },
+        "关根诗织":{
+            "id":"10205",
+            "en":"CathyA",
+            "path":"./角色/Angel Beats!/CathyA"
+        },
+        "芳冈由依":{
+            "id":"10206",
+            "en":"CathyB",
+            "path":"./角色/Angel Beats!/CathyB"
+        },
+        "岩泽雅美":{
+            "id":"10207",
+            "en":"CathyC",
+            "path":"./角色/Angel Beats!/CathyC"
         }
         
     }

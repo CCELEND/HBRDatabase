@@ -1,10 +1,12 @@
 
 {
-    "img_path":".webp",
-    "name":"",
-    "en":"",
-    "nicknames":[""],
-    "description":"",
-    "team":"",
-    "weapon_attribute":"斩突打"
+    "img_path":"./角色/Angel Beats!/CathyC/CathyCProfile.webp",
+    "name":"岩泽雅美",
+    "en":"CathyC",
+    "nicknames":["YUI","由依"],
+    "description":"CV：泽城美雪\n所属队伍：Angel Beats! 生日：- 身高：- 出生地：-\n『弹奏rock吧』\n死后世界的人气乐团Girls Dead Monster的吉他手兼主唱。\n不只演奏，作词作曲也是亲力亲为。\n沉着冷静的外表下藏着一颗热爱音乐的心，具备天才般的优秀资质。\n基本上满脑子只想着音乐，不太在乎其他的事。",
+    "team":"Angel Beats!",
+    "weapon_attribute":"突",
+    "weapon":"炮"
 }
+
