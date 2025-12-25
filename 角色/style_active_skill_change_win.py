@@ -61,29 +61,63 @@ def active_skill_change_proc(scrollbar_frame_obj, row_frame, change_effects_info
     # effect_frames 重新设置会导致布局改变，需要重新刷新滚动条
     scrollbar_frame_obj.update_canvas()
 
+# 共享管理器
+class ChangeButtonManager:
+    def __init__(self):
+        self.current_button = None
+        self.current_name = ""
+    
+    def handle_button_click(self, scrollbar_frame_obj, parent_frame, change_effects_infos, 
+                          active_skill, button, change_name):
+
+        active_skill_change_proc(scrollbar_frame_obj, parent_frame, change_effects_infos, active_skill)
+        
+        # 高亮处理
+        if self.current_button is not None:
+            self.current_button.config(bootstyle="primary-outline")
+        
+        # 设置当前按钮为高亮
+        button.config(bootstyle="primary")
+        self.current_button = button
+        self.current_name = change_name
+
 
 # 创建切换技能按钮并绑定点击处理函数
 def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill):
-
+    # 创建共享管理器实例
+    button_manager = ChangeButtonManager()
+    
     change_button_frame = ttk.Frame(parent_frame)
     change_button_frame.grid(row=1, column=0, columnspan=4, pady=5, sticky="nsew")
-    change_button_frame.grid_rowconfigure(0, weight=1)  # 确保行填充
+    change_button_frame.grid_rowconfigure(0, weight=1)
 
     default_change_name = ""
+    buttons = []  # 存储所有按钮引用
     for i, change_name in enumerate(active_skill.switch):
         if not default_change_name: 
             default_change_name = change_name
 
-        # 切换技能效果信息列表
         change_effects_infos = active_skill.switch[change_name]
 
+        # 创建按钮
         change_button = ttk.Button(change_button_frame, 
-            text=change_name, bootstyle="primary-outline",
-            command=lambda change_effects_infos=change_effects_infos: active_skill_change_proc(scrollbar_frame_obj, 
-                parent_frame, change_effects_infos, active_skill))
-
+            text=change_name, bootstyle="primary-outline")
+        
+        # 闭包保存当前按钮
+        def make_command(cn=change_name, cei=change_effects_infos, btn=change_button):
+            return lambda: button_manager.handle_button_click(
+                scrollbar_frame_obj, parent_frame, cei, active_skill, btn, cn
+            )
+        
+        change_button.config(command=make_command())
         change_button.grid(row=0, column=i, padx=(10,0), sticky="nsew")
-        # change_button_frame.grid_columnconfigure(i, weight=1)
+        buttons.append(change_button)
+    
+    # 默认选中第一个按钮
+    if buttons:
+        buttons[0].config(bootstyle="primary")
+        button_manager.current_button = buttons[0]
+        button_manager.current_name = list(active_skill.switch.keys())[0]
 
     # 默认的切换技能列表
     default_change_effects = []
