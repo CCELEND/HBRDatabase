@@ -7,6 +7,50 @@ from canvas_events import get_photo, create_canvas_with_image
 import 战斗系统.职业.careers_info
 import 战斗系统.属性.attributes_info
 
+# 单元素属性
+def _create_single_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info):
+
+    element_attribute_path = attributes_info[element_attribute].path
+    element_attribute_photo = get_photo(element_attribute_path, (40, 40))
+    element_attribute_canvas = create_canvas_with_image(parent_frame, 
+        element_attribute_photo, 60, 40, 0, 0, 0, 1)
+
+    weapon_attribute_path = attributes_info[weapon_attribute].path
+    weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
+    weapon_attribute_canvas = create_canvas_with_image(parent_frame, 
+        weapon_attribute_photo, 40, 40, 0, 0, 0, 2)
+
+# 双元素属性
+def _create_double_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info):
+
+    element_attribute_path0  = attributes_info[element_attribute[0]].path
+    element_attribute_photo = get_photo(element_attribute_path0, (40, 40))
+    element_attribute_canvas = create_canvas_with_image(parent_frame, 
+        element_attribute_photo, 60, 40, 0, 0, 0, 1)
+
+    element_attribute_path1  = attributes_info[element_attribute[1]].path
+    element_attribute_photo1 = get_photo(element_attribute_path1, (40, 40))
+    element_attribute_canvas = create_canvas_with_image(parent_frame, 
+        element_attribute_photo1, 60, 40, 0, 0, 0, 2)
+
+    weapon_attribute_path = attributes_info[weapon_attribute].path
+    weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
+    weapon_attribute_canvas = create_canvas_with_image(parent_frame, 
+        weapon_attribute_photo, 40, 40, 0, 0, 0, 3)
+
+def _create_attribute_widgets(parent_frame, element_attribute, weapon_attribute):
+
+    attributes_info = 战斗系统.属性.attributes_info.attributes
+    if len(element_attribute) == 1:
+        # 单元素属性
+        _create_single_element_attribute(parent_frame, 
+            element_attribute, weapon_attribute, attributes_info)
+    else:
+        # 双元素属性
+        _create_double_element_attribute(parent_frame, 
+            element_attribute, weapon_attribute, attributes_info)
+
+
 # 职能 frame
 def creat_career_frame(parent_frame, career_frame_row, style):
 
@@ -21,32 +65,7 @@ def creat_career_frame(parent_frame, career_frame_row, style):
     career_photo = get_photo(career.path, (200, 40))
     career_canvas = create_canvas_with_image(career_frame, 
         career_photo, 240, 40, 20, 0, 0, 0)
-
-    if len(element_attribute) == 1:
-        element_attribute_path = 战斗系统.属性.attributes_info.attributes[element_attribute].path
-        element_attribute_photo = get_photo(element_attribute_path, (40, 40))
-        element_attribute_canvas = create_canvas_with_image(career_frame, 
-            element_attribute_photo, 60, 40, 0, 0, 0, 1)
-
-        weapon_attribute_path = 战斗系统.属性.attributes_info.attributes[weapon_attribute].path
-        weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
-        weapon_attribute_canvas = create_canvas_with_image(career_frame, 
-            weapon_attribute_photo, 40, 40, 0, 0, 0, 2)
-        
-    else:
-        element_attribute_path0  = 战斗系统.属性.attributes_info.attributes[element_attribute[0]].path
-        element_attribute_path1  = 战斗系统.属性.attributes_info.attributes[element_attribute[1]].path
-
-        element_attribute_photo = get_photo(element_attribute_path0, (40, 40))
-        element_attribute_canvas = create_canvas_with_image(career_frame, 
-            element_attribute_photo, 60, 40, 0, 0, 0, 1)
-
-        element_attribute_photo1 = get_photo(element_attribute_path1, (40, 40))
-        element_attribute_canvas = create_canvas_with_image(career_frame, 
-            element_attribute_photo1, 60, 40, 0, 0, 0, 2)
-
-        weapon_attribute_path = 战斗系统.属性.attributes_info.attributes[weapon_attribute].path
-        weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
-        weapon_attribute_canvas = create_canvas_with_image(career_frame, 
-            weapon_attribute_photo, 40, 40, 0, 0, 0, 3)
+    
+    # 元素属性和武器属性
+    _create_attribute_widgets(career_frame, element_attribute, weapon_attribute)
 
