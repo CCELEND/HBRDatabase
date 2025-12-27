@@ -11,9 +11,10 @@ import 战斗系统.属性.attributes_info
 def creat_career_frame(parent_frame, career_frame_row, style):
 
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"
+    weapon_attribute = style.weapon_attribute
 
     career = 战斗系统.职业.careers_info.careers[style.career]
-    career_frame = ttk.Labelframe(parent_frame, text=style.career+"-"+element_attribute)
+    career_frame = ttk.Labelframe(parent_frame, text=style.career+"-"+element_attribute+"-"+weapon_attribute)
     career_frame.grid(row=career_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
     career_frame.grid_rowconfigure(0, weight=1)
 
@@ -25,7 +26,13 @@ def creat_career_frame(parent_frame, career_frame_row, style):
         element_attribute_path = 战斗系统.属性.attributes_info.attributes[element_attribute].path
         element_attribute_photo = get_photo(element_attribute_path, (40, 40))
         element_attribute_canvas = create_canvas_with_image(career_frame, 
-            element_attribute_photo, 80, 40, 0, 0, 0, 1)
+            element_attribute_photo, 60, 40, 0, 0, 0, 1)
+
+        weapon_attribute_path = 战斗系统.属性.attributes_info.attributes[weapon_attribute].path
+        weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
+        weapon_attribute_canvas = create_canvas_with_image(career_frame, 
+            weapon_attribute_photo, 40, 40, 0, 0, 0, 2)
+        
     else:
         element_attribute_path0  = 战斗系统.属性.attributes_info.attributes[element_attribute[0]].path
         element_attribute_path1  = 战斗系统.属性.attributes_info.attributes[element_attribute[1]].path
@@ -36,5 +43,10 @@ def creat_career_frame(parent_frame, career_frame_row, style):
 
         element_attribute_photo1 = get_photo(element_attribute_path1, (40, 40))
         element_attribute_canvas = create_canvas_with_image(career_frame, 
-            element_attribute_photo1, 40, 40, 0, 0, 0, 2)
+            element_attribute_photo1, 60, 40, 0, 0, 0, 2)
+
+        weapon_attribute_path = 战斗系统.属性.attributes_info.attributes[weapon_attribute].path
+        weapon_attribute_photo = get_photo(weapon_attribute_path, (40, 40))
+        weapon_attribute_canvas = create_canvas_with_image(career_frame, 
+            weapon_attribute_photo, 40, 40, 0, 0, 0, 3)
 
