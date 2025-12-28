@@ -1308,6 +1308,112 @@
             "weakness":"斩-50、暗-50","resist":""
         }
     }
+},
+
+"HELL-62F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-62F",
+    "enemys":
+    {
+        "DarkRayHammer":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DarkRayHammer",
+            "border":"453",
+            "DP":"1,700,000","HP":"56,000,000",
+            "weakness":"打-150、光-150","resist":""
+        },
+        "DarkRayHammer2":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"DarkRayHammer2",
+            "border":"453",
+            "DP":"1,700,000","HP":"56,000,000",
+            "weakness":"打-150、光-150","resist":""
+        }
+    }
+},
+
+"HELL-63F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-63F",
+    "enemys":
+    {
+        "暗影·理莎[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·理莎[]",
+            "border":"453",
+            "DP":"18,000,000","HP":"1,200,000",
+            "weakness":"突-150","resist":""
+        }
+    }
+},
+
+"HELL-64F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-64F",
+    "enemys":
+    {
+        "ArachneYellowLine":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"ArachneYellowLine",
+            "border":"453",
+            "DP":"3,900,000","HP":"95,000,000",
+            "weakness":"突-150、火-150","resist":"打+50"
+        }
+    }
+},
+
+"HELL-65F":
+{
+    "img_path":"./敌人/时钟塔/boss.png",
+    "logo_path":"./敌人/时钟塔/boss.ico",
+    "name":"HELL-65F",
+    "enemys":
+    {
+        "暗影·玉[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·玉[]",
+            "border":"453",
+            "DP":"170,000","HP":"2,100,000",
+            "weakness":"斩-150","resist":""
+        },
+        "暗影·惠[]":
+        {
+            "img_path":"./敌人/时钟塔/boss.png",
+            "name":"暗影·惠[]",
+            "border":"453",
+            "DP":"450,000","HP":"1,100,000",
+            "weakness":"打-150","resist":""
+        }
+    }
+},
+
+"HELL-66F":
+{
+    "img_path":"./敌人/时钟塔/ordinary.png",
+    "logo_path":"./敌人/时钟塔/ordinary.ico",
+    "name":"HELL-66F",
+    "enemys":
+    {
+        "BlueSpiral":
+        {
+            "img_path":"./敌人/时钟塔/ordinary.png",
+            "name":"BlueSpiral",
+            "border":"453",
+            "DP":"3,000,000","HP":"4,400,000",
+            "weakness":"斩-50、雷-150","resist":"突+50"
+        }
+    }
 }
 
 }
