@@ -44,6 +44,15 @@
     "logo_path":"./敌人/恒星战/沙海中蠢动的歌女#5/DimensionBattleCentralTop_006.ico",
     "name":"沙海中蠢动的歌女#5",
     "guide_path":"./敌人/恒星战/沙海中蠢动的歌女#5/5.jpg"
+},
+
+"招致灾祸的鳞羽#6":
+{
+    "img_path":"./敌人/恒星战/招致灾祸的鳞羽#6/hxz6.png",
+    "img_path_enemy":"./敌人/恒星战/招致灾祸的鳞羽#6/DimensionBattleCentralTop_007.png",
+    "logo_path":"./敌人/恒星战/招致灾祸的鳞羽#6/DimensionBattleCentralTop_007.ico",
+    "name":"招致灾祸的鳞羽#6",
+    "guide_path":"./敌人/恒星战/招致灾祸的鳞羽#6/6.jpg"
 }
 
 }
