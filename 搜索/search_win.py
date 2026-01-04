@@ -154,7 +154,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     role_search_frame.grid(row=0, column=0, columnspan=2, padx=10, sticky="nsew")
 
     rarity_options = [
-        "ALL", "A", "S", "SS"
+        "ALL", "A", "S", "SS", "SSR"
     ]
     rarity_selected_values = []
     rarity_frame = creat_select_frame("稀有度", 

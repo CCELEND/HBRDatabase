@@ -164,6 +164,18 @@ def show_rarity(frame, role, team, row=2):
         for ss, SSstyle in enumerate(role.SSstyles):
             bind_style_canvas(RaritySSframe, team, SSstyle, 0, ss+1)
 
+        row += 1
+
+    if role.SSRstyles:
+        # 创建 RaritySSRframe 并设置 row
+        RaritySSRframe = ttk.Frame(frame)
+        RaritySSRframe.grid(row=row, column=0, padx=10, pady=5, sticky="nsew")
+        photoRaritySSR = get_photo("./角色/IconRaritySSR.png", (130, 130))
+        canvasRaritySSR = create_canvas_with_image(RaritySSRframe, 
+            photoRaritySSR, 134, 134, 0, 0, 0, 0)
+        for ssr, SSRstyle in enumerate(role.SSRstyles):
+            bind_style_canvas(RaritySSRframe, team, SSRstyle, 0, ssr+1)
+
 # 队伍描述
 def creat_team_desc_frame(parent_frame, team):
     team_desc_frame = ttk.Labelframe(parent_frame, text=team.name)
