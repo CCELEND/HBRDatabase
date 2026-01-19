@@ -462,3 +462,6 @@ def format_hex_dump(hex_string, bytes_per_line=16):
         result.append(f"{offset}  {hex_part}  |{ascii_part}|")
     
     return '\n'.join(result)
+
+def not_letter(text):
+    return not any(char.isalpha() for char in text) 

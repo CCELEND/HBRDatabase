@@ -2,6 +2,7 @@
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
+from tools import not_letter
 
 from 角色.style_combobox_win import creat_lv_combo_lab, bind_lv_combo_lab
 from 角色.style_active_skill_change_win import creat_active_skill_change_frame, is_skill_change
@@ -33,7 +34,7 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     level_req_lab.grid(row=0, column=1, sticky="nse", padx=5, pady=5)
 
     # 技能消耗SP和使用次数
-    sp_cost_text = "SP" + active_skill.sp_cost if active_skill.sp_cost.isdigit() else active_skill.sp_cost
+    sp_cost_text = "SP" + active_skill.sp_cost if not_letter(active_skill.sp_cost) else active_skill.sp_cost
     uses_text = active_skill.max_uses if active_skill.max_uses else "∞"
     text = f"{sp_cost_text}\n{uses_text}"
     
