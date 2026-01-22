@@ -1,5 +1,20 @@
 {
-
+	"火耀远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High4_fire.png",
+		"name":"火耀远古项链",
+		"en":"Necklace_High4_fire",
+		"type":"项链",
+		"description":"火属性技能的技能次数 +1\n技能升攻 +10%、破坏率提升量 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
+	"火套远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High3_fire.png",
+		"name":"火套远古项链",
+		"en":"Necklace_High3_fire",
+		"type":"项链",
+		"description":"火属性技能的技能次数 +1\nDP +300、防御力 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
 	"银冰远古项链":{
 		"path":"./持有物/饰品/项链/Necklace_High4_ice.png",
 		"name":"银冰远古项链",
@@ -14,6 +29,22 @@
 		"en":"Necklace_High3_ice",
 		"type":"项链",
 		"description":"冰属性技能的技能次数 +1\nDP +300、防御力 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
+	"雷霆远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High4_thunder.png",
+		"name":"雷霆远古项链",
+		"en":"Necklace_High4_thunder",
+		"type":"项链",
+		"description":"雷属性技能的技能次数 +1\n技能升攻 +10%、破坏率提升量 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
+	"雷套远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High3_thunder.png",
+		"name":"雷套远古项链",
+		"en":"Necklace_High3_thunder",
+		"type":"项链",
+		"description":"雷属性技能的技能次数 +1\nDP +300、防御力 +10%、初始SP +3",
 		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
 	},
 
