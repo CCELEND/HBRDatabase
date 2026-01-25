@@ -1044,6 +1044,14 @@
         "type":"其他",
         "series":"特殊状态" 
     },
+    "攻击切换":{
+        "name":"攻击切换",
+        "path":"./战斗系统/状态/Nonelement.webp",
+        "effect":"","description":"",
+        "stack":"-",
+        "type":"其他",
+        "series":"攻击切换" 
+    },
     "恢复EShield盾":{
         "name":"恢复EShield盾",
         "path":"./战斗系统/状态/ReviveEShield.webp",
