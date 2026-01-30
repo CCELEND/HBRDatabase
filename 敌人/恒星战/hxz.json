@@ -53,6 +53,15 @@
     "logo_path":"./敌人/恒星战/招致灾祸的鳞羽#6/DimensionBattleCentralTop_007.ico",
     "name":"招致灾祸的鳞羽#6",
     "guide_path":"./敌人/恒星战/招致灾祸的鳞羽#6/6.jpg"
+},
+
+"疾驰的异貌之兽#7":
+{
+    "img_path":"./敌人/恒星战/疾驰的异貌之兽#7/hxz7.png",
+    "img_path_enemy":"./敌人/恒星战/疾驰的异貌之兽#7/DimensionBattleCentralTop_008.png",
+    "logo_path":"./敌人/恒星战/疾驰的异貌之兽#7/DimensionBattleCentralTop_008.ico",
+    "name":"疾驰的异貌之兽#7",
+    "guide_path":"./敌人/恒星战/疾驰的异貌之兽#7/7.jpg"
 }
 
 }
