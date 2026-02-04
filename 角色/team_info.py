@@ -86,8 +86,11 @@ def get_team_obj(team_name):
 
 # # 加载全部队伍对象
 # def get_all_team_obj():
-
 #     load_teams_json()
+#     if not teams_json:
+#         return
+#     if len(teams) == len(teams_json):
+#         return
 
 #     for team_name in teams_json:
 #         get_team_obj(team_name)
