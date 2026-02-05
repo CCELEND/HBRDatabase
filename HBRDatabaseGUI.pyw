@@ -7,7 +7,8 @@ from canvas_events import ArtworkDisplayerHeight
 from window import set_window_expand, set_window_icon, creat_window, set_window_top, set_global_bg
 from window import load_menu_icon, get_ico_path_by_name
 from scrollbar_frame_win import ScrollbarFrameWin
-from tools import delete_old_file_and_subdirs, is_admin, check_error_queue
+from tools import delete_old_file_and_subdirs, is_admin
+from 日志.error_queue_proc import check_error_queue
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
