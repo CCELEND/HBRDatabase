@@ -80,6 +80,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 
     # 定义被动技能效果的检查函数
     def check_passive_effect(skill):
+        if isinstance(skill.effect_type, list): return False
         return (is_parentstring(skill.effect_type, keyword_list) or
                 is_parentstring(skill.description, keyword_list) or
                 is_parentstring(output_string(skill.target) + output_string(skill.effect_type), keyword_list))
