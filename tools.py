@@ -421,20 +421,48 @@ def init_chrome_driver(chrome_options):
 
     return driver
 
-
 def is_admin():
     try:
-        return ctypes.windll.shell32.IsUserAnAdmin()
-    except:
+        # 判断系统平台
+        if sys.platform.startswith('win'):
+            # Windows 系统
+            import ctypes
+            return ctypes.windll.shell32.IsUserAnAdmin()
+        elif sys.platform.startswith('linux'):
+            # Linux 系统：检查有效 UID 是否为0
+            return os.geteuid() == 0
+        else:
+            # 其他系统暂不支持，返回 False
+            logger.warning(f"暂不支持 {sys.platform} 系统的权限判断")
+            messagebox.showwarning("警告", f"暂不支持 {sys.platform} 系统的权限判断")
+            return False
+    except Exception as e:
+        logger.error(f"权限判断出错: {str(e)}")
+        messagebox.showerror("错误", f"权限判断出错: {str(e)}")
         return False
 
 def run_admin():
-    if not is_admin():
-        # 重新以管理员权限运行脚本
-        ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, " ".join(sys.argv), None, 1
-        )
+    if is_admin(): return
+    
+    try:
+        if sys.platform.startswith('win'):
+            ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+            )
+        elif sys.platform.startswith('linux'):
+            import subprocess
+            cmd = ['sudo', sys.executable] + sys.argv
+            subprocess.call(cmd)
+        else:
+            logger.error(f"暂不支持 {sys.platform} 系统的提权运行")
+            messagebox.showerror("错误", f"暂不支持 {sys.platform} 系统的提权运行")
+            return
+    except Exception as e:
+        logger.error(f"提权运行失败: {str(e)}")
+        messagebox.showerror("错误", f"提权运行失败: {str(e)}")
+    finally:
         sys.exit()
+
 
 def format_hex_dump(hex_string, bytes_per_line=16):
     
