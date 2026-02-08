@@ -16,11 +16,15 @@ def creat_resonance_frame(parent_frame, resonance_frame_row, style):
 
     resonance_photo = get_photo(resonance_img_path, (80, 64))
     resonance_canvas = create_canvas_with_image(resonance_frame, 
-        resonance_photo, 80, 64, 0, 0, 0, 0, padx=10)
+        resonance_photo, 120, 120, 20, 28, 0, 0, padx=10)
 
-    text = "style.resonance"
-    # {"0":"","1":"","2":}
-
+    
+    text = f"{style.resonance['name']}\n"
+    text += f"上限突破0：{style.resonance['0']}\n"
+    text += f"上限突破1：{style.resonance['1']}\n"
+    text += f"上限突破2：{style.resonance['2']}\n"
+    text += f"上限突破3：{style.resonance['3']}\n"
+    text += f"上限突破4：{style.resonance['4']}\n"
     resonance_lab = ttk.Label(resonance_frame, text=text, 
         justify="left", font=("Monospace", 10, "bold"))
-    resonance_lab.grid(row=0, column=1, sticky="nsw", padx=15, pady=5)
+    resonance_lab.grid(row=0, column=1, sticky="nsw", padx=0, pady=5)
