@@ -14,6 +14,7 @@ from 角色.style_active_skill_win import creat_active_skill_frame
 from 角色.style_passive_skill_win import creat_passive_skill_frame
 from 角色.style_growth_ability_win import creat_growth_ability_frame
 from 角色.style_growth_status_win import creat_growth_status_frame
+from 角色.style_resonance_win import creat_resonance_frame
 
 import 持有物.强化素材.strengthen_materials
 import 战斗系统.职业.careers_info
@@ -52,6 +53,10 @@ def show_style(scrollbar_frame_obj, style):
 
     # 成长状态
     creat_growth_status_frame(parent_frame, growth_status_frame_row, style)
+
+    # 共鸣天赋
+    if style.resonance:
+        creat_resonance_frame(parent_frame, growth_status_frame_row+1, style)
 
     scrollbar_frame_obj.update_canvas()
 

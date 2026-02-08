@@ -204,7 +204,7 @@ class Style:
         weapon_attribute = None, element_attribute = None,
         id_en = None,
         active_skills = None, passive_skills = None, 
-        growth_ability = None, status_growth = None):
+        growth_ability = None, status_growth = None, resonance = None):
         self.path = path                        # 风格头像路径
         self.team_name = team_name              # 所属队伍名
         self.role_name = role_name              # 所属角色名
@@ -221,6 +221,7 @@ class Style:
         self.passive_skills = passive_skills    # 被动技能列表
         self.growth_ability = growth_ability    # 成长能力
         self.status_growth = status_growth      # 成长状态值
+        self.resonance = resonance              # 共鸣天赋
 
 # 使用字典存储所有风格分类
 style_categories = {
@@ -367,6 +368,8 @@ def create_style(data):
 
     statusgrowth = data['status_growth'] if 'status_growth' in data else None
 
+    resonance = data['resonance'] if 'resonance' in data else None
+
     style = Style(
         style_info_data['path'],
         style_info_data['team_name'],
@@ -383,7 +386,8 @@ def create_style(data):
         activeskills,
         passiveskills,
         growthability,
-        statusgrowth
+        statusgrowth,
+        resonance
     )
 
 
