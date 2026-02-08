@@ -228,7 +228,8 @@ style_categories = {
     "rarity": {
         "A":  {},
         "S":  {},
-        "SS": {}
+        "SS": {},
+        "SSR":{}
     },
     "career":{
         "攻击者":{},

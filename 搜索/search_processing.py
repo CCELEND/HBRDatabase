@@ -132,7 +132,7 @@ def get_filtered_styles(filter_dict, keyword_list):
         (role, style)
         for team in 角色.team_info.teams.values()
         for role in team.roles
-        for style in role.SSstyles + role.Sstyles + role.Astyles
+        for style in role.SSRstyles + role.SSstyles + role.Sstyles + role.Astyles
     ]
 
     # 映射列表过滤，保持role和style的关联
