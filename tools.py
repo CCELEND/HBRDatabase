@@ -103,6 +103,7 @@ def is_parentstring(parent_string, stringlist):
 
 # 判断list1中的字符串是否是list2中某个字符串的父串
 def list_val_in_another(list1, list2):
+    if not list1: return False
     for item in list1:
         if is_parentstring(item, list2):
             return True
