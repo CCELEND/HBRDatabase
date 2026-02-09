@@ -164,5 +164,5 @@ def is_master_skill_passive(Master_skill):
 
 def get_master_skill_type(Master_skill):
     if Master_skill.sp_cost == "被动技能":
-        return "被动技能"
-    return "主动技能"
+        return "天赋/大师被动"
+    return "主动/被动"

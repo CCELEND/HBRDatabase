@@ -31,6 +31,10 @@ def creat_select_frame(label_content, options, selected_values,
     # 初始化 last 列表，记录上一次的状态
     last = [False] * len(options)
 
+    if label_content == "技能、天赋": n = 2
+    elif label_content == "稀有度": n = 5
+    else: n = 4
+
     # 定义自定义样式（背景色 + 字体颜色）
     style = ttk.Style()
     style.configure(
@@ -51,13 +55,13 @@ def creat_select_frame(label_content, options, selected_values,
         )
 
         # 计算行和列的位置
-        row = i // 4  # 每四个按钮换行
-        column = i % 4  # 列位置
+        row = i // n  # 每n个按钮换行
+        column = i % n  # 列位置
         check_button.grid(row=row, column=column, padx=5, pady=5, sticky="nsw")  # 设置间距
 
         check_vars.append(check_var)
         column_count += 1  # 更新列计数器
-        if column_count == 4:  # 如果已经到达第四列，重置列计数器并增加行
+        if column_count == n:  # 如果已经到达第n列，重置列计数器并增加行
             column_count = 0
 
     return label_frame
@@ -202,10 +206,10 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
 
     skill_options = [
         "ALL", 
-        "主动技能", "被动技能"
+        "主动/被动", "天赋/大师被动", "共鸣天赋"
     ]
     skill_selected_values = []
-    skill_frame = creat_select_frame("技能", 
+    skill_frame = creat_select_frame("技能、天赋", 
         skill_options, skill_selected_values,
         role_search_frame, 2, 1)
 
@@ -217,6 +221,15 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     master_skill_frame = creat_select_frame("大师技能", 
         master_skill_options, master_skill_selected_values,
         role_search_frame, 3, 0)
+
+    # resonance_options = [
+    #     "ALL", 
+    #     "共鸣天赋"
+    # ]
+    # resonance_selected_values = []
+    # resonance_frame = creat_select_frame("共鸣天赋", 
+    #     resonance_options, resonance_selected_values,
+    #     role_search_frame, 3, 1)
 
 
     # 关键词标签
@@ -236,8 +249,9 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     selected_values_dir["队伍"] = team_selected_values
     selected_values_dir["武器属性"] = weapon_attribute_selected_values
     selected_values_dir["元素属性"] = element_attribute_selected_values
-    selected_values_dir["技能"] = skill_selected_values
+    selected_values_dir["技能、天赋"] = skill_selected_values
     selected_values_dir["大师技能"] = master_skill_selected_values
+    # selected_values_dir["共鸣天赋"] = resonance_selected_values
 
     # 创建搜索按钮
     search_button = ttk.Button(search_win_frame, 

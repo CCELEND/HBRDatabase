@@ -5,6 +5,8 @@ from tools import list_val_in_another, is_parentstring, output_string, list_is, 
 from 角色.style_info import is_skill_effect
 import 角色.team_info
 
+from 搜索.search_processing_resonance import check_resonance
+
 # 选中处理
 def on_select(check_vars, options, last, selected_values, all_index=0):
 
@@ -64,8 +66,8 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 
     # 定义技能类型与获取方法的映射
     skill_type_map = {
-        "主动技能": lambda: style.active_skills,
-        "被动技能": lambda: style.passive_skills
+        "主动/被动": lambda: style.active_skills,
+        "天赋/大师被动": lambda: style.passive_skills
     }
 
     # 定义主动技能效果的检查函数
@@ -86,11 +88,11 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
                 is_parentstring(output_string(skill.target) + output_string(skill.effect_type), keyword_list))
 
     # 遍历筛选的技能类型
-    for select_skill in filter_dict['技能']:
+    for select_skill in filter_dict['技能、天赋']:
         if select_skill in skill_type_map:
             skills = skill_type_map[select_skill]()
             
-            # 遍历该类型下的所有技能
+            # 列表遍历该类型下的所有技能对象
             for skill in skills:
 
                 # 检查技能名称
@@ -102,24 +104,28 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
                     return True
                 
                 # 根据技能类型检查不同的效果
-                if select_skill == "主动技能":
+                if select_skill == "主动/被动":
                     for effect in skill.effects:
                         if check_active_effect(effect):
                             return True
-                elif select_skill == "被动技能":
-                    if check_passive_effect(skill):
-                        return True
+
+                elif select_skill == "天赋/大师被动":
+                    if check_passive_effect(skill): return True
+
     return False
 
 # 检查风格是否符合筛选条件
 def filter_judge(filter_dict, keyword_list, role, style):
     if check_filter(style, filter_dict):
 
-        if should_include(role, style, keyword_list):
-            return True
+        if filter_dict["技能、天赋"] == ["共鸣天赋"]:
+            if check_resonance(style, keyword_list): return True
+        else:
+            if should_include(role, style, keyword_list):
+                return True
 
-        if check_keywords_in_skills(style, keyword_list, filter_dict):
-            return True
+            if check_keywords_in_skills(style, keyword_list, filter_dict):
+                return True
 
 # 根据筛选条件和关键词列表获取风格对象列表
 def get_filtered_styles(filter_dict, keyword_list):
