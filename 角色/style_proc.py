@@ -8,6 +8,8 @@ logger = AdvancedLogger.get_logger(__name__)
 def extract_skill_numbers(text, type):
     # 添加 re.DOTALL 以匹配换行符
     if type == "攻击":
+        temp = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL)
+        if not temp: return []
         strength_text = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "治疗":
         strength_text = re.search(r"回复DP(.*?)，属性倍率", text, re.DOTALL).group(1)
@@ -77,6 +79,7 @@ def get_strength_min_max(strength):
 
 # [] 返回不同等级技能强度最大值 最小值 列表形式 [min, max]
 def get_lv_strength_min_max(strength_min_max, lv):
+    if not strength_min_max: return []
     strength_min_base = float(strength_min_max[0])
     strength_max_base = float(strength_min_max[1])
 
