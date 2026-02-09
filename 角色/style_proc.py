@@ -16,7 +16,9 @@ def extract_skill_numbers(text, type):
     elif type == "连击数上升":
         strength_text = re.search(r"连击数上升(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "上升":
-        strength_text = re.search(r"上升(.*?)，属性倍率", text, re.DOTALL).group(1)
+        temp = re.search(r"上升(.*?)，属性倍率", text, re.DOTALL)
+        if not temp: return []
+        strength_text = temp.group(1)
     elif type == "下降":
         strength_text = re.search(r"下降(.*?)，属性倍率", text, re.DOTALL).group(1)
     elif type == "心眼":
@@ -30,6 +32,7 @@ def extract_skill_numbers(text, type):
 
 # 回写字符串
 def write_numbers_back(text, modified_numbers, type):
+    if not modified_numbers: return text
     # 使用 re.DOTALL 分割原字符串
 
     if type == "攻击":
@@ -46,6 +49,9 @@ def write_numbers_back(text, modified_numbers, type):
         parts = re.split(r"(下降.*?，属性倍率)", text, flags=re.DOTALL)
     elif type == "心眼":
         parts = re.split(r"(伤害增加：.*?，属性倍率)", text, flags=re.DOTALL)
+
+    if not parts:
+        return text
 
     strength_text = parts[1]
     numbers_with_commas = re.findall(r"\d{1,3}(?:,\d{3})*|\d+", strength_text)
@@ -95,6 +101,7 @@ def get_lv_heal_min_max(heal_min_max, lv):
 
 # [] 返回不同等级buff最大值 最小值 列表形式 [min, max]
 def get_lv_buff_min_max(buff_min_max, lv):
+    if not buff_min_max: return []
     buff_min_base = float(buff_min_max[0])
     buff_max_base = float(buff_min_max[1])
 
