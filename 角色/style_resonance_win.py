@@ -9,7 +9,7 @@ def creat_resonance_frame(parent_frame, resonance_frame_row, style):
 
     name = style.resonance['name']
     resonance_frame = ttk.Labelframe(parent_frame, text=f"共鸣天赋（{name}）")
-    resonance_frame.grid(row=resonance_frame_row, column=0, columnspan=4, padx=10, pady=(5,10), sticky="nsew")
+    resonance_frame.grid(row=resonance_frame_row, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
     resonance_frame.grid_rowconfigure(0, weight=1)
     resonance_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
     resonance_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 描述列

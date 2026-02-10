@@ -59,7 +59,7 @@ def creat_career_frame(parent_frame, career_frame_row, style):
 
     career = 战斗系统.职业.careers_info.careers[style.career]
     career_frame = ttk.Labelframe(parent_frame, text=style.career+"-"+element_attribute+"-"+weapon_attribute)
-    career_frame.grid(row=career_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    career_frame.grid(row=career_frame_row, column=0, columnspan=4, padx=10, pady=(5,10), sticky="nsew")
     career_frame.grid_rowconfigure(0, weight=1)
 
     career_photo = get_photo(career.path, (200, 40))

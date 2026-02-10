@@ -58,7 +58,7 @@ def creat_active_skill_frame(scrollbar_frame_obj, parent_frame, active_skill_fra
 
     # 主动技能、被动
     active_skill_frame = ttk.Labelframe(parent_frame, text="主动技能 / 被动技能")
-    active_skill_frame.grid(row=active_skill_frame_row, column=0, columnspan=4, padx=10, pady=5, sticky="nsew")
+    active_skill_frame.grid(row=active_skill_frame_row, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
     active_skill_frame.grid_rowconfigure(0, weight=1)
     # 配置 active_skill_frame 的每一列权重
     for col_index in range(4):
