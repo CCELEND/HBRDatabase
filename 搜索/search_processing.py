@@ -1,6 +1,7 @@
 import re
 
 from tools import list_val_in_another, is_parentstring, output_string, list_is, check_dict_in_list
+from tools import load_json
 
 from 角色.style_info import is_skill_effect
 import 角色.team_info
@@ -182,31 +183,8 @@ def keyword_processing(key_word_str):
     key_word_str = key_word_str.replace(',', '，')
     key_word_str = key_word_str.replace('、', '，')
 
-    # 定义替换字典
-    replacement_dict = {
-        "减防": "防御下降","降防": "防御下降","降攻": "攻击下降",
-        "加防": "防御上升","加攻": "攻击上升",
-        "TOKEN": "信念","象征": "信念",
-        "大范围": "全体","群体": "全体","AOE": "全体",
-        "追加回合": "额外回合",
-        "返婴状态": "Babied", "返婴" :"Babied",
-        "稻强化领域":"稻穗强化领域",
-        "暴伤": "暴击伤害",
-        "特大连击":"连击数上升（特大）",
-        "超大连击":"连击数上升（特大）",
-        "大连击": "连击数上升（大）",
-        "小连击": "连击数上升（小）",
-        "中连击":"连击数上升（中）",
-        "封印": "禁锢",
-        "破盾免疫": "击破保护",
-        "技能进化": "+",
-        "上方修正": "上修","技能上修": "上修", "平衡性调整":"上修",
-        "大火强化领域":"火属性强化领域（大）","大冰强化领域":"冰属性强化领域（大）",
-        "大雷强化领域":"雷属性强化领域（大）",
-        "大光强化领域":"光属性强化领域（大）","大暗强化领域":"暗属性强化领域（大）",
-        "樱花箭":"攻击上升且减益效果强化","樱花之箭":"攻击上升且减益效果强化",
-        "全能力":"全状态值"
-    }
+    # 加载替换字典
+    replacement_dict = load_json("./搜索/replace_dict.json")
 
     # 关键词分割并放入列表中
     keyword_list = key_word_str.split('，')
