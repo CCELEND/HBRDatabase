@@ -222,15 +222,6 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
         master_skill_options, master_skill_selected_values,
         role_search_frame, 3, 0)
 
-    # resonance_options = [
-    #     "ALL", 
-    #     "共鸣天赋"
-    # ]
-    # resonance_selected_values = []
-    # resonance_frame = creat_select_frame("共鸣天赋", 
-    #     resonance_options, resonance_selected_values,
-    #     role_search_frame, 3, 1)
-
 
     # 关键词标签
     key_word_label = ttk.Label(search_win_frame, text="关键词")
