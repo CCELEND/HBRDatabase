@@ -10,16 +10,16 @@ import 角色.team_info
 def check_filter(role, filter_dict):
 
     filters = [
-        ('队伍', lambda: role.team in filter_dict['队伍']),
-        ('武器属性', lambda: role.weapon_attribute in filter_dict['武器属性']),
-        ('技能、天赋', lambda: get_master_skill_type(role.master_skill) in filter_dict['技能、天赋'])
+        ('队伍', lambda: role.team in filter_dict.get('队伍')),
+        ('武器属性', lambda: role.weapon_attribute in filter_dict.get('武器属性')),
+        ('技能、天赋', lambda: get_master_skill_type(role.master_skill) in filter_dict.get('技能、天赋'))
     ]
     return all(not filter_dict.get(key) or check() for key, check in filters)
 
 # 角色名称关键词判断
 def should_include(role, keyword_list, filter_dict):
     # 没有关键词和选中技能时返回真
-    if not keyword_list and not filter_dict["技能、天赋"]:
+    if not keyword_list and not filter_dict.get("技能、天赋"):
         return True
 
     checks = [
@@ -49,7 +49,7 @@ def check_keywords_in_skills(master_skill, keyword_list, filter_dict):
 
 
 
-    for select_skill in filter_dict['技能、天赋']:
+    for select_skill in filter_dict.get('技能、天赋'):
         is_select_active = (select_skill == "主动/被动")
         # 判断master_skill是主动还是被动
         is_master_passive = is_master_skill_passive(master_skill)

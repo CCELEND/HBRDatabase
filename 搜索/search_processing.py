@@ -36,11 +36,11 @@ def check_filter(style, filter_dict):
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"
 
     filters = [
-        ('队伍', lambda: style.team_name in filter_dict['队伍']),
-        ('稀有度', lambda: style.rarity in filter_dict['稀有度']),
-        ('职能', lambda: style.career in filter_dict['职能']),
-        ('武器属性', lambda: style.weapon_attribute in filter_dict['武器属性']),
-        ('元素属性', lambda: is_parentstring(element_attribute, filter_dict['元素属性']))
+        ('队伍', lambda: style.team_name in filter_dict.get('队伍')),
+        ('稀有度', lambda: style.rarity in filter_dict.get('稀有度')),
+        ('职能', lambda: style.career in filter_dict.get('职能')),
+        ('武器属性', lambda: style.weapon_attribute in filter_dict.get('武器属性')),
+        ('元素属性', lambda: is_parentstring(element_attribute, filter_dict.get('元素属性')))
     ]
     return all(not filter_dict.get(key) or check() for key, check in filters)
 
@@ -89,7 +89,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
                 is_parentstring(output_string(skill.target) + output_string(skill.effect_type), keyword_list))
 
     # 遍历筛选的技能类型
-    for select_skill in filter_dict['技能、天赋']:
+    for select_skill in filter_dict.get('技能、天赋'):
         if select_skill in skill_type_map:
             skills = skill_type_map[select_skill]()
             
@@ -119,7 +119,7 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 def filter_judge(filter_dict, keyword_list, role, style):
     if check_filter(style, filter_dict):
 
-        if filter_dict["技能、天赋"] == ["共鸣天赋"]:
+        if filter_dict.get("技能、天赋") == ["共鸣天赋"]:
             if check_resonance(role, style, keyword_list): return True
         else:
             if should_include(role, style, keyword_list):

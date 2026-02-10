@@ -9,9 +9,9 @@ def check_resonance(role, style, keyword_list):
         return True
 
     checks = [
-        is_parentstring(style.resonance['name'], keyword_list),
+        is_parentstring(style.resonance.get('name'), keyword_list),
         list_val_in_another(style.resonance.get('type'), keyword_list),
-        is_parentstring(style.resonance['0'], keyword_list),
+        is_parentstring(style.resonance.get('0'), keyword_list),
 
         list_val_in_another(role.nicknames, keyword_list),
         is_parentstring(role.en.upper(), keyword_list),
