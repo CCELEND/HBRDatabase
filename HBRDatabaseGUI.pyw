@@ -27,6 +27,7 @@ from 持有物.芯片.chips_win import show_chips
 from 持有物.碎片.fragments_win import show_fragments
 
 sys.path.append(os.path.abspath("./战斗系统"))
+from 战斗系统.共鸣天赋.gmtf_win import creat_gmtf_win
 from 战斗系统.基础.jc_win import creat_jc_win
 from 战斗系统.OD.od_win import creat_od_win
 from 战斗系统.乘区.cq_win import creat_cq_win
@@ -183,17 +184,18 @@ def create_menu(parent_frame, scrollbar_frame_obj):
     battle_menu = ttk.Menu(menu_bar, tearoff=0)
     # 定义菜单项的名称和对应的回调函数
     menu_battle_calls = [
+        ("共鸣天赋", creat_gmtf_win),  
         ("基础", creat_jc_win),
         ("Hit", creat_od_win),
         ("乘区", creat_cq_win),
         ("职业", show_career),
         ("武器", show_weapon),
         ("属性", show_attribute),
-        ("效果、状态", show_statu)  
+        ("效果、状态", show_statu)
     ]
     # 循环创建菜单项
     for battle_call_name, callback in menu_battle_calls:
-        if battle_call_name in ['基础','Hit','乘区']:
+        if battle_call_name in ['共鸣天赋','基础','Hit','乘区']:
             icon = load_menu_icon("./战斗系统/help.ico", battle_call_name)
             create_menu_item(battle_menu, battle_call_name, icon, callback, parent_frame)
         else:
