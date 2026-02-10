@@ -119,7 +119,7 @@ def filter_judge(filter_dict, keyword_list, role, style):
     if check_filter(style, filter_dict):
 
         if filter_dict["技能、天赋"] == ["共鸣天赋"]:
-            if check_resonance(style, keyword_list): return True
+            if check_resonance(role, style, keyword_list): return True
         else:
             if should_include(role, style, keyword_list):
                 return True
