@@ -84,7 +84,8 @@ def get_lv_strength_min_max(strength_min_max, lv):
     strength_max_base = float(strength_min_max[1])
 
     step_len_min = strength_min_base * 0.05
-    step_len_max = strength_min_base * 0.1
+    # step_len_max = strength_min_base * 0.1
+    step_len_max = strength_max_base * 0.02
     lv_strength_min = round(step_len_min * (lv - 1) + strength_min_base)
     lv_strength_max = round(step_len_max * (lv - 1) + strength_max_base)
 
