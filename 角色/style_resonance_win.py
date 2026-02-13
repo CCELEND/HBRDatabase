@@ -14,7 +14,7 @@ def creat_resonance_frame(parent_frame, resonance_frame_row, style):
     resonance_frame.grid_columnconfigure(0, weight=1, minsize=100)  # 图片列
     resonance_frame.grid_columnconfigure(1, weight=6, minsize=600)  # 描述列
 
-    resonance_img_path = "./角色/IconResonance.webp"
+    resonance_img_path = "./角色/IconResonance.png"
 
     resonance_photo = get_photo(resonance_img_path, (80, 64))
     resonance_canvas = create_canvas_with_image(resonance_frame, 
