@@ -2,28 +2,34 @@
 {
     "战斗报告Ⅰ":{
         "path":"./持有物/成长素材/ThumbnailExperienceS.png", 
-        "description":"可获得少量经验值的道具",
+        "description":"可获得500经验值的道具",
         "price":"5,000 GP", 
-        "location":"商店（记忆之庭）等"
+        "location":"棱镜战\n光球BOSS\n商店（记忆之庭）等"
     },
     "战斗报告Ⅱ":{
         "path":"./持有物/成长素材/ThumbnailExperienceM.png", 
-        "description":"可获得较多经验值的道具", 
+        "description":"可获得500经验值的道具", 
         "price":"43,000 GP\n1 GGP", 
-        "location":"商店（记忆之庭）等"
+        "location":"棱镜战\n光球BOSS\n商店（记忆之庭）等"
     },
     "战斗报告Ⅲ":{
         "path":"./持有物/成长素材/ThumbnailExperienceL.png", 
-        "description":"可获得较多经验值的道具", 
+        "description":"可获得50000经验值的道具", 
         "price":"370,000 GP\n10 GGP", 
-        "location":"商店（记忆之庭）等"
+        "location":"棱镜战\n光球BOSS\n商店（记忆之庭）等"
     },
 
-    "风格报告":{
+    "战斗报告Ⅳ":{
         "path":"./持有物/成长素材/StyleExp01.png", 
-        "description":"可获得风格等级经验值的道具", 
+        "description":"可获得200000经验值的道具", 
         "price":"", 
-        "location":""
+        "location":"棱镜战\n光球BOSS"
+    },
+    "战斗报告Ⅴ":{
+        "path":"./持有物/成长素材/ThumbnailExpAllround5.png", 
+        "description":"可获得2000000经验值的道具", 
+        "price":"", 
+        "location":"棱镜战\n光球BOSS"
     },
 
     "强化教材（Lv.20）":{
@@ -75,13 +81,13 @@
         "path":"./持有物/成长素材/ThumbnailExpBookStyleA.png", 
         "description":"可将风格等级提升1级的道具\n无法超过风格等级上限", 
         "price":"", 
-        "location":""
+        "location":"探险（主线剧情）"
     },
     "风格强化教材Ⅱ":{
         "path":"./持有物/成长素材/ThumbnailExpBookStyleB.png", 
         "description":"可将风格等级提升至10级的道具", 
         "price":"", 
-        "location":""
+        "location":"探险（主线剧情）"
     }
 
 } 
