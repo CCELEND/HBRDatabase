@@ -1006,7 +1006,7 @@
     },
     "贯通暴击":{
         "name":"贯通暴击",
-        "path":"./战斗系统/状态/Nonelement.webp",
+        "path":"./战斗系统/状态/Nonelement.png",
         "effect":"","description":"临时无视抗性，并造成大量的伤害（计弱点），一定触发暴击",
         "stack":"-",
         "type":"其他",
