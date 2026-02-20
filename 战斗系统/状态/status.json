@@ -31,6 +31,14 @@
         "type":"回复",
         "series":"回复DP" 
     },
+    "再生之阵":{
+        "name":"再生之阵",
+        "path":"./战斗系统/状态/RegeneDP.png",
+        "effect":"回合开始时，若任意友方角色破盾\n复活其DP且己方全体回复DP50%","description":"回合开始时，若任意友方角色破盾\n复活其DP且己方全体回复DP50%",
+        "stack":"-",
+        "type":"回复",
+        "series":"回复DP" 
+    },
     "回复SP":{
         "name":"回复SP",
         "path":"./战斗系统/状态/HealSp.webp",
@@ -1038,7 +1046,7 @@
     },
     "特殊状态":{
         "name":"特殊状态",
-        "path":"./战斗系统/状态/Nonelement.webp",
+        "path":"./战斗系统/状态/Nonelement.png",
         "effect":"随机值","description":"随机",
         "stack":"-",
         "type":"其他",
@@ -1046,7 +1054,7 @@
     },
     "攻击切换":{
         "name":"攻击切换",
-        "path":"./战斗系统/状态/Nonelement.webp",
+        "path":"./战斗系统/状态/Nonelement.png",
         "effect":"","description":"",
         "stack":"-",
         "type":"其他",
