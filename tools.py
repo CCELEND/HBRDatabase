@@ -22,7 +22,7 @@ def get_version() -> str:
 
 
 # 弹出确认框，询问用户是否重启
-def confirm_restart(info):
+def confirm_restart(info: str):
     response = messagebox.askyesno(info, "是否确认重启程序？")
     if response:  # 如果选择是
         restart_program()
@@ -33,7 +33,7 @@ def restart_program():
     os.execv(python, [python] + sys.argv)  # 重启程序
 
 # 匹配带逗号的数字范围
-def extract_number_range(text:str) -> tuple[int, int] | None:
+def extract_number_range(text: str) -> tuple[int, int] | None:
     match = re.search(r"(\d{1,3}(?:,\d{3})*) ~ (\d{1,3}(?:,\d{3})*)", text)
     if match:
         min_val, max_val = match.groups()
@@ -44,21 +44,21 @@ def extract_number_range(text:str) -> tuple[int, int] | None:
     return None
 
 # int 10,000 转换 10000
-def comma_str_to_int(number_string:str) -> int:
+def comma_str_to_int(number_string: str) -> int:
     number = int(number_string.replace(',', ''))
     return number
 
 # 10000 转换为 10,000
-def int_to_comma_str(number:int) -> str:
+def int_to_comma_str(number: int) -> str:
     number_string = "{:,}".format(number)
     return number_string
 
 # 判断空文件
-def is_file_empty(file_path:str) -> bool:
+def is_file_empty(file_path: str) -> bool:
     return os.path.getsize(file_path) == 0
 
 # 加载 json 文件
-def load_json(json_path:str) -> dict:
+def load_json(json_path: str) -> dict:
     try:
         if is_file_empty(json_path): return {}
 
@@ -92,17 +92,17 @@ def output_string(value) -> str:
     return "" if value is None else value
 
 # 判断一个字符串是否是字符串列表中某个字符串的子串
-def is_substring(substring:str, string_list:list[str]) -> bool:
+def is_substring(substring: str, string_list:list[str]) -> bool:
     return any(substring in s for s in string_list)
 
 # 判断一个字符串是否是字符串列表中某个字符串的父串
-def is_parentstring(parent_string:str, stringlist:list[str]) -> bool:
+def is_parentstring(parent_string: str, stringlist: list[str]) -> bool:
     if not parent_string or not stringlist:
         return False
     return any(s in parent_string for s in stringlist)
 
 # 判断list1中的字符串是否是list2中某个字符串的父串
-def list_val_in_another(list1:list[str], list2:list[str]) -> bool:
+def list_val_in_another(list1: list[str], list2: list[str]) -> bool:
     if not list1: return False
     for item in list1:
         if is_parentstring(item, list2):
@@ -111,7 +111,7 @@ def list_val_in_another(list1:list[str], list2:list[str]) -> bool:
         #     return False
     return False
 
-def list_is(list:list[str], string:str) -> bool:
+def list_is(list: list[str], string:str) -> bool:
     return (len(list) == 1 and list[0] == string)
 
 # 检查字典的键或值是否存在于指定列表中
@@ -132,14 +132,14 @@ def check_dict_in_list(input_dict: dict, check_list: list[str], check_keys=True,
 
 
 # 检查目录是否存在，如果不存在则创建
-def creat_directory(file_name:str):
+def creat_directory(file_name: str):
     # 获取目录路径
     directory = os.path.dirname(file_name)
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 # 计算需要填充的字节数量，使得总长度为8的倍数
-def padding_data(data:bytes) -> bytes:
+def padding_data(data: bytes) -> bytes:
     padding_length = (8 - (len(data) % 8)) % 8
     padded_bytes = data + b'\x00' * padding_length
     return padded_bytes
@@ -152,12 +152,12 @@ def int_to_str_8bytes(value:int) -> bytes:
     return hex_value_str_8bytes
 
 #字符串字节序列，十六进制转换为整数，eg: b"\x00\x00\x00a23fc" => 664572
-def str_8bytes_to_int(hex_value_str_8bytes:bytes) -> int:
+def str_8bytes_to_int(hex_value_str_8bytes: bytes) -> int:
     hex_value_str = hex_value_str_8bytes.decode('utf-8').lstrip('\x00')
     return int(hex_value_str, 16)
 
 # 查找子字符串出现的全部位置，返回位置列表
-def find_all_substring_positions(substring:str, string:str) -> list[int]:
+def find_all_substring_positions(substring: str, string: str) -> list[int]:
     start = 0
     positions = []
     while True:
@@ -248,7 +248,7 @@ def delete_mp3_files(directory: str) -> None:
                 logger.error(f"删除 {mp3_file} 时出错: {e}")
                 messagebox.showerror("错误", f"删除 {mp3_file} 时出错: {e}")
 
-def delete_all_files_and_subdirs(directory:str) -> bool:
+def delete_all_files_and_subdirs(directory: str) -> bool:
     if not os.path.isdir(directory):
         return
     try:
@@ -336,7 +336,7 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
         messagebox.showerror("错误", f"读取文件时发生意外错误: {file_path}\n{e}")
         return None
 
-def compute_hash(text:str, algorithm = "sha256") -> str:
+def compute_hash(text: str, algorithm = "sha256") -> str:
 
     # algorithm (str): 
     # md5
@@ -387,7 +387,7 @@ def convert_hex_string_to_escape(hex_string: str) -> str:
     return result
 
 # 返回列表不是数字元素的第一个下标
-def get_list_not_isinstance_index(a:list) -> int | None:
+def get_list_not_isinstance_index(a: list) -> int | None:
     index = None
     for index, item in enumerate(a):
         if not isinstance(item, (int, float)):
@@ -465,7 +465,7 @@ def run_admin():
         sys.exit()
 
 
-def format_hex_dump(hex_string:str, bytes_per_line=16):
+def format_hex_dump(hex_string: str, bytes_per_line=16):
     
     # 格式化十六进制输出
     result = []
@@ -497,5 +497,5 @@ def format_hex_dump(hex_string:str, bytes_per_line=16):
     
     return '\n'.join(result)
 
-def not_letter(text:str) -> bool:
+def not_letter(text: str) -> bool:
     return not any(char.isalpha() for char in text) 
