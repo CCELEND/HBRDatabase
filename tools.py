@@ -396,7 +396,7 @@ def get_list_not_isinstance_index(a: list) -> int | None:
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-def init_chrome_driver(chrome_options):
+def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
 
     # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
     try:

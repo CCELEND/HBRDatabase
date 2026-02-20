@@ -9,6 +9,6 @@ def load_resources():
         return
     style_id_brochure_id = load_json("./工具/HBRbrochure/style_id_brochure_id.json")
 
-def GetBrochureIdByStyleId(style_id):
+def GetBrochureIdByStyleId(style_id) -> str:
     brochure_id = style_id_brochure_id[style_id]
     return brochure_id

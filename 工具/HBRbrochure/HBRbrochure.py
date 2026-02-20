@@ -1,3 +1,4 @@
+from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,11 +17,11 @@ import threading
 global chrome_driver
 chrome_driver = None
 
-def list_newline(you_list, how_projects_newline):
+def list_newline(you_list: list, how_projects_newline: int):
     for i in range(0, len(you_list), how_projects_newline):
         print(", ".join(map(str, you_list[i:i+how_projects_newline])))
 
-def dir_newline(you_dir, how_projects_newline):
+def dir_newline(you_dir: dict, how_projects_newline: int):
     line_count = how_projects_newline - 1
     # 初始化计数器
     count = 0
@@ -35,14 +36,14 @@ def dir_newline(you_dir, how_projects_newline):
     if count % how_projects_newline != 0:
         print()
 
-def FindKeyByValue(dict, value_to_find):
+def FindKeyByValue(dict: dict, value_to_find: str) -> str | None:
     for key, value in dict.items():
         if value == value_to_find:
             return key
     return None  # 如果没有找到对应的键，则返回None
 
 # 获取风格 id
-def get_style_id(style_item_card_element):
+def get_style_id(style_item_card_element) -> str:
     style_id = ""
     try:
         # 获取 data-id 属性值
@@ -153,12 +154,17 @@ def get_styles_info(container):
 
         my_style_num += 1
 
-    
-    return my_style_num, my_style_ids, my_style_levels, limit_break_levels, my_style_infos
+    style_infos_dir = {}
+    style_infos_dir["my_style_num"] = my_style_num
+    style_infos_dir["my_style_ids"] = my_style_ids
+    style_infos_dir["my_style_levels"] = my_style_levels
+    style_infos_dir["limit_break_levels"] = limit_break_levels
+    style_infos_dir["my_style_infos"] = my_style_infos
+    return style_infos_dir
 
 
 
-def switch_to_brochure(driver, style_infos):
+def switch_to_brochure(driver: webdriver.Chrome, style_infos: dict):
     # 使用 JavaScript 打开新标签页
     driver.execute_script(
         "window.open('https://leprechaun-chtholly-nota-seniorious.github.io/HeavenBurnsRedStyleChart.html');"
@@ -223,8 +229,20 @@ def run_browser_in_thread():
 
         container_elements = content_element.find_elements(By.CLASS_NAME, "container")
 
-        SSR_style_num, SSR_style_ids, SSR_style_levels, SSR_limit_break_levels, SSR_style_infos = get_styles_info(container_elements[0])
-        SS_style_num, SS_style_ids, SS_style_levels, SS_limit_break_levels, SS_style_infos = get_styles_info(container_elements[1])
+        SSR_style_infos_dir = get_styles_info(container_elements[0])
+        SS_style_infos_dir = get_styles_info(container_elements[1])
+
+        SSR_style_num = SSR_style_infos_dir["my_style_num"]
+        SSR_style_ids = SSR_style_infos_dir["my_style_ids"]
+        SSR_style_levels = SSR_style_infos_dir["my_style_levels"]
+        SSR_limit_break_levels = SSR_style_infos_dir["limit_break_levels"]
+        SSR_style_infos = SSR_style_infos_dir["my_style_infos"]
+
+        SS_style_num = SS_style_infos_dir["my_style_num"]
+        SS_style_ids = SS_style_infos_dir["my_style_ids"]
+        SS_style_levels = SS_style_infos_dir["my_style_levels"]
+        SS_limit_break_levels = SS_style_infos_dir["limit_break_levels"]
+        SS_style_infos = SS_style_infos_dir["my_style_infos"]
 
         my_style_num = SSR_style_num + SS_style_num
         my_style_ids = SSR_style_ids + SS_style_ids
