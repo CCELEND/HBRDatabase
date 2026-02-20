@@ -7,7 +7,7 @@ import subprocess
 # pip install psutil
 # pip install pipreqs
 
-def get_basic_info():
+def get_basic_info() -> str:
     # 获取基本系统信息
     basic_info = "\n===== 基本系统信息 =====\n"
     basic_info += f"操作系统名称：{platform.system()}\n" # Windows/Linux/macOS
@@ -20,7 +20,7 @@ def get_basic_info():
     return basic_info
 
 
-def get_cpu_info():
+def get_cpu_info() -> str:
     # 获取CPU信息
     cpu_info = "\n===== CPU 信息 =====\n"
     cpu_info += f"物理核心数：{psutil.cpu_count(logical=False)}\n"  # 实际物理CPU核心数
@@ -32,7 +32,7 @@ def get_cpu_info():
     return cpu_info
 
 
-def get_memory_info():
+def get_memory_info() -> str:
     # 获取内存信息
     memory_info = "\n===== 内存信息 =====\n"
     virtual_mem = psutil.virtual_memory()
@@ -52,7 +52,7 @@ def get_memory_info():
     memory_info += f"交换内存使用率：{swap_mem.percent}%\n"
     return memory_info
 
-def get_disk_info():
+def get_disk_info() -> str:
     # 获取磁盘信息
     disk_info = "\n===== 磁盘信息 =====\n"
     # 所有磁盘分区
@@ -73,7 +73,7 @@ def get_disk_info():
     return disk_info
 
 
-def get_network_info():
+def get_network_info() -> str:
     # 获取网络信息
     network_info = "\n===== 网络信息 =====\n"
     # 网络接口IP地址
@@ -89,7 +89,7 @@ def get_network_info():
     return network_info
 
 
-def get_py_info():
+def get_py_info() -> str:
     # 获取python模块信息
     py_info = "\n===== python模块信息 =====\n"
     # pipreqs ./ --encoding=utf8 --print
