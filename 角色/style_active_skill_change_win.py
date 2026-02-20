@@ -7,7 +7,7 @@ from 角色.style_effect_win import delete_all_effect_frame, set_effect_frames
 from 角色.style_combobox_win import bind_lv_combo_lab
 
 # 如果有技能切换
-def is_skill_change(active_skill):
+def is_skill_change(active_skill) -> bool:
     if active_skill.switch:
         return True
     else:
@@ -83,7 +83,7 @@ class ChangeButtonManager:
 
 
 # 创建切换技能按钮并绑定点击处理函数
-def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill):
+def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill) -> list:
     # 创建共享管理器实例
     button_manager = ChangeButtonManager()
     

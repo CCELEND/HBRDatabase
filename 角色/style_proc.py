@@ -5,7 +5,7 @@ from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 # 提取范围值列表
-def extract_skill_numbers(text, type):
+def extract_skill_numbers(text, type) -> list:
     # 添加 re.DOTALL 以匹配换行符
     if type == "攻击":
         temp = re.search(r"技能强度：(.*?)，属性倍率", text, re.DOTALL)
@@ -33,7 +33,7 @@ def extract_skill_numbers(text, type):
     return result[:effective_range]
 
 # 回写字符串
-def write_numbers_back(text, modified_numbers, type):
+def write_numbers_back(text, modified_numbers, type) -> str:
     if not modified_numbers: return text
     # 使用 re.DOTALL 分割原字符串
 
@@ -73,12 +73,12 @@ def write_numbers_back(text, modified_numbers, type):
     return "".join(parts)
 
 # [] 返回技能强度最大值 最小值 列表形式 [min, max]
-def get_strength_min_max(strength):
+def get_strength_min_max(strength) -> list:
     strength_min_max_str = strength.replace(',', '').split(' ~ ')
     return [int(strength_min_max_str[0]), int(strength_min_max_str[1])]
 
 # [] 返回不同等级技能强度最大值 最小值 列表形式 [min, max]
-def get_lv_strength_min_max(strength_min_max, lv):
+def get_lv_strength_min_max(strength_min_max, lv) -> list:
     if not strength_min_max: return []
     strength_min_base = float(strength_min_max[0])
     strength_max_base = float(strength_min_max[1])
@@ -92,7 +92,7 @@ def get_lv_strength_min_max(strength_min_max, lv):
     return [lv_strength_min, lv_strength_max]
 
 # [] 返回不同等级回复量最大值 最小值 列表形式 [min, max]
-def get_lv_heal_min_max(heal_min_max, lv):
+def get_lv_heal_min_max(heal_min_max, lv) -> list:
     heal_min_base = float(heal_min_max[0])
     heal_max_base = float(heal_min_max[1])
 
@@ -104,7 +104,7 @@ def get_lv_heal_min_max(heal_min_max, lv):
     return [lv_heal_min, lv_heal_max]
 
 # [] 返回不同等级buff最大值 最小值 列表形式 [min, max]
-def get_lv_buff_min_max(buff_min_max, lv):
+def get_lv_buff_min_max(buff_min_max, lv) -> list:
     if not buff_min_max: return []
     buff_min_base = float(buff_min_max[0])
     buff_max_base = float(buff_min_max[1])
@@ -123,7 +123,7 @@ def get_lv_buff_min_max(buff_min_max, lv):
 
 
 # [] 返回不同等级defense上升最大值 最小值 列表形式 [min, max]
-def get_lv_defense_min_max(defense_min_max, lv):
+def get_lv_defense_min_max(defense_min_max, lv) -> list:
     defense_min_base = float(defense_min_max[0])
     defense_max_base = float(defense_min_max[1])
 
@@ -140,7 +140,7 @@ def get_lv_defense_min_max(defense_min_max, lv):
     return [lv_defense_min, lv_defense_max]
 
 # [] 返回不同等级连击数上升最大值 最小值 列表形式 [min, max]
-def get_lv_hit_min_max(hit_min_max, lv):
+def get_lv_hit_min_max(hit_min_max, lv) -> list:
     lv_hit_min = hit_min_max[0]
     lv_hit_max = hit_min_max[1]
     if int(lv) >= 8:
@@ -149,7 +149,7 @@ def get_lv_hit_min_max(hit_min_max, lv):
     return [lv_hit_min, lv_hit_max]
 
 # [] 返回不同等级debuff最大值 最小值 列表形式 [min, max]
-def get_lv_debuff_min_max(debuff_min_max, lv):
+def get_lv_debuff_min_max(debuff_min_max, lv) -> list:
     debuff_min_base = float(debuff_min_max[0])
     debuff_max_base = float(debuff_min_max[1])
 
@@ -167,7 +167,7 @@ def get_lv_debuff_min_max(debuff_min_max, lv):
 
 
 # 技能 hit 伤害分布：0.1×2，0.25×2，0.3×1
-def get_hit_damage_str(hit_damage):
+def get_hit_damage_str(hit_damage) -> str:
     # 统计每个数值出现的次数
     damage_count = {}
     for damage in hit_damage:
@@ -181,7 +181,7 @@ def get_hit_damage_str(hit_damage):
     return hit_damage_str
 
 # 技能 hit 伤害分布：0.1，0.1，0.25，0.25，0.3
-def get_hit_damage_expand_str(hit_damage):
+def get_hit_damage_expand_str(hit_damage) -> str:
     hit_damage_expand_str = "，".join(map(str, hit_damage))
     return hit_damage_expand_str
 
@@ -349,13 +349,13 @@ def get_lv_percentage(percentage_base, lv):
     return lv_percentage
 
 # 提取百分比数字
-def extract_percentage_skill_numbers(text):
+def extract_percentage_skill_numbers(text) -> str:
     # 添加 re.DOTALL 以匹配换行符
     percentage = re.search(r"百分比的伤害：(.*?)%", text, re.DOTALL).group(1).strip()
     return percentage
 
 # 回写
-def write_percentage_numbers_back(text, new_percentage):
+def write_percentage_numbers_back(text, new_percentage) -> str:
     new_text = re.sub(
         r"(百分比的伤害：)(\d+\.?\d*)(%，)",  # 匹配模式
         lambda m: f"{m.group(1)}{new_percentage}{m.group(3)}",  # 替换逻辑

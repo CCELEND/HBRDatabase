@@ -123,7 +123,7 @@ class MasterSkill:
 
 
 # 获取大师技能对象
-def get_master_skill_obj(skill_info):
+def get_master_skill_obj(skill_info) -> MasterSkill:
 
     if skill_info == None:
         return None
@@ -150,19 +150,19 @@ def get_master_skill_obj(skill_info):
 
 
 # 判断是否是技能效果对象，否则就是攻击技能
-def is_master_skill_effect(skill):
+def is_master_skill_effect(skill) -> bool:
     if isinstance(skill, MasterSkillEffect):
         return True
     else:
         return False
 
 # 判断大师技能是否是被动技能
-def is_master_skill_passive(Master_skill):
+def is_master_skill_passive(Master_skill) -> bool:
     if Master_skill.sp_cost == "被动技能":
         return True
     return False
 
-def get_master_skill_type(Master_skill):
+def get_master_skill_type(Master_skill) -> str:
     if Master_skill.sp_cost == "被动技能":
         return "天赋/大师被动"
     return "主动/被动"

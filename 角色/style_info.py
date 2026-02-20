@@ -290,7 +290,7 @@ def set_style_category(style):
 
 
 # 根据字典 创建并返回风格对象
-def create_style(data):
+def create_style(data) -> Style:
 
     style_info = data['style_info']
     style_fields = [
@@ -395,7 +395,7 @@ def create_style(data):
     return style
 
 # 获取风格对象
-def get_style_obj(data):
+def get_style_obj(data) -> Style:
 
     style_info = data['style_info']
     style_name = style_info[1]
@@ -411,28 +411,28 @@ def get_style_obj(data):
 
 
 # 判断是否是技能效果对象，否则就是攻击技能
-def is_skill_effect(skill):
+def is_skill_effect(skill) -> bool:
     if isinstance(skill, SkillEffect):
         return True
     else:
         return False
 
-def get_en_by_id(style_id):
+def get_en_by_id(style_id) -> str:
     style = style_categories['id'][style_id]
     return next(iter(style.id_en.values()))
 
-def get_id_by_en(style_en):
+def get_id_by_en(style_en) -> str:
     style = style_categories['en'][style_en]
     return next(iter(style.id_en.keys()))
 
 
-def is_id_in_style_categories(style_id):
+def is_id_in_style_categories(style_id) -> bool:
     if style_id in style_categories['id']:
         return True
     else:
         return False
 
-def is_en_in_style_categories(style_en):
+def is_en_in_style_categories(style_en) -> bool:
     if style_en in style_categories['en']:
         return True
     else:

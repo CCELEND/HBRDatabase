@@ -1,5 +1,5 @@
 from tools import load_json, get_dir_values_list
-from 角色.role_info import creat_role_obj
+from 角色.role_info import creat_role_obj, Role
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -32,7 +32,7 @@ def load_teams_json():
 teams = {}
 
 # 根据字典 创建并返回队伍对象
-def creat_team(team_info, roles):
+def creat_team(team_info, roles) -> Team:
 
     logo_path = team_info['logo_path']
     name = team_info['name']
@@ -48,11 +48,11 @@ def creat_team(team_info, roles):
     return team
 
 
-def get_team_logo_path(team_name):
+def get_team_logo_path(team_name) -> str:
     return f"./角色/{team_name}/{team_name.lower()}.ico"
 
 # 获得 team 对象
-def get_team_obj(team_name):
+def get_team_obj(team_name) -> Team:
     global teams
 
     load_teams_json()
@@ -119,7 +119,7 @@ def get_all_team_obj():
                 logger.error(f"加载队伍：{team_name} 时出错: {e}")
 
 
-def get_role_by_master_name(name):
+def get_role_by_master_name(name) -> Role:
     for team in teams.values():
         for role in team.roles:
             if not role.master_skill:

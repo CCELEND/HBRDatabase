@@ -61,7 +61,7 @@ def show_style(scrollbar_frame_obj, style):
     scrollbar_frame_obj.update_canvas()
 
 # 获取别名
-def get_style_win_name(style):  
+def get_style_win_name(style) -> str:  
     if style.nicknames:
         style_win_name = style.name + f"（{style.nicknames[0]}）"
     else:

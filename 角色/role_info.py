@@ -28,7 +28,7 @@ class Role:
         self.SSRstyles = SSRstyles                  # SSR风格对象列表
 
 # 根据字典 创建并返回角色对象
-def creat_role(role_json, Astyles, Sstyles, SSstyles, SSRstyles):
+def creat_role(role_json, Astyles, Sstyles, SSstyles, SSRstyles) -> Role:
 
     img_path = role_json['img_path']
     name = role_json['name']
@@ -62,7 +62,7 @@ def creat_role(role_json, Astyles, Sstyles, SSstyles, SSRstyles):
     return role
 
 # 获取角色的风格对象列表
-def get_styles(role_path, style_rarity):
+def get_styles(role_path, style_rarity) -> list:
     file_path = os.path.join(role_path, f"{style_rarity}styles.json")
     if not os.path.exists(file_path):
         return []
@@ -75,7 +75,7 @@ def get_styles(role_path, style_rarity):
 # 角色对象字典 键：角色名，值：角色对象
 all_roles = {}
 
-def creat_role_obj(role_path):
+def creat_role_obj(role_path) -> Role:
 
     role_json = load_json(role_path + "/role.json")
     role_name = role_json['name']
@@ -96,6 +96,6 @@ def creat_role_obj(role_path):
     return role
 
 
-def get_role_master_img(role):
+def get_role_master_img(role) -> str:
     photo_path = f"./角色/{role.team}/{role.en}/{role.en}Q.png"
     return photo_path

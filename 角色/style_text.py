@@ -17,7 +17,7 @@ special_effects = [
 def output_skill_effect(turn_num, duration, target, effect_type,
     description, value, attribute_multiplier_dir=None,
     attribute_difference=None,
-    IsActive=True):
+    IsActive=True) -> str:
 
     text = output_string(turn_num) + output_string(duration) + output_string(target)
     text += output_string(effect_type) + '\n'
@@ -55,7 +55,7 @@ def output_skill_effect(turn_num, duration, target, effect_type,
 def output_attack_skill(hit_num, target, hit_damage,
     biased,
     strength, attribute_multiplier_dir, 
-    attribute_difference, destructive_multiplier):
+    attribute_difference, destructive_multiplier) -> str:
 
     text = hit_num + '-hit' + target + '攻击'
     if hit_damage:

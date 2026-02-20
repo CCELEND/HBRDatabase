@@ -19,7 +19,7 @@ skill_options = [
 ]
 
 # 新建技能等级选择框
-def creat_lv_combo_lab(parent_frame, level_max):
+def creat_lv_combo_lab(parent_frame, level_max) -> ttk.Combobox:
     # lv_combo_name = active_skill.name
 
     lv_combo = ttk.Combobox(parent_frame, 
