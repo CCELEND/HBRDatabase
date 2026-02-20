@@ -89,7 +89,7 @@ def triple_click_bind_canvas_events(canvas, triple_click_handler=None, **kwargs)
 
 # 获取图片对象
 image_refs = {}
-def get_photo(img_path, img_resize):
+def get_photo(img_path, img_resize) -> ImageTk.PhotoImage:
     # 创建唯一的键，由图片路径和加载大小决定
     unique_key = f"{img_path}_{img_resize}"
 
@@ -114,7 +114,7 @@ def create_canvas_with_image(parent_frame,
     photo,
     canvas_width, canvas_height, 
     create_image_x, create_image_y, 
-    row, column, rowspan=1, columnspan=1, padx=5, pady=5):
+    row, column, rowspan=1, columnspan=1, padx=5, pady=5) -> tk.Canvas:
 
     # 创建 Canvas 并显示图片
     canvas = tk.Canvas(parent_frame, width=canvas_width, height=canvas_height)

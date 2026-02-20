@@ -14,7 +14,7 @@ def set_window_disable_size(parent_frame):
     parent_frame.resizable(False, False)
 
 menu_icons = {}
-def load_menu_icon(path, name):
+def load_menu_icon(path, name) -> ImageTk.PhotoImage:
     if not path:
         return None
     if name in menu_icons:
@@ -36,13 +36,13 @@ def set_global_bg(parent_frame, bg="#f0f0f0"):
 
 # 创建一个新窗口 主窗口
 def creat_window(title, 
-    wide=None, high=None, x=None, y=None):
+    wide=None, high=None, x=None, y=None) -> ttk.Window:
+    
     new_window = ttk.Window(title=title, size=(wide, high), position=(x,y))
-
     return new_window   
 
 # 创建一个新窗口 子窗口
-def creat_Toplevel(title, width=None, height=None, x=None, y=None):
+def creat_Toplevel(title, width=None, height=None, x=None, y=None) -> ttk.Toplevel:
     # 参数类型校验
     if not isinstance(title, str):
         raise TypeError("title参数必须是字符串类型")
@@ -219,7 +219,7 @@ def edit_text(text_widget, data):
         text_widget.insert(tk.END, data)
 
 
-def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity):
+def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity) -> ImageTk.PhotoImage:
     # 加载背景图片
     bg_image = Image.open(bg_path)
     bg_image = bg_image.resize((parent_width, parent_height), Image.LANCZOS)
