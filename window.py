@@ -6,15 +6,15 @@ from tkinter import Menu, messagebox
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-def set_window_disable_maximize(parent_frame):
+def set_window_disable_maximize(parent_frame: ttk.Window):
     # Windows系统
     parent_frame.wm_attributes("-toolwindow", True)
 
-def set_window_disable_size(parent_frame):
+def set_window_disable_size(parent_frame: ttk.Window):
     parent_frame.resizable(False, False)
 
 menu_icons = {}
-def load_menu_icon(path, name) -> ImageTk.PhotoImage:
+def load_menu_icon(path: str, name: str) -> ImageTk.PhotoImage:
     if not path:
         return None
     if name in menu_icons:
@@ -22,7 +22,7 @@ def load_menu_icon(path, name) -> ImageTk.PhotoImage:
     menu_icons[name] = ImageTk.PhotoImage(Image.open(path).resize((22, 22)))
     return menu_icons[name]
 
-def set_global_bg(parent_frame, bg="#f0f0f0"):
+def set_global_bg(parent_frame: ttk.Window, bg="#f0f0f0"):
     # 获取当前主题的颜色配置
     current_theme = parent_frame.style.theme_use()
     colors = parent_frame.style.colors
@@ -35,14 +35,14 @@ def set_global_bg(parent_frame, bg="#f0f0f0"):
     colors.light = bg
 
 # 创建一个新窗口 主窗口
-def creat_window(title, 
+def creat_window(title: str, 
     wide=None, high=None, x=None, y=None) -> ttk.Window:
-    
+
     new_window = ttk.Window(title=title, size=(wide, high), position=(x,y))
     return new_window   
 
 # 创建一个新窗口 子窗口
-def creat_Toplevel(title, width=None, height=None, x=None, y=None) -> ttk.Toplevel:
+def creat_Toplevel(title: str, width=None, height=None, x=None, y=None) -> ttk.Toplevel:
     # 参数类型校验
     if not isinstance(title, str):
         raise TypeError("title参数必须是字符串类型")
@@ -66,24 +66,24 @@ def creat_Toplevel(title, width=None, height=None, x=None, y=None) -> ttk.Toplev
     return new_window
 
 # 配置窗口的行和列的伸展
-def set_window_expand(frame, rowspan=1, columnspan=1):
+def set_window_expand(frame: ttk.Frame, rowspan=1, columnspan=1):
     for row in range(rowspan):
         frame.grid_rowconfigure(row, weight=1)
     for col in range(columnspan):
         frame.grid_columnconfigure(col, weight=1)
 
 # 配置窗口的行伸展
-def set_window_row_expand(frame, rowspan=1):
+def set_window_row_expand(frame: ttk.Frame, rowspan=1):
     for row in range(rowspan):
         frame.grid_rowconfigure(row, weight=1)
 
 # 配置窗口的列伸展
-def set_window_colum_expand(frame, columnspan=1):
+def set_window_colum_expand(frame: ttk.Frame, columnspan=1):
     for col in range(columnspan):
         frame.grid_columnconfigure(col, weight=1)
 
 # 设置窗口图标
-def set_window_icon(frame, icon_path):
+def set_window_icon(frame: ttk.Window, icon_path: str):
     # 检查文件是否存在
     if not os.path.exists(icon_path):
         messagebox.showerror("错误", "图标文件未找到")
@@ -118,7 +118,7 @@ def set_window_icon(frame, icon_path):
         messagebox.showerror("错误", f"设置图标时出错: {str(e)}")
 
 # webp 设置窗口图标，并可以指定图标大小
-def set_window_icon_webp_save(frame, webp_path, size=(64, 64)):
+def set_window_icon_webp_save(frame: ttk.Window, webp_path: str, size=(64, 64)):
     try:
         # 加载图片
         icon_image = Image.open(webp_path).convert("RGBA")
@@ -135,7 +135,7 @@ def set_window_icon_webp_save(frame, webp_path, size=(64, 64)):
         messagebox.showerror("错误", f"无法设置窗口图标: {e}")
 
 # webp 设置窗口图标，并可以指定图标大小
-def set_window_icon_webp(frame, webp_path, size=(64, 64)):
+def set_window_icon_webp(frame: ttk.Window, webp_path: str, size=(64, 64)):
     try:
         # 加载图片
         icon_image = Image.open(webp_path).convert("RGBA")
@@ -152,13 +152,13 @@ def set_window_icon_webp(frame, webp_path, size=(64, 64)):
         messagebox.showerror("错误", f"无法设置窗口图标: {e}")
 
 # 当父窗口被点击时，将其置于顶层
-def set_window_top(parent_frame):
+def set_window_top(parent_frame: ttk.Window):
     parent_frame.deiconify()  # 如果窗口被最小化，先恢复窗口
     parent_frame.lift()
 
 
 # 右键复制
-def copy_text(event, text_widget):
+def copy_text(event, text_widget: tk.Text):
     try:
         # 获取选中的文本
         selected_text = text_widget.get("sel.first", "sel.last")
@@ -169,14 +169,14 @@ def copy_text(event, text_widget):
         pass  # 如果没有选中文本，忽略错误
 
 # 右键粘贴
-def paste_text(event, text_widget):
+def paste_text(event, text_widget: tk.Text):
     try:
         text_widget.insert(tk.INSERT, text_widget.clipboard_get())
     except tk.TclError:
         pass  # 如果剪贴板为空，忽略错误
 
 # 右键剪切
-def cut_text(event, text_widget):
+def cut_text(event, text_widget: tk.Text):
     try:
         selected_text = text_widget.get("sel.first", "sel.last")
         if selected_text:
@@ -187,7 +187,7 @@ def cut_text(event, text_widget):
         pass
 
 # 右键菜单
-def show_context_menu(event, text_widget):
+def show_context_menu(event, text_widget: tk.Text):
     # 创建上下文菜单
     context_menu = Menu(text_widget, tearoff=0)
     context_menu.add_command(label="复制", command=lambda e=event: copy_text(e, text_widget))
@@ -219,7 +219,8 @@ def edit_text(text_widget, data):
         text_widget.insert(tk.END, data)
 
 
-def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity) -> ImageTk.PhotoImage:
+def set_bg_opacity(parent_frame: ttk.Window, 
+                   parent_width: int, parent_height: int, bg_path: str, opacity: str) -> ImageTk.PhotoImage:
     # 加载背景图片
     bg_image = Image.open(bg_path)
     bg_image = bg_image.resize((parent_width, parent_height), Image.LANCZOS)
@@ -247,13 +248,13 @@ def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity) 
 # 已打开的窗口字典，键：名，值：窗口句柄
 open_wins = {}
 
-def win_open_manage(open_win_frame, module):
+def win_open_manage(open_win_frame: ttk.Window, module: str):
     open_win_name = f"{module}_{open_win_frame.title()}"
     open_wins[open_win_name] = open_win_frame
 
 
 # 关闭窗口时，清除列表中对应的窗口名，并销毁窗口
-def win_close_manage(open_win_frame, module, class_resources = None):
+def win_close_manage(open_win_frame: ttk.Window, module: str, class_resources = None):
 
     # print(open_wins)
 
@@ -272,7 +273,7 @@ def win_close_all():
         del open_wins[open_win_name]
         win_frame.destroy()  # 销毁窗口
 
-def win_set_top(open_win, module):
+def win_set_top(open_win: ttk.Window, module: str):
     if isinstance(open_win, str):
         open_win_name = f"{module}_{open_win}"
         set_window_top(open_wins[open_win_name])
@@ -281,16 +282,17 @@ def win_set_top(open_win, module):
         set_window_top(open_wins[open_win_name])
 
 
-def is_win_open(open_win_name, module):
+def is_win_open(open_win_name: str, module: str):
     open_win_name = f"{module}_{open_win_name}"
     return True if open_win_name in open_wins else False
 
 
-def is_win_exist(win_frame):
+def is_win_exist(win_frame: ttk.Window):
+
     return True if win_frame.winfo_exists() else False
 
 
-def get_ico_path_by_name(name):
+def get_ico_path_by_name(name: str):
     if not name: return None 
 
     infos = {

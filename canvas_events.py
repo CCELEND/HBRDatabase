@@ -9,51 +9,51 @@ import time
 import platform
 
 # 定义鼠标进入 Canvas 时的事件处理函数
-def mouse_on_enter(event):
+def mouse_on_enter(event: tk.Event):
     # 获取触发事件的控件 设置光标为手型
     event.widget.config(cursor="hand2")  
 
 # 定义鼠标离开 Canvas 时的事件处理函数
-def mouse_on_leave(event):
+def mouse_on_leave(event: tk.Event):
     # 获取触发事件的控件 恢复默认光标
     event.widget.config(cursor="")
 
 # 绑定鼠标进入和离开事件到 Canvas
-def mouse_bind_canvas_events(canvas):
+def mouse_bind_canvas_events(canvas: tk.Canvas):
     canvas.bind("<Enter>", mouse_on_enter)
     canvas.bind("<Leave>", mouse_on_leave) 
 
 # 显示边框
-def mouse_on_enter_frame(event):
+def mouse_on_enter_frame(event: tk.Canvas):
     event.widget.config(highlightbackground="blue", highlightthickness=2)  # 鼠标进入时显示边框
 
-def mouse_on_leave_frame(event):
+def mouse_on_leave_frame(event: tk.Canvas):
     event.widget.config(highlightbackground="SystemButtonFace", highlightthickness=0)   # 鼠标离开时隐藏边框gray
 
 # 绑定鼠标进入和离开事件到 Canvas
-def mouse_frame_bind_canvas_events(canvas):
+def mouse_frame_bind_canvas_events(canvas: tk.Canvas):
     canvas.bind("<Enter>", mouse_on_enter_frame)
     canvas.bind("<Leave>", mouse_on_leave_frame) 
 
 
-def mouse_on_enter2(event):
+def mouse_on_enter2(event: tk.Event):
     # 获取触发事件的控件，设置光标为手型并显示蓝色边框
     widget = event.widget
     widget.config(cursor="hand2", highlightbackground="#93CBE4", highlightthickness=2)
 
-def mouse_on_leave2(event):
+def mouse_on_leave2(event: tk.Event):
     # 获取触发事件的控件，恢复默认光标并隐藏边框
     widget = event.widget
     widget.config(cursor="", highlightbackground="SystemButtonFace", highlightthickness=0)
 
 # 绑定鼠标进入和离开事件到Canvas
-def mouse_bind_canvas_events2(canvas):
+def mouse_bind_canvas_events2(canvas: tk.Canvas):
     canvas.bind("<Enter>", mouse_on_enter2)
     canvas.bind("<Leave>", mouse_on_leave2)
 
 
 # 右键绑定 动态调整被绑定函数参数并传入
-def right_click_bind_canvas_events(canvas, right_click_handler=None, **kwargs):
+def right_click_bind_canvas_events(canvas: tk.Canvas, right_click_handler=None, **kwargs):
     # 为 Canvas 绑定事件
     if right_click_handler:
         # 使用 partial 来预填充所有额外的参数
@@ -62,7 +62,7 @@ def right_click_bind_canvas_events(canvas, right_click_handler=None, **kwargs):
 
 
 # 单击绑定 动态调整被绑定函数参数并传入
-def bind_canvas_events(canvas, click_handler=None, **kwargs):
+def bind_canvas_events(canvas: tk.Canvas, click_handler=None, **kwargs):
     # 为 Canvas 绑定事件
     if click_handler:
         # 使用 partial 来预填充所有额外的参数
@@ -71,7 +71,7 @@ def bind_canvas_events(canvas, click_handler=None, **kwargs):
 
 
 # 双击绑定 动态调整被绑定函数参数并传入
-def double_click_bind_canvas_events(canvas, double_click_handler=None, **kwargs):
+def double_click_bind_canvas_events(canvas: tk.Canvas, double_click_handler=None, **kwargs):
     # 为 Canvas 绑定事件
     if double_click_handler:
         # 使用 partial 来预填充所有额外的参数
@@ -80,7 +80,7 @@ def double_click_bind_canvas_events(canvas, double_click_handler=None, **kwargs)
 
 
 # 三击绑定 动态调整被绑定函数参数并传入
-def triple_click_bind_canvas_events(canvas, triple_click_handler=None, **kwargs):
+def triple_click_bind_canvas_events(canvas: tk.Canvas, triple_click_handler=None, **kwargs):
     # 为 Canvas 绑定事件
     if triple_click_handler:
         # 使用 partial 来预填充所有额外的参数
@@ -89,7 +89,7 @@ def triple_click_bind_canvas_events(canvas, triple_click_handler=None, **kwargs)
 
 # 获取图片对象
 image_refs = {}
-def get_photo(img_path, img_resize) -> ImageTk.PhotoImage:
+def get_photo(img_path: str, img_resize: tuple) -> ImageTk.PhotoImage:
     # 创建唯一的键，由图片路径和加载大小决定
     unique_key = f"{img_path}_{img_resize}"
 
@@ -110,8 +110,8 @@ def get_photo(img_path, img_resize) -> ImageTk.PhotoImage:
     return photo
 
 # 创建图片 canvas
-def create_canvas_with_image(parent_frame, 
-    photo,
+def create_canvas_with_image(parent_frame: tk.Frame, 
+    photo: ImageTk.PhotoImage,
     canvas_width, canvas_height, 
     create_image_x, create_image_y, 
     row, column, rowspan=1, columnspan=1, padx=5, pady=5) -> tk.Canvas:

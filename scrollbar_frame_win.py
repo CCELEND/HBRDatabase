@@ -3,7 +3,7 @@ import tkinter as tk
 
 # 滚动条窗口类
 class ScrollbarFrameWin:
-    def __init__(self, parent_frame, columnspan):
+    def __init__(self, parent_frame: tk.Frame, columnspan: int):
         # 初始化
         self.root = parent_frame
         self.create_scrollbar_frame(columnspan)
