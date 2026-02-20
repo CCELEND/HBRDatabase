@@ -16,7 +16,7 @@ logger = AdvancedLogger.get_logger(__name__)
 
 import 日志.error_queue_proc
 
-def get_version():
+def get_version() -> str:
     version = read_txt_file("./关于/version.txt", "text")
     return version
 
@@ -33,7 +33,7 @@ def restart_program():
     os.execv(python, [python] + sys.argv)  # 重启程序
 
 # 匹配带逗号的数字范围
-def extract_number_range(text):
+def extract_number_range(text:str) -> tuple[int, int] | None:
     match = re.search(r"(\d{1,3}(?:,\d{3})*) ~ (\d{1,3}(?:,\d{3})*)", text)
     if match:
         min_val, max_val = match.groups()
@@ -44,21 +44,21 @@ def extract_number_range(text):
     return None
 
 # int 10,000 转换 10000
-def comma_str_to_int(number_string):
+def comma_str_to_int(number_string:str) -> int:
     number = int(number_string.replace(',', ''))
     return number
 
 # 10000 转换为 10,000
-def int_to_comma_str(number):
+def int_to_comma_str(number:int) -> str:
     number_string = "{:,}".format(number)
     return number_string
 
 # 判断空文件
-def is_file_empty(file_path):
+def is_file_empty(file_path:str) -> bool:
     return os.path.getsize(file_path) == 0
 
 # 加载 json 文件
-def load_json(json_path):
+def load_json(json_path:str) -> dict:
     try:
         if is_file_empty(json_path): return {}
 
@@ -72,11 +72,11 @@ def load_json(json_path):
         return {}
 
 # 根据字典，返回其值的列表
-def get_dir_values_list(dir1):
+def get_dir_values_list(dir1: dict) -> list:
     return list(dir1.values())
 
 # 字典相加
-def add_dicts(dict1, dict2):
+def add_dicts(dict1: dict, dict2: dict) -> dict:
     # 创建 dict1 的副本，以避免修改原始字典
     result = dict1.copy()
     # 更新 result 字典，以包含 dict2 中的键值对
@@ -84,25 +84,25 @@ def add_dicts(dict1, dict2):
     return result
 
 # 判断字典的子字典全为空
-def is_all_values_empty(dir1):
+def is_all_values_empty(dir1: dict) -> bool:
     return not any(dir1.values())
 
 # 如果是 None 就转换为""
-def output_string(value):
+def output_string(value) -> str:
     return "" if value is None else value
 
 # 判断一个字符串是否是字符串列表中某个字符串的子串
-def is_substring(substring, string_list):
+def is_substring(substring:str, string_list:list[str]) -> bool:
     return any(substring in s for s in string_list)
 
 # 判断一个字符串是否是字符串列表中某个字符串的父串
-def is_parentstring(parent_string, stringlist):
+def is_parentstring(parent_string:str, stringlist:list[str]) -> bool:
     if not parent_string or not stringlist:
         return False
     return any(s in parent_string for s in stringlist)
 
 # 判断list1中的字符串是否是list2中某个字符串的父串
-def list_val_in_another(list1, list2):
+def list_val_in_another(list1:list[str], list2:list[str]) -> bool:
     if not list1: return False
     for item in list1:
         if is_parentstring(item, list2):
@@ -111,11 +111,11 @@ def list_val_in_another(list1, list2):
         #     return False
     return False
 
-def list_is(list, string):
+def list_is(list:list[str], string:str) -> bool:
     return (len(list) == 1 and list[0] == string)
 
 # 检查字典的键或值是否存在于指定列表中
-def check_dict_in_list(input_dict, check_list, check_keys=True, check_values=True):
+def check_dict_in_list(input_dict: dict, check_list: list[str], check_keys=True, check_values=True) -> bool:
     if not input_dict: return False
     
     # 检查键
@@ -132,32 +132,32 @@ def check_dict_in_list(input_dict, check_list, check_keys=True, check_values=Tru
 
 
 # 检查目录是否存在，如果不存在则创建
-def creat_directory(file_name):
+def creat_directory(file_name:str):
     # 获取目录路径
     directory = os.path.dirname(file_name)
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 # 计算需要填充的字节数量，使得总长度为8的倍数
-def padding_data(data):
+def padding_data(data:bytes) -> bytes:
     padding_length = (8 - (len(data) % 8)) % 8
     padded_bytes = data + b'\x00' * padding_length
     return padded_bytes
 
 # 整数转换为，字符串字节序列，十六进制，eg: 664572 => b"\x00\x00\x00a23fc"
-def int_to_str_8bytes(value):
+def int_to_str_8bytes(value:int) -> bytes:
     hex_value = hex(value)[2:]
     hex_value_str_bytes = hex_value.encode('utf-8')
     hex_value_str_8bytes = hex_value_str_bytes.rjust(8, b'\x00')
     return hex_value_str_8bytes
 
 #字符串字节序列，十六进制转换为整数，eg: b"\x00\x00\x00a23fc" => 664572
-def str_8bytes_to_int(hex_value_str_8bytes):
+def str_8bytes_to_int(hex_value_str_8bytes:bytes) -> int:
     hex_value_str = hex_value_str_8bytes.decode('utf-8').lstrip('\x00')
     return int(hex_value_str, 16)
 
 # 查找子字符串出现的全部位置，返回位置列表
-def find_all_substring_positions(substring, string):
+def find_all_substring_positions(substring:str, string:str) -> list[int]:
     start = 0
     positions = []
     while True:
@@ -248,7 +248,7 @@ def delete_mp3_files(directory: str) -> None:
                 logger.error(f"删除 {mp3_file} 时出错: {e}")
                 messagebox.showerror("错误", f"删除 {mp3_file} 时出错: {e}")
 
-def delete_all_files_and_subdirs(directory):
+def delete_all_files_and_subdirs(directory:str) -> bool:
     if not os.path.isdir(directory):
         return
     try:
@@ -266,7 +266,7 @@ def delete_old_file_and_subdirs():
     delete_all_files_and_subdirs("./工具/HBRbrochure/chromedriver-win64")
     delete_all_files_and_subdirs("./工具/HBRbrochure/chrome_user_data")
 
-def delete_file(file):
+def delete_file(file: str) -> bool:
     if not os.path.isfile(file):
         return
     try:
@@ -336,7 +336,7 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
         messagebox.showerror("错误", f"读取文件时发生意外错误: {file_path}\n{e}")
         return None
 
-def compute_hash(text, algorithm = "sha256"):
+def compute_hash(text:str, algorithm = "sha256") -> str:
 
     # algorithm (str): 
     # md5
@@ -354,7 +354,7 @@ def compute_hash(text, algorithm = "sha256"):
     return hash_func.hexdigest()
 
 # bytes to hex str
-def convert_hex_escape_to_string(hex_escape_string):
+def convert_hex_escape_to_string(hex_escape_string: str) -> str:
     # 使用正则表达式匹配\x后跟两个十六进制字符的模式
     hex_pattern = r'\\x([0-9a-fA-F]{2})'
     
@@ -367,7 +367,7 @@ def convert_hex_escape_to_string(hex_escape_string):
     return result
 
 # hex to bytes str
-def convert_hex_string_to_escape(hex_string):
+def convert_hex_string_to_escape(hex_string: str) -> str:
     # 确保输入是有效的十六进制字符串（只包含0-9和a-f或A-F）
     if not re.match(r'^[0-9a-fA-F]+$', hex_string):
         logger.error("输入必须是有效的十六进制字符串")
@@ -387,7 +387,7 @@ def convert_hex_string_to_escape(hex_string):
     return result
 
 # 返回列表不是数字元素的第一个下标
-def get_list_not_isinstance_index(a):
+def get_list_not_isinstance_index(a:list) -> int | None:
     index = None
     for index, item in enumerate(a):
         if not isinstance(item, (int, float)):
@@ -422,7 +422,7 @@ def init_chrome_driver(chrome_options):
 
     return driver
 
-def is_admin():
+def is_admin() -> bool:
     try:
         # 判断系统平台
         if sys.platform.startswith('win'):
@@ -465,7 +465,7 @@ def run_admin():
         sys.exit()
 
 
-def format_hex_dump(hex_string, bytes_per_line=16):
+def format_hex_dump(hex_string:str, bytes_per_line=16):
     
     # 格式化十六进制输出
     result = []
@@ -497,5 +497,5 @@ def format_hex_dump(hex_string, bytes_per_line=16):
     
     return '\n'.join(result)
 
-def not_letter(text):
+def not_letter(text:str) -> bool:
     return not any(char.isalpha() for char in text) 
