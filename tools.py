@@ -186,67 +186,49 @@ def webp_to_ico(size=(80, 66)):
             # 保存为ICO文件
             iconimage.save(tempiconpath, format='ICO', sizes=[(size[0], size[1])])
 
-def delete_webp_files(directory: str) -> None:
 
-    # if os.path.exists("./持有物/饰品/专武/Soul_png.png"):
-    #     return
+def delete_files_if_alternative_exists(
+    directory: str,
+    target_suffix: str,
+    alternative_suffix: str
+) -> None:
 
-    # 检查目录是否存在
-    if not os.path.exists(directory):
+    if not target_suffix.startswith('.'):
+        target_suffix = '.' + target_suffix
+    if not alternative_suffix.startswith('.'):
+        alternative_suffix = '.' + alternative_suffix
+
+    # 目录合法性检查
+    if not os.path.exists(directory) or not os.path.isdir(directory):
+        logger.warning(f"目录 {directory} 不存在或不是有效目录，跳过删除操作")
         return
-    
-    # 检查是否为有效目录
-    if not os.path.isdir(directory):
-        return
-    
-    # 转换为Path对象以便使用更现代的文件操作API
+
+    # 转换为Path对象
     dir_path = pathlib.Path(directory)
-    
-    # 遍历目录及其子目录中的所有.webp文件
-    for webp_file in dir_path.rglob('*.webp'):
-        # 构建同名PNG文件路径
-        png_file = webp_file.with_suffix('.png')
-        # 检查PNG文件是否存在
-        if png_file.exists():
-            try:
-                # 删除文件
-                webp_file.unlink()
-            except PermissionError:
-                logger.error(f"没有权限删除 {webp_file}")
-                messagebox.showerror("错误", f"没有权限删除 {webp_file}")
-            except Exception as e:
-                logger.error(f"删除 {webp_file} 时出错: {e}")
-                messagebox.showerror("错误", f"删除 {webp_file} 时出错: {e}")
 
+    # 遍历目标后缀的所有文件
+    for target_file in dir_path.rglob(f'*{target_suffix}'):
+        # 构建替代文件路径
+        alternative_file = target_file.with_suffix(alternative_suffix)
+        
+        if alternative_file.exists():
+            try:
+                target_file.unlink()
+                logger.info(f"成功删除文件: {target_file}")
+            except PermissionError:
+                error_msg = f"没有权限删除 {target_file}"
+                logger.error(error_msg)
+                messagebox.showerror("错误", error_msg)
+            except Exception as e:
+                error_msg = f"删除 {target_file} 时出错: {e}"
+                logger.error(error_msg)
+                messagebox.showerror("错误", error_msg)
+
+def delete_webp_files(directory: str) -> None:
+    delete_files_if_alternative_exists(directory, "webp", "png")
 
 def delete_mp3_files(directory: str) -> None:
-
-    # 检查目录是否存在
-    if not os.path.exists(directory):
-        return
-    
-    # 检查是否为有效目录
-    if not os.path.isdir(directory):
-        return
-    
-    # 转换为Path对象以便使用更现代的文件操作API
-    dir_path = pathlib.Path(directory)
-    
-    # 遍历目录及其子目录中的所有.mp3文件
-    for mp3_file in dir_path.rglob('*.mp3'):
-        # 构建同名flac文件路径
-        flac_file = mp3_file.with_suffix('.flac')
-        # 检查flac文件是否存在
-        if flac_file.exists():
-            try:
-                # 删除文件
-                mp3_file.unlink()
-            except PermissionError:
-                logger.error(f"没有权限删除 {mp3_file}")
-                messagebox.showerror("错误", f"没有权限删除 {mp3_file}")
-            except Exception as e:
-                logger.error(f"删除 {mp3_file} 时出错: {e}")
-                messagebox.showerror("错误", f"删除 {mp3_file} 时出错: {e}")
+    delete_files_if_alternative_exists(directory, "mp3", "flac")
 
 def delete_all_files_and_subdirs(directory: str) -> bool:
     if not os.path.isdir(directory):
