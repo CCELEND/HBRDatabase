@@ -282,17 +282,17 @@ def win_set_top(open_win: ttk.Window, module: str):
         set_window_top(open_wins[open_win_name])
 
 
-def is_win_open(open_win_name: str, module: str):
+def is_win_open(open_win_name: str, module: str) -> bool:
     open_win_name = f"{module}_{open_win_name}"
     return True if open_win_name in open_wins else False
 
 
-def is_win_exist(win_frame: ttk.Window):
+def is_win_exist(win_frame: ttk.Window) -> bool:
 
     return True if win_frame.winfo_exists() else False
 
 
-def get_ico_path_by_name(name: str):
+def get_ico_path_by_name(name: str) -> str | None:
     if not name: return None 
 
     infos = {
