@@ -499,3 +499,15 @@ def format_hex_dump(hex_string: str, bytes_per_line=16):
 
 def not_letter(text: str) -> bool:
     return not any(char.isalpha() for char in text) 
+
+def replace_file_extension(file_path: str, new_extension: str) -> str:
+    # 替换文件路径中的后缀名
+    if not new_extension.startswith('.'):
+        new_extension = '.' + new_extension
+    
+    file_name_without_ext, _ = os.path.splitext(file_path)
+    
+    # 拼接新的路径
+    new_file_path = file_name_without_ext + new_extension
+    
+    return new_file_path

@@ -8,6 +8,7 @@ from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
+from tools import replace_file_extension
 
 from 角色.style_career_win import creat_career_frame
 from 角色.style_active_skill_win import creat_active_skill_frame
@@ -121,7 +122,7 @@ def creat_style_right_menu(event, parent_frame, team, style):
 def show_style_animation(parent_frame, team, style):
 
     animation_path = style.path.replace("_Thumbnail", "")
-    animation_path = animation_path[:-4] + "webm"
+    animation_path = replace_file_extension(animation_path, "webm")
 
     # 判断有没有动画
     if os.path.exists(animation_path):
@@ -174,7 +175,7 @@ def show_style_artwork(parent_frame, team, style):
 def show_style_artwork_3d(parent_frame, team, style):
 
     artwork_3d_path = style.path.replace("_Thumbnail", "_3d")
-    artwork_3d_path = artwork_3d_path[:-4] + "png"
+    artwork_3d_path = replace_file_extension(artwork_3d_path, "png")
 
     if os.path.exists(artwork_3d_path):
 
