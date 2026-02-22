@@ -7,6 +7,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
+from time import sleep
+
 # from HBRbrochure.mapping import GetBrochureIdByStyleId
 # import HBRbrochure.mapping
 
@@ -111,6 +113,8 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
 
     # 切换国服
     switch_cn(driver)
+
+    sleep(1)
 
     # 网页缩略到50%
     web_abbreviation(driver, 50)
