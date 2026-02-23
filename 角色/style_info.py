@@ -217,11 +217,14 @@ class Style:
         self.element_attribute = element_attribute  # 元素属性
         self.id_en = id_en                      # 风格ID：英文字典
 
-        self.active_skills = active_skills      # 主动技能列表
-        self.passive_skills = passive_skills    # 被动技能列表
+        self.active_skills = active_skills      # 主动技能列表[]
+        self.passive_skills = passive_skills    # 被动技能列表[]
         self.growth_ability = growth_ability    # 成长能力
         self.status_growth = status_growth      # 成长状态值
         self.resonance = resonance              # 共鸣天赋
+
+    def __str__(self):
+        return f"风格：{self.name}，所属角色：{self.role_name}，稀有度：{self.rarity}，职业：{self.career}，武器属性：{self.weapon_attribute}，元素属性：{self.element_attribute}，主动技能数量：{len(self.active_skills)}，被动技能数量：{len(self.passive_skills)}"
 
 # 使用字典存储所有风格分类
 style_categories = {

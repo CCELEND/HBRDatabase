@@ -113,13 +113,16 @@ class MasterAttackSkill:
 class MasterSkill:
     def __init__(self, name = None, description = None, 
         sp_cost = None, max_uses = None, 
-        effects = None, missions = None):
+        effects = None, missions:str = None):
         self.name = name
         self.description = description      # 技能描述
         self.sp_cost = sp_cost              # SP 消耗
         self.max_uses = max_uses            # 使用次数 None：无限
         self.effects = effects              # 技能效果对象列表 []
         self.missions =  missions           # 达成的任务
+
+    def __str__(self):
+        return f"大师技能：{self.name}，描述：{self.description}，SP消耗：{self.sp_cost}，最大使用次数：{self.max_uses}，效果数量：{len(self.effects)}，任务：{self.missions}"
 
 
 # 获取大师技能对象

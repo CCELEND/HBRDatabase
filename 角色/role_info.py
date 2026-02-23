@@ -22,10 +22,13 @@ class Role:
         self.weapon = weapon                        # 武器
         self.master_skill = master_skill            # 大师技能
 
-        self.Astyles = Astyles                      # A风格对象列表
-        self.Sstyles = Sstyles                      # S风格对象列表
-        self.SSstyles = SSstyles                    # SS风格对象列表
-        self.SSRstyles = SSRstyles                  # SSR风格对象列表
+        self.Astyles = Astyles                      # A风格对象列表[]
+        self.Sstyles = Sstyles                      # S风格对象列表[]
+        self.SSstyles = SSstyles                    # SS风格对象列表[]
+        self.SSRstyles = SSRstyles                  # SSR风格对象列表[]
+    
+    def __str__(self):
+        return f"角色：{self.name}，英文：{self.en}，别名：{self.nicknames}，描述：{self.description}，队伍：{self.team}，武器属性：{self.weapon_attribute}，武器：{self.weapon}，大师技能：{self.master_skill}，A风格数量：{len(self.Astyles)}，S风格数量：{len(self.Sstyles)}，SS风格数量：{len(self.SSstyles)}，SSR风格数量：{len(self.SSRstyles)}"
 
 # 根据字典 创建并返回角色对象
 def creat_role(role_json, Astyles, Sstyles, SSstyles, SSRstyles) -> Role:

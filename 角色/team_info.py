@@ -14,7 +14,10 @@ class Team:
         self.logo_path = logo_path                  # 队伍头像路径
         self.name = name                            # 队伍名
         self.description = description              # 队伍描述
-        self.roles = roles                          # 角色对象列表
+        self.roles = roles                          # 角色对象列表[]
+
+    def __str__(self):
+        return f"队伍：{self.name}，描述：{self.description}，角色数量：{len(self.roles)}"
 
 
 teams_json = {}
