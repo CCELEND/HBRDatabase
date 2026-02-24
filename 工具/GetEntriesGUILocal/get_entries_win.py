@@ -325,6 +325,22 @@ def save_index_wash_entries_to_file(index_wash_entries):
         logger.error(f"{e}\n请关闭打开的 index_wash_entries.xlsx 并重试")
         messagebox.showerror("错误", f"{e}\n请关闭打开的 index_wash_entries.xlsx 并重试")
 
+def ini_config():
+    if not os.path.exists("./工具/GetEntriesGUILocal/config.ini"):
+        config = configparser.ConfigParser()
+        config['ChangeAbility'] = {
+            'ChangeAbility_seed': '',
+            'ChangeAbility_index': ''
+        }
+        config['RandomMainAbility'] = {
+            'RandomMainAbility_seed': '',
+            'RandomMainAbility_index': ''
+        }
+        config['Count'] = {
+            'DataCount': '300'
+        }
+        with open('./工具/GetEntriesGUILocal/config.ini', 'w') as configfile:
+            config.write(configfile)
 
 def creat_ct_win():
 
@@ -335,6 +351,8 @@ def creat_ct_win():
 
     ct_win_frame = creat_Toplevel("词条获取", 700, 405)
     set_window_icon(ct_win_frame, "./工具/GetEntriesGUILocal/entries.ico")
+
+    ini_config()
 
     # 配置主窗口的列和行的伸展
     ct_win_frame.grid_rowconfigure(0, weight=1)     # get_entries_frame 行随着窗口调整大小
