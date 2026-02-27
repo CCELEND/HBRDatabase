@@ -32,7 +32,7 @@
 
 * 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
 1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
->使用之前需要修改 config.ini 配置文件，文件路径：./工具/GetEntriesGUILocal/config.ini   
+>第一次运行会生成 config.ini 配置文件，修改后再使用，文件路径：./工具/GetEntriesGUILocal/config.ini   
 * 填入洗孔的 seed 和 index：  
 	ChangeAbility_seed=  
 	ChangeAbility_index=  
@@ -41,12 +41,11 @@
 	RandomMainAbility_index=  
 * 控制获取数据数，修改 DataCount，这里默认是获取300条数据  
 	DataCount=300  
->如果想要获取自己账号的装备 seed 和 index、洗孔 seed 和 index，请与我联系。  
->根据 seed 获取对应 index，管理员模式运行 ./工具/GetEntriesGUILocal/get_index_by_seed.exe，仅支持炽焰天穹PC端。    
->seed_tools：可以自动获取 seed 和 index，管理员模式运行 ./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe，仅支持炽焰天穹PC端。  
->~~运行 get_index_by_seed.exe、seed_tools.exe 时，如果炽焰天穹PC端处于时修状态，需要结束刷图再重新打开PC端，否则无法获取 seed 和 index！（实测结束刷图再进入饰品炼金界面也行（大概吧。。））~~  
+>根据 seed 获取对应 index，管理员模式运行：./工具/GetEntriesGUILocal/get_index_by_seed.exe，仅支持炽焰天穹PC端。  
+>seed_tools：可以自动获取 seed 和 index，管理员模式运行：./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe，仅支持炽焰天穹PC端。  
 >不要使用启动器运行炽焰天穹PC端，运行PC端安装目录下的 HeavenBurnsRed Game 目录下的 HeavenBurnsRed.exe。  
->seed 正确值范围应该小于4294967295，如果获取值错误需要重启PC端。
+>seed 正确值范围应该小于4294967295，如果获取值错误需要重启PC端。  
+>不会操作的请与我联系。
 2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
 >第一次获取时需要登录，后续会自动登录    
 >需要安装最新版本的 chrome 浏览器，登录之后可能会出现没有数据的情况，刷新一下网页即可  
@@ -70,4 +69,3 @@
 ### 修复
 
 * 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
-
