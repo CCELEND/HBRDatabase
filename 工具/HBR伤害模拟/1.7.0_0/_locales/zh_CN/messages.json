@@ -1,0 +1,365 @@
+{
+   "All": {
+      "message": "敌方全体"
+   },
+   "AllyAll": {
+      "message": "全体的"
+   },
+   "AllyAllWithoutSelf": {
+      "message": "自己以外的我方成员的"
+   },
+   "AllyFront": {
+      "message": "前卫的"
+   },
+   "AllySingle": {
+      "message": "我方单体的"
+   },
+   "AllySingleWithoutSelf": {
+      "message": "自己以外的我方单体的"
+   },
+   "AllySub": {
+      "message": "后卫的"
+   },
+   "AttackPattern": {
+      "message": "行动模式"
+   },
+   "ClockTowerHell": {
+      "message": "钟楼HELL"
+   },
+   "ClockTowerNormal": {
+      "message": "钟楼"
+   },
+   "Conquest": {
+      "message": "压制战"
+   },
+   "ConquestArea": {
+      "message": "区域"
+   },
+   "Count": {
+      "message": "次"
+   },
+   "Customize": {
+      "message": "自定义"
+   },
+   "Dark": {
+      "message": "暗属性"
+   },
+   "EnemyTurnEnd": {
+      "message": "敌方回合"
+   },
+   "Eternal": {
+      "message": "永久"
+   },
+   "Field": {
+      "message": "强化领域"
+   },
+   "Fire": {
+      "message": "火属性"
+   },
+   "GateDark": {
+      "message": "暗门"
+   },
+   "GateFire": {
+      "message": "火门"
+   },
+   "GateIce": {
+      "message": "冰门"
+   },
+   "GateLight": {
+      "message": "光门"
+   },
+   "GateThunder": {
+      "message": "雷门"
+   },
+   "HardMC": {
+      "message": "异时层"
+   },
+   "Ice": {
+      "message": "冰属性"
+   },
+   "Jewel": {
+      "message": "宝珠迷宫"
+   },
+   "Light": {
+      "message": "光属性"
+   },
+   "MainQuest": {
+      "message": "主线任务"
+   },
+   "MaximumDp": {
+      "message": "最多DP"
+   },
+   "MinimumDp": {
+      "message": "最少DP"
+   },
+   "Nonelement": {
+      "message": "无"
+   },
+   "Orb": {
+      "message": "光球Boss"
+   },
+   "OverDriveEnd": {
+      "message": "超频状态时"
+   },
+   "PenetrationCriticalAttack": {
+      "message": "贯通暴击"
+   },
+   "PlayerTurnEnd": {
+      "message": "回合"
+   },
+   "ScoreAttack": {
+      "message": "高分挑战"
+   },
+   "Self": {
+      "message": "自己的"
+   },
+   "Single": {
+      "message": "敌方单体"
+   },
+   "Slash": {
+      "message": "斩"
+   },
+   "Stab": {
+      "message": "突"
+   },
+   "Stellar": {
+      "message": "恒星扫荡战线"
+   },
+   "Strike": {
+      "message": "打"
+   },
+   "SubMission": {
+      "message": "支线任务"
+   },
+   "Thunder": {
+      "message": "雷属性"
+   },
+   "WaveBattle": {
+      "message": "炽天使遭遇战演习"
+   },
+   "add": {
+      "message": "添加"
+   },
+   "addSkillsAutomatically": {
+      "message": "自动添加技能"
+   },
+   "allStatus": {
+      "message": "全属性值"
+   },
+   "atk": {
+      "message": "攻击力"
+   },
+   "atkUpSkillEffect": {
+      "message": "攻击力增加技能效果"
+   },
+   "attackSkill": {
+      "message": "攻击技能"
+   },
+   "attacker": {
+      "message": "攻击者"
+   },
+   "back": {
+      "message": "返回"
+   },
+   "border": {
+      "message": "属性值"
+   },
+   "challengeGrade": {
+      "message": "挑战等阶"
+   },
+   "clear": {
+      "message": "清空"
+   },
+   "clearAddedSkills": {
+      "message": "清空已添加的技能"
+   },
+   "close": {
+      "message": "关闭"
+   },
+   "con": {
+      "message": "体力"
+   },
+   "copyFormation": {
+      "message": "复制编队"
+   },
+   "crit": {
+      "message": "暴击"
+   },
+   "critDMG": {
+      "message": "暴击伤害"
+   },
+   "critRate": {
+      "message": "暴击率"
+   },
+   "damage": {
+      "message": "伤害"
+   },
+   "debuffSkillEffect": {
+      "message": "减益技能效果"
+   },
+   "def": {
+      "message": "防御力"
+   },
+   "defenseDebuffSkillEffect": {
+      "message": "减防技能效果"
+   },
+   "destructionCoefficient": {
+      "message": "破坏倍率"
+   },
+   "devastationRate": {
+      "message": "破坏率"
+   },
+   "dex": {
+      "message": "灵巧"
+   },
+   "dmg": {
+      "message": "伤害"
+   },
+   "doubleClickToRemoveSkill": {
+      "message": "双击技能后删除技能"
+   },
+   "dpRate": {
+      "message": "DP比率"
+   },
+   "dr": {
+      "message": "破坏率"
+   },
+   "dragHereToRemove": {
+      "message": "拖到此处删除"
+   },
+   "edit": {
+      "message": "编队"
+   },
+   "enable": {
+      "message": "启用"
+   },
+   "enabled": {
+      "message": "已启用"
+   },
+   "enemy": {
+      "message": "敌方"
+   },
+   "enemyBorder": {
+      "message": "敌方属性值"
+   },
+   "enemyElementResist": {
+      "message": "敌方$1抗性"
+   },
+   "enemyValues": {
+      "message": "敌方数值"
+   },
+   "enhancement": {
+      "message": "增强"
+   },
+   "exSkillOnly": {
+      "message": "仅限EX技能"
+   },
+   "extDescription": {
+      "message": "通过添加的技能与填写的能力值来计算出最终伤害。炽焰天穹伤害计算器。"
+   },
+   "extName": {
+      "message": "HBR 伤害模拟"
+   },
+   "fragile": {
+      "message": "脆弱"
+   },
+   "growthAbility": {
+      "message": "宝珠强化"
+   },
+   "hit": {
+      "message": "对"
+   },
+   "hitCount": {
+      "message": "连击数"
+   },
+   "independent": {
+      "message": "单独发动"
+   },
+   "latestStyle": {
+      "message": "最新风格"
+   },
+   "limitBreak": {
+      "message": "突破"
+   },
+   "luk": {
+      "message": "运气"
+   },
+   "masterSkill": {
+      "message": "大师技能"
+   },
+   "mindEye": {
+      "message": "心眼"
+   },
+   "morale": {
+      "message": "士气"
+   },
+   "normalAttack": {
+      "message": "普通攻击"
+   },
+   "options": {
+      "message": "选项"
+   },
+   "passiveSkill": {
+      "message": "被动技能"
+   },
+   "passives": {
+      "message": "被动"
+   },
+   "remove": {
+      "message": "移除"
+   },
+   "removeEnemyElementResist": {
+      "message": "清除敌方$1抗性"
+   },
+   "reportABugOrMakeASuggestion": {
+      "message": "报告错误或提出建议"
+   },
+   "select": {
+      "message": "选择"
+   },
+   "set": {
+      "message": "设置"
+   },
+   "skill": {
+      "message": "技能"
+   },
+   "skills": {
+      "message": "技能"
+   },
+   "skillsAfterSelectedStyle": {
+      "message": "在选择的风格后实装的技能不会被自动添加。"
+   },
+   "sort": {
+      "message": "调整排序"
+   },
+   "spr": {
+      "message": "精神"
+   },
+   "squad": {
+      "message": "队伍"
+   },
+   "status": {
+      "message": "属性值"
+   },
+   "statusBonus": {
+      "message": "属性值提升"
+   },
+   "str": {
+      "message": "力量"
+   },
+   "token": {
+      "message": "信念"
+   },
+   "underConstruction": {
+      "message": "建设中..."
+   },
+   "v2Formula": {
+      "message": "V2公式"
+   },
+   "wis": {
+      "message": "智慧"
+   },
+   "zoneEffect": {
+      "message": "领域效果"
+   }
+}
