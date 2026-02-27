@@ -1,3 +1,5 @@
+import pathlib
+
 from selenium.webdriver.chrome.options import Options
 from tools import delete_all_files_and_subdirs, delete_file
 
@@ -27,6 +29,11 @@ def run_browser_in_thread():
         
         extension_path = os.path.abspath('./工具/HBR伤害模拟/1.7.0_0')
         chrome_options.add_argument(f"--load-extension={extension_path}")
+
+        # 设置用户数据目录
+        script_directory = pathlib.Path().absolute()
+        data_dir = f"{script_directory}\\工具\\chrome\\chrome_user_data"
+        chrome_options.add_argument(f"--user-data-dir={data_dir}")
 
         # 初始化driver
         chrome_driver = init_chrome_driver(chrome_options)
