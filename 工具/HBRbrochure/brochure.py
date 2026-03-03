@@ -48,6 +48,65 @@ def web_abbreviation(driver: webdriver.Chrome, zoom_percentage: int):
         logger.error(str(e))
         print(f"[-] {e}")
 
+
+
+def click_style_element(driver, style_id, limit_break_level):
+    try:
+        brochure_id = get_en_by_id(style_id)
+    except KeyError:
+        logger.error(f"[-] Missing mapping, style ID: {style_id}")
+        print("[-] Missing mapping, style ID: " + style_id)
+        return False
+    
+    try:
+        style_element = driver.find_element(By.ID, brochure_id)
+        # 模拟点击 limit_break_level+1 次
+        for _ in range(limit_break_level + 1):
+            style_element.click()
+        logger.info(f"[+] Successfully clicked style ID: {style_id} ({brochure_id})")
+        return True
+    except NoSuchElementException:
+        logger.error(f"[-] No such style element, ID:  {brochure_id}")
+        print("[-] No such style element, ID: " + brochure_id)
+        return False
+    except Exception as e:
+        logger.error(f"[-] Error clicking style {style_id}: {str(e)}")
+        print(f"[-] Error clicking style {style_id}: {e}")
+        return False
+
+from concurrent.futures import ThreadPoolExecutor, as_completed
+def click_brochure_multithread(driver: webdriver.Chrome, style_infos: dict, max_workers=4):
+    # 将任务拆分为列表
+    tasks = []
+    for style_id, info in style_infos.items():
+        limit_break_level = int(info["limit_break_level"])
+        tasks.append((style_id, limit_break_level))
+    
+    # 使用线程池执行任务
+    results = []
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # 提交所有任务
+        future_to_task = {
+            executor.submit(click_style_element, driver, style_id, limit_break_level): (style_id, limit_break_level)
+            for style_id, limit_break_level in tasks
+        }
+        
+        # 收集执行结果
+        for future in as_completed(future_to_task):
+            style_id, _ = future_to_task[future]
+            try:
+                success = future.result()
+                results.append((style_id, success))
+            except Exception as e:
+                logger.error(f"[-] Task for style {style_id} failed: {str(e)}")
+                results.append((style_id, False))
+    
+    # 统计执行结果
+    # success_count = sum(1 for _, success in results if success)
+    # fail_count = len(results) - success_count
+    # logger.info(f"[+] Multithread click completed: {success_count} succeeded, {fail_count} failed")
+    return results
+
 def click_brochure(driver: webdriver.Chrome, my_style_infos: dict):
     try:
         for style_id in my_style_infos:
@@ -120,7 +179,8 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     web_abbreviation(driver, 50)
 
     # 点击图鉴
-    click_brochure(driver, style_infos)
+    # click_brochure(driver, style_infos)
+    click_brochure_multithread(driver, style_infos, max_workers=4)
 
     # 下载图鉴
     download_brochure(driver)
