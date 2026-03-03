@@ -63,7 +63,7 @@ def click_style_element(driver, style_id, limit_break_level):
         # 模拟点击 limit_break_level+1 次
         for _ in range(limit_break_level + 1):
             style_element.click()
-        logger.info(f"[+] Successfully clicked style ID: {style_id} ({brochure_id})")
+        # logger.info(f"[+] Successfully clicked style ID: {style_id} ({brochure_id})")
         return True
     except NoSuchElementException:
         logger.error(f"[-] No such style element, ID:  {brochure_id}")
