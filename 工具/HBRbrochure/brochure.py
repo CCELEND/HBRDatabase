@@ -74,6 +74,96 @@ def click_style_element(driver, style_id, limit_break_level):
         print(f"[-] Error clicking style {style_id}: {e}")
         return False
 
+
+def process_style_chunk(driver: webdriver.Chrome, chunk_data):
+    chunk_style_infos, thread_id = chunk_data
+    success_count = 0
+    fail_count = 0
+    
+    try:
+        # driver = init_thread_driver()
+        # logger.info(f"[+] 线程 {thread_id} 启动，处理 {len(chunk_style_infos)} 个风格")
+        
+        # 处理当前分片的所有style
+        for style_id, info in chunk_style_infos.items():
+            limit_break_level = int(info["limit_break_level"])
+            try:
+                brochure_id = get_en_by_id(style_id)
+                style_element = driver.find_element(By.ID, brochure_id)
+                # 模拟点击
+                for _ in range(limit_break_level + 1):
+                    style_element.click()
+                success_count += 1
+            except KeyError:
+                logger.error(f"[-] 线程 {thread_id} - 缺失映射: {style_id}")
+                fail_count += 1
+            except NoSuchElementException:
+                logger.error(f"[-] 线程 {thread_id} - 元素不存在: {brochure_id}")
+                fail_count += 1
+            except Exception as e:
+                logger.error(f"[-] 线程 {thread_id} - 处理 {style_id} 失败: {e}")
+                fail_count += 1
+        
+        return {
+            "thread_id": thread_id,
+            "success": success_count,
+            "fail": fail_count,
+            "total": len(chunk_style_infos)
+        }
+    
+    except Exception as e:
+        logger.error(f"[-] 线程 {thread_id} 执行失败: {e}")
+        return {
+            "thread_id": thread_id,
+            "success": 0,
+            "fail": len(chunk_style_infos),
+            "total": len(chunk_style_infos),
+            "error": str(e)
+        }
+
+def click_brochure_by_chunk(driver: webdriver.Chrome, style_infos: dict, thread_count=4):
+    # 将字典拆分为多个分片
+    style_items = list(style_infos.items())
+    chunk_size = (len(style_items) + thread_count - 1) // thread_count  # 向上取整
+    chunks = []
+    
+    for i in range(thread_count):
+        # 切片并转换回字典
+        start = i * chunk_size
+        end = min((i + 1) * chunk_size, len(style_items))
+        chunk_dict = dict(style_items[start:end])
+        if chunk_dict:  # 跳过空分片
+            chunks.append((chunk_dict, i + 1))
+    
+    # 多线程执行分片任务
+    results = []
+    with ThreadPoolExecutor(max_workers=len(chunks)) as executor:
+        # 提交所有分片任务
+        future_to_chunk = {
+            executor.submit(process_style_chunk, driver, chunk_data): chunk_data[1]
+            for chunk_data in chunks
+        }
+        
+        # 收集结果
+        for future in as_completed(future_to_chunk):
+            thread_id = future_to_chunk[future]
+            try:
+                result = future.result()
+                results.append(result)
+                # logger.info(f"[+] 线程 {thread_id} 完成: 成功{result['success']} / 失败{result['fail']}")
+            except Exception as e:
+                logger.error(f"[-] 线程 {thread_id} 结果获取失败: {e}")
+    
+    # 汇总结果
+    total_success = sum(r["success"] for r in results)
+    total_fail = sum(r["fail"] for r in results)
+    # logger.info(f"[+] 所有线程执行完成 - 总计: 成功{total_success} / 失败{total_fail}")
+    return {
+        "total_success": total_success,
+        "total_fail": total_fail,
+        "thread_results": results
+    }
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 def click_brochure_multithread(driver: webdriver.Chrome, style_infos: dict, max_workers=4):
     # 将任务拆分为列表
@@ -181,6 +271,7 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     # 点击图鉴
     # click_brochure(driver, style_infos)
     click_brochure_multithread(driver, style_infos, max_workers=4)
+    # click_brochure_by_chunk(driver, style_infos, thread_count=8)
 
     # 下载图鉴
     download_brochure(driver)
