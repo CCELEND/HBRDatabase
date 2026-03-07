@@ -4,7 +4,7 @@ from selenium.webdriver.chrome.options import Options
 from tools import delete_all_files_and_subdirs, delete_file
 
 import os
-from tools import init_chrome_driver
+from tools import init_chrome_driver, unzip_file, check_dir_exists_pathlib
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
@@ -20,6 +20,9 @@ def run_browser_in_thread():
         delete_file(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0.crx'))
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.0_0'))
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.1_0'))
+
+        if not check_dir_exists_pathlib('./工具/HBR伤害模拟/1.7.0_0'):
+            unzip_file(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0.zip'), os.path.abspath('./工具/HBR伤害模拟'))
 
         # 设置Chrome选项
         chrome_options = Options()

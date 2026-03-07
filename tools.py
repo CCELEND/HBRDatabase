@@ -9,6 +9,7 @@ import hashlib
 import binascii
 import re
 import shutil
+import zipfile
 from pathlib import Path
 
 from 日志.advanced_logger import AdvancedLogger
@@ -493,3 +494,43 @@ def replace_file_extension(file_path: str, new_extension: str) -> str:
     new_file_path = file_name_without_ext + new_extension
     
     return new_file_path
+
+
+# 解压 ZIP 文件到指定目录
+def unzip_file(zip_path, extract_to):
+
+    # 检查 ZIP 文件是否存在
+    if not os.path.exists(zip_path):
+        logger.error(f"找不到 ZIP 文件 {zip_path}")
+        messagebox.showerror("错误", f"找不到 ZIP 文件 {zip_path}")
+        return
+    
+    # 创建解压目录
+    os.makedirs(extract_to, exist_ok=True)
+    
+    try:
+        # 以只读模式打开 ZIP 文件
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            # 解压所有文件
+            zip_ref.extractall(extract_to)
+            # print(f"解压成功！文件已保存到：{os.path.abspath(extract_to)}")
+    except zipfile.BadZipFile:
+        logger.error(f"{zip_path} 不是有效的 ZIP 文件，可能已损坏")
+        messagebox.showerror("错误", f"{zip_path} 不是有效的 ZIP 文件，可能已损坏")
+    except PermissionError:
+        logger.error(f"没有权限解压到 {extract_to} 目录")
+        messagebox.showerror("错误", f"没有权限解压到 {extract_to} 目录")
+    except Exception as e:
+        logger.error(f"解压失败：{str(e)}")
+        messagebox.showerror("错误", f"解压失败：{str(e)}")
+
+# pathlib 判断目录是否存在
+def check_dir_exists_pathlib(dir_path):
+
+    # 将路径转为 Path 对象
+    dir_obj = Path(dir_path)
+    
+    # 判断是否是目录且存在
+    if dir_obj.is_dir(): return True
+    elif dir_obj.exists(): return False
+    else: return False
