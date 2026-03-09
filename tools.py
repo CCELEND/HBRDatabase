@@ -534,3 +534,6 @@ def check_dir_exists_pathlib(dir_path):
     if dir_obj.is_dir(): return True
     elif dir_obj.exists(): return False
     else: return False
+
+def sort_dict_by_key(input_dict: dict, reverse=False) -> dict:
+    return dict(sorted(input_dict.items(), key=lambda item: item[0]))
