@@ -6,12 +6,6 @@ from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 修复.hash import calculate_file_hashes, calculate_file_hash, save_hashes_to_json
 
-# ./关于/client_file_hashes.json
-        # client_file_hashes = calculate_file_hashes("./")
-        # save_hashes_to_json(client_file_hashes, "./关于/client_file_hashes.json")
-        # key, file_hash = calculate_file_hash("./关于/client_file_hashes.json", "client_file_hashes")
-        # "(build-"+file_hash[0:8]+")"
-
 # 创建关于窗口
 def creat_about_win(parent_frame):
 
