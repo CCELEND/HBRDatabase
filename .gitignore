@@ -8,3 +8,4 @@ chrome_user_data/
 *.log
 工具/GetEntriesGUILocal/config.ini
 工具/HBR伤害模拟/1.7.0_0/
+关于/client_file_hashes.json
