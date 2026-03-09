@@ -67,12 +67,12 @@ def calculate_file_hash_block(filepath, key):
             sha256_hash.update(chunk)
     return key, sha256_hash.hexdigest()
 
-# 计算指定目录下所有文件的哈希值（使用多线程）
+
 def calculate_file_hashes(directory):
     file_hashes = {}
     skip_items = ["__pycache__", ".mp3", ".flac", 
                   ".xlsx", "chrome_user_data", ".log", "client_file_hashes.json",
-                  "./工具/HBR伤害模拟/1.7.0_0", "./.git"]  # 要跳过的目录或文件名列表
+                  "./工具/HBR伤害模拟/1.7.0_0/", "./.git"]  # 要跳过的目录或文件名列表
 
     # 遍历目录，收集所有需要计算哈希的文件路径
     file_tasks = []
@@ -87,7 +87,16 @@ def calculate_file_hashes(directory):
                 key = key.replace('\\', '/')
 
             # 跳过不需要的文件
-            if any(item in key for item in skip_items):
+            skip = False
+            for item in skip_items:
+                if item in key:
+                    # 特殊处理：如果是目录路径，确保只跳过目录本身，不跳过同名的.zip文件
+                    if item.endswith('/') and key == item.rstrip('/') + '.zip':
+                        continue  # 不跳过同名的.zip文件
+                    skip = True
+                    break
+            
+            if skip:
                 continue
 
             # 将任务添加到任务列表
@@ -109,4 +118,3 @@ def calculate_file_hashes(directory):
                 messagebox.showerror("错误", f"计算文件：{key}的哈希值时出错：{e}")
 
     return file_hashes
-
