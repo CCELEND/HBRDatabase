@@ -535,5 +535,6 @@ def check_dir_exists_pathlib(dir_path):
     elif dir_obj.exists(): return False
     else: return False
 
+# 字典排序 按键升序排序
 def sort_dict_by_key(input_dict: dict, reverse=False) -> dict:
-    return dict(sorted(input_dict.items(), key=lambda item: item[0]))
+    return dict(sorted(input_dict.items(), key=lambda item: item[0], reverse=reverse))
