@@ -15,7 +15,9 @@ class ScrollbarFrameWin:
 
     # 处理鼠标滚轮事件
     def on_mousewheel(self, event):
-        self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+        # 步长：按系统默认的3单位/次
+        scroll_units = int(-1 * (event.delta / 120)) * 3
+        self.canvas.yview_scroll(scroll_units, "units")
 
     # 更新滚动区域
     def update_scrollregion(self, event=None):
