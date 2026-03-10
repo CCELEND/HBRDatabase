@@ -542,3 +542,68 @@ def check_dir_exists_pathlib(dir_path):
 # 字典排序 按键升序排序
 def sort_dict_by_key(input_dict: dict, reverse=False) -> dict:
     return dict(sorted(input_dict.items(), key=lambda item: item[0], reverse=reverse))
+
+
+
+import glob
+def merge_and_extract_chrome_zip(
+    folder_path,  # 分卷文件所在的文件夹路径
+    output_zip="chrome-win64.zip",  # 合并后的完整zip文件名
+    extract_dir="chrome-win64"  # 解压后的文件夹
+):
+    """
+    合并chrome分卷压缩包并解压
+    :param folder_path: 分卷文件所在目录
+    :param output_zip: 合并后的完整zip文件名
+    :param extract_dir: 解压目标目录
+    """
+    # 获取所有分卷文件，并提取序号进行正确排序
+    part_pattern = re.compile(r"chrome-win64\.zip\.(\d+)")  # 匹配后缀的数字序号
+    part_files = []
+    
+    # 遍历所有分卷文件，提取序号
+    for file_path in glob.glob(os.path.join(folder_path, "chrome-win64.zip.*")):
+        file_name = os.path.basename(file_path)
+        match = part_pattern.search(file_name)
+        if match:
+            # 存储
+            part_num = int(match.group(1))
+            part_files.append((part_num, file_path))
+    
+    # 按序号数字升序排序
+    part_files.sort(key=lambda x: x[0])
+    # 提取排序后的文件路径列表
+    sorted_part_paths = [path for (num, path) in part_files]
+    
+    if not sorted_part_paths:
+        raise FileNotFoundError("未找到任何分卷文件（chrome-win64.zip.xxx）")
+    # print(f"找到 {len(sorted_part_paths)} 个分卷文件（已按序号排序）：")
+    # for idx, path in enumerate(sorted_part_paths, 1):
+    #     print(f"  {idx}. {os.path.basename(path)}")
+
+    # 合并所有分卷为完整的zip文件
+    output_zip_path = os.path.join(folder_path, output_zip)
+    with open(output_zip_path, "wb") as out_f:
+        for part_file in sorted_part_paths:
+            # print(f"\n正在合并：{os.path.basename(part_file)}")
+            with open(part_file, "rb") as in_f:
+                # 按4KB块读取写入，避免大文件占用过多内存
+                while chunk := in_f.read(4096):
+                    out_f.write(chunk)
+    # print(f"\n分卷合并完成，完整文件：{output_zip_path}")
+
+    # 解压合并后的zip文件
+    if not os.path.exists(extract_dir):
+        os.makedirs(extract_dir)
+    
+    # print(f"开始解压到：{os.path.abspath(extract_dir)}")
+    try:
+        with zipfile.ZipFile(output_zip_path, "r") as zip_f:
+            # 支持中文路径，设置编码（如需要）
+            zip_f.extractall(extract_dir)
+        # print("解压完成！")
+    except zipfile.BadZipFile:
+        raise RuntimeError("解压失败！可能是分卷文件缺失/损坏，或合并顺序错误")
+
+    # 删除合并后的zip文件
+    os.remove(output_zip_path)
