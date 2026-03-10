@@ -381,6 +381,8 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
 
+    # chrome_options.binary_location = "./工具/chrome/chrome-win64/chrome.exe"
+
     # 设置 ChromeDriver 的服务，初始化 Chrome WebDriver
     try:
         chromedriver_path = "./工具/chrome/chromedriver-win64/chromedriver.exe"
