@@ -381,6 +381,13 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
 
+    if not check_dir_exists_pathlib('./工具/chrome/chrome-win64'):
+        merge_and_extract_chrome_zip(
+            folder_path='./工具/chrome',
+            output_zip='chrome-win64.zip',
+            extract_dir='./工具/chrome'
+        )
+
     chrome_path = "./工具/chrome/chrome-win64/chrome.exe"
     if os.path.exists(chrome_path):
         chrome_options.binary_location = chrome_path

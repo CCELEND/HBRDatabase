@@ -192,13 +192,6 @@ def run_browser_in_thread():
         # 当前脚本路径
         scriptDirectory = pathlib.Path().absolute()
 
-        if not check_dir_exists_pathlib('./工具/chrome/chrome-win64'):
-            merge_and_extract_chrome_zip(
-                folder_path='./工具/chrome',
-                output_zip='chrome-win64.zip',
-                extract_dir='./工具/chrome'
-            )
-
         # 设置 Chrome 选项
         chrome_options = Options()
         # chrome_options.add_argument("--headless")  # 无头模式
