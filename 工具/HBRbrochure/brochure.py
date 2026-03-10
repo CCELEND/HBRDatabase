@@ -265,8 +265,8 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
 
     sleep(1)
 
-    # 网页缩略到50%
-    web_abbreviation(driver, 50)
+    # 网页缩略到40%
+    web_abbreviation(driver, 40)
 
     # 点击图鉴
     # click_brochure(driver, style_infos)
@@ -279,8 +279,3 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     driver.delete_all_cookies()  # 清除所有cookies
     driver.execute_script('window.localStorage.clear();')  # 清除localStorage
     driver.execute_script('window.sessionStorage.clear();')  # 清除sessionStorage
-
-
-
-
-
