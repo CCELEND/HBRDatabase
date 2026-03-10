@@ -1,7 +1,7 @@
 
 from window import set_window_expand, set_window_icon, creat_Toplevel, show_context_menu, set_window_top
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
-from tkinter import scrolledtext
+from tkinter import scrolledtext, messagebox
 
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
@@ -12,6 +12,39 @@ import 角色.team_info
 
 from 搜索.search_processing import on_select, get_filtered_styles, keyword_processing
 from 搜索.search_processing_master import get_filtered_master_skills
+
+has_shown_warning = False
+def limit_text_length(event):
+    # 取消之前的 after 调用
+    if hasattr(limit_text_length, 'after_id'):
+        event.widget.after_cancel(limit_text_length.after_id)
+    
+    # 延迟执行检查
+    limit_text_length.after_id = event.widget.after(100, lambda: check_text_length(event))
+def check_text_length(event):
+    global has_shown_warning
+    current_text = event.widget.get("1.0", 'end-1c')
+    max_length = 1000
+    
+    if len(current_text) > max_length:
+        # 显示警告
+        if not has_shown_warning:
+            messagebox.showwarning(
+                title="输入过长",
+                message=f"输入内容超出限制！最多可输入{max_length}个字符。"
+            )
+            has_shown_warning = True
+        
+        # 截断到最大长度，并重新设置文本
+        event.widget.delete("1.0", 'end')
+        event.widget.insert("1.0", current_text[:max_length])
+        # 光标移到末尾
+        event.widget.mark_set(ttk.INSERT, 'end')
+    else:
+        has_shown_warning = False
+        # 确保输入框是启用状态
+        if str(event.widget.cget('state')) == 'disabled':
+            event.widget.config(state='normal')
 
 # 创建选项的 frame
 def creat_select_frame(label_content, options, selected_values,
@@ -142,7 +175,6 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 def creat_search_win(parent_frame, scrollbar_frame_obj):
 
     # 重复打开时，窗口置顶并直接返回
-    # 重复打开时，窗口置顶并直接返回
     if is_win_open("搜索", __name__):
         win_set_top("搜索", __name__)
         return "break"
@@ -233,6 +265,8 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     # 绑定鼠标右键点击事件到上下文菜单
     key_word_text.bind("<Button-3>", 
         lambda event, tw=key_word_text: show_context_menu(event, tw))
+    
+    key_word_text.bind("<KeyRelease>", limit_text_length)
 
     selected_values_dir = {}
     selected_values_dir["稀有度"] = rarity_selected_values
