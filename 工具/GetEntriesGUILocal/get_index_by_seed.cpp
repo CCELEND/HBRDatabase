@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <windows.h>
 #include <tlhelp32.h>
 #include <stdio.h>
@@ -242,7 +243,7 @@ static int search_memory_region_by_seed(HANDLE hProcess, uint64_t start_addr, ui
 
     while (current_addr < end_addr && (!found_random || !found_change)) {
         SIZE_T bytes_read;
-        SIZE_T read_size = (SIZE_T)min(BUFFER_SIZE, (size_t)(end_addr - current_addr));
+        SIZE_T read_size = (SIZE_T)std::min(BUFFER_SIZE, (size_t)(end_addr - current_addr));
 
         if (!ReadProcessMemory(hProcess, (LPCVOID)current_addr, buffer, read_size, &bytes_read) || bytes_read == 0) {
             current_addr += BUFFER_SIZE;
@@ -339,8 +340,8 @@ static void search_process_memory_fast(DWORD pid, uint64_t known_random_seed, ui
         }
 
         // 计算实际搜索范围（处理部分重叠的情况）
-        uint64_t search_start = max(region_start, SEARCH_START);
-        uint64_t search_end = min(region_end, SEARCH_END);
+        uint64_t search_start = std::max(region_start, SEARCH_START);
+        uint64_t search_end = std::min(region_end, SEARCH_END);
 
         // printf("[+] Searching private committed region: 0x%llx - 0x%llx (size: 0x%llx)\n",
         //        search_start, search_end, search_end - search_start);

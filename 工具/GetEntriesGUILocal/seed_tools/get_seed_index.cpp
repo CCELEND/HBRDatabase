@@ -43,7 +43,7 @@ int search_memory_region(HANDLE hProcess, uint64_t start_addr, uint64_t end_addr
 
     while (current_addr < end_addr && !found) {
         SIZE_T bytes_read;
-        SIZE_T read_size = (SIZE_T)min(BUFFER_SIZE, (size_t)(end_addr - current_addr));
+        SIZE_T read_size = (SIZE_T)std::min(BUFFER_SIZE, (size_t)(end_addr - current_addr));
 
         // 检查读取是否成功
         if (!ReadProcessMemory(hProcess, (LPCVOID)current_addr, buffer, read_size, &bytes_read)
