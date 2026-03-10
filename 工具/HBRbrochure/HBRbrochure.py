@@ -5,7 +5,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pathlib
 
-from tools import init_chrome_driver, add_dicts
+import os
+from tools import init_chrome_driver, add_dicts, unzip_file, check_dir_exists_pathlib
 # import HBRbrochure.role_info
 import HBRbrochure.brochure
 from 角色.team_info import get_all_team_obj
@@ -190,6 +191,9 @@ def run_browser_in_thread():
         # HBRbrochure.role_info.load_resources()
         # 当前脚本路径
         scriptDirectory = pathlib.Path().absolute()
+
+        if not check_dir_exists_pathlib('./工具/chrome/chrome-win64'):
+            unzip_file(os.path.abspath('./工具/chrome/chrome-win64.zip'), os.path.abspath('./工具/chrome'))
 
         # 设置 Chrome 选项
         chrome_options = Options()

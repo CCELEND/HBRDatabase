@@ -71,7 +71,7 @@ def calculate_file_hashes(directory):
     file_hashes = {}
     skip_items = ["__pycache__", ".mp3", ".flac", 
                   ".xlsx", "chrome_user_data", ".log", "client_file_hashes.json", "GetEntriesGUILocal/config.ini",
-                  "./工具/HBR伤害模拟/1.7.0_0/", "./.git/"]  # 要跳过的目录或文件名列表
+                  "./工具/HBR伤害模拟/1.7.0_0/", "./.git/", "./工具/chrome/chrome-win64/"]  # 要跳过的目录或文件名列表
 
     # 遍历目录，收集所有需要计算哈希的文件路径
     file_tasks = []
