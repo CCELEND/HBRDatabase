@@ -6,7 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pathlib
 
 import os
-from tools import init_chrome_driver, add_dicts, merge_and_extract_chrome_zip, check_dir_exists_pathlib
+from tools import init_chrome_driver, add_dicts
 # import HBRbrochure.role_info
 import HBRbrochure.brochure
 from 角色.team_info import get_all_team_obj
