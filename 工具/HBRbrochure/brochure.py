@@ -9,7 +9,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 from time import sleep
 
-# from HBRbrochure.mapping import GetBrochureIdByStyleId
+from HBRbrochure.mapping import GetBrochureIdByStyleId
 # import HBRbrochure.mapping
 
 from 日志.advanced_logger import AdvancedLogger
@@ -19,6 +19,8 @@ from 角色.style_info import get_en_by_id
 
 def switch_cn(driver: webdriver.Chrome):
     try:
+        CN_element = driver.find_element(By.XPATH, "//*[text()='CN']")
+        if CN_element: return
         # 找到切换图鉴的元素，初始是国际服JP
         data_switch_element = driver.find_element(By.XPATH, "//*[text()='JP']")
         data_switch_element.click()
@@ -52,7 +54,8 @@ def web_abbreviation(driver: webdriver.Chrome, zoom_percentage: int):
 
 def click_style_element(driver, style_id, limit_break_level):
     try:
-        brochure_id = get_en_by_id(style_id)
+        # brochure_id = get_en_by_id(style_id)
+        brochure_id = GetBrochureIdByStyleId(style_id)
     except KeyError:
         logger.error(f"[-] Missing mapping, style ID: {style_id}")
         print("[-] Missing mapping, style ID: " + style_id)
@@ -201,8 +204,8 @@ def click_brochure(driver: webdriver.Chrome, my_style_infos: dict):
     try:
         for style_id in my_style_infos:
             try:
-                # brochure_id = GetBrochureIdByStyleId(style_id)
-                brochure_id = get_en_by_id(style_id)
+                brochure_id = GetBrochureIdByStyleId(style_id)
+                # brochure_id = get_en_by_id(style_id)
             except KeyError:
                 logger.error(f"[-] Missing mapping, style ID: {style_id}")
                 print("[-] Missing mapping, style ID: " + style_id)
@@ -253,7 +256,7 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     try:
         # 等待立华奏加载完成 绝对不是因为我是一个奏厨（
         TachibanaKanadeElement = WebDriverWait(driver, 300).until(
-            EC.visibility_of_element_located((By.ID, "AliceADefault_R3"))
+            EC.visibility_of_element_located((By.ID, "ab-1-2"))
         )
         
     except Exception as e:
@@ -265,8 +268,8 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
 
     sleep(1)
 
-    # 网页缩略到40%
-    web_abbreviation(driver, 40)
+    # 网页缩略到60%
+    web_abbreviation(driver, 60)
 
     # 点击图鉴
     # click_brochure(driver, style_infos)

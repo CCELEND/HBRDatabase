@@ -10,6 +10,8 @@ from tools import init_chrome_driver, add_dicts
 # import HBRbrochure.role_info
 import HBRbrochure.brochure
 from 角色.team_info import get_all_team_obj
+from HBRbrochure.mapping import load_resources
+from HBRbrochure.chrome_proc import close_other_tabs
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -168,7 +170,7 @@ def get_styles_info(container):
 def switch_to_brochure(driver: webdriver.Chrome, style_infos: dict):
     # 使用 JavaScript 打开新标签页
     driver.execute_script(
-        "window.open('https://leprechaun-chtholly-nota-seniorious.github.io/HeavenBurnsRedStyleChart.html');"
+        "window.open('https://ruriro.cc/hbr/StyleChart/');"
     )
 
     # 获取所有窗口句柄
@@ -217,6 +219,8 @@ def run_browser_in_thread():
         chrome_driver.set_window_size(1160, 820)
         # 打开 game.bilibili.com
         chrome_driver.get('https://game.bilibili.com/tool/hbr/#/file/more')
+
+        close_other_tabs(chrome_driver)
 
         # 等待 class 为 card-box 的元素加载完成
         card_box_element = WebDriverWait(chrome_driver, 300).until(
@@ -281,6 +285,9 @@ def run_browser_in_thread():
 def get_hbr_brochure():
     # 获取全部队伍对象
     get_all_team_obj()
+
+    # 加载资源文件
+    load_resources()
     # 启动独立线程执行浏览器操作
     browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
     browser_thread.start()

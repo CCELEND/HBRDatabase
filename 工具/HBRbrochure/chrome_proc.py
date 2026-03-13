@@ -33,3 +33,25 @@ def close_all_tabs(driver: webdriver.Chrome):
             
     except Exception as e:
         logger.error(f"关闭标签页失败: {e}")
+
+def close_other_tabs(driver: webdriver.Chrome):
+    """
+    关闭所有非当前页面的标签页，只保留当前激活的标签页
+    """
+    try:
+        # 获取当前标签页句柄
+        current_handle = driver.current_window_handle
+        # 获取所有窗口句柄
+        all_handles = driver.window_handles
+
+        # 遍历所有标签页，关闭非当前标签页
+        for handle in all_handles:
+            if handle != current_handle:
+                driver.switch_to.window(handle)
+                driver.close()
+
+        # 确保最终切回当前标签页
+        driver.switch_to.window(current_handle)
+
+    except Exception as e:
+        logger.error(f"关闭标签页失败: {e}")
