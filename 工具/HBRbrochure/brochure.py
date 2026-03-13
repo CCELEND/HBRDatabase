@@ -19,16 +19,21 @@ from 角色.style_info import get_en_by_id
 
 def switch_cn(driver: webdriver.Chrome):
     try:
-        # CN_element = driver.find_element(By.XPATH, "//*[text()='CN']")
-        # if CN_element: return
-        # print(CN_element)
-        # 找到切换图鉴的元素，初始是国际服JP
-        data_switch_element = driver.find_element(By.XPATH, "//*[text()='JP']")
-        data_switch_element.click()
+        CN_elements = driver.find_elements(By.XPATH, "//*[text()='CN']")
+        
+        # 如果已经是 CN，直接退出
+        if len(CN_elements) > 0: return
+
+        # 如果不是 CN，就找 JP 并点击切换
+        JP_elements = driver.find_elements(By.XPATH, "//*[text()='JP']")
+        if len(JP_elements) > 0:
+            JP_elements[0].click()
+            print("[+] 已切换到 CN")
 
     except Exception as e:
         logger.error(str(e))
-        print(f"[-] {e}")
+        print(f"[-] 切换失败: {e}")
+
 
 # 切换全屏
 def switch_full_screen(driver: webdriver.Chrome):
