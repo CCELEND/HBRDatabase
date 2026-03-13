@@ -26,7 +26,7 @@ def http_update_data():
 
     # 下载服务器返回的需要更新的文件
     if 'files_to_download' in response:
-        download_files_from_server(server_url, response['files_to_download'])
+        download_files_from_server(server_url, response['files_to_download'], response.get('server_file_hashes', None))
     else:
         messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
         logger.error(f"错误响应：{response}\n请重试或联系开发者")

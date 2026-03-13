@@ -8,7 +8,8 @@ from threading import Thread
 from urllib.parse import quote
 
 from window import set_window_icon
-from tools import creat_directory, confirm_restart
+from tools import creat_directory, confirm_restart, sort_dict_by_key
+from hash import save_hashes_to_json
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -128,7 +129,12 @@ def download_files_with_progress(files_to_download, server_url):
 
 
 # 从服务器下载文件
-def download_files_from_server(server_url, files_to_download):
+def download_files_from_server(server_url, files_to_download, server_file_hashes):
+
+    if server_file_hashes:
+        server_file_hashes = sort_dict_by_key(server_file_hashes)
+        save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")
+
     if files_to_download:
         global is_updating
         is_updating = True

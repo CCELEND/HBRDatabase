@@ -8,7 +8,9 @@ from threading import Thread
 from urllib.parse import quote
 
 from window import set_window_icon, creat_window
-from tools import creat_directory
+from tools import creat_directory, sort_dict_by_key
+from hash import save_hashes_to_json
+
 from 日志.advanced_logger import AdvancedLogger
 
 logger = AdvancedLogger.get_logger(__name__)
@@ -168,7 +170,12 @@ def download_files_with_progress(files_to_download, server_url):
     progress_window.mainloop()
 
 # 从服务器下载文件
-def download_files_from_server(server_url, files_to_download):
+def download_files_from_server(server_url, files_to_download, server_file_hashes):
+
+    if server_file_hashes:
+        server_file_hashes = sort_dict_by_key(server_file_hashes)
+        save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")
+
     if not files_to_download:
         messagebox.showinfo("提示", "未发现资源完整性冲突")
         return

@@ -4,7 +4,7 @@ from ttkbootstrap.constants import *
 from window import set_window_expand, set_window_icon, creat_Toplevel
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 
-from 修复.hash import calculate_file_hashes, calculate_file_hash, save_hashes_to_json
+from 更新.hash import calculate_file_hashes, calculate_file_hash, save_hashes_to_json
 from tools import sort_dict_by_key
 
 # 创建关于窗口
@@ -19,10 +19,10 @@ def creat_about_win(parent_frame):
     set_window_icon(about_win_frame, "./关于/KamiSama.ico")
     set_window_expand(about_win_frame, rowspan=3, columnspan=2)
 
-    client_file_hashes = calculate_file_hashes("./")
-    client_file_hashes = sort_dict_by_key(client_file_hashes)
-    save_hashes_to_json(client_file_hashes, "./关于/client_file_hashes.json")
-    key, file_hash = calculate_file_hash("./关于/client_file_hashes.json", "client_file_hashes")
+    # client_file_hashes = calculate_file_hashes("./")
+    # client_file_hashes = sort_dict_by_key(client_file_hashes)
+    # save_hashes_to_json(client_file_hashes, "./关于/client_file_hashes.json")
+    key, file_hash = calculate_file_hash("./关于/server_file_hashes.json", "server_file_hashes")
 
     # 创建 Labelframe
     ver_frame = ttk.Labelframe(about_win_frame, text="🧰版本")
