@@ -9,7 +9,7 @@ from urllib.parse import quote
 
 from window import set_window_icon, creat_window
 from tools import creat_directory, sort_dict_by_key
-from hash import save_hashes_to_json
+from 修复.hash import save_hashes_to_json
 
 from 日志.advanced_logger import AdvancedLogger
 
