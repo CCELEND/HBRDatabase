@@ -19,8 +19,9 @@ from 角色.style_info import get_en_by_id
 
 def switch_cn(driver: webdriver.Chrome):
     try:
-        CN_element = driver.find_element(By.XPATH, "//*[text()='CN']")
-        if CN_element: return
+        # CN_element = driver.find_element(By.XPATH, "//*[text()='CN']")
+        # if CN_element: return
+        # print(CN_element)
         # 找到切换图鉴的元素，初始是国际服JP
         data_switch_element = driver.find_element(By.XPATH, "//*[text()='JP']")
         data_switch_element.click()
