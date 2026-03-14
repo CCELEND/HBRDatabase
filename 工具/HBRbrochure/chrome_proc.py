@@ -48,6 +48,7 @@ def close_other_tabs(driver: webdriver.Chrome):
         for handle in all_handles:
             if handle != current_handle:
                 driver.switch_to.window(handle)
+                clear_data(driver)  # 仅清除数据，不清除登录态、会话信息
                 driver.close()
 
         # 确保最终切回当前标签页
@@ -55,3 +56,24 @@ def close_other_tabs(driver: webdriver.Chrome):
 
     except Exception as e:
         logger.error(f"关闭标签页失败: {e}")
+
+def clear_data_and_cookies(driver: webdriver.Chrome):
+    """
+    清除浏览器数据和Cookies
+    """
+    try:
+        driver.delete_all_cookies() #登录态、会话信息
+        driver.execute_script("window.localStorage.clear();") #网页本地持久化数据
+        driver.execute_script("window.sessionStorage.clear();")  #会话临时数据
+    except Exception as e:
+        logger.error(f"清除数据和Cookies失败: {e}")
+
+def clear_data(driver: webdriver.Chrome):
+    """
+    仅清除数据，不清除登录态、会话信息
+    """
+    try:
+        driver.execute_script("window.localStorage.clear();") #网页本地持久化数据
+        driver.execute_script("window.sessionStorage.clear();")  #会话临时数据
+    except Exception as e:
+        logger.error(f"清除数据失败: {e}")

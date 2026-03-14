@@ -11,6 +11,7 @@ from time import sleep
 
 from HBRbrochure.mapping import GetBrochureIdByStyleId
 # import HBRbrochure.mapping
+from HBRbrochure.chrome_proc import clear_data_and_cookies
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -285,6 +286,4 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     # 下载图鉴
     download_brochure(driver)
 
-    driver.delete_all_cookies()  # 清除所有cookies
-    driver.execute_script('window.localStorage.clear();')  # 清除localStorage
-    driver.execute_script('window.sessionStorage.clear();')  # 清除sessionStorage
+    clear_data_and_cookies(driver)
