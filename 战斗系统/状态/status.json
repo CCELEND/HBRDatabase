@@ -39,6 +39,14 @@
         "type":"回复",
         "series":"回复DP" 
     },
+    "彩妆":{
+        "name":"彩妆",
+        "path":"./战斗系统/状态/Makeup.png",
+        "effect":"回合开始时，回复DP10%\n被破盾时失去【彩妆】效果","description":"回合开始时，回复DP10%\n被破盾时失去【彩妆】效果",
+        "stack":"-",
+        "type":"回复",
+        "series":"回复DP" 
+    },
     "回复SP":{
         "name":"回复SP",
         "path":"./战斗系统/状态/HealSp.webp",

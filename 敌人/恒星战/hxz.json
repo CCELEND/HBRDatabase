@@ -62,6 +62,15 @@
     "logo_path":"./敌人/恒星战/疾驰的异貌之兽#7/DimensionBattleCentralTop_008.ico",
     "name":"疾驰的异貌之兽#7",
     "guide_path":"./敌人/恒星战/疾驰的异貌之兽#7/7.jpg"
+},
+
+"变幻莫测的不灭圆环#8":
+{
+    "img_path":"./敌人/恒星战/变幻莫测的不灭圆环#8/hxz8.png",
+    "img_path_enemy":"./敌人/恒星战/变幻莫测的不灭圆环#8/DimensionBattleCentralTop_009.png",
+    "logo_path":"./敌人/恒星战/变幻莫测的不灭圆环#8/DimensionBattleCentralTop_009.ico",
+    "name":"变幻莫测的不灭圆环#8",
+    "guide_path":"./敌人/恒星战/变幻莫测的不灭圆环#8/8.png"
 }
 
 }
