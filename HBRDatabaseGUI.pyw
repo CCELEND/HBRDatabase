@@ -9,6 +9,7 @@ from window import load_menu_icon, get_ico_path_by_name
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import delete_old_file_and_subdirs, is_admin
 from 日志.error_queue_proc import check_error_queue
+from 更新.check_proc import check_for_updates
 
 sys.path.append(os.path.abspath("./持有物"))
 from 持有物.饰品.jewelrys_win import show_jewelrys_type
@@ -258,6 +259,8 @@ if __name__ == "__main__":
         root_win_name = "HBRDatabase"
 
     delete_old_file_and_subdirs()
+
+    check_for_updates()
 
     # 创建主窗口
     root = creat_window(root_win_name, 1160, 717, 440, 50)#1160
