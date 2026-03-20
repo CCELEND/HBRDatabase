@@ -4,7 +4,8 @@ chrome_user_data/
 .idea/
 *.flac
 *.mp3
-*.xlsx
+index_equipments.xlsx
+index_wash_entries.xlsx
 *.log
 工具/GetEntriesGUILocal/config.ini
 工具/HBR伤害模拟/1.7.0_0/
