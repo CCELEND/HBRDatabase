@@ -23,7 +23,7 @@ def check_for_updates():
     # 下载服务器返回的需要更新的文件
     if 'files_to_download' in response:
         if response['files_to_download']:
-            messagebox.showinfo("信息", f"发现新版本，请更新")
+            messagebox.showinfo("提示", f"检测到资源冲突或存在新版本，请更新！")
     else:
         messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
         logger.error(f"错误响应：{response}\n请重试或联系开发者")
