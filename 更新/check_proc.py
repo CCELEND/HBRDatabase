@@ -1,8 +1,8 @@
 
-from hash import calculate_file_hashes
+from 更新.hash import calculate_file_hashes
 from tkinter import messagebox
 
-from http_client import send_hashes_to_server
+from 更新.http_client import send_hashes_to_server
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
