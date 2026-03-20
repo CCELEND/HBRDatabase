@@ -260,8 +260,6 @@ if __name__ == "__main__":
 
     delete_old_file_and_subdirs()
 
-    check_for_updates()
-
     # 创建主窗口
     root = creat_window(root_win_name, 1160, 717, 440, 50)#1160
     set_global_bg(root)
@@ -281,5 +279,7 @@ if __name__ == "__main__":
         "vbg_hbr.png", 717, 0, "70%")
 
     check_error_queue(root)
+
+    check_for_updates()
 
     root.mainloop()
