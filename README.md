@@ -56,7 +56,8 @@
 4. hbr-tool：包含一些便利的工具（日文）  
 5. hbr-axletool：一个 HBR 的排轴工具网站  
 6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备  
-7. 资源和攻略网站：hbr.quest、o.hbr.quest、入队培训手册、gamekee、game8
+7. 资源和攻略网站：hbr.quest、o.hbr.quest、入队培训手册、gamekee、game8  
+8. 附带‘等效破坏率与OD计算表’
 
 ### 音乐
 
