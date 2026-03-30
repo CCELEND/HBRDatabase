@@ -614,3 +614,18 @@ def merge_and_extract_chrome_zip(
 
     # 删除合并后的zip文件
     os.remove(output_zip_path)
+
+from datetime import datetime
+def get_file_datetime(file_path, type="fromt"):
+
+    if type == "fromt":
+        mtime = os.path.getmtime(file_path)
+        # 转成可读时间，2025-05-15 00:46:33
+        format_time = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M:%S")
+        # print("修改时间：", format_time)
+        return format_time
+    else:
+        file_path = Path(file_path)
+        # 获取修改时间戳
+        mtime = file_path.stat().st_mtime
+        return mtime
