@@ -25,19 +25,23 @@ def list_newline(you_list: list, how_projects_newline: int):
         print(", ".join(map(str, you_list[i:i+how_projects_newline])))
 
 def dir_newline(you_dir: dict, how_projects_newline: int):
-    line_count = how_projects_newline - 1
-    # 初始化计数器
-    count = 0
-    # 遍历字典的项
-    for key, value in you_dir.items():
-        # 输出键值对，格式为 "key: value"
-        print(f"{key}: {value}", 
-            end = ", " if count % how_projects_newline != line_count else "\n")
-        count += 1
-
-    # 如果最后一行不足 how_projects_newline 项，需要手动换行
-    if count % how_projects_newline != 0:
-        print()
+    # 把字典转成列表
+    items = list(you_dir.items())
+    total = len(items)
+    
+    for index, (key, value) in enumerate(items):
+        # 拼接当前项字符串
+        item_str = f"{key}: {value}"
+        
+        # 判断是否是一行的最后一个
+        is_line_end = (index + 1) % how_projects_newline == 0
+        is_last_item = (index + 1) == total
+        
+        if is_line_end or is_last_item:
+            # 最后一项
+            print(item_str)
+        else:
+            print(item_str, end=", ")
 
 def FindKeyByValue(dict: dict, value_to_find: str) -> str | None:
     for key, value in dict.items():
