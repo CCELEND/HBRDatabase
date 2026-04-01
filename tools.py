@@ -583,6 +583,7 @@ def merge_and_extract_chrome_zip(
     sorted_part_paths = [path for (num, path) in part_files]
     
     if not sorted_part_paths:
+        logger.error(f"未找到任何分卷文件（chrome-win64.zip.xxx）")
         raise FileNotFoundError("未找到任何分卷文件（chrome-win64.zip.xxx）")
     # print(f"找到 {len(sorted_part_paths)} 个分卷文件（已按序号排序）：")
     # for idx, path in enumerate(sorted_part_paths, 1):
@@ -610,8 +611,10 @@ def merge_and_extract_chrome_zip(
             zip_f.extractall(extract_dir)
         # print("解压完成！")
     except zipfile.BadZipFile:
+        logger.error(f"解压失败！可能是分卷文件缺失/损坏，或合并顺序错误")
         raise RuntimeError("解压失败！可能是分卷文件缺失/损坏，或合并顺序错误")
 
+    logger.info(f"解压完成！")
     # 删除合并后的zip文件
     os.remove(output_zip_path)
 
