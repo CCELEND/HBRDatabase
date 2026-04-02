@@ -217,6 +217,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     # 工具菜单
     tool_menu = ttk.Menu(menu_bar, tearoff=0)
     menu_tool_calls = [
+        ("图片转线稿工具", creat_line_art_win),
         ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
         ("伤害分计算", creat_dsc_win),
@@ -228,7 +229,6 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         ("hbr-axletool", load_hbr_axletool),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
-        ("图片转线稿工具", creat_line_art_win),
 
         ("o.hbr.quest（v5.10）", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
