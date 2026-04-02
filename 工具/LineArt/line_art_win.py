@@ -70,6 +70,7 @@ class LineArtGUI:
             filetypes=[("图片文件", "*.png *.jpg *.jpeg *.bmp"), ("所有文件", "*.*")]
         )
         if path:
+            win_set_top('图片转线稿工具', __name__)
             self.input_path.set(path)
 
     def image_to_lineart(self, input_path, output_path, line_thickness, threshold1, threshold2, invert=False):
@@ -90,6 +91,7 @@ class LineArtGUI:
         input_path = self.input_path.get()
         if input_path == "未选择图片":
             messagebox.showwarning("提示", "请先选择图片！")
+            win_set_top('图片转线稿工具', __name__)
             return
         
         lt = self.line_thickness.get()
@@ -119,9 +121,11 @@ class LineArtGUI:
             )
             
             messagebox.showinfo("成功", f"线稿已保存！\n{output_path}")
+            win_set_top('图片转线稿工具', __name__)
         except Exception as e:
             logger.error(str(e))
             messagebox.showerror("错误", f"生成失败：{str(e)}")
+            win_set_top('图片转线稿工具', __name__)
         finally:
             self.gen_btn.config(text="生成线稿", state=NORMAL)
 
