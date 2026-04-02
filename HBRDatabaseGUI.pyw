@@ -78,6 +78,7 @@ from 工具.hbr_quest.Load import load_hbr_quest
 from 工具.game8_hbr.Load import load_game8_hbr
 from 工具.gamekee_hbr.Load import load_gamekee_hbr
 from 工具.入队培训手册.Load import load_game_bilibili_com
+from 工具.LineArt.line_art_win import creat_line_art_win
 
 sys.path.append(os.path.abspath("./关于"))
 from 关于.about_win import creat_about_win
@@ -227,6 +228,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         ("hbr-axletool", load_hbr_axletool),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
+        ("图片转线稿工具", creat_line_art_win),
 
         ("o.hbr.quest（v5.10）", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
@@ -280,6 +282,6 @@ if __name__ == "__main__":
 
     check_error_queue(root)
 
-    check_for_updates()
+    # check_for_updates()
 
     root.mainloop()
