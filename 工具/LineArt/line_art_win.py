@@ -124,7 +124,7 @@ class LineArtGUI:
     def open_file(self):
         path = filedialog.askopenfilename(
             title="选择图片",
-            filetypes=[("图片文件", "*.png *.jpg *.jpeg *.bmp"), ("所有文件", "*.*")]
+            filetypes=[("图片文件", "*.png *.jpg *.jpeg *.bmp *.webp"), ("所有文件", "*.*")]
         )
         if path:
             win_set_top('图片转线稿工具', __name__)
@@ -182,7 +182,7 @@ class LineArtGUI:
                 invert=False
             )
             
-            messagebox.showinfo("成功", f"线稿已保存！\n{output_path}")
+            # messagebox.showinfo("成功", f"线稿已保存！\n{output_path}")
             win_set_top('图片转线稿工具', __name__)
         except Exception as e:
             logger.error(str(e))
