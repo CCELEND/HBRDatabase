@@ -93,7 +93,7 @@ class LineArtGUI:
         ttk.Button(file_frame, text="打开文件", command=self.open_file, bootstyle=PRIMARY).pack(side=LEFT, padx=5)
 
         # 参数面板
-        param_frame = ttk.LabelFrame(self.root, text="参数设置（数值越小细节越多）", padding=15)
+        param_frame = ttk.LabelFrame(self.root, text="参数设置（数值越小细节越多，但是噪声会更多）", padding=15)
         param_frame.pack(fill=BOTH, expand=YES, padx=10, pady=5)
         
         # 线条粗细
