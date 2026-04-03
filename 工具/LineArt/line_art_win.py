@@ -11,6 +11,55 @@ from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
+
+class ToolTip:
+    def __init__(self, widget, text=''):
+        self.widget = widget
+        self.text = text
+        self.tipwindow = None
+        self.id = None
+        self.x = self.y = 0
+        widget.bind("<Enter>", self.enter)
+        widget.bind("<Leave>", self.leave)
+        widget.bind("<ButtonPress>", self.leave)
+
+    def enter(self, event=None):
+        self.schedule()
+
+    def leave(self, event=None):
+        self.unschedule()
+        self.hidetip()
+
+    def schedule(self):
+        self.unschedule()
+        self.id = self.widget.after(300, self.showtip)
+
+    def unschedule(self):
+        id = self.id
+        self.id = None
+        if id:
+            self.widget.after_cancel(id)
+
+    def showtip(self):
+        if self.tipwindow:
+            return
+        x, y, _, _ = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 25
+        self.tipwindow = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry("+%d+%d" % (x, y))
+        label = tk.Label(tw, text=self.text, justify=tk.LEFT,
+                         background="#ffffff", relief=tk.SOLID, borderwidth=1,
+                         font=("Microsoft YaHei", 9))
+        label.pack(ipadx=4, ipady=2)
+
+    def hidetip(self):
+        tw = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()
+
 class LineArtGUI:
     def __init__(self, root):
         self.root = root
@@ -32,7 +81,15 @@ class LineArtGUI:
         file_frame.pack(fill=X, anchor=W)
         
         ttk.Label(file_frame, text="输入图片：").pack(side=LEFT, padx=5)
-        ttk.Entry(file_frame, textvariable=self.input_path, width=40, state=READONLY).pack(side=LEFT, padx=5)
+
+        # ttk.Entry(file_frame, textvariable=self.input_path, width=40, state=READONLY).pack(side=LEFT, padx=5)
+        self.path_entry = ttk.Entry(file_frame, textvariable=self.input_path, width=40, state=READONLY)
+        self.path_entry.pack(side=LEFT, padx=5)
+        # 初始化提示
+        self.path_tooltip = ToolTip(self.path_entry, text=self.input_path.get())
+        # 路径变化时同步更新提示文本
+        self.input_path.trace_add("write", self.update_tooltip)
+
         ttk.Button(file_frame, text="打开文件", command=self.open_file, bootstyle=PRIMARY).pack(side=LEFT, padx=5)
 
         # 参数面板
@@ -40,18 +97,18 @@ class LineArtGUI:
         param_frame.pack(fill=BOTH, expand=YES, padx=10, pady=5)
         
         # 线条粗细
-        ttk.Label(param_frame, text="线条粗细：").grid(row=0, column=0, sticky=W, padx=5, pady=8)
-        thickness_cb = ttk.Combobox(param_frame, textvariable=self.line_thickness, values=[1,2,3,4,5], width=10, state=READONLY)
+        ttk.Label(param_frame, text="高斯模糊核大小").grid(row=0, column=0, sticky=W, padx=5, pady=8)
+        thickness_cb = ttk.Combobox(param_frame, textvariable=self.line_thickness, values=[1,2,3,4,5,6,7,8,9,10], width=10, state=READONLY)
         thickness_cb.grid(row=0, column=1, padx=5, pady=8)
 
         # 阈值1
-        ttk.Label(param_frame, text="阈值 1 (0-100)：").grid(row=0, column=2, sticky=W, padx=5, pady=8)
-        t1_cb = ttk.Combobox(param_frame, textvariable=self.threshold1, values=list(range(0, 101)), width=10, state=READONLY)
+        ttk.Label(param_frame, text="Canny算子低阈值(10-300)").grid(row=0, column=2, sticky=W, padx=5, pady=8)
+        t1_cb = ttk.Combobox(param_frame, textvariable=self.threshold1, values=list(range(10, 301, 10)), width=10, state=READONLY)
         t1_cb.grid(row=0, column=3, padx=5, pady=8)
 
         # 阈值2
-        ttk.Label(param_frame, text="阈值 2 (0-100)：").grid(row=1, column=0, sticky=W, padx=5, pady=8)
-        t2_cb = ttk.Combobox(param_frame, textvariable=self.threshold2, values=list(range(0, 101)), width=10, state=READONLY)
+        ttk.Label(param_frame, text="Canny算子高阈值(10-300)").grid(row=1, column=0, sticky=W, padx=5, pady=8)
+        t2_cb = ttk.Combobox(param_frame, textvariable=self.threshold2, values=list(range(10, 301, 10)), width=10, state=READONLY)
         t2_cb.grid(row=1, column=1, padx=5, pady=8)
 
         # 生成按钮
@@ -72,6 +129,11 @@ class LineArtGUI:
         if path:
             win_set_top('图片转线稿工具', __name__)
             self.input_path.set(path)
+
+    def update_tooltip(self, *args):
+        # 路径改变时自动更新悬浮提示内容
+        if self.path_tooltip:
+            self.path_tooltip.text = self.input_path.get()
 
     def image_to_lineart(self, input_path, output_path, line_thickness, threshold1, threshold2, invert=False):
         data = np.fromfile(input_path, dtype=np.uint8)
@@ -136,7 +198,7 @@ def creat_line_art_win():
         win_set_top('图片转线稿工具', __name__)
         return "break"
 
-    line_art_win_frame = creat_Toplevel("图片转线稿工具", 600, 280,x=500, y=300)
+    line_art_win_frame = creat_Toplevel("图片转线稿工具", 695, 280,x=500, y=300)
     gui = LineArtGUI(line_art_win_frame)
 
     win_open_manage(line_art_win_frame, __name__)
