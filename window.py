@@ -186,6 +186,18 @@ def cut_text(event, text_widget: tk.Text):
     except tk.TclError:
         pass
 
+# 右键全选
+def select_all_text(event, text_widget: tk.Text):
+    try:
+        # 先取消现有选中
+        text_widget.tag_remove(tk.SEL, "1.0", tk.END)
+        # 选中全部文本
+        text_widget.tag_add(tk.SEL, "1.0", tk.END)
+        # 设置焦点
+        text_widget.focus_set()
+    except tk.TclError:
+        pass
+
 # 右键菜单
 def show_context_menu(event, text_widget: tk.Text):
     # 创建上下文菜单
@@ -193,6 +205,8 @@ def show_context_menu(event, text_widget: tk.Text):
     context_menu.add_command(label="复制", command=lambda e=event: copy_text(e, text_widget))
     context_menu.add_command(label="粘贴", command=lambda e=event: paste_text(e, text_widget))
     context_menu.add_command(label="剪切", command=lambda e=event: cut_text(e, text_widget))
+    context_menu.add_command(label="全选", command=lambda e=event: select_all_text(e, text_widget))
+    context_menu.add_command(label="清空", command=lambda: clear_text(text_widget))
     # 在鼠标右键点击的位置显示菜单
     context_menu.tk_popup(event.x_root, event.y_root)
     context_menu.grab_release()
