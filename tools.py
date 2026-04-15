@@ -243,11 +243,17 @@ def delete_all_files_and_subdirs(directory: str) -> bool:
         messagebox.showerror("错误", f"清空目录时发生错误: {e}")
         return False
 
-def delete_old_file_and_subdirs():
+
+def delete_old_file_and_subdirs_proc():
     delete_webp_files("./")
     delete_mp3_files("./")
     delete_all_files_and_subdirs("./工具/HBRbrochure/chromedriver-win64")
     delete_all_files_and_subdirs("./工具/HBRbrochure/chrome_user_data")
+
+import threading 
+def delete_old_file_and_subdirs():
+    proc_thread = threading.Thread(target=delete_old_file_and_subdirs_proc, daemon=False)
+    proc_thread.start()
 
 def delete_file(file: str) -> bool:
     if not os.path.isfile(file):

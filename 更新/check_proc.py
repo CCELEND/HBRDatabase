@@ -30,8 +30,8 @@ def check_for_updates_proc():
         logger.error(f"错误响应：{response}\n请重试或联系开发者")
 
 def check_for_updates():
-    browser_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
-    browser_thread.start()
+    proc_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
+    proc_thread.start()
 
 
 
