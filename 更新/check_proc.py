@@ -1,14 +1,14 @@
 
 from 更新.hash import calculate_file_hashes
 from tkinter import messagebox
+import threading
 
 from 更新.http_client import send_hashes_to_server
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-def check_for_updates():
-
+def check_for_updates_proc():
     current_file_hashes = calculate_file_hashes("./")
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"
@@ -28,5 +28,10 @@ def check_for_updates():
     else:
         messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
         logger.error(f"错误响应：{response}\n请重试或联系开发者")
+
+def check_for_updates():
+    browser_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
+    browser_thread.start()
+
 
 
