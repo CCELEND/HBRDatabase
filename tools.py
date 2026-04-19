@@ -410,6 +410,7 @@ def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chr
 
     try:
         driver = webdriver.Chrome(service=service, options=chrome_options)
+        print("[+] Chrome 浏览器已启动")
     except Exception as e:
         if "chrome not found" in str(e).lower():
             logger.error("Chrome 未安装或路径不正确！")

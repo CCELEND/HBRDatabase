@@ -288,7 +288,7 @@ def run_browser_in_thread():
 
 def get_hbr_brochure():
     # 获取全部队伍对象
-    get_all_team_obj()
+    # get_all_team_obj()
 
     # 加载资源文件
     load_resources()
