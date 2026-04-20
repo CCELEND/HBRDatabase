@@ -287,3 +287,14 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     download_brochure(driver)
 
     clear_data_and_cookies(driver)
+
+    # 等待浏览器被关闭
+    while True:
+        try:
+            driver.window_handles
+        except:
+            break
+        sleep(0.5)
+
+    driver.quit()
+    print("[+] 浏览器已关闭，已清理 driver 驱动进程")

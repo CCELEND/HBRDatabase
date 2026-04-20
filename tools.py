@@ -408,9 +408,11 @@ def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chr
         messagebox.showinfo("信息", f"进入 ChromeDriverManager 模式\n需要等待自动安装")
         service = Service(executable_path=ChromeDriverManager().install())
 
+    print("[+] 已初始化 ChromeDriver 服务，Chrome WebDriver")
+    print("[*] 正在启动 Chrome 测试浏览器...")
     try:
         driver = webdriver.Chrome(service=service, options=chrome_options)
-        print("[+] Chrome 浏览器已启动")
+        print("[+] Chrome 测试浏览器已启动")
     except Exception as e:
         if "chrome not found" in str(e).lower():
             logger.error("Chrome 未安装或路径不正确！")
