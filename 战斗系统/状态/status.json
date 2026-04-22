@@ -1261,6 +1261,22 @@
         "stack":"-",
         "type":"其他",
         "series":"白菜汤"           
+    },
+    "干劲":{
+        "name":"干劲",
+        "path":"./战斗系统/状态/Motivation.webp",
+        "effect":"受到主动技能回复DP时干劲提升1级\n受到伤害时干劲降低1级","description":"受到主动技能回复DP时干劲提升1级\n受到伤害时干劲降低1级",
+        "stack":"-",
+        "type":"其他",
+        "series":"干劲"           
+    },
+    "指定SP消耗":{
+        "name":"指定SP消耗",
+        "path":"./战斗系统/状态/OverwriteSp.webp",
+        "effect":"指定SP消耗","description":"指定SP消耗",
+        "stack":"-",
+        "type":"其他",
+        "series":"指定SP消耗"           
     }
 
 }
