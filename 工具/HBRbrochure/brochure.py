@@ -34,6 +34,7 @@ def switch_cn(driver: webdriver.Chrome):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] 切换失败: {e}")
+        driver.quit()
 
 
 # 切换全屏
@@ -47,6 +48,7 @@ def switch_full_screen(driver: webdriver.Chrome):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
 
 def web_abbreviation(driver: webdriver.Chrome, zoom_percentage: int):
@@ -56,6 +58,7 @@ def web_abbreviation(driver: webdriver.Chrome, zoom_percentage: int):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
 
 
@@ -130,6 +133,7 @@ def process_style_chunk(driver: webdriver.Chrome, chunk_data):
             "total": len(chunk_style_infos),
             "error": str(e)
         }
+    
 
 def click_brochure_by_chunk(driver: webdriver.Chrome, style_infos: dict, thread_count=4):
     # 将字典拆分为多个分片
@@ -163,6 +167,7 @@ def click_brochure_by_chunk(driver: webdriver.Chrome, style_infos: dict, thread_
                 # logger.info(f"[+] 线程 {thread_id} 完成: 成功{result['success']} / 失败{result['fail']}")
             except Exception as e:
                 logger.error(f"[-] 线程 {thread_id} 结果获取失败: {e}")
+                driver.quit()
     
     # 汇总结果
     total_success = sum(r["success"] for r in results)
@@ -234,6 +239,7 @@ def click_brochure(driver: webdriver.Chrome, my_style_infos: dict):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
 def download_brochure(driver: webdriver.Chrome):
     try:
@@ -244,6 +250,7 @@ def download_brochure(driver: webdriver.Chrome):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
 # 按下 esc 键
 def press_esc(driver: webdriver.Chrome):
@@ -255,6 +262,7 @@ def press_esc(driver: webdriver.Chrome):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
 def get_brochure(driver: webdriver.Chrome, style_infos: dict):
 
@@ -269,6 +277,7 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        driver.quit()
 
     # 切换国服
     switch_cn(driver)

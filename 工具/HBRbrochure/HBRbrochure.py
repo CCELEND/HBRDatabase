@@ -5,11 +5,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import pathlib
 
-import os
+# import os
 from tools import init_chrome_driver, add_dicts
 # import HBRbrochure.role_info
 import HBRbrochure.brochure
-from 角色.team_info import get_all_team_obj
+# from 角色.team_info import get_all_team_obj
 from HBRbrochure.mapping import load_resources
 from HBRbrochure.chrome_proc import close_other_tabs
 
@@ -63,7 +63,7 @@ def get_style_id(style_item_card_element) -> str:
     return style_id
 
 # 获取风格等级信息
-def get_role_level(style_item_card_elements, i):
+def get_role_level(style_item_card_elements, i, last_style_item_card_elements=None):
 
     style_item_card_element = style_item_card_elements[i]
 
@@ -79,7 +79,12 @@ def get_role_level(style_item_card_elements, i):
         )
 
         if not role_level_element.is_displayed():
-            style_item_card_elements[i-1].location_once_scrolled_into_view
+            if i == 0 and last_style_item_card_elements is not None:
+                print(f"[-] role_level_element is not visible, scrolling into view last element")
+                last_style_item_card_elements[-1].location_once_scrolled_into_view
+            else:
+                print(f"[-] role_level_element is not visible, scrolling into view {i-1}")
+                style_item_card_elements[i-1].location_once_scrolled_into_view
 
         # 提取元素值
         current_level = span_elements[1].text
@@ -103,6 +108,7 @@ def get_limit_break_level(style_item_card_elements, i):
         )
 
         if not limit_break_level_element.is_displayed():
+            print(f"[-] limit_break_level_element is not visible, scrolling into view {i-1}")
             style_item_card_elements[i-1].location_once_scrolled_into_view
 
         limit_break_level = limit_break_level_element.text
@@ -113,7 +119,7 @@ def get_limit_break_level(style_item_card_elements, i):
     return limit_break_level
 
 
-def get_styles_info(container):
+def get_styles_info(container, last_style_item_card_elements=None):
 
     # 查找类名为 style-item card 的 <div> 元素
     card_box_element = container.find_element(
@@ -139,7 +145,7 @@ def get_styles_info(container):
 
         # 获取风格等级
         # result = get_role_level(style_item_card_element)
-        result = get_role_level(style_item_card_elements, i)
+        result = get_role_level(style_item_card_elements, i, last_style_item_card_elements)
         current_level = result[0]
         maximum_level = result[1].replace("/", "")  # 去掉第二个元素中的 "/"
         my_style_levels[my_style_id] = [current_level, maximum_level]
@@ -167,7 +173,7 @@ def get_styles_info(container):
     style_infos_dir["my_style_levels"] = my_style_levels
     style_infos_dir["limit_break_levels"] = limit_break_levels
     style_infos_dir["my_style_infos"] = my_style_infos
-    return style_infos_dir
+    return style_infos_dir, style_item_card_elements
 
 
 
@@ -183,7 +189,6 @@ def switch_to_brochure(driver: webdriver.Chrome, style_infos: dict):
     driver.switch_to.window(handles[-1])
 
     HBRbrochure.brochure.get_brochure(driver, style_infos)
-
 
 def run_browser_in_thread():
     global chrome_driver
@@ -238,8 +243,8 @@ def run_browser_in_thread():
 
         container_elements = content_element.find_elements(By.CLASS_NAME, "container")
 
-        SSR_style_infos_dir = get_styles_info(container_elements[0])
-        SS_style_infos_dir = get_styles_info(container_elements[1])
+        SSR_style_infos_dir, SSR_style_item_card_elements = get_styles_info(container_elements[0])
+        SS_style_infos_dir, SS_style_item_card_elements = get_styles_info(container_elements[1], SSR_style_item_card_elements)
 
         SSR_style_num = SSR_style_infos_dir["my_style_num"]
         SSR_style_ids = SSR_style_infos_dir["my_style_ids"]
@@ -284,6 +289,7 @@ def run_browser_in_thread():
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
+        chrome_driver.quit()
 
 
 def get_hbr_brochure():
