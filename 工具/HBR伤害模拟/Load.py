@@ -20,9 +20,11 @@ def run_browser_in_thread():
         delete_file(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0.crx'))
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.0_0'))
         delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.1_0'))
+        delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0'))
+        delete_file(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0.zip'))
 
-        if not check_dir_exists_pathlib('./工具/HBR伤害模拟/1.7.0_0'):
-            unzip_file(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0.zip'), os.path.abspath('./工具/HBR伤害模拟'))
+        if not check_dir_exists_pathlib('./工具/HBR伤害模拟/2.0.1_0'):
+            unzip_file(os.path.abspath('./工具/HBR伤害模拟/2.0.1_0.zip'), os.path.abspath('./工具/HBR伤害模拟'))
 
         # 设置Chrome选项
         chrome_options = Options()
@@ -30,7 +32,7 @@ def run_browser_in_thread():
         chrome_options.add_experimental_option('excludeSwitches', ['enable-logging', 'enable-automation'])
         chrome_options.add_experimental_option("useAutomationExtension", False)
         
-        extension_path = os.path.abspath('./工具/HBR伤害模拟/1.7.0_0')
+        extension_path = os.path.abspath('./工具/HBR伤害模拟/2.0.1_0')
         chrome_options.add_argument(f"--load-extension={extension_path}")
 
         # 设置用户数据目录

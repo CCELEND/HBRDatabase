@@ -9,7 +9,7 @@ index_equipments.xlsx
 index_wash_entries.xlsx
 *.log
 工具/GetEntriesGUILocal/config.ini
-工具/HBR伤害模拟/1.7.0_0/
+工具/HBR伤害模拟/2.0.1_0/
 关于/client_file_hashes.json
 关于/server_file_hashes.json
 工具/chrome/chrome-win64/
