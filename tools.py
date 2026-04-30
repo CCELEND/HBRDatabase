@@ -259,6 +259,7 @@ def delete_old_file_and_subdirs_proc():
 
 import threading 
 def delete_old_file_and_subdirs():
+    print("[*] 启动旧文件清理线程...")
     proc_thread = threading.Thread(target=delete_old_file_and_subdirs_proc, daemon=False)
     proc_thread.start()
 

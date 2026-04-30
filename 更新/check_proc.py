@@ -30,6 +30,7 @@ def check_for_updates_proc():
         logger.error(f"错误响应：{response}\n请重试或联系开发者")
 
 def check_for_updates():
+    print("[*] 启动更新检查线程...")
     proc_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
     proc_thread.start()
 
