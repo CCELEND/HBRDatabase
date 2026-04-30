@@ -240,15 +240,22 @@ def delete_all_files_and_subdirs(directory: str) -> bool:
         return True
     except Exception as e:
         logger.error(f"清空目录时发生错误: {e}")
-        messagebox.showerror("错误", f"清空目录时发生错误: {e}")
+        # messagebox.showerror("错误", f"清空目录时发生错误: {e}")
+        日志.error_queue_proc.error_queue.put(f"清空目录时发生错误: {e}")
         return False
 
 
 def delete_old_file_and_subdirs_proc():
     delete_webp_files("./")
     delete_mp3_files("./")
-    delete_all_files_and_subdirs("./工具/HBRbrochure/chromedriver-win64")
-    delete_all_files_and_subdirs("./工具/HBRbrochure/chrome_user_data")
+
+    UnnecessaryFiles = load_json("./UnnecessaryFiles.json")
+    delete_files = UnnecessaryFiles.get("delete_files", [])
+    delete_dirs = UnnecessaryFiles.get("delete_dirs", [])
+    for file in delete_files:
+        delete_file(file)
+    for dir in delete_dirs:
+        delete_all_files_and_subdirs(dir)
 
 import threading 
 def delete_old_file_and_subdirs():
@@ -264,7 +271,8 @@ def delete_file(file: str) -> bool:
         return True
     except Exception as e:
         logger.error(f"删除文件时发生错误: {e}")
-        messagebox.showerror("错误", f"删除文件时发生错误: {e}")
+        # messagebox.showerror("错误", f"删除文件时发生错误: {e}")
+        日志.error_queue_proc.error_queue.put(f"删除文件时发生错误: {e}")
         return False
 
 

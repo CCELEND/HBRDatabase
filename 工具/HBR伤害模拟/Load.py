@@ -15,14 +15,7 @@ chrome_driver = None
 def run_browser_in_thread():
     global chrome_driver
     try:
-        # 清理文件
-        delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0'))
-        delete_file(os.path.abspath('./工具/HBR伤害模拟/1.3.0_0.crx'))
-        delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.0_0'))
-        delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.4.1_0'))
-        delete_all_files_and_subdirs(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0'))
-        delete_file(os.path.abspath('./工具/HBR伤害模拟/1.7.0_0.zip'))
-
+        
         if not check_dir_exists_pathlib('./工具/HBR伤害模拟/2.0.1_0'):
             unzip_file(os.path.abspath('./工具/HBR伤害模拟/2.0.1_0.zip'), os.path.abspath('./工具/HBR伤害模拟'))
 
