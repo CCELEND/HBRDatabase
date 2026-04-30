@@ -68,7 +68,7 @@
         null,
         null]
     ],
-    "GrowthAbility":"提升技能伤害值",
+    "GrowthAbility":"提升技能伤害值的威力",
     "status_growth":{
         "DP":  "+70% +200",
         "力量": "+70% +39","灵巧": "+40% +35",

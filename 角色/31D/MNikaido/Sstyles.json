@@ -50,7 +50,7 @@
             null,
             "自身"]
         ],
-    "GrowthAbility":"提升技能伤害值",
+    "GrowthAbility":"提升技能伤害值的威力",
         "status_growth": {
             "DP": "+50% +50",
             "力量": "+20% +21",
@@ -110,7 +110,7 @@
             "己方回合",
             "自身"]
         ],
-    "GrowthAbility":"提升技能伤害值",
+    "GrowthAbility":"提升技能伤害值的威力",
         "status_growth": {
             "DP": "+50% +50",
             "力量": "+40% +21",
