@@ -280,6 +280,7 @@ if __name__ == "__main__":
     ArtworkDisplayerHeight(scrollbar_frame_obj.scrollable_frame,
         "vbg_hbr.png", 717, 0, "70%")
 
+    print("[*] 初始化并轮询错误队列...")
     check_error_queue(root)
 
     check_for_updates()

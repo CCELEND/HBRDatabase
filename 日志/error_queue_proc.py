@@ -5,7 +5,6 @@ import queue
 error_queue = queue.Queue()
 
 def check_error_queue(root):
-    print("[*] 初始化并轮询错误队列...")
     # 主线程轮询错误队列，处理GUI提示，需在主线程调用
     try:
         # 非阻塞获取队列中的错误信息
