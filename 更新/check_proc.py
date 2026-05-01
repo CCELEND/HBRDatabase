@@ -24,6 +24,7 @@ def check_for_updates_proc():
     if 'files_to_download' in response:
         if response['files_to_download']:
             server_file_datetime = response.get('server_file_datetime', None)
+            print(f"[!] 检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
             messagebox.showinfo("提示", f"检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
     else:
         messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
