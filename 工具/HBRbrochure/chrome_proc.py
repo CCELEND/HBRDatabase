@@ -65,7 +65,7 @@ def clear_data_and_cookies(driver: webdriver.Chrome):
         driver.delete_all_cookies() #登录态、会话信息
         driver.execute_script("window.localStorage.clear();") #网页本地持久化数据
         driver.execute_script("window.sessionStorage.clear();")  #会话临时数据
-        print("[+] 浏览器数据和Cookies已清除")
+        print("[+] 浏览器数据和 Cookies 已清除")
     except Exception as e:
         logger.error(f"清除数据和Cookies失败: {e}")
 
