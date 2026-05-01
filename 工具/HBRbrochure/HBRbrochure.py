@@ -80,10 +80,10 @@ def get_role_level(style_item_card_elements, i, last_style_item_card_elements=No
 
         if not role_level_element.is_displayed():
             if i == 0 and last_style_item_card_elements is not None:
-                print(f"[-] role_level_element is not visible, scrolling into view last element")
+                print(f"[!] role_level_element is not visible, scrolling into view last element")
                 last_style_item_card_elements[-1].location_once_scrolled_into_view
             else:
-                print(f"[-] role_level_element is not visible, scrolling into view {i-1}")
+                print(f"[!] role_level_element is not visible, scrolling into view {i-1}")
                 style_item_card_elements[i-1].location_once_scrolled_into_view
 
         # 提取元素值
@@ -108,7 +108,7 @@ def get_limit_break_level(style_item_card_elements, i):
         )
 
         if not limit_break_level_element.is_displayed():
-            print(f"[-] limit_break_level_element is not visible, scrolling into view {i-1}")
+            print(f"[!] limit_break_level_element is not visible, scrolling into view {i-1}")
             style_item_card_elements[i-1].location_once_scrolled_into_view
 
         limit_break_level = limit_break_level_element.text
