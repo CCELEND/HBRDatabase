@@ -91,12 +91,47 @@ logger = AdvancedLogger.get_logger(__name__)
 def update_output(text):
     print(text)
 
+# 全局快捷键绑定函数
+def bind_shortcuts(root, scrollbar_frame_obj):
+
+    # Ctrl+S 打开搜索
+    root.bind_all('<Control-s>', lambda event: creat_search_win(root, scrollbar_frame_obj))
+    root.bind_all('<Control-S>', lambda event: creat_search_win(root, scrollbar_frame_obj))
+    
+    # Ctrl+U 更新数据
+    root.bind_all('<Control-u>', lambda event: http_update_data())
+    root.bind_all('<Control-U>', lambda event: http_update_data())
+    
+    # Ctrl+A 关于
+    root.bind_all('<Control-a>', lambda event: creat_about_win(root))
+    root.bind_all('<Control-A>', lambda event: creat_about_win(root))
+    
+    # Ctrl+M 音乐
+    root.bind_all('<Control-m>', lambda event: creat_music_win())
+    root.bind_all('<Control-M>', lambda event: creat_music_win())
+    
+    # Ctrl+Q 退出
+    root.bind_all('<Control-q>', lambda event: root.quit())
+    root.bind_all('<Control-Q>', lambda event: root.quit())
+    
+    # F1 打开搜索
+    root.bind_all('<F1>', lambda event: creat_search_win(root, scrollbar_frame_obj))
+
 # 创建单个菜单项，并绑定命令
-def create_menu_item(menu: ttk.Menu, label: str, image, command: callable, *args):
-    if image:
-        menu.add_command(label=label, image=image, compound="left", command=lambda: command(*args))
+def create_menu_item(menu: ttk.Menu, label: str, image, command: callable, accelerator=None, *args):
+    if accelerator:
+        if image:
+            menu.add_command(label=label, image=image, compound="left", 
+                           accelerator=accelerator, command=lambda: command(*args))
+        else:
+            menu.add_command(label=label, accelerator=accelerator, 
+                           command=lambda: command(*args))
     else:
-        menu.add_command(label=label, command=lambda: command(*args))
+        if image:
+            menu.add_command(label=label, image=image, compound="left", 
+                           command=lambda: command(*args))
+        else:
+            menu.add_command(label=label, command=lambda: command(*args))
 
 # 创建菜单栏
 def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin):
@@ -119,7 +154,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         ico_path = get_ico_path_by_name(team_name)
         icon = load_menu_icon(ico_path, team_name)
         create_menu_item(team_menu, team_name, icon,
-            creat_team_win, parent_frame, team_name)
+            creat_team_win, None, parent_frame, team_name)
     menu_bar.add_cascade(label="👤角色", menu=team_menu)
 
     # 物品材料菜单
@@ -128,7 +163,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         "活动道具"
     ]
     for item_name in item_names:
-        create_menu_item(item_menu, item_name, None, update_output, item_name)
+        create_menu_item(item_menu, item_name, None, update_output, None, item_name)
 
     # 定义菜单项的名称和对应的回调函数
     menu_item_calls = [
@@ -151,7 +186,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     for item_call_name, callback in menu_item_calls:
         ico_path = get_ico_path_by_name(item_call_name)
         icon = load_menu_icon(ico_path, item_call_name)
-        create_menu_item(item_menu, item_call_name, icon, callback, scrollbar_frame_obj)
+        create_menu_item(item_menu, item_call_name, icon, callback, None, scrollbar_frame_obj)
     menu_bar.add_cascade(label="📜持有物", menu=item_menu)
 
     # 敌人菜单
@@ -160,7 +195,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         "活动棱镜战","废域"
     ]
     for enemy_name in enemy_names:
-        create_menu_item(enemy_menu, enemy_name, None, update_output, enemy_name)
+        create_menu_item(enemy_menu, enemy_name, None, update_output, None, enemy_name)
 
     menu_enemy_calls = [
         ("时钟塔", show_szt_enemys),
@@ -178,7 +213,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     for enemy_call_name, callback in menu_enemy_calls:
         ico_path = get_ico_path_by_name(enemy_call_name)
         icon = load_menu_icon(ico_path, enemy_call_name)
-        create_menu_item(enemy_menu, enemy_call_name, icon, callback, scrollbar_frame_obj)
+        create_menu_item(enemy_menu, enemy_call_name, icon, callback, None, scrollbar_frame_obj)
     # menu_bar.add_cascade(label="🪬敌人", menu=enemy_menu)
     menu_bar.add_cascade(label="👾敌人", menu=enemy_menu)
     
@@ -199,20 +234,22 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     for battle_call_name, callback in menu_battle_calls:
         if battle_call_name in ['共鸣天赋','基础','Hit','乘区']:
             icon = load_menu_icon("./战斗系统/help.ico", battle_call_name)
-            create_menu_item(battle_menu, battle_call_name, icon, callback, parent_frame)
+            create_menu_item(battle_menu, battle_call_name, icon, callback, None, parent_frame)
         else:
             ico_path = get_ico_path_by_name(battle_call_name)
             icon = load_menu_icon(ico_path, battle_call_name)
-            create_menu_item(battle_menu, battle_call_name, icon, callback, scrollbar_frame_obj)
+            create_menu_item(battle_menu, battle_call_name, icon, callback, None, scrollbar_frame_obj)
     menu_bar.add_cascade(label="⚔战斗系统", menu=battle_menu)
 
-    # 搜索菜单
-    menu_bar.add_command(label="🔍搜索", 
-        command=lambda: creat_search_win(parent_frame, scrollbar_frame_obj))
+    # 搜索菜单 - 添加快捷键显示
+    search_icon = load_menu_icon("./favicon.ico", "搜索")
+    menu_bar.add_command(label="🔍搜索", compound="left",
+        accelerator="Ctrl+S", command=lambda: creat_search_win(parent_frame, scrollbar_frame_obj))
 
-    # 音乐菜单
-    menu_bar.add_command(label="🎧音乐", 
-        command=lambda: creat_music_win())
+    # 音乐菜单 - 添加快捷键显示
+    music_icon = load_menu_icon("./favicon.ico", "音乐")
+    menu_bar.add_command(label="🎧音乐", compound="left",
+        accelerator="Ctrl+M", command=lambda: creat_music_win())
 
     # 工具菜单
     tool_menu = ttk.Menu(menu_bar, tearoff=0)
@@ -229,7 +266,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         ("hbr-axletool", load_hbr_axletool),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
-
+        
         ("o.hbr.quest（v5.10）", load_o_hbr_quest),
         ("hbr.quest", load_hbr_quest),
         ("入队培训手册", load_game_bilibili_com),
@@ -243,15 +280,20 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     menu_bar.add_cascade(label="🛠️工具", menu=tool_menu)
 
 
-    # 更新数据菜单
-    menu_bar.add_command(label="📲更新", 
-        command=lambda: http_update_data())
+    # 更新数据菜单 - 添加快捷键显示
+    update_icon = load_menu_icon("./favicon.ico", "更新")
+    menu_bar.add_command(label="📲更新", compound="left",
+        accelerator="Ctrl+U", command=lambda: http_update_data())
 
-    # 关于菜单
-    menu_bar.add_command(label="🏷️关于", 
-        command=lambda: creat_about_win(parent_frame))
+    # 关于菜单 - 添加快捷键显示
+    about_icon = load_menu_icon("./favicon.ico", "关于")
+    menu_bar.add_command(label="🏷️关于", compound="left",
+        accelerator="Ctrl+A", command=lambda: creat_about_win(parent_frame))
 
     parent_frame.config(menu=menu_bar)
+    
+    # 绑定全局快捷键
+    bind_shortcuts(parent_frame, scrollbar_frame_obj)
 
 if __name__ == "__main__":
 
