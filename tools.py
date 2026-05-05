@@ -112,8 +112,16 @@ def list_val_in_another(list1: list[str], list2: list[str]) -> bool:
         #     return False
     return False
 
+# 判断一个字符串列表是否只包含一个字符串，并且这个字符串等于指定字符串
 def list_is(list: list[str], string:str) -> bool:
     return (len(list) == 1 and list[0] == string)
+
+# 判断一个列表中是否包含子列表，包含子列表返回True，否则返回False
+def has_sublist(lst):
+    for item in lst:
+        if type(item) is list:
+            return True
+    return False
 
 # 检查字典的键或值是否存在于指定列表中
 def check_dict_in_list(input_dict: dict, check_list: list[str], check_keys=True, check_values=True) -> bool:
