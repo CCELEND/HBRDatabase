@@ -3,6 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image
+from tools import has_sublist
 from 角色.style_info import AttackSkill, SkillEffect
 from 角色.style_text import output_skill_effect, output_attack_skill
 
@@ -127,5 +128,10 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
             effect_lab.grid(row=0, column=1, sticky="nsw", padx=5, pady=5)
         else:
             effect_frame.grid_columnconfigure(0, weight=1) # 确保列填充
-            for i, passive_skill_effect_type in enumerate(passive_skill.effect_type):
-                desc_lab, text = creat_passive_effect_frame(effect_frame, i, passive_skill_effect_type)
+            if has_sublist(passive_skill.effect_type):
+                for i, passive_skill_effect_type in enumerate(passive_skill.effect_type):
+                    desc_lab, text = creat_passive_effect_frame(effect_frame, 
+                                                                i, passive_skill_effect_type)
+            else:
+                desc_lab, text = creat_passive_effect_frame(effect_frame, 
+                                                            0, passive_skill.effect_type)
