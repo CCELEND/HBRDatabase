@@ -5,13 +5,13 @@
         "./角色/31A/TKunimi/TKunimiAutumn2025_R3_Thumbnail.webp",
         "31A","国见玉",
         "欢迎光临♪恶梦大游行",
-        ["冰tama","冰玉","灵符tama","灵符玉"],
+        ["冰tama","冰玉","灵符tama","灵符玉","僵尸玉","冰国见"],
         "拥有能降低敌人冰属性防御力，并使敌人陷入脆弱状态的 EX 技能 并可活用【灵符】弱化敌人的 DEBUFFER",
         "SSR",
         "减益者",
         "斩",
         "冰",
-        {"1001709":"TKunimiAutumn2025_R3"}
+        {"1001710":"TKunimiAutumn2025_R3"}
     ],
     "ActiveSkills":[
     [
