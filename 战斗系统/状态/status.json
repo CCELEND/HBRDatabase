@@ -774,6 +774,14 @@
         "type":"减益",
         "series":"状态值下降" 
     },
+    "畏惧魔界骑兵":{
+        "name":"畏惧魔界骑兵",
+        "path":"./战斗系统/状态/FearOfDevil.webp",
+        "effect":"全属性值下降100点","description":"全属性值下降100点",
+        "stack":"-",
+        "type":"减益",
+        "series":"状态值下降" 
+    },
     "回复效果下降":{
         "name":"回复效果下降",
         "path":"./战斗系统/状态/HealDown.webp",
