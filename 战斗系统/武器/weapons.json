@@ -51,6 +51,18 @@
         "name":"盾","en":"Shield",
         "path":"./战斗系统/武器/Shield.png",
         "description":"盾（打武器属性）","hit":"1"
+    },
+
+    "短剑":{
+        "name":"短剑","en":"ShortSword",
+        "path":"./战斗系统/武器/ShortSword.webp",
+        "description":"短剑（斩武器属性）","hit":"3"
+    },
+
+    "赤手空拳":{
+        "name":"赤手空拳","en":"BareHands",
+        "path":"./战斗系统/武器/BareHands.webp",
+        "description":"赤手空拳（打武器属性）","hit":"3"
     }
 
 

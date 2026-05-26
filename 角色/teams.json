@@ -403,6 +403,28 @@
         }
         
     }
+},
+
+"persona5r":
+{
+    "logo_path":"./角色/persona5r/persona5r.ico",
+    "name":"persona5r",
+    "description":"",
+    
+    "roles":
+    {
+        "MONA":{
+            "id":"10211",
+            "en":"EmaB",
+            "path":"./角色/persona5r/EmaB"
+        },
+        "QUEEN":{
+            "id":"10212",
+            "en":"EmaC",
+            "path":"./角色/persona5r/EmaC"
+        }
+        
+    }
 }
 
 }

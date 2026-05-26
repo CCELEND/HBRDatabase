@@ -148,7 +148,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     # 角色菜单 菜单不可分离
     team_menu = ttk.Menu(menu_bar, tearoff=0)
     team_names = [
-        "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X", "Angel Beats!", "司令部"
+        "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X", "Angel Beats!", "司令部", "persona5r"
     ]
     for team_name in team_names:
         ico_path = get_ico_path_by_name(team_name)
@@ -322,7 +322,6 @@ if __name__ == "__main__":
     ArtworkDisplayerHeight(scrollbar_frame_obj.scrollable_frame,
         "vbg_hbr.png", 717, 0, "70%")
 
-    print("[*] 初始化并轮询错误队列...")
     check_error_queue(root)
 
     check_for_updates()

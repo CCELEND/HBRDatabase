@@ -1,0 +1,11 @@
+
+{
+    "img_path":"./角色/persona5r/EmaB/EmaBProfile.webp",
+    "name":"MONA",
+    "en":"EmaB",
+    "nicknames":["MONA","摩尔加纳"],
+    "description":"CV：大谷育江\n所属队伍：persona5r 生日：- 身高：50cm 出生地：-\n「心之怪盗团」的成员，宛如黑猫般的神秘存在。\n实际上并不是猫，所以一被当成猫对待就会主张「吾辈才不是猫！」彻底订正。\n以怪盗团王牌的身分支持着伙伴们，时而予以指引。\n似乎可以变身成各种模样。",
+    "team":"persona5r",
+    "weapon_attribute":"斩",
+    "weapon":"短剑"
+}

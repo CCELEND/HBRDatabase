@@ -316,6 +316,7 @@ def get_ico_path_by_name(name: str) -> str | None:
         "31F":"./角色/31F/DioramaStamp31f.ico", "31X":"./角色/31X/DioramaStamp31x.ico", 
         "Angel Beats!":"./角色/Angel Beats!/angelbeats.ico",
         "司令部":"./角色/司令部/司令部.ico",
+        "persona5r":"./角色/persona5r/persona5r.ico",
         "主线道具":"./持有物/主线道具/ThumbnailFishingRod.png",
         "道具":"./持有物/道具/ThumbnailHC.png",
         "饰品":"./持有物/饰品/专武/Soul_png.png",
