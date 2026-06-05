@@ -422,6 +422,11 @@
             "id":"10212",
             "en":"EmaC",
             "path":"./角色/persona5r/EmaC"
+        },
+        "VIOLET":{
+            "id":"10213",
+            "en":"EmaD",
+            "path":"./角色/persona5r/EmaD"
         }
         
     }

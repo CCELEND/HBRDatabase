@@ -63,6 +63,12 @@
         "name":"赤手空拳","en":"BareHands",
         "path":"./战斗系统/武器/BareHands.webp",
         "description":"赤手空拳（打武器属性）","hit":"3"
+    },
+
+    "细剑":{
+        "name":"细剑","en":"Rapier",
+        "path":"./战斗系统/武器/Rapier.webp",
+        "description":"细剑（斩武器属性）","hit":"3"
     }
 
 
