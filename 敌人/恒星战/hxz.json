@@ -81,6 +81,15 @@
     "logo_path":"./敌人/恒星战/侵蚀万象的妖花#9/DimensionBattleCentralTop_010.ico",
     "name":"侵蚀万象的妖花#9",
     "guide_path":"./敌人/恒星战/侵蚀万象的妖花#9/9.png"
+},
+
+"栖息于峡谷的幽鬼Ⅱ#10":
+{
+    "img_path":"./敌人/恒星战/栖息于峡谷的幽鬼Ⅱ#10/hxz10.png",
+    "img_path_enemy":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.png",
+    "logo_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.ico",
+    "name":"栖息于峡谷的幽鬼Ⅱ#10",
+    "guide_path":"./敌人/恒星战/栖息于峡谷的幽鬼Ⅱ#10/10.jpg"
 }
 
 }
