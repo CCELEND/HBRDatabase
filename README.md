@@ -71,3 +71,26 @@
 ### 修复
 
 * 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
+
+### 其他
+
+如有疑问请与我联系：
+- CCELEND：[不吃花椒的汪汪队(B站空间)](https://space.bilibili.com/442776860)
+- QQ：2644884626、邮箱：celend2644884626@163.com
+
+参考资料：
+- [数据库(hbr.quest)](https://hbr.quest)
+- [快查表](https://www.kdocs.cn/l/cvdGm5gwG4Jq?R=L1MvMTM=)
+- [日服攻略](https://game8.jp/heavenburnsred)
+- [gamekee](https://www.gamekee.com/hbr/)
+- [wiki.hbr-hd](https://wiki.hbr-hd.com/)
+- [hbr-axletool](https://hbr-axletool.pages.dev/)
+- [hbr-tool](https://www.hbr-tool.com/)
+- [红烧BOX图鉴](https://ruriro.cc/hbr/StyleChart/)
+- [词条计算器](https://hbrapi.fuyumi.xyz/)
+- [国服官方工具](https://game.bilibili.com/tool/hbr#/)
+- [炽焰天穹_HBR(B站空间)](https://space.bilibili.com/3546599741458758)
+- [道家深湖(B站空间)](https://space.bilibili.com/24124162)
+- [废纸扔了_快查表(B站空间)](https://space.bilibili.com/61357074)
+- [兰叔爱玩炽焰天穹(B站空间)](https://space.bilibili.com/10147172)
+- [茅森月哥(B站空间)](https://space.bilibili.com/535889)
