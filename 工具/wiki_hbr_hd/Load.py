@@ -31,6 +31,16 @@ def run_browser_in_thread():
         chrome_driver.set_window_size(1160, 820)
         chrome_driver.get("https://wiki.hbr-hd.com/")
 
+        from time import sleep
+        # 等待浏览器被关闭
+        while True:
+            try:
+                chrome_driver.window_handles
+            except:
+                break
+            sleep(0.5)
+        chrome_driver.quit()
+
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")

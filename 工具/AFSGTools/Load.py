@@ -28,7 +28,7 @@ def run_browser_in_thread():
             return
 
         chrome_driver.set_window_size(1160, 820)
-        chrome_driver.get("https://www.hbr-tool.com/")
+        chrome_driver.get("https://roywu0922.github.io/hbr_calc_web/")
 
         from time import sleep
         # 等待浏览器被关闭
@@ -44,8 +44,8 @@ def run_browser_in_thread():
         logger.error(str(e))
         print(f"[-] {e}")
 
-def load_hbr_tool():
+
+def load_AFSGTools():
     # 启动独立线程执行浏览器操作
     browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
     browser_thread.start()
-

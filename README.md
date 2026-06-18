@@ -80,6 +80,8 @@
 
 参考资料：
 - [数据库(hbr.quest)](https://hbr.quest)
+- [hbr_calc_web(GitHub)](https://github.com/RoyWu0922/hbr_calc_web)
+- [AFSGTools — Heaven Burns Red 伤害计算器](https://roywu0922.github.io/hbr_calc_web/)
 - [快查表](https://www.kdocs.cn/l/cvdGm5gwG4Jq?R=L1MvMTM=)
 - [日服攻略](https://game8.jp/heavenburnsred)
 - [gamekee](https://www.gamekee.com/hbr/)

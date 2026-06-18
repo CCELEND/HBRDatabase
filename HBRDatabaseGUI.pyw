@@ -68,6 +68,7 @@ from 工具.DamageScoreCal.damage_score_cal_win import creat_dsc_win
 from 工具.DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
 from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
 from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
+from 工具.AFSGTools.Load import load_AFSGTools
 from 工具.hbr_tool.Load import load_hbr_tool
 from 工具.hbr_tool_old_damage_calculator.Load import load_hbr_tool_old_damage_calculator
 from 工具.hbr_axletool.Load import load_hbr_axletool
@@ -260,6 +261,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
         ("伤害分计算", creat_dsc_win),
         ("伤害分计算V2", creat_dsc_win_v2),
         ("风格图鉴获取", get_hbr_brochure),
+        ("AFSGTools伤害计算", load_AFSGTools),
         ("伤害模拟", load_hbr_damage_simulation),
         ("hbr-tool", load_hbr_tool),
         ("hbr-tool伤害计算", load_hbr_tool_old_damage_calculator),
