@@ -1,17 +1,20 @@
+# HBRDatabase — 炽焰天穹本地数据库
+
+**基于 Python Tkinter‌ 的 GUI 应用，支持角色风格搜素、seed 自动获取、词条计算、红烧 BOX 自动获取、HBR 音乐资源下载等**
 
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show.png)
 
 ## 安装依赖
 
-* python3.10 以上  
+* Python3.10 以上  
 * opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
->运行 install_module.py 安装依赖模块  
+>运行 `install_module.py` 安装依赖模块  
 >高版本 ttkbootstrap 会导致异常，需要卸载高版本 ttkbootstrap，再安装 ttkbootstrap==1.12.0
 
 ## 使用
 
-* 运行 HBRDatabaseGUI.py 即可
->无控制台窗口运行：HBRDatabaseGUI.pyw
+* 运行 `HBRDatabaseGUI.py` 即可
+>无控制台窗口运行：`HBRDatabaseGUI.pyw`
 
 ### 角色
 
@@ -32,8 +35,8 @@
 ### 工具
 
 * 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟   
-1. 词条获取：计算真实随机值并获取词条保存为 Excel 文件  
->第一次运行会生成 config.ini 配置文件，修改后再使用，文件路径：./工具/GetEntriesGUILocal/config.ini   
+1. **词条获取**：计算真实随机值并获取词条保存为 Excel 文件  
+>第一次运行会生成 `config.ini` 配置文件，修改后再使用，文件路径：`./工具/GetEntriesGUILocal/config.ini`   
 * 填入洗孔的 seed 和 index：  
 	ChangeAbility_seed=  
 	ChangeAbility_index=  
@@ -42,22 +45,23 @@
 	RandomMainAbility_index=  
 * 控制获取数据数，修改 DataCount，这里默认是获取300条数据  
 	DataCount=300  
->根据 seed 获取对应 index，管理员模式运行：./工具/GetEntriesGUILocal/get_index_by_seed.exe，仅支持炽焰天穹PC端。  
->seed_tools：可以自动获取 seed 和 index，管理员模式运行：./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe，仅支持炽焰天穹PC端。  
->不要使用启动器运行炽焰天穹PC端，运行PC端安装目录下的 HeavenBurnsRed Game 目录下的 HeavenBurnsRed.exe。  
->seed 正确值范围应该小于4294967295，如果获取值错误需要重启PC端。  
+2. **seed_tools**：可以自动获取 seed 和 index，管理员模式运行：`./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe`，仅支持炽焰天穹PC端
+>还可以根据 seed 获取对应 index，管理员模式运行：`./工具/GetEntriesGUILocal/get_index_by_seed.exe`，仅支持炽焰天穹PC端   
+>不要使用启动器运行炽焰天穹PC端，运行PC端安装目录下的 HeavenBurnsRed Game 目录下的 `HeavenBurnsRed.exe`  
+>seed 正确值范围应该小于4294967295，如果获取值错误需要重启PC端  
 >不会操作的请与我联系。
-2. 风格图鉴获取：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
+3. **风格图鉴获取**：自动获取炽焰天穹国服风格的 Heaven Burns Red Style Chart 图鉴
 >第一次获取时需要登录，后续会自动登录    
 >本项目自带了 chrome 测试版浏览器，其实是我比较懒不想一直更新chromedriver（惭愧），登录之后可能会出现没有数据的情况，刷新一下网页即可  
->如果图鉴数据错误，就删除目录：./工具/chrome/chrome_user_data 再重新运行    
-3. 伤害模拟：通过添加的技能与填写的能力值来计算出最终伤害。炽焰天穹伤害计算器版本：2.0.1_0  
->第一次运行需要启动开发者模式并加载未打包的拓展程序，然后选择目录：./工具/HBR伤害模拟/2.0.1_0  
-4. hbr-tool：包含一些便利的工具（日文）  
-5. hbr-axletool：一个 HBR 的排轴工具网站  
-6. 词条计算器（在线）：在线计算词条，模拟洗词条，打装备  
-7. 资源和攻略网站：hbr.quest、o.hbr.quest、入队培训手册、gamekee、game8  
-8. 附带‘等效破坏率与OD计算表’
+>如果图鉴数据错误，就删除目录：`./工具/chrome/chrome_user_data` 再重新运行    
+4. **伤害模拟**：通过添加的技能与填写的能力值来计算出最终伤害。炽焰天穹伤害计算器版本：2.0.1_0  
+>第一次运行需要启动开发者模式并加载未打包的拓展程序，然后选择目录：`./工具/HBR伤害模拟/2.0.1_0`  
+5. **hbr-tool**：包含一些便利的工具（日文）  
+6. **hbr-axletool**：一个 HBR 的排轴工具网站  
+7. **词条计算器（在线）**：在线计算词条，模拟洗词条，打装备  
+8. **资源和攻略网站**：hbr.quest、o.hbr.quest、入队培训手册、gamekee、game8  
+9. 附带**等效破坏率与OD计算表**  
+10. **AFSGTools**：Web 版全能红烧天堂计算工具箱，支持伤害计算、白值计算、OD/破坏/打分、遭遇战出分、受击伤害等
 
 ### 音乐
 
@@ -66,11 +70,11 @@
 ### 更新
 
 * 点击更新菜单栏，更新数据和版本
->更新失败的话多更新几次。更新后如果启动失败，需要运行一下 install_module.py
+>更新失败的话多更新几次。更新后如果启动失败，需要运行一下 `install_module.py`
 
 ### 修复
 
-* 当主窗口无法成功运行时，运行 repair.pyw 修复缺失文件
+* 当主窗口无法成功运行时，运行 `repair.pyw` 修复缺失文件
 
 ### 其他
 
