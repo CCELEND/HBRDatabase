@@ -14,6 +14,8 @@
 * 运行 `HBRDatabaseGUI.py` 即可
 >无控制台窗口运行：`HBRDatabaseGUI.pyw`
 
+## 功能模块
+
 ### 角色
 
 * 点击角色菜单栏，选择队伍后弹出队伍窗口，左键点击角色，显示角色的全身画
@@ -82,16 +84,17 @@ Web 版全能红烧天堂计算工具箱，支持伤害计算、白值计算、O
 
 * 当主窗口无法成功运行时，运行 `repair.pyw` 修复缺失文件
 
-### 其他
+## 其他
 
 如有疑问请与我联系：
-- CCELEND：[不吃花椒的汪汪队(B站空间)](https://space.bilibili.com/442776860)
+- CCELEND — [不吃花椒的汪汪队(B站空间)](https://space.bilibili.com/442776860)
 - QQ：2644884626、邮箱：celend2644884626@163.com
 
 参考资料：
 - [数据库(hbr.quest)](https://hbr.quest)
 - [hbr_calc_web(GitHub)](https://github.com/RoyWu0922/hbr_calc_web)
-- [AFSGTools — Heaven Burns Red 伤害计算器](https://roywu0922.github.io/hbr_calc_web/)
+- [AFSGTools — Heaven Burns Red 伤害计算器(GitHub Pages)](https://roywu0922.github.io/hbr_calc_web/)
+- [AFSGTools — Heaven Burns Red 伤害计算器(Vercel Pages)](https://hbrtoolbox.vercel.app/)
 - [快查表](https://www.kdocs.cn/l/cvdGm5gwG4Jq?R=L1MvMTM=)
 - [日服攻略](https://game8.jp/heavenburnsred)
 - [gamekee](https://www.gamekee.com/hbr/)
