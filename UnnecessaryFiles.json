@@ -1,4 +1,4 @@
 {
-	"delete_files":["./工具/HBR伤害模拟/1.3.0_0.crx","./工具/HBR伤害模拟/1.7.0_0.zip"],
-	"delete_dirs":["./工具/HBR伤害模拟/1.3.0_0","./工具/HBR伤害模拟/1.4.0_0","./工具/HBR伤害模拟/1.4.1_0","./工具/HBR伤害模拟/1.7.0_0","./工具/HBRbrochure/chromedriver-win64","./工具/HBRbrochure/chrome_user_data"]
+	"delete_files":["./工具/HBR伤害模拟/1.3.0_0.crx","./工具/HBR伤害模拟/1.7.0_0.zip","./工具/HBR伤害模拟/2.0.1_0.zip"],
+	"delete_dirs":["./工具/HBR伤害模拟/1.3.0_0","./工具/HBR伤害模拟/1.4.0_0","./工具/HBR伤害模拟/1.4.1_0","./工具/HBR伤害模拟/1.7.0_0","./工具/HBR伤害模拟/2.0.1_0", "./工具/HBRbrochure/chromedriver-win64","./工具/HBRbrochure/chrome_user_data"]
 }
