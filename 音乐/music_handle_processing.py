@@ -48,6 +48,7 @@ album_cover_paths={
     "Summer_Pockets_Original_Sound_Track":"./音乐/下载/Summer_Pockets_Original_Sound_Track/Summer_Pockets_Original_Sound_Track.jpg",
     "Summer_Pockets_REFLECTION_BLUE_Original_SoundTrack":"./音乐/下载/Summer_Pockets_REFLECTION_BLUE_Original_SoundTrack/Summer_Pockets_REFLECTION_BLUE_Original_SoundTrack.jpg",
     "CLANNAD_Original_Sound_Track":"./音乐/下载/CLANNAD_Original_Sound_Track/CLANNAD_Original_Sound_Track.png",
+    "Rewrite_Original_Sound_Track":"./音乐/下载/Rewrite_Original_Sound_Track/Rewrite_Original_Sound_Track.jpg",
     "Inst_Test_Examples":"./音乐/下载/Inst_Test_Examples/"
 
 }
