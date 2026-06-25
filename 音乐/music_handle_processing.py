@@ -7,13 +7,14 @@ from urllib.parse import quote
 from tools import creat_directory
 from canvas_events import get_photo, create_canvas_with_image
 import music_player
+from window import win_set_top
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 server_url = "http://47.96.235.36:65431"
 
-def download_music_files_from_server(file_path_album):
+def download_music_files_from_server(file_path_album, music_win_name):
     file_path_all = "./音乐/下载/" + file_path_album
     creat_directory(file_path_all)
 
@@ -26,6 +27,7 @@ def download_music_files_from_server(file_path_album):
         err_info = response.content.decode('utf-8')
         logger.error(f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
         messagebox.showerror("错误", f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
+        win_set_top("音乐", music_win_name)
         return False
 
     # 保存文件
@@ -33,6 +35,7 @@ def download_music_files_from_server(file_path_album):
         f.write(response.content)
 
     messagebox.showinfo("信息", f"文件 '{file_path_album}' 下载成功")
+    win_set_top("音乐", music_win_name)
     return True
 
 
@@ -82,7 +85,7 @@ def safe_stop():
         # 等待 Tkinter 处理事件队列
         music_player.PlayerApp.frame.update_idletasks()
 
-def music_handle(all_albun_name, disc_name, file_name):
+def music_handle(all_albun_name, disc_name, file_name, music_win_name):
 
     # 更新窗口UI 例如专辑图片
     album_cover_path = get_album_cover_path(all_albun_name, file_name)
@@ -97,7 +100,7 @@ def music_handle(all_albun_name, disc_name, file_name):
     file_path_album = all_albun_name + "/" + disc_name + "/" + file_name
     file_path_all = "./音乐/下载/" + file_path_album
     if not os.path.exists(file_path_all):
-        if not download_music_files_from_server(file_path_album):
+        if not download_music_files_from_server(file_path_album, music_win_name):
             safe_stop()
             return
 

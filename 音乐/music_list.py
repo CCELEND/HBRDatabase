@@ -28,12 +28,13 @@ except:
 
 # 鼠标悬停选项时提示
 class ExpandableList:
-    def __init__(self, parent_frame, categories, row, column):
+    def __init__(self, parent_frame, categories, row, column, music_win_name):
         # 创建主框架
         self.frame = ttk.Frame(parent_frame, padding=(5, 5))
         self.frame.grid(row=row, column=column, padx=5, pady=5, sticky="nsew")
         self.frame.grid_rowconfigure(0, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
+        self.music_win_name = music_win_name
 
         # 配置Treeview样式
         style = ttk.Style()
@@ -203,7 +204,7 @@ class ExpandableList:
                     self.currently_selected_parent = parent_item
                     self.tree.item(parent_item, tags=('category', 'parent-selected'))  # 添加父节点选中样式
 
-                    music_handle(all_album_name, disc_name, file_name)
+                    music_handle(all_album_name, disc_name, file_name, self.music_win_name)
                 except Exception as e:
                     logger.error(f"节点解析错误：{str(e)}")
                     messagebox.showerror("错误", f"节点解析错误：{str(e)}")

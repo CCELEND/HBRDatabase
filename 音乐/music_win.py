@@ -27,7 +27,7 @@ def creat_music_win():
     music_win_frame.grid_columnconfigure(1, weight=10, minsize=500)
 
     categories = load_json("./音乐/music.json")
-    ListApp = ExpandableList(music_win_frame, categories, 0, 0)
+    ListApp = ExpandableList(music_win_frame, categories, 0, 0, music_win_name=__name__)
 
     music_player.play_info_frame = ttk.Frame(music_win_frame)
     music_player.play_info_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
