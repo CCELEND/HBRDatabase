@@ -58,7 +58,7 @@ class LineArtGUI2:
     def __init__(self, root):
         self.root = root
         self.input_path = tk.StringVar(value="未选择图片")
-        self.min_radius = tk.IntVar(value=3)
+        self.min_radius = tk.IntVar(value=2)
         self.brightness_offset = tk.IntVar(value=50)
         # 修改为 StringVar，默认显示 "无"
         self.enhance_mode = tk.StringVar(value="无")  
