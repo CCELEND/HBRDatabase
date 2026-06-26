@@ -64,18 +64,18 @@ class ToolTip:
 class LineArtGUI2:
     def __init__(self, root):
         self.root = root
-        # 变量
         self.input_path = tk.StringVar(value="未选择图片")
-        self.min_radius = tk.IntVar(value=3)          # 最小值半径
-        self.brightness_offset = tk.IntVar(value=50)  # 亮度补偿（0~100）
-        
+        self.min_radius = tk.IntVar(value=3)
+        self.brightness_offset = tk.IntVar(value=50)
+        # 修改为 StringVar，默认显示 "无"
+        self.enhance_mode = tk.StringVar(value="无")  
+
         self.create_widgets()
 
     def create_widgets(self):
-        # 选择文件
         file_frame = ttk.Frame(self.root, padding=10)
         file_frame.pack(fill=X, anchor=W)
-        
+
         ttk.Label(file_frame, text="输入图片：").pack(side=LEFT, padx=5)
 
         self.path_entry = ttk.Entry(file_frame, textvariable=self.input_path, width=40, state=READONLY)
@@ -85,28 +85,31 @@ class LineArtGUI2:
 
         ttk.Button(file_frame, text="打开文件", command=self.open_file, bootstyle=PRIMARY).pack(side=LEFT, padx=5)
 
-        # 参数面板（修改后只保留两个参数）
-        param_frame = ttk.LabelFrame(self.root, text="参数设置（最小值半径控制线条粗细，亮度补偿调节明暗）", padding=15)
+        param_frame = ttk.LabelFrame(self.root, text="参数设置（调节线条粗细、明暗及清晰度）", padding=12)
         param_frame.pack(fill=BOTH, expand=YES, padx=10, pady=5)
-        
-        # 最小值半径
-        ttk.Label(param_frame, text="最小值半径（1~10）").grid(row=0, column=0, sticky=W, padx=5, pady=8)
-        radius_cb = ttk.Combobox(param_frame, textvariable=self.min_radius, 
-                                 values=list(range(1, 11)), width=10, state=READONLY)
-        radius_cb.grid(row=0, column=1, padx=5, pady=8)
 
-        # 亮度补偿（相当于线性减淡后的亮度微调）
-        ttk.Label(param_frame, text="亮度补偿（0~100）").grid(row=0, column=2, sticky=W, padx=5, pady=8)
+        ttk.Label(param_frame, text="最小值半径（1~10）").grid(row=0, column=0, sticky=W, padx=5, pady=6)
+        radius_cb = ttk.Combobox(param_frame, textvariable=self.min_radius,
+                                 values=list(range(1, 11)), width=10, state=READONLY)
+        radius_cb.grid(row=0, column=1, padx=5, pady=6)
+
+        ttk.Label(param_frame, text="亮度补偿（0~100）").grid(row=0, column=2, sticky=W, padx=5, pady=6)
         bright_cb = ttk.Combobox(param_frame, textvariable=self.brightness_offset,
                                  values=list(range(0, 101, 5)), width=10, state=READONLY)
-        bright_cb.grid(row=0, column=3, padx=5, pady=8)
+        bright_cb.grid(row=0, column=3, padx=5, pady=6)
 
-        # 生成按钮
+        ttk.Label(param_frame, text="清晰度增强：").grid(row=1, column=0, sticky=W, padx=5, pady=6)
+        # values 为显示文本，textvariable 绑定到 StringVar
+        enhance_cb = ttk.Combobox(param_frame, textvariable=self.enhance_mode,
+                                  values=["无", "对比度拉伸", "轻度锐化", "强锐化+去噪"],
+                                  width=15, state=READONLY)
+        enhance_cb.grid(row=1, column=1, columnspan=3, sticky=W, padx=5, pady=6)
+
         btn_frame = ttk.Frame(self.root, padding=10)
         btn_frame.pack(fill=X)
-        
+
         self.gen_btn = ttk.Button(
-            btn_frame, text="生成线稿", command=self.generate_lineart, 
+            btn_frame, text="生成线稿", command=self.generate_lineart,
             bootstyle=SUCCESS, width=20
         )
         self.gen_btn.pack(side=RIGHT, padx=5)
@@ -124,43 +127,46 @@ class LineArtGUI2:
         if self.path_tooltip:
             self.path_tooltip.text = self.input_path.get()
 
-    def image_to_lineart(self, input_path, output_path, min_radius, brightness_offset, invert=False):
-        """
-        PS风格线稿提取：去色 → 反相 → 最小值滤波 → 线性减淡（相加）
-        min_radius: 最小值滤波半径（核大小 = 2*radius+1）
-        brightness_offset: 亮度补偿，范围0~100，用于调整线性减淡后的整体亮度
-        """
-        # 读取图片
+    def image_to_lineart(self, input_path, output_path, min_radius, brightness_offset,
+                         enhance_mode=0, invert=False):
         data = np.fromfile(input_path, dtype=np.uint8)
         img = cv2.imdecode(data, cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("无法解码图片")
 
-        # 1. 去色（灰度）
+        # 去色（灰度）
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        # 2. 反相
+        # 反相
         inverted = 255 - gray
-
-        # 3. 最小值滤波（腐蚀）核大小 = 2*radius+1
+        # 最小值滤波（腐蚀）核大小 = 2*radius+1
         kernel_size = 2 * min_radius + 1
         kernel = np.ones((kernel_size, kernel_size), np.uint8)
         inverted_min = cv2.erode(inverted, kernel, anchor=(-1, -1), borderType=cv2.BORDER_REPLICATE)
+        # 线性减淡（亮部相加）：结果 = 原灰度 + 反相最小值图
+        result = cv2.add(gray, inverted_min)
 
-        # 4. 线性减淡（亮部相加）：结果 = 原灰度 + 反相最小值图
-        result = cv2.add(gray, inverted_min)  # 自动截断至[0,255]
-
-        # 5. 亮度补偿（若不为0，则整体调整亮度，相当于调整曝光）
-        if brightness_offset != 50:  # 默认50为不调整，此处可做映射
-            # 将50映射为0偏移，范围0~100映射到 -50~+50
-            offset = (brightness_offset - 50) * 1.0  # 直接加减
+        offset = (brightness_offset - 50) * 1.0
+        if offset != 0:
             result = np.clip(result.astype(np.int16) + offset, 0, 255).astype(np.uint8)
 
-        # 如果需要反色
+        if enhance_mode == 1:
+            p_low, p_high = np.percentile(result, (2, 98))
+            if p_high > p_low:
+                result = np.clip((result - p_low) / (p_high - p_low) * 255, 0, 255).astype(np.uint8)
+        elif enhance_mode == 2:
+            gaussian = cv2.GaussianBlur(result, (0, 0), sigmaX=1.5)
+            result = cv2.addWeighted(result, 1.5, gaussian, -0.5, 0)
+            result = np.clip(result, 0, 255).astype(np.uint8)
+        elif enhance_mode == 3:
+            kernel_open = np.ones((2, 2), np.uint8)
+            result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel_open)
+            gaussian = cv2.GaussianBlur(result, (0, 0), sigmaX=2.0)
+            result = cv2.addWeighted(result, 2.0, gaussian, -1.0, 0)
+            result = np.clip(result, 0, 255).astype(np.uint8)
+
         if invert:
             result = 255 - result
 
-        # 保存
         cv2.imencode('.png', result)[1].tofile(output_path)
 
     def generate_lineart(self):
@@ -169,9 +175,14 @@ class LineArtGUI2:
             messagebox.showwarning("提示", "请先选择图片！")
             win_set_top('图片转线稿工具2.0', __name__)
             return
-        
+
         radius = self.min_radius.get()
         bright = self.brightness_offset.get()
+        enhance_str = self.enhance_mode.get()   # 获取字符串
+
+        # 映射为整数
+        enhance_map = {"无": 0, "对比度拉伸": 1, "轻度锐化": 2, "强锐化+去噪": 3}
+        enhance = enhance_map.get(enhance_str, 0)
 
         output_path = filedialog.asksaveasfilename(
             title="保存线稿",
@@ -184,15 +195,15 @@ class LineArtGUI2:
         try:
             self.gen_btn.config(text="生成中...", state=DISABLED)
             self.root.update()
-            
+
             self.image_to_lineart(
                 input_path=input_path,
                 output_path=output_path,
                 min_radius=radius,
                 brightness_offset=bright,
+                enhance_mode=enhance,
                 invert=False
             )
-            
             win_set_top('图片转线稿工具2.0', __name__)
         except Exception as e:
             logger.error(str(e))
