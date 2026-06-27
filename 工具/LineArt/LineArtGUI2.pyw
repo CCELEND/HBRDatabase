@@ -345,11 +345,11 @@ class LineArtGUI2:
                 invert=False
             )
 
-            preview_win = creat_Toplevel("线稿预览", width=1000, height=565, x=70, y=200)
+            preview_win = creat_Toplevel("线稿预览", width=1000, height=900, x=70, y=70)
             frame = ttk.Frame(preview_win)
             frame.pack(fill=tk.BOTH, expand=True)
 
-            viewer = ImageViewerWithScrollbar(frame, 1000, 565, self.temp_preview_path)
+            viewer = ImageViewerWithScrollbar(frame, 1000, 900, self.temp_preview_path)
 
             self.preview_window = preview_win
             self.viewer = viewer
