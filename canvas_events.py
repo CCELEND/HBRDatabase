@@ -562,6 +562,7 @@ class ImageViewerWithScrollbar:
         # 获取当前父容器的宽度（减去滚动条的宽度）
         scrollbar_width = self.v_scrollbar.winfo_width()
         new_width = self.parent_frame.winfo_width() - scrollbar_width
+        new_width = max(1, new_width)
 
         # 如果滚动条未显示，宽度不需要减去滚动条宽度
         if not self.v_scrollbar.winfo_ismapped():
@@ -569,6 +570,7 @@ class ImageViewerWithScrollbar:
 
         # 计算新的高度，保持宽高比
         new_height = int(self.original_height * (new_width / self.original_width))
+        new_height = max(1, new_height)
 
         # 调整图片大小
         resized_image = self.image.resize((new_width, new_height), Image.LANCZOS)
