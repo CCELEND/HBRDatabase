@@ -23,75 +23,64 @@ class ImageViewerWithScrollbar:
         self.parent_height = parent_height
         self.image_path = image_path
 
-        # 打开图片
         self.image = Image.open(self.image_path)
         self.original_width, self.original_height = self.image.size
 
-        # 将图片转换为 Tkinter 可用的格式
         self.tk_image = ImageTk.PhotoImage(self.image)
 
-        # 创建 Canvas
-        # self.canvas = tk.Canvas(self.parent_frame)
         self.canvas = tk.Canvas(self.parent_frame, width=self.parent_width, height=self.parent_height)
         self.canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # 在 Canvas 上显示图片
         self.image_id = self.canvas.create_image(0, 0, anchor=tk.NW, image=self.tk_image)
-
-        # 设置 Canvas 的滚动区域
         self.canvas.config(scrollregion=(0, 0, self.original_width, self.original_height))
 
-        # 创建垂直滚动条
         self.v_scrollbar = tk.Scrollbar(self.parent_frame, orient=tk.VERTICAL, command=self.canvas.yview)
         self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-
-        # 绑定 Canvas 和滚动条
         self.canvas.config(yscrollcommand=self.v_scrollbar.set)
 
-        # 保持图片引用，避免被垃圾回收
         self.canvas.image = self.tk_image
 
-        # 记录上一次的窗口大小
         self.last_width = parent_frame.winfo_width()
         self.last_height = parent_frame.winfo_height()
-
-        # 绑定窗口大小变化事件（防抖处理）
         self.resize_timeout = None
         self.parent_frame.bind("<Configure>", self.on_resize)
-
-        # 绑定鼠标滚轮事件
         self.bind_mouse_wheel_events()
 
-        # 初始化大小
         self.resize_image()
+
+    def update_image(self, new_image_path):
+        # 更新显示新图片
+        self.image_path = new_image_path
+        self.image = Image.open(self.image_path)
+        self.original_width, self.original_height = self.image.size
+        self.tk_image = ImageTk.PhotoImage(self.image)
+        self.canvas.itemconfig(self.image_id, image=self.tk_image)
+        self.canvas.image = self.tk_image
+        self.canvas.config(scrollregion=(0, 0, self.original_width, self.original_height))
+        self.resize_image()
+        self.canvas.update_idletasks()
 
     def on_resize(self, event):
         if event.widget != self.parent_frame:
             return
-        # 过滤异常值
         if event.width < 50 or event.height < 50:
             return
-
         if event.width != self.last_width or event.height != self.last_height:
             self.last_width = event.width
             self.last_height = event.height
-
             if self.resize_timeout:
                 self.parent_frame.after_cancel(self.resize_timeout)
             self.resize_timeout = self.parent_frame.after(200, self.resize_image)
 
     def resize_image(self):
-        # 获取当前父容器的宽度（减去滚动条的宽度，如果滚动条可见）
         scrollbar_width = self.v_scrollbar.winfo_width() if self.v_scrollbar.winfo_ismapped() else 0
         new_width = self.parent_frame.winfo_width() - scrollbar_width
-        new_width = max(1, new_width)  # 确保宽度至少为1
-
+        new_width = max(1, new_width)
         new_height = int(self.original_height * (new_width / self.original_width))
         new_height = max(1, new_height)
 
         resized_image = self.image.resize((new_width, new_height), Image.LANCZOS)
         self.resized_tk_image = ImageTk.PhotoImage(resized_image)
-
         self.canvas.itemconfig(self.image_id, image=self.resized_tk_image)
         self.canvas.image = self.resized_tk_image
         self.canvas.config(scrollregion=(0, 0, new_width, new_height))
@@ -101,7 +90,7 @@ class ImageViewerWithScrollbar:
             self.canvas.yview_scroll(-1 * (event.delta // 120), "units")
         elif platform.system() == "Darwin":
             self.canvas.yview_scroll(-1 * event.delta, "units")
-        else:  # Linux
+        else:
             if event.num == 4:
                 self.canvas.yview_scroll(-1, "units")
             elif event.num == 5:
@@ -179,7 +168,8 @@ class LineArtGUI2:
         self.brightness_offset = tk.IntVar(value=50)
         self.enhance_mode = tk.StringVar(value="无")
 
-        self.preview_window = None          # 保存预览窗口引用
+        self.preview_window = None          # 预览窗口引用
+        self.viewer = None                  # 图片查看器对象
         self.temp_preview_path = None       # 临时文件路径
 
         self.create_widgets()
@@ -219,14 +209,12 @@ class LineArtGUI2:
         btn_frame = ttk.Frame(self.root, padding=10)
         btn_frame.pack(fill=X)
 
-        # 预览按钮
         self.preview_btn = ttk.Button(
             btn_frame, text="预览线稿", command=self.preview_lineart,
             bootstyle=INFO, width=20
         )
         self.preview_btn.pack(side=LEFT, padx=5)
 
-        # 生成按钮
         self.gen_btn = ttk.Button(
             btn_frame, text="生成线稿", command=self.generate_lineart,
             bootstyle=SUCCESS, width=20
@@ -291,20 +279,43 @@ class LineArtGUI2:
             win_set_top('图片转线稿工具2.0', __name__)
             return
 
-        # 如果已有预览窗口，先关闭它
-        if self.preview_window is not None:
-            try:
-                if self.preview_window.winfo_exists():
-                    self.preview_window.destroy()
-            except:
-                pass
-            self.preview_window = None
+        # 如果预览窗口存在且有效，则更新图片
+        if self.preview_window is not None and self.preview_window.winfo_exists():
+            # 生成最新线稿到临时文件
+            radius = self.min_radius.get()
+            bright = self.brightness_offset.get()
+            enhance_str = self.enhance_mode.get()
+            enhance_map = {"无": 0, "对比度拉伸": 1, "轻度锐化": 2, "强锐化+去噪": 3}
+            enhance = enhance_map.get(enhance_str, 0)
 
-        # 生成临时文件
+            try:
+                self.preview_btn.config(text="预览中...", state=DISABLED)
+                self.root.update()
+
+                self.image_to_lineart(
+                    input_path=input_path,
+                    output_path=self.temp_preview_path,
+                    min_radius=radius,
+                    brightness_offset=bright,
+                    enhance_mode=enhance,
+                    invert=False
+                )
+
+                # 更新查看器中的图片
+                self.viewer.update_image(self.temp_preview_path)
+                self.preview_window.lift()  # 窗口提到最前
+            except Exception as e:
+                logger.error(str(e))
+                messagebox.showerror("错误", f"预览更新失败：{str(e)}")
+            finally:
+                self.preview_btn.config(text="预览线稿", state=NORMAL)
+            return
+
+        # 否则创建新预览窗口
+        # 生成临时文件（如果尚未创建）
         if self.temp_preview_path is None:
-            # 创建临时文件，后缀 .png，并立即关闭文件句柄
             fd, self.temp_preview_path = tempfile.mkstemp(suffix='.png', prefix='lineart_preview_')
-            os.close(fd)  # 释放文件句柄，以便后续写入
+            os.close(fd)
 
         radius = self.min_radius.get()
         bright = self.brightness_offset.get()
@@ -325,25 +336,20 @@ class LineArtGUI2:
                 invert=False
             )
 
-            # 创建预览窗口
             preview_win = creat_Toplevel("线稿预览", width=1000, height=565, x=70, y=200)
-            # 创建框架放置图片查看器
             frame = ttk.Frame(preview_win)
             frame.pack(fill=tk.BOTH, expand=True)
 
-            preview_win.update_idletasks()
-
-            # 显示图片
             viewer = ImageViewerWithScrollbar(frame, 1000, 565, self.temp_preview_path)
 
-            # 保存引用以便后续关闭
             self.preview_window = preview_win
-            # 绑定窗口关闭事件，清理引用和临时文件
+            self.viewer = viewer
+
             def on_close():
-                viewer.destroy()
+                self.viewer.destroy()
                 preview_win.destroy()
                 self.preview_window = None
-                # 不删除临时文件，可复用
+                self.viewer = None
             preview_win.protocol("WM_DELETE_WINDOW", on_close)
 
         except Exception as e:
