@@ -37,6 +37,13 @@
 ### 工具
 
 > 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟等
+#### 图片转线稿工具2.0
+>优化图像处理算法，相较于图片转线稿工具基于 Canny 边缘检测，图片转线稿工具2.0则基于最小值滤波和线性减淡
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show1.png)
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show2.png)
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show3.png)
+
+
 #### 词条获取
 计算真实随机值并获取词条保存为 Excel 文件  
 >第一次运行会生成 `config.ini` 配置文件，修改后再使用，文件路径：`./工具/GetEntriesGUILocal/config.ini`   
