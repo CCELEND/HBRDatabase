@@ -81,6 +81,7 @@ from 工具.gamekee_hbr.Load import load_gamekee_hbr
 from 工具.入队培训手册.Load import load_game_bilibili_com
 from 工具.LineArt.line_art_win import creat_line_art_win
 from 工具.LineArt.line_art_win2 import creat_line_art_win2
+from 工具.LineArt.LineArtGUI2_QT import load_LineArtGUI2_QT
 
 sys.path.append(os.path.abspath("./关于"))
 from 关于.about_win import creat_about_win
@@ -258,6 +259,7 @@ def create_menu(parent_frame: ttk.Frame, scrollbar_frame_obj: ScrollbarFrameWin)
     menu_tool_calls = [
         ("图片转线稿工具", creat_line_art_win),
         ("图片转线稿工具2.0", creat_line_art_win2),
+        ("图片转线稿工具2.0 QT", load_LineArtGUI2_QT),
         ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
         ("伤害分计算", creat_dsc_win),
