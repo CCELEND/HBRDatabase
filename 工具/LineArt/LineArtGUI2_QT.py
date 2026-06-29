@@ -384,7 +384,7 @@ def run_LineArtGUI2_QT():
     app.setFont(QFont("Microsoft YaHei", 10))
 
     from PyQt5.QtGui import QIcon
-    app.setWindowIcon(QIcon("app_icon.png"))
+    app.setWindowIcon(QIcon("./工具/LineArt/app_icon.png"))
 
     # 全局样式
     app.setStyleSheet("""
