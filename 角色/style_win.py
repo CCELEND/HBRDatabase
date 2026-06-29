@@ -6,7 +6,7 @@ from ttkbootstrap.constants import *
 from canvas_events import ArtworkDisplayerHeight
 from canvas_events import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window import set_window_expand, set_window_icon, creat_Toplevel
-from window import win_open_manage, win_close_manage, is_win_open, win_set_top
+from window import win_open_manage, win_close_manage, is_win_open, win_set_top, PreviewWindow
 from scrollbar_frame_win import ScrollbarFrameWin
 from tools import replace_file_extension
 
@@ -146,30 +146,66 @@ def show_style_animation(parent_frame, team, style):
         return
 
 # 显示风格静态图
+# 全局管理已打开的 PyQt5 窗口
+import types  # 用于安全地绑定方法
+_qt_open_windows = {}
+_qt_app = None
 def show_style_artwork(parent_frame, team, style):
-
+    global _qt_app
     artwork_path = style.path.replace("_Thumbnail", "")
 
-    if os.path.exists(artwork_path):
-        open_style_win = get_style_win_name(style) + "-artwork"
-        # 重复打开时，窗口置顶并直接返回
-        if is_win_open(open_style_win, __name__):
-            win_set_top(open_style_win, __name__)
-            return "break"
-
-        style_artwork_win_frame = creat_Toplevel(open_style_win, 1366, 769, x=300, y=120)
-        set_window_icon(style_artwork_win_frame, team.logo_path)
-        win_open_manage(style_artwork_win_frame, __name__)
-
-        displayer = ImageViewerWithScrollbar(style_artwork_win_frame, 1366, 769, artwork_path)
-
-        # 窗口关闭时清理
-        style_artwork_win_frame.protocol("WM_DELETE_WINDOW", 
-            lambda: (win_close_manage(style_artwork_win_frame, __name__, displayer)))
-
-    else:
+    if not os.path.exists(artwork_path):
         return
 
+    open_style_win = get_style_win_name(style) + "-artwork"
+
+    # 重复打开时，窗口置顶并直接返回
+    if open_style_win in _qt_open_windows:
+        win = _qt_open_windows[open_style_win]
+        win.showNormal()
+        win.raise_()
+        win.activateWindow()
+        return "break"
+    
+    from PyQt5.QtWidgets import QApplication
+    import sys
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+        _qt_app = app  # 保存到全局，防止被回收
+    else:
+        _qt_app = app
+    app.setQuitOnLastWindowClosed(False)
+
+    # 创建新的 PreviewWindow
+    preview_win = PreviewWindow(title_name=open_style_win)
+    
+    # 设置窗口图标
+    if hasattr(team, 'logo_path') and os.path.exists(team.logo_path):
+        from PyQt5.QtGui import QIcon
+        preview_win.setWindowIcon(QIcon(team.logo_path))
+
+    # 加载图片
+    preview_win.show_image(artwork_path)
+
+    # 4. 安全地重写 closeEvent 以处理清理逻辑
+    def custom_close_event(self_win, event):
+        # 执行原有的清理逻辑
+        
+        # 从管理字典中移除
+        if open_style_win in _qt_open_windows:
+            del _qt_open_windows[open_style_win]
+            
+        # 调用父类的关闭逻辑（真正关闭窗口）
+        super(PreviewWindow, self_win).closeEvent(event)
+        
+    # 使用 types.MethodType 将函数安全地绑定为实例方法
+    preview_win.closeEvent = types.MethodType(custom_close_event, preview_win)
+
+    # 显示窗口并加入管理
+    preview_win.show()
+    _qt_open_windows[open_style_win] = preview_win
+    
 
 # 显示风格3d静态图
 def show_style_artwork_3d(parent_frame, team, style):

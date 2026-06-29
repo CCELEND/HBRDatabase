@@ -354,3 +354,149 @@ def get_ico_path_by_name(name: str) -> str | None:
     return infos[name]
 
 
+
+import sys
+import os
+import numpy as np
+import cv2
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QLabel, QMessageBox,
+    QGraphicsView, QGraphicsScene, QGraphicsPixmapItem,
+    QSizePolicy, QStatusBar
+)
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtGui import QImage, QPixmap, QPainter, QWheelEvent
+
+
+# 图片查看器
+class ImageViewer(QGraphicsView):
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.scene = QGraphicsScene(self)
+        self.setScene(self.scene)
+        self.pixmap_item = QGraphicsPixmapItem()
+        self.scene.addItem(self.pixmap_item)
+
+        self.pixmap_item.setTransformationMode(Qt.SmoothTransformation)
+        self.setRenderHint(QPainter.Antialiasing)
+        self.setRenderHint(QPainter.SmoothPixmapTransform)
+        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+        self.setDragMode(QGraphicsView.ScrollHandDrag)
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
+        self.setBackgroundBrush(Qt.white)
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.setMinimumSize(400, 300)
+
+        self._zoom_factor = 1.0
+        self._min_zoom = 0.05
+        self._max_zoom = 20.0
+        self._image_loaded = False
+        self._user_zoomed = False
+
+    def _safe_fit_in_view(self):
+        if not self._image_loaded:
+            return
+        rect = self.scene.sceneRect()
+        if rect.width() < 1 or rect.height() < 1:
+            return
+        view_size = self.viewport().size()
+        if view_size.width() < 10 or view_size.height() < 10:
+            QTimer.singleShot(50, self._safe_fit_in_view)
+            return
+        self.fitInView(rect, Qt.KeepAspectRatio)
+        self._zoom_factor = self.transform().m11()
+
+    # 从文件路径加载图片（支持中文路径）
+    def set_image_from_path(self, file_path: str):
+        if not os.path.exists(file_path):
+            print(f"[-] 文件不存在: {file_path}")
+            return False
+        
+        # 使用 imdecode 解决 OpenCV 不支持中文路径的问题
+        np_arr = np.fromfile(file_path, dtype=np.uint8)
+        np_array = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+        
+        if np_array is None:
+            print(f"[-] 无法解码图片: {file_path}")
+            return False
+            
+        self.set_image_from_array(np_array)
+        return True
+
+    def set_image_from_array(self, np_array: np.ndarray):
+        if np_array.ndim == 2:
+            h, w = np_array.shape
+            qimg = QImage(np_array.data, w, h, w, QImage.Format_Grayscale8)
+        else:
+            h, w, ch = np_array.shape
+            rgb = cv2.cvtColor(np_array, cv2.COLOR_BGR2RGB)
+            qimg = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
+
+        pixmap = QPixmap.fromImage(qimg.copy())
+        self.pixmap_item.setPixmap(pixmap)
+        self.scene.setSceneRect(0, 0, w, h)
+        self._image_loaded = True
+        self._user_zoomed = False
+
+        QTimer.singleShot(0, self._safe_fit_in_view)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if not self._image_loaded:
+            return
+
+        if not self._user_zoomed:
+            self._safe_fit_in_view()
+        else:
+            scene_rect = self.mapFromScene(self.scene.sceneRect()).boundingRect()
+            viewport_rect = self.viewport().rect()
+            if (scene_rect.width() > viewport_rect.width() * 1.5 and
+                    scene_rect.height() > viewport_rect.height() * 1.5):
+                pass
+
+    def wheelEvent(self, event: QWheelEvent):
+        delta = event.angleDelta().y()
+        factor = 1.15 if delta > 0 else 1 / 1.15
+        new_zoom = self._zoom_factor * factor
+        if self._min_zoom <= new_zoom <= self._max_zoom:
+            self.scale(factor, factor)
+            self._zoom_factor = new_zoom
+            self._user_zoomed = True
+
+    def mouseDoubleClickEvent(self, event):
+        self._user_zoomed = False
+        self._safe_fit_in_view()
+        super().mouseDoubleClickEvent(event)
+
+
+# 预览窗口
+class PreviewWindow(QMainWindow):
+    def __init__(self, parent=None, title_name=None):
+        super().__init__(parent)
+        self.setWindowTitle(title_name)
+        self.resize(1366, 799)
+        self.setMinimumSize(800, 600)
+        self.move(300, 120) 
+
+        self.viewer = ImageViewer(self)
+        self.setCentralWidget(self.viewer)
+
+        status = QLabel("滚轮缩放 | 拖拽平移 | 双击还原")
+        status.setStyleSheet("background: #ecf0f1; padding: 4px 8px; color: #555; font-size: 12px;")
+        sb = QStatusBar()
+        sb.addPermanentWidget(status)
+        self.setStatusBar(sb)
+
+    # 传入图片路径
+    def show_image(self, image_path: str):
+        success = self.viewer.set_image_from_path(image_path)
+        if not success:
+            QMessageBox.warning(self, "加载失败", f"无法加载图片:\n{image_path}")
+
+    def closeEvent(self, event):
+        # event.ignore()
+        # self.hide()
+        event.accept()  # 接受关闭事件，窗口将被销毁
