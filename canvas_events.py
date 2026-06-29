@@ -926,30 +926,29 @@ class ToolTip:
         self.hidetip()
 
     def schedule(self):
-        """延迟 300 毫秒后显示提示框，避免鼠标快速划过时频繁闪烁"""
+        # 延迟 300 毫秒后显示提示框，避免鼠标快速划过时频繁闪烁
         self.unschedule()
         self.id = self.widget.after(300, self.showtip)
 
     def unschedule(self):
-        """取消延迟任务"""
+        # 取消延迟任务
         id = self.id
         self.id = None
         if id:
             self.widget.after_cancel(id)
 
     def showtip(self):
-        """显示提示框"""
+        # 显示提示框
         if self.tipwindow:
             return
         
-        # 【核心修改】使用 winfo_rootx/y 获取控件绝对坐标，
-        # 替代原来对 Canvas 不兼容的 bbox("insert")
+        # 使用 winfo_rootx/y 获取控件绝对坐标，
         x = self.widget.winfo_rootx() + 25
         y = self.widget.winfo_rooty() + 25
         
         # 边界检测：防止提示框超出屏幕右侧边缘
         screen_width = self.widget.winfo_screenwidth()
-        # 估算提示框宽度（根据文本长度和字体大小粗略计算）
+        # 估算提示框宽度
         estimated_width = len(self.text) * 8 + 20  
         if x + estimated_width > screen_width:
             x = screen_width - estimated_width - 10
@@ -966,7 +965,7 @@ class ToolTip:
         label.pack(ipadx=4, ipady=2)
 
     def hidetip(self):
-        """隐藏并销毁提示框"""
+        # 隐藏并销毁提示框
         tw = self.tipwindow
         self.tipwindow = None
         if tw:
