@@ -48,8 +48,8 @@ def mouse_on_leave2(event: tk.Event):
 
 # 绑定鼠标进入和离开事件到Canvas
 def mouse_bind_canvas_events2(canvas: tk.Canvas):
-    canvas.bind("<Enter>", mouse_on_enter2)
-    canvas.bind("<Leave>", mouse_on_leave2)
+    canvas.bind("<Enter>", mouse_on_enter2, add="+")
+    canvas.bind("<Leave>", mouse_on_leave2, add="+")
 
 
 # 右键绑定 动态调整被绑定函数参数并传入
@@ -903,3 +903,71 @@ class ImageViewerWithScrollbarOpacity:
         self.canvas.image = None  # 释放图片引用
         self.canvas.destroy()  # 销毁 Canvas
         self.v_scrollbar.destroy()  # 销毁滚动条
+
+
+class ToolTip:
+    def __init__(self, widget, text=''):
+        self.widget = widget
+        self.text = text
+        self.tipwindow = None
+        self.id = None
+        self.x = self.y = 0
+        
+        # 绑定鼠标进入、离开和点击事件
+        widget.bind("<Enter>", self.enter)
+        widget.bind("<Leave>", self.leave)
+        widget.bind("<ButtonPress>", self.leave)
+
+    def enter(self, event=None):
+        self.schedule()
+
+    def leave(self, event=None):
+        self.unschedule()
+        self.hidetip()
+
+    def schedule(self):
+        """延迟 300 毫秒后显示提示框，避免鼠标快速划过时频繁闪烁"""
+        self.unschedule()
+        self.id = self.widget.after(300, self.showtip)
+
+    def unschedule(self):
+        """取消延迟任务"""
+        id = self.id
+        self.id = None
+        if id:
+            self.widget.after_cancel(id)
+
+    def showtip(self):
+        """显示提示框"""
+        if self.tipwindow:
+            return
+        
+        # 【核心修改】使用 winfo_rootx/y 获取控件绝对坐标，
+        # 替代原来对 Canvas 不兼容的 bbox("insert")
+        x = self.widget.winfo_rootx() + 25
+        y = self.widget.winfo_rooty() + 25
+        
+        # 边界检测：防止提示框超出屏幕右侧边缘
+        screen_width = self.widget.winfo_screenwidth()
+        # 估算提示框宽度（根据文本长度和字体大小粗略计算）
+        estimated_width = len(self.text) * 8 + 20  
+        if x + estimated_width > screen_width:
+            x = screen_width - estimated_width - 10
+
+        # 创建无边框的顶层窗口
+        self.tipwindow = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry("+%d+%d" % (x, y))
+        
+        # 创建标签并设置样式
+        label = tk.Label(tw, text=self.text, justify=tk.LEFT,
+                         background="#ffffff", relief=tk.SOLID, borderwidth=1,
+                         font=("Microsoft YaHei", 9))
+        label.pack(ipadx=4, ipady=2)
+
+    def hidetip(self):
+        """隐藏并销毁提示框"""
+        tw = self.tipwindow
+        self.tipwindow = None
+        if tw:
+            tw.destroy()

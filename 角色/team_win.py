@@ -3,7 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import bind_canvas_events, get_photo, create_canvas_with_image, ArtworkDisplayerHeight
-from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2
+from canvas_events import mouse_bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2, ToolTip
 from window import set_window_expand, set_window_icon, creat_Toplevel
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
@@ -78,6 +78,8 @@ def bind_style_canvas(parent_frame, team, style, x, y):
     photo = get_photo(style.path, (90, 90))
     canvas = create_canvas_with_image(outer_frame, 
         photo, 130, 130, 20, 20, 0, 0)
+    
+    ToolTip(canvas, text=style.name)
     
     mouse_bind_canvas_events2(canvas)
 
