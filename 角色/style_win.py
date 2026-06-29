@@ -151,12 +151,10 @@ import types  # 用于安全地绑定方法
 _qt_open_windows = {}
 _qt_app = None
 def show_style_artwork(parent_frame, team, style):
-    global _qt_app
+    
     artwork_path = style.path.replace("_Thumbnail", "")
-
     if not os.path.exists(artwork_path):
         return
-
     open_style_win = get_style_win_name(style) + "-artwork"
 
     # 重复打开时，窗口置顶并直接返回
@@ -167,6 +165,7 @@ def show_style_artwork(parent_frame, team, style):
         win.activateWindow()
         return "break"
     
+    global _qt_app
     from PyQt5.QtWidgets import QApplication
     import sys
     app = QApplication.instance()
@@ -188,15 +187,15 @@ def show_style_artwork(parent_frame, team, style):
     # 加载图片
     preview_win.show_image(artwork_path)
 
-    # 4. 安全地重写 closeEvent 以处理清理逻辑
+    # 重写 closeEvent 以处理清理逻辑
     def custom_close_event(self_win, event):
         # 执行原有的清理逻辑
-        
+
         # 从管理字典中移除
         if open_style_win in _qt_open_windows:
             del _qt_open_windows[open_style_win]
             
-        # 调用父类的关闭逻辑（真正关闭窗口）
+        # 调用父类的关闭逻辑
         super(PreviewWindow, self_win).closeEvent(event)
         
     # 使用 types.MethodType 将函数安全地绑定为实例方法

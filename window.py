@@ -353,9 +353,6 @@ def get_ico_path_by_name(name: str) -> str | None:
     if name not in infos: return None
     return infos[name]
 
-
-
-import sys
 import os
 import numpy as np
 import cv2
@@ -474,17 +471,17 @@ class ImageViewer(QGraphicsView):
 
 # 预览窗口
 class PreviewWindow(QMainWindow):
-    def __init__(self, parent=None, title_name=None):
+    def __init__(self, parent=None, title_name=None, width=1366, height=796):
         super().__init__(parent)
         self.setWindowTitle(title_name)
-        self.resize(1366, 799)
+        self.resize(width, height)
         self.setMinimumSize(800, 600)
         self.move(300, 120) 
 
         self.viewer = ImageViewer(self)
         self.setCentralWidget(self.viewer)
 
-        status = QLabel("滚轮缩放 | 拖拽平移 | 双击还原")
+        status = QLabel("滚轮缩放 | 拖拽平移 | 双击适配窗口")
         status.setStyleSheet("background: #ecf0f1; padding: 4px 8px; color: #555; font-size: 12px;")
         sb = QStatusBar()
         sb.addPermanentWidget(status)
