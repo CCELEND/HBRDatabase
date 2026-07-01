@@ -292,7 +292,8 @@ class LineArtGUI(QMainWindow):
         if self.preview_window is None or not self.preview_window.isVisible():
             self.preview_window = PreviewWindow(None)
         self.preview_window.show_image(np_array)
-        self.preview_window.show()
+        # self.preview_window.show()
+        self.preview_window.showNormal()
 
         # 强制置顶
         # self.preview_window.raise_()
@@ -369,11 +370,10 @@ class PreviewWindow(QMainWindow):
         self.hide()
 
 
-
 def load_LineArtGUI2_QT():
-    import threading
-    browser_thread = threading.Thread(target=run_LineArtGUI2_QT, daemon=False)
-    browser_thread.start()
+    import multiprocessing
+    p = multiprocessing.Process(target=run_LineArtGUI2_QT)
+    p.start()
 
 def run_LineArtGUI2_QT():
     # 高DPI支持
