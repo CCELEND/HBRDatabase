@@ -8,7 +8,7 @@ from window import set_window_expand, set_window_icon, creat_Toplevel
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
-from 角色.team_info import get_team_obj, get_all_team_obj
+from 角色.team_info import get_team_obj, get_all_team_obj, Team, Role
 from 角色.role_info import get_role_master_img
 from 角色.style_win import creat_style_skill_win, creat_style_right_menu
 from 角色.master_skill_win import creat_master_skill_win
@@ -19,7 +19,7 @@ def load_resources():
     战斗系统.武器.weapons_info.get_all_weapon_obj()
 
 # 创建右键菜单
-def creat_role_right_menu(event, parent_frame, role, team):
+def creat_role_right_menu(event, parent_frame, role: Role, team: Team):
     
     right_click_menu = ttk.Menu(parent_frame, tearoff=0)
     right_click_menu.add_command(label="全身画", 
@@ -28,7 +28,7 @@ def creat_role_right_menu(event, parent_frame, role, team):
     right_click_menu.post(event.x_root, event.y_root)
 
 # 显示全身画
-def show_role_full_img(event, parent_frame, role, team):
+def show_role_full_img(event, parent_frame, role: Role, team: Team):
 
     open_role_win = role.name+"-full"
     # 重复打开时，窗口置顶并直接返回
@@ -51,7 +51,7 @@ def show_role_full_img(event, parent_frame, role, team):
     return "break"  # 阻止事件冒泡
 
 # 显示缩略图
-def show_role_img(event, parent_frame, role, team):
+def show_role_img(event, parent_frame, role: Role, team: Team):
 
     open_role_win = role.name
     # 重复打开时，窗口置顶并直接返回
@@ -68,7 +68,7 @@ def show_role_img(event, parent_frame, role, team):
     return "break"  # 阻止事件冒泡
 
 # 绑定风格 canvas 的事件
-def bind_style_canvas(parent_frame, team, style, x, y):
+def bind_style_canvas(parent_frame, team: Team, style, x, y):
 
     # 创建一个 Frame 并禁用自动调整大小
     outer_frame = ttk.Frame(parent_frame, width=140, height=134)  # 预留边框空间
@@ -91,7 +91,7 @@ def bind_style_canvas(parent_frame, team, style, x, y):
 
 
 # 绑定大师技能 canvas 的事件
-def bind_master_skill_canvas(parent_frame, role, x, y):
+def bind_master_skill_canvas(parent_frame, role: Role, x, y):
 
     photo_path = get_role_master_img(role)
 
@@ -111,7 +111,7 @@ def bind_master_skill_canvas(parent_frame, role, x, y):
 
 
 
-def show_rarity(frame, role, team, row=2):
+def show_rarity(frame, role: Role, team: Team, row=2):
 
     if role.master_skill:
         # 创建 MasterSkillframe 并设置 row
@@ -179,7 +179,7 @@ def show_rarity(frame, role, team, row=2):
             bind_style_canvas(RaritySSRframe, team, SSRstyle, 0, ssr+1)
 
 # 队伍描述
-def creat_team_desc_frame(parent_frame, team):
+def creat_team_desc_frame(parent_frame, team: Team):
     team_desc_frame = ttk.Labelframe(parent_frame, text=team.name)
     team_desc_frame.grid(row=0, column=0, columnspan=4, padx=10, pady=(0,10), sticky="nsew")
     team_desc_frame.grid_rowconfigure(0, weight=1)
@@ -195,7 +195,7 @@ def creat_team_desc_frame(parent_frame, team):
 
 
 # 武器和大师技能 frame
-def creat_weapon_frame(parent_frame, role):
+def creat_weapon_frame(parent_frame, role: Role):
 
     weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
     weapon_frame = ttk.Frame(parent_frame)
@@ -206,7 +206,7 @@ def creat_weapon_frame(parent_frame, role):
     weapon_canvas = create_canvas_with_image(weapon_frame, 
         weapon_photo, 100, 200, 20, 90, 0, 2)
 
-def show_team(scrollbar_frame_obj, team):
+def show_team(scrollbar_frame_obj, team: Team):
 
     # 清除之前的组件
     scrollbar_frame_obj.destroy_components()
