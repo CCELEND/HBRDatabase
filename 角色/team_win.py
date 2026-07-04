@@ -104,6 +104,8 @@ def bind_master_skill_canvas(parent_frame, role: Role, x, y):
     canvas = create_canvas_with_image(outer_frame, 
         photo, 130, 130, 20, 20, 0, 0)
     
+    ToolTip(canvas, text=role.name)
+    
     mouse_bind_canvas_events2(canvas)
 
     bind_canvas_events(canvas, 
