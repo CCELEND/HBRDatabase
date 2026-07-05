@@ -471,7 +471,7 @@ class ImageViewer(QGraphicsView):
 
 # 预览窗口
 class PreviewWindow(QMainWindow):
-    def __init__(self, parent=None, title_name=None, width=1366, height=796):
+    def __init__(self, parent=None, title_name=None, width=1362, height=795):
         super().__init__(parent)
         self.setWindowTitle(title_name)
         self.resize(width, height)
