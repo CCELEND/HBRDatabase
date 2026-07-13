@@ -790,6 +790,14 @@
         "type":"减益",
         "series":"状态值下降" 
     },
+    "攻击状态值下降":{
+        "name":"攻击状态值下降",
+        "path":"./战斗系统/状态/AttackDown.webp",
+        "effect":"攻击状态值下降50","description":"攻击状态值下降50",
+        "stack":"-",
+        "type":"减益",
+        "series":"状态值下降" 
+    },
     "回复效果下降":{
         "name":"回复效果下降",
         "path":"./战斗系统/状态/HealDown.webp",
