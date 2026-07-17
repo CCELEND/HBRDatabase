@@ -27,23 +27,46 @@ static void input_str(string* data) {
 }
 
 // 查找进程ID
+// static DWORD find_process_id(const WCHAR* process_name) {
+//     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+//     if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
+
+//     PROCESSENTRY32W pe = { sizeof(PROCESSENTRY32W) };
+//     DWORD pid = 0;
+
+//     for (BOOL success = Process32FirstW(hSnapshot, &pe);
+//         success && pid == 0;
+//         success = Process32NextW(hSnapshot, &pe)) {
+//         if (_wcsicmp(pe.szExeFile, process_name) == 0) {
+//             pid = pe.th32ProcessID;
+//         }
+//     }
+
+//     CloseHandle(hSnapshot);
+//     return pid;
+// }
+
 static DWORD find_process_id(const WCHAR* process_name) {
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
     if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
 
     PROCESSENTRY32W pe = { sizeof(PROCESSENTRY32W) };
-    DWORD pid = 0;
+    DWORD max_pid = 0;   // 初始为 0
 
+    // 遍历所有进程，不再提前终止
     for (BOOL success = Process32FirstW(hSnapshot, &pe);
-        success && pid == 0;
-        success = Process32NextW(hSnapshot, &pe)) {
+         success;
+         success = Process32NextW(hSnapshot, &pe)) {
         if (_wcsicmp(pe.szExeFile, process_name) == 0) {
-            pid = pe.th32ProcessID;
+            // 更新为更大的 PID
+            if (pe.th32ProcessID > max_pid) {
+                max_pid = pe.th32ProcessID;
+            }
         }
     }
 
     CloseHandle(hSnapshot);
-    return pid;
+    return max_pid;
 }
 
 
