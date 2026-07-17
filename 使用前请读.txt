@@ -52,7 +52,6 @@
 #### seed_tools
 自动获取 seed 和 index，管理员模式运行：`./工具/GetEntriesGUILocal/seed_tools/seed_tools.exe`，仅支持炽焰天穹PC端
 * 根据 seed 获取对应 index，管理员模式运行：`./工具/GetEntriesGUILocal/get_index_by_seed.exe`，仅支持炽焰天穹PC端   
-* 不要使用启动器运行炽焰天穹PC端，运行PC端安装目录下的 `HeavenBurnsRed Game` 目录下的 `HeavenBurnsRed.exe`  
 * seed 正确值范围应该小于**4294967295**，如果获取值错误需要重启PC端  
 >不会操作的请与我联系
 #### 风格图鉴获取
