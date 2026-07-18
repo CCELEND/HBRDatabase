@@ -3,7 +3,7 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 from canvas_events import get_photo, create_canvas_with_image
-from window import set_window_expand, creat_Toplevel, set_window_icon
+from window import set_window_expand, creat_Toplevel, set_window_icon_webp
 from window import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_win import ScrollbarFrameWin
 
@@ -98,7 +98,7 @@ def creat_orb_skill_win(event, parent_frame, orb):
 
     orb_win_frame = creat_Toplevel(open_orb_win, 812, 300, 350, 280)
     set_window_expand(orb_win_frame, rowspan=1, columnspan=2)
-    set_window_icon(orb_win_frame, orb.path)
+    set_window_icon_webp(orb_win_frame, orb.path)
     scrollbar_frame_obj = ScrollbarFrameWin(orb_win_frame, columnspan=2)
 
     win_open_manage(orb_win_frame, __name__)
