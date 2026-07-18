@@ -69,6 +69,12 @@
         "name":"细剑","en":"Rapier",
         "path":"./战斗系统/武器/Rapier.webp",
         "description":"细剑（斩武器属性）","hit":"3"
+    },
+
+    "槊":{
+        "name":"槊","en":"Lance",
+        "path":"./战斗系统/武器/Lance.webp",
+        "description":"槊（突武器属性）","hit":"3"
     }
 
 

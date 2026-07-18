@@ -396,11 +396,18 @@
     
     "roles":
     {
+        "手塚咲":{
+            "id":"10101",
+            "en":"STezuka",
+            "path":"./角色/司令部/STezuka"
+        },
         "七濑七海":{
             "id":"10102",
             "en":"NNanase",
             "path":"./角色/司令部/NNanase"
         }
+
+
         
     }
 },
