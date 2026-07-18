@@ -1325,6 +1325,14 @@
         "stack":"-",
         "type":"其他",
         "series":"无酒精鸡尾酒"        
+    },
+    "DP增加":{
+        "name":"DP增加",
+        "path":"./战斗系统/状态/IconAccessoriesPlusParameterDP.png",
+        "effect":"DP增加","description":"DP上限增加",
+        "stack":"-",
+        "type":"其他",
+        "series":"属性上升"        
     }
 
 }

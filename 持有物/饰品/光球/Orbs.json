@@ -189,6 +189,58 @@
 			[["对暗弱点HP百分比攻击", "10%，\n（最高造成500,000伤害）", null, null, null, null, "单体"],
 				["暗防御下降", "30 ~ 45%", {"智慧": "2", "运气": "1"}, "200", "1", "敌方回合", "单体"]]
 		]
+	},
+
+	"遗能光球":{
+		"path":"./持有物/饰品/光球/Orb_Character.webp",
+		"name":"遗能光球",
+		"en":"Orb_Character",
+		"type":"光球",
+		"description":"角色的DP +1000",
+		"rarity":"5","location":"赛季奖章兑换所",
+		"skill": [
+			"DP增加", "增加专属角色DP", "0", "0", 
+			[["DP增加", "1000", null, null, null, null, "自身"]]
+		]
+	},
+
+	"硬身光球":{
+		"path":"./持有物/饰品/光球/Orb4_normal1.webp",
+		"name":"硬身光球",
+		"en":"Orb4_normal1",
+		"type":"光球",
+		"description":"蕴含被动技能之力的神奇宝玉\n可习得「防御提升」",
+		"rarity":"5","location":"光球BOSSⅣ\n阿蒙之门W",
+		"skill": [
+			"防御提升", "自身防御力持续+10%", "0", "0", 
+			[["防御上升", "10%", null, null, null, null, "自身"]]
+		]
+	},
+
+	"奋勇光球":{
+		"path":"./持有物/饰品/光球/Orb4_normal2.webp",
+		"name":"奋勇光球",
+		"en":"Orb4_normal2",
+		"type":"光球",
+		"description":"蕴含技能之力的神奇宝玉\n可习得「充能注入」",
+		"rarity":"5","location":"光球BOSSⅣ\n阿蒙之门W",
+		"skill": [
+			"充能注入", "为自身充能（强化技能）", "5", "1", 
+			[["充能", null, null, null, null, null, "自身"]]
+		]
+	},
+
+	"高昂光球":{
+		"path":"./持有物/饰品/光球/Orb4_normal3.webp",
+		"name":"高昂光球",
+		"en":"Orb4_normal3",
+		"type":"光球",
+		"description":"蕴含技能之力的神奇宝玉\n可习得「加油助威」",
+		"rarity":"5","location":"光球BOSSⅣ\n阿蒙之门W",
+		"skill": [
+			"加油助威", "提升自身士气等级2级（最大10级）", "6", "2", 
+			[["士气等级上升", "2（最大等级：10），每级士气+5全属性值并提供5%技能攻击上升", null, null, null, null, "自身"]]
+		]
 	}
 
 }
