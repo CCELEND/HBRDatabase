@@ -63,6 +63,22 @@
 		"description":"光属性技能的技能次数 +1\nDP +300、防御力 +10%、初始SP +3",
 		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
 	},
+	"常暗远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High4_dark.webp",
+		"name":"常暗远古项链",
+		"en":"Necklace_High4_dark",
+		"type":"项链",
+		"description":"暗属性技能的技能次数 +1\n技能升攻 +10%、破坏率提升量 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
+	"暗套远古项链":{
+		"path":"./持有物/饰品/项链/Necklace_High3_dark.webp",
+		"name":"暗套远古项链",
+		"en":"Necklace_High3_dark",
+		"type":"项链",
+		"description":"暗属性技能的技能次数 +1\nDP +300、防御力 +10%、初始SP +3",
+		"rarity":"6","location":"讨伐证兑换所\n20 讨伐证"
+	},
 
 	"火之加护项链":{
 		"path":"./持有物/饰品/项链/Necklace_High2_fire_w5.png",
