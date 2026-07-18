@@ -264,7 +264,7 @@
 
     "灵魂共振核心":{
         "path":"./持有物/强化素材/ThumbnailSSRCore.webp",
-        "description":"让特定SS风格的稀有度变更为SS<灵魂共振>的珍贵道具",
+        "description":"让特定SS风格的稀有度\n变更为SS<灵魂共振>的珍贵道具",
         "price":"", 
         "location":"异时层EX"
     }
