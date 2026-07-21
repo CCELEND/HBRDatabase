@@ -69,6 +69,54 @@ static DWORD find_process_id(const WCHAR* process_name) {
     return max_pid;
 }
 
+DWORD Get64BitProcessIdByName(const std::wstring& processName) {
+    DWORD pid = 0;
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE) {
+        std::cerr << "无法创建进程快照，错误代码: " << GetLastError() << std::endl;
+        return 0;
+    }
+
+    PROCESSENTRY32W pe32;
+    pe32.dwSize = sizeof(PROCESSENTRY32W);
+
+    if (Process32FirstW(hSnapshot, &pe32)) {
+        do {
+            // 忽略大小写比较进程名
+            std::wstring currentProc = pe32.szExeFile;
+            std::wstring targetProc = processName;
+            std::transform(currentProc.begin(), currentProc.end(), currentProc.begin(), ::towlower);
+            std::transform(targetProc.begin(), targetProc.end(), targetProc.begin(), ::towlower);
+
+            if (currentProc == targetProc) {
+                // 进程名匹配，尝试打开进程句柄
+                HANDLE hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe32.th32ProcessID);
+                if (hProcess != NULL) {
+                    BOOL bIsWow64 = FALSE;
+                    // 3. 检查是否为 WoW64 进程
+                    if (IsWow64Process(hProcess, &bIsWow64)) {
+                        // 如果 bIsWow64 == FALSE，说明它是真正的 64位进程
+                        if (!bIsWow64) {
+                            pid = pe32.th32ProcessID;
+                            CloseHandle(hProcess);
+                            break; // 找到第一个 64位匹配进程即返回
+                        }
+                    }
+                    CloseHandle(hProcess);
+                } else {
+                    // 如果打开进程失败，通常是权限不足
+                    std::wcerr << L"警告: 无法打开进程 [" << pe32.szExeFile 
+                               << L"] (PID: " << pe32.th32ProcessID 
+                               << L")，可能需要管理员权限。" << std::endl;
+                }
+            }
+        } while (Process32NextW(hSnapshot, &pe32));
+    }
+
+    CloseHandle(hSnapshot);
+    return pid;
+}
+
 
 // 搜索进程内存-快速定位私有提交内存区域
 static void search_process_memory_fast(DWORD pid, 
@@ -240,7 +288,9 @@ int main() {
 
     const WCHAR* process_name = L"HeavenBurnsRed.exe";
     printf("\n[*] Looking for process: %ls\n", process_name);
-    DWORD pid = find_process_id(process_name);
+    // DWORD pid = find_process_id(process_name);
+    std::wstring targetName = L"HeavenBurnsRed.exe";
+    DWORD pid = Get64BitProcessIdByName(targetName);
     if (!pid) {
         fprintf(stderr, "    [-] Process %ls not found!\n", process_name);
         system("pause");
