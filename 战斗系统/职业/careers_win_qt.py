@@ -55,8 +55,11 @@ def creat_career_win(event, parent_frame, career):
         layout.setSpacing(0)
     layout.addWidget(career_frame, 0, 0)
 
-    career_win_frame.mousePressEvent = lambda ev: win_set_top(career_win_frame, __name__)
-    career_win_frame.closeEvent = lambda ev: (win_close_manage(career_win_frame, __name__), ev.accept())
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(career_win_frame, __name__)
+        ev.accept()
+    career_win_frame.closeEvent = on_close
 
     return "break"
 

@@ -284,9 +284,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     tool_menu = add_top_menu_button(menu_bar, "🛠️工具", "🛠️工具",
                                     "./工具/w1.ico")[0]
     menu_tool_calls = [
-        ("图片转线稿工具", creat_line_art_win),
-        ("图片转线稿工具2.0", creat_line_art_win2),
-        ("图片转线稿工具2.0 QT", load_LineArtGUI2_QT),
+        ("图片转线稿工具2.0", load_LineArtGUI2_QT),
         ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
         ("伤害分计算", creat_dsc_win),

@@ -60,8 +60,11 @@ def creat_weapon_win(event, parent_frame, weapon):
         layout.setSpacing(0)
     layout.addWidget(weapon_frame, 0, 0)
 
-    weapon_win_frame.mousePressEvent = lambda ev: win_set_top(weapon_win_frame, __name__)
-    weapon_win_frame.closeEvent = lambda ev: (win_close_manage(weapon_win_frame, __name__), ev.accept())
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(weapon_frame, __name__)
+        ev.accept()
+    weapon_frame.closeEvent = on_close
 
     return "break"
 

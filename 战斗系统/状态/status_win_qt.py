@@ -59,9 +59,6 @@ def creat_statu_win(event, parent_frame, statu):
     layout.setSpacing(5)
     layout.addWidget(statu_frame, 0, 0)
 
-    # statu_win_frame.mousePressEvent = lambda ev: win_set_top(statu_win_frame, __name__)
-    # statu_win_frame.closeEvent = lambda ev: (win_close_manage(statu_win_frame, __name__), ev.accept())
-
     def on_close(self, event):
         win_close_manage(statu_win_frame, __name__)
         event.accept()

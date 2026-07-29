@@ -225,6 +225,13 @@ def creat_dsc_win_v2():
     layout.addWidget(clear_button, 2, 0, 1, 2)
 
     win_open_manage(dsc_win_frame, __name__)
-    dsc_win_frame.closeEvent = lambda ev: win_close_manage(dsc_win_frame, __name__)
+
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(dsc_win_frame, __name__)
+        ev.accept()
+    dsc_win_frame.closeEvent = on_close
+
+    return "break"
 
     return "break"

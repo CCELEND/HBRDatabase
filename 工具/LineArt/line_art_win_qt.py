@@ -177,5 +177,12 @@ def creat_line_art_win():
     gui = LineArtGUI(line_art_win_frame)
 
     win_open_manage(line_art_win_frame, __name__)
-    line_art_win_frame.closeEvent = lambda ev: (win_close_manage(line_art_win_frame, __name__), ev.accept())
+
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(line_art_win_frame, __name__)
+        ev.accept()
+    line_art_win_frame.closeEvent = on_close
+
+    return "break"
 

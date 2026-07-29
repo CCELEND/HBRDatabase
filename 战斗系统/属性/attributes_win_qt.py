@@ -55,10 +55,14 @@ def creat_attribute_win(event, parent_frame, attribute):
         layout.setSpacing(0)
     layout.addWidget(attribute_frame, 0, 0)
 
-    attribute_win_frame.mousePressEvent = lambda ev: win_set_top(attribute_win_frame, __name__)
-    attribute_win_frame.closeEvent = lambda ev: (win_close_manage(attribute_win_frame, __name__), ev.accept())
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(attribute_win_frame, __name__)
+        ev.accept()
+    attribute_win_frame.closeEvent = on_close
 
     return "break"
+
 
 
 def show_attribute(scrollbar_frame_obj):
