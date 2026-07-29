@@ -136,8 +136,8 @@ class UpdateProgressDialog(QDialog):
         self.progress_bar.setValue(100)
         self.percent_label.setText("100%")
         # 询问重启
+        confirm_restart_qt("更新完成")
         self.close()
-        confirm_restart_qt("更新完成")   # 该函数应改为 PyQt5 版本（稍后说明）
 
     def on_error(self, error_msg):
         self.status_label.setText("下载出错")
