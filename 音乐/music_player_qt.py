@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QMessageBox, QFileDialog, QStyle, QStyleOptionSlider
 )
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPixmap
 
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame

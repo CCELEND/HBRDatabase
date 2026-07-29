@@ -16,17 +16,15 @@ sys.path.append(os.path.abspath("./日志"))
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout,
     QMenu, QToolButton, QAction, QToolBar,
-    QShortcut, QMessageBox
+    QShortcut
 )
-from PyQt5.QtCore import Qt, QTimer, QSize
+from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QKeySequence, QIcon
 
-from canvas_events_qt import (
-    ArtworkDisplayerHeight, ResizableArtworkDisplayerHeight
-)
+from canvas_events_qt import ResizableArtworkDisplayerHeight
 from window_qt import (
-    set_global_bg, creat_window, set_window_icon, set_window_top,
-    load_menu_icon, get_ico_path_by_name, win_close_all
+    set_global_bg, creat_window, set_window_icon,
+    load_menu_icon, get_ico_path_by_name
 )
 from scrollbar_frame_qt import ScrollbarFrameWin
 from tools import delete_old_file_and_subdirs, is_admin
@@ -364,7 +362,7 @@ if __name__ == "__main__":
         # app.exec_() 返回后，Qt 事件循环已结束
         # 所有 Qt 对象已析构、aboutToQuit 信号已触发、文件句柄已关闭
         
-        # 检查是否需要重启（标志由 confirm_restart_qt 设置）
+        # 检查是否需要重启
         if app.property("_restart_requested"):
             logger.info("检测到重启标志，正在启动新进程...")
             # start_new_session=True 确保新进程完全脱离当前进程
