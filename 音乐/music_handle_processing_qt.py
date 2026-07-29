@@ -136,7 +136,7 @@ def music_handle(all_albun_name, disc_name, file_name, music_win_name):
             return
         try:
             music_player_qt.PlayerApp.load_file(file_path_all)
-            music_player_qt.PlayerApp.play()
+            # music_player_qt.PlayerApp.play()
         except Exception as e:
             logger.error(f"加载或播放失败：{e}")
             raise

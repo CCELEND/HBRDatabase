@@ -38,7 +38,9 @@ music_dir = {
 
 class ClickableSlider(QSlider):
     """支持点击轨道直接跳转到点击位置的滑块，同时保留拖动功能"""
+
     def _handle_rect(self):
+        """获取滑块手柄的矩形区域"""
         option = QStyleOptionSlider()
         self.initStyleOption(option)
         return self.style().subControlRect(
@@ -47,11 +49,13 @@ class ClickableSlider(QSlider):
 
     def mousePressEvent(self, event):
         handle_rect = self._handle_rect()
+        
+        # 如果点击的是手柄本身，走默认拖动逻辑
         if handle_rect.contains(event.pos()):
             super().mousePressEvent(event)
             return
 
-        # 点击轨道时直接跳转到鼠标位置
+        # 点击轨道时，阻止 valueChanged 触发 on_progress_value_changed 中的 seeking=True
         if self.orientation() == Qt.Horizontal:
             slider_min = handle_rect.width() // 2
             slider_max = self.width() - handle_rect.width() // 2
@@ -63,9 +67,15 @@ class ClickableSlider(QSlider):
             pos = max(slider_min, min(event.pos().y(), slider_max))
             ratio = 1 - (pos - slider_min) / max(1, slider_max - slider_min)
 
-        value = self.minimum() + ratio * (self.maximum() - self.minimum())
-        self.setValue(int(value))
-        self.sliderPressed.emit()
+        value = int(self.minimum() + ratio * (self.maximum() - self.minimum()))
+
+        # 先 blockSignals 防止触发 on_progress_value_changed 中的 seeking=True
+        self.blockSignals(True)
+        self.setValue(value)
+        self.blockSignals(False)
+
+        # 手动触发一次 sliderReleased，让 _seek_from_slider 统一处理跳转
+        self.sliderReleased.emit()
 
 
 class FLACPlayerApp:
@@ -197,8 +207,7 @@ class FLACPlayerApp:
 
     def play(self):
         if self.current_file:
-            self.start_progress_volume("up")
-            time.sleep(0.5)
+            self._start_volume_fade("up")
 
             if self.loop_enabled and self.current_position >= self.duration:
                 self.current_position = 0
@@ -246,8 +255,7 @@ class FLACPlayerApp:
 
     def pause(self):
         if self.playing and not self.paused:
-            self.start_progress_volume("down")
-            time.sleep(0.5)
+            self._start_volume_fade("down")
             pygame.mixer.music.pause()
             self.paused = True
             self.current_position = self.get_current_pos()
@@ -259,8 +267,7 @@ class FLACPlayerApp:
     def stop(self):
         self.running = False
         self.progress_timer.stop()
-        self.start_progress_volume("down")
-        time.sleep(0.5)
+        self._start_volume_fade("down")
         pygame.mixer.music.stop()
         self.playing = False
         self.paused = False
@@ -326,25 +333,33 @@ class FLACPlayerApp:
             return
 
         value = self.progress_slider.value()
-        seek_percent = value / 1000.0 * 100
-        seek_percent = max(0, min(100, seek_percent))
+        seek_percent = max(0, min(100, value / 1000.0 * 100))
         self.seek_position = (seek_percent / 100) * self.duration
         self.position_selected = True
 
         if self.playing or self.paused:
             try:
+                # 先记录目标位置和时间戳，再操作 pygame
+                self.current_position = self.seek_position
+                self.seek_time = time.time()
+                
+                # stop + play + set_pos 的顺序优化
                 pygame.mixer.music.stop()
                 pygame.mixer.music.play()
-                pygame.mixer.music.set_pos(self.seek_position)
+                # 给 mixer 一个微小的缓冲时间再 set_pos
+                # 注意：这里不能用 time.sleep，改用 QTimer.singleShot
+                from PyQt5.QtCore import QTimer
+                QTimer.singleShot(50, lambda: self._apply_seek_position())
+                
             except Exception as e:
                 logger.error(f"跳转失败: {e}")
                 QMessageBox.critical(self.frame, "错误", f"无法跳转到指定位置: {e}")
                 return
-            self.current_position = self.seek_position
-            self.seek_time = time.time()
+
             self.playing = True
             self.paused = False
             self.running = True
+            self.seeking = False  # 立即重置 seeking
             self.progress_timer.start(100)
             self.play_btn.setEnabled(False)
             self.pause_btn.setEnabled(True)
@@ -352,6 +367,13 @@ class FLACPlayerApp:
 
         self.update_progress_display(seek_percent)
         self.update_time_display(self.seek_position, self.duration)
+
+    def _apply_seek_position(self):
+        """延迟应用 seek 位置，避免 pygame 时序问题"""
+        try:
+            pygame.mixer.music.set_pos(self.seek_position)
+        except Exception as e:
+            logger.warning(f"延迟 set_pos 失败: {e}")
 
     def on_progress_click(self, event):
         if self.duration > 0 and self.current_file:
@@ -392,25 +414,30 @@ class FLACPlayerApp:
         pygame.mixer.music.stop()
         pygame.mixer.quit()
 
-    def gradient_volume_up(self):
-        val = 0
-        step = 10
-        for i in range(5):
-            val += step
-            pygame.mixer.music.set_volume(val / 100)
-            time.sleep(0.1)
 
-    def gradient_volume_down(self):
-        val = 50
-        step = 10
-        for i in range(5):
-            val -= step
-            pygame.mixer.music.set_volume(val / 100)
-            time.sleep(0.1)
-
-    def start_progress_volume(self, operate):
-        if operate == "up":
-            self.volume_thread = Thread(target=self.gradient_volume_up, daemon=True)
-        else:
-            self.volume_thread = Thread(target=self.gradient_volume_down, daemon=True)
-        self.volume_thread.start()
+    def _start_volume_fade(self, direction: str):
+        """direction: 'up' or 'down'"""
+        target = self.volume if direction == "up" else 0.0
+        current = 0.0 if direction == "up" else self.volume
+        step = 0.02  # 每步增量
+        interval = 50  # ms
+        
+        fade_timer = QTimer(self.frame)
+        fade_timer.setInterval(interval)
+        
+        def _fade_step():
+            nonlocal current
+            if direction == "up":
+                current = min(current + step, target)
+            else:
+                current = max(current - step, target)
+            
+            pygame.mixer.music.set_volume(current)
+            
+            if abs(current - target) < step:
+                pygame.mixer.music.set_volume(target)
+                fade_timer.stop()
+                fade_timer.deleteLater()
+        
+        fade_timer.timeout.connect(_fade_step)
+        fade_timer.start()
