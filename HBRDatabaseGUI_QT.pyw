@@ -1,5 +1,6 @@
 import sys
 import os
+import subprocess
 
 sys.path.append(os.path.abspath("./持有物"))
 sys.path.append(os.path.abspath("./战斗系统"))
@@ -325,36 +326,51 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
 
 
 if __name__ == "__main__":
+    restart_args = [sys.executable] + sys.argv
+    
+    while True:
+        app = QApplication(sys.argv)
 
-    app = QApplication(sys.argv)
+        if is_admin():
+            root_win_name = "HBRDatabase - 以管理员身份运行"
+        else:
+            root_win_name = "HBRDatabase"
 
-    if is_admin():
-        root_win_name = "HBRDatabase - 以管理员身份运行"
-    else:
-        root_win_name = "HBRDatabase"
+        delete_old_file_and_subdirs()
+        set_global_bg(app)
 
-    delete_old_file_and_subdirs()
+        root = creat_window(root_win_name, 1160, 700, 440, 50)
+        set_window_icon(root, "./favicon.ico")
 
-    set_global_bg(app)
+        central_widget = QWidget()
+        root.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
 
-    root = creat_window(root_win_name, 1160, 700, 440, 50)
-    set_window_icon(root, "./favicon.ico")
+        scrollbar_frame_obj = ScrollbarFrameWin(central_widget, columnspan=6)
+        create_menu(root, scrollbar_frame_obj)
 
-    central_widget = QWidget()
-    root.setCentralWidget(central_widget)
-    main_layout = QVBoxLayout(central_widget)
-    main_layout.setContentsMargins(0, 0, 0, 0)
+        ResizableArtworkDisplayerHeight(
+            scrollbar_frame_obj.scrollable_frame, "vbg_hbr.png", "70%"
+        )
 
-    scrollbar_frame_obj = ScrollbarFrameWin(central_widget, columnspan=6)
+        check_error_queue_qt(root)
+        check_for_updates()
 
-    create_menu(root, scrollbar_frame_obj)
+        root.show()
+        
+        exit_code = app.exec_()
+        
+        # app.exec_() 返回后，Qt 事件循环已结束
+        # 所有 Qt 对象已析构、aboutToQuit 信号已触发、文件句柄已关闭
+        
+        # 检查是否需要重启（标志由 confirm_restart_qt 设置）
+        if app.property("_restart_requested"):
+            logger.info("检测到重启标志，正在启动新进程...")
+            # start_new_session=True 确保新进程完全脱离当前进程
+            subprocess.Popen(restart_args, start_new_session=True)
+            break  # 退出 while 循环，当前进程正常结束
+        else:
+            # 正常退出
+            sys.exit(exit_code)
 
-    ResizableArtworkDisplayerHeight(scrollbar_frame_obj.scrollable_frame,
-                                    "vbg_hbr.png", "70%")
-
-    check_error_queue_qt(root)
-
-    check_for_updates()
-
-    root.show()
-    sys.exit(app.exec_())

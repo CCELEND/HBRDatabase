@@ -28,13 +28,20 @@ def confirm_restart(info: str):
     if response:  # 如果选择是
         restart_program()
 
-from PyQt5.QtWidgets import QMessageBox
-def confirm_restart_qt(message):
-    reply = QMessageBox.question(None, "提示", f"是否确认重启程序？",
-                                 QMessageBox.Yes | QMessageBox.No)
+from PyQt5.QtWidgets import QMessageBox, QApplication
+def confirm_restart_qt(msg: str):
+    reply = QMessageBox.question(
+        None, "提示",
+        f"{msg}\n是否确认重启程序？",
+        QMessageBox.Yes | QMessageBox.No
+    )
     if reply == QMessageBox.Yes:
-        # 重启逻辑（例如调用自身）
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        app = QApplication.instance()
+        if app:
+            # 设置动态属性作为重启信号
+            app.setProperty("_restart_requested", True)
+            # 正常退出事件循环
+            app.quit()
 
 # 重启 Python 程序
 def restart_program():
