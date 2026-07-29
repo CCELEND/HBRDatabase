@@ -28,6 +28,14 @@ def confirm_restart(info: str):
     if response:  # 如果选择是
         restart_program()
 
+from PyQt5.QtWidgets import QMessageBox
+def confirm_restart_qt(message):
+    reply = QMessageBox.question(None, "提示", f"是否确认重启程序？",
+                                 QMessageBox.Yes | QMessageBox.No)
+    if reply == QMessageBox.Yes:
+        # 重启逻辑（例如调用自身）
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
 # 重启 Python 程序
 def restart_program():
     python = sys.executable  # 获取当前 Python 解释器的路径

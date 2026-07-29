@@ -70,7 +70,7 @@ from 敌人.遭遇战.zyz_win_qt import show_zyz_enemys
 
 from 搜索.search_win_qt import creat_search_win
 from 角色.team_win_qt import creat_team_win
-from 更新.http_update_processing import http_update_data
+from 更新.http_update_processing_qt import http_update_data
 from 音乐.music_win_qt import creat_music_win
 
 from 工具.GetEntriesGUILocal.seed_tools.Load_qt import load_seed_tools
@@ -90,8 +90,6 @@ from 工具.hbr_quest.Load import load_hbr_quest
 from 工具.game8_hbr.Load import load_game8_hbr
 from 工具.gamekee_hbr.Load import load_gamekee_hbr
 from 工具.入队培训手册.Load import load_game_bilibili_com
-from 工具.LineArt.line_art_win_qt import creat_line_art_win
-from 工具.LineArt.line_art_win2_qt import creat_line_art_win2
 from 工具.LineArt.LineArtGUI2_QT import load_LineArtGUI2_QT
 
 from 关于.about_win_qt import creat_about_win
