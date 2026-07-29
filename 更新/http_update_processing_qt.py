@@ -7,7 +7,7 @@ from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 def http_update_data(parent_widget):
-    if http_client.is_updating():
+    if http_client_qt.is_updating():
         return
 
     current_file_hashes = calculate_file_hashes("./")
@@ -21,7 +21,7 @@ def http_update_data(parent_widget):
         return
 
     if 'files_to_download' in response:
-        download_files_from_server(parent_widget, server_url,
+        http_client_qt.download_files_from_server(parent_widget, server_url,
                                    response['files_to_download'],
                                    response.get('server_file_hashes', None))
     else:

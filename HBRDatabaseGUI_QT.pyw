@@ -310,7 +310,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
                                       "./更新/net.ico")[0]
     update_action2 = QAction(update_icon, "更新", root)
     update_action2.setShortcut("Ctrl+U")
-    update_action2.triggered.connect(lambda: http_update_data())
+    update_action2.triggered.connect(lambda: http_update_data(root))
     update_menu.addAction(update_action2)
 
     about_icon = load_menu_icon("./关于/KamiSama.ico", "关于")
