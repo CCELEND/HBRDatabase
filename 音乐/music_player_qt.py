@@ -95,7 +95,7 @@ class FLACPlayerApp:
         self.current_file = None
         self.paused = False
         self.playing = False
-        self.volume = 0.5
+        self.volume = 0.3
         self.duration = 0
         self.seeking = False
         self.current_position = 0
@@ -110,6 +110,10 @@ class FLACPlayerApp:
         self.progress_timer.timeout.connect(self._update_progress)
         self.running = True
         self.volume_thread = None
+
+        self.fade_timer = None   # 新增
+
+        self.seek_time = time.time()
 
     def create_widgets(self):
         file_frame = QFrame(self.frame)
@@ -163,12 +167,14 @@ class FLACPlayerApp:
         volume_frame.layout().addWidget(volume_label)
         self.volume_slider = QSlider(Qt.Horizontal)
         self.volume_slider.setRange(0, 100)
-        self.volume_slider.setValue(50)
+        self.volume_slider.setValue(30)
         self.volume_slider.valueChanged.connect(self.set_volume)
         volume_frame.layout().addWidget(self.volume_slider)
         self.frame.layout().addWidget(volume_frame)
 
         self.frame.layout().addStretch()
+
+        self.apply_stylesheet()
 
     def select_file(self):
         file_path, _ = QFileDialog.getOpenFileName(
@@ -205,9 +211,15 @@ class FLACPlayerApp:
         self.loop_enabled = not self.loop_enabled
         self.loop_btn.setText("循环🔁" if self.loop_enabled else "循环◻")
 
+
     def play(self):
         if self.current_file:
-            self._start_volume_fade("up")
+            # 只有从停止状态或全新播放时才淡入
+            if not self.paused and not self.playing:
+                self._start_volume_fade("up")
+            else:
+                # 暂停恢复时直接设为设定音量，避免淡入
+                pygame.mixer.music.set_volume(self.volume)
 
             if self.loop_enabled and self.current_position >= self.duration:
                 self.current_position = 0
@@ -267,7 +279,14 @@ class FLACPlayerApp:
     def stop(self):
         self.running = False
         self.progress_timer.stop()
-        self._start_volume_fade("down")
+        
+        # 停止并清理淡出定时器（如果有）
+        if self.fade_timer is not None:
+            self.fade_timer.stop()
+            self.fade_timer.deleteLater()
+            self.fade_timer = None
+
+        pygame.mixer.music.set_volume(0)
         pygame.mixer.music.stop()
         self.playing = False
         self.paused = False
@@ -404,40 +423,165 @@ class FLACPlayerApp:
 
     def on_close(self):
         self.running = False
-        self.progress_timer.stop()
+        self.progress_timer.stop()   # progress_timer 始终存在，无需判断
+
+        # 安全停止淡出定时器
+        if self.fade_timer is not None:
+            self.fade_timer.stop()
+            self.fade_timer.deleteLater()
+            self.fade_timer = None
+
         pygame.mixer.music.stop()
         pygame.mixer.quit()
         self.frame.deleteLater()
 
     def on_clean(self):
         self.running = False
+
+        if self.fade_timer is not None:
+            self.fade_timer.stop()
+            self.fade_timer.deleteLater()
+            self.fade_timer = None
+
         pygame.mixer.music.stop()
         pygame.mixer.quit()
 
 
+
     def _start_volume_fade(self, direction: str):
-        """direction: 'up' or 'down'"""
-        target = self.volume if direction == "up" else 0.0
-        current = 0.0 if direction == "up" else self.volume
-        step = 0.02  # 每步增量
+        # 停止之前的淡出定时器
+        if self.fade_timer is not None:
+            self.fade_timer.stop()
+            self.fade_timer.deleteLater()
+            self.fade_timer = None
+
+        if direction == "up":
+            target = self.volume
+            current = 0.0
+            pygame.mixer.music.set_volume(current)   # 立即静音
+        else:  # down
+            target = 0.0
+            current = self.volume
+            pygame.mixer.music.set_volume(current)   # 保持当前音量
+
+        step = 0.02
         interval = 50  # ms
-        
-        fade_timer = QTimer(self.frame)
-        fade_timer.setInterval(interval)
-        
+
+        self.fade_timer = QTimer(self.frame)   # 关键：赋值给实例变量
+        self.fade_timer.setInterval(interval)
+
         def _fade_step():
             nonlocal current
+            if pygame.mixer.get_init() is None:
+                self.fade_timer.stop()
+                self.fade_timer.deleteLater()
+                self.fade_timer = None
+                return
+
             if direction == "up":
                 current = min(current + step, target)
             else:
                 current = max(current - step, target)
-            
+
             pygame.mixer.music.set_volume(current)
-            
+
             if abs(current - target) < step:
                 pygame.mixer.music.set_volume(target)
-                fade_timer.stop()
-                fade_timer.deleteLater()
-        
-        fade_timer.timeout.connect(_fade_step)
-        fade_timer.start()
+                self.fade_timer.stop()
+                self.fade_timer.deleteLater()
+                self.fade_timer = None
+
+        # 正确的位置：连接信号并启动定时器（不在任何条件块内）
+        self.fade_timer.timeout.connect(_fade_step)
+        self.fade_timer.start()
+
+    def apply_stylesheet(self):
+        self.frame.setStyleSheet("""
+            /* ----- 整体容器 ----- */
+            QFrame {
+                background: transparent;
+            }
+
+            /* ----- 通用按钮 ----- */
+            QPushButton {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #f6f7fa, stop:1 #e6e8ed);
+                border: 1px solid #c8cbd0;
+                border-radius: 5px;
+                padding: 6px 12px;
+                font-size: 12px;
+                font-weight: bold;
+                color: #2c3e50;
+                min-width: 60px;
+            }
+            QPushButton:hover {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #eef0f5, stop:1 #d6d9e0);
+                border-color: #a0a5ad;
+            }
+            QPushButton:pressed {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #d6d9e0, stop:1 #c2c6ce);
+                border-color: #8a9098;
+            }
+            QPushButton:disabled {
+                background: #eaeef2;
+                color: #a0a8b0;
+                border-color: #d0d4d9;
+            }
+
+            /* ----- 进度条（QSlider）----- */
+            QSlider::groove:horizontal {
+                height: 6px;
+                background: #dde1e6;
+                border-radius: 3px;
+                margin: 0px;
+            }
+            QSlider::handle:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                            stop:0 #5b9bd5, stop:1 #2a7fc4);
+                width: 16px;
+                height: 16px;
+                margin: -5px 0;
+                border-radius: 8px;
+                border: 1px solid #1f6a9e;
+            }
+            QSlider::handle:horizontal:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                            stop:0 #6ba8e0, stop:1 #3a8ed0);
+                border-color: #1a5a8a;
+                width: 18px;
+                height: 18px;
+                margin: -6px 0;
+            }
+            QSlider::sub-page:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                            stop:0 #4a90d9, stop:1 #7bb3e6);
+                border-radius: 3px;
+            }
+
+            /* ----- 音量滑块（与进度条分开，仅调整手柄颜色）----- */
+            QSlider#volumeSlider::handle:horizontal {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                            stop:0 #a8b8c8, stop:1 #7a8a9a);
+                border-color: #5a6a7a;
+            }
+            QSlider#volumeSlider::handle:horizontal:hover {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                            stop:0 #b8c8d8, stop:1 #8a9aaa);
+            }
+            QSlider#volumeSlider::sub-page:horizontal {
+                background: #b0c4d8;
+            }
+
+            /* ----- 时间标签 ----- */
+            QLabel {
+                color: #2c3e50;
+                font-size: 16px;
+                font-weight: bold;
+                background: transparent;
+            }
+        """)
+
+        # 为音量滑块单独设置 objectName，以便应用不同颜色
+        self.volume_slider.setObjectName("volumeSlider")
