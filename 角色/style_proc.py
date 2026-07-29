@@ -185,6 +185,22 @@ def get_hit_damage_expand_str(hit_damage) -> str:
     hit_damage_expand_str = "，".join(map(str, hit_damage))
     return hit_damage_expand_str
 
+# 兼容 tkinter/ttkbootstrap 的 Label 与 PyQt5 的 QLabel
+def set_label_text(label, text):
+    if hasattr(label, "setText"):
+        label.setText(text)
+        if hasattr(label, "updateGeometry"):
+            label.updateGeometry()
+            parent = label.parentWidget() if hasattr(label, "parentWidget") else None
+            while parent is not None:
+                if hasattr(parent, "updateGeometry"):
+                    parent.updateGeometry()
+                if hasattr(parent, "layout") and parent.layout() is not None:
+                    parent.layout().activate()
+                parent = parent.parentWidget() if hasattr(parent, "parentWidget") else None
+    else:
+        label["text"] = text
+
 # 暗忍用
 def on_buff_attack_combo_select(event, desc_labs, lv1_skill_strengths):
     on_attack_combo_select(event, desc_labs[0], lv1_skill_strengths[0])
@@ -205,7 +221,7 @@ def on_attack_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_strength_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "攻击")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -227,7 +243,7 @@ def on_heal_combo_select(event, desc_lab, lv1_skill_strength):
         new_original_numbers1 = get_lv_heal_min_max(original_numbers[2:], lv)
         new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "治疗")
 
-    desc_lab["text"] = new_text
+    set_label_text(desc_lab, new_text)
     # except:
     #     return
 
@@ -247,7 +263,7 @@ def on_defense_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_defense_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "防御上升")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -268,7 +284,7 @@ def on_hit_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_hit_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "连击数上升")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -289,7 +305,7 @@ def on_buff_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_buff_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "上升")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -310,7 +326,7 @@ def on_mindeye_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_buff_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "心眼")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -331,7 +347,7 @@ def on_debuff_combo_select(event, desc_lab, lv1_skill_strength):
             new_original_numbers1 = get_lv_debuff_min_max(original_numbers[2:], lv)
             new_text = write_numbers_back(lv1_skill_strength, new_original_numbers0+new_original_numbers1, "下降")
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     except Exception as e:
         logger.error(str(e))
         return
@@ -374,7 +390,7 @@ def on_percentage_combo_select(event, desc_lab, lv1_skill_strength):
         lv_percentage = get_lv_percentage(original_numbers, lv)
         new_text = write_percentage_numbers_back(lv1_skill_strength, lv_percentage)
 
-        desc_lab["text"] = new_text
+        set_label_text(desc_lab, new_text)
     # except:
     except Exception as e:
         logger.error(str(e))
