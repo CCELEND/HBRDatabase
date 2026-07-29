@@ -31,7 +31,7 @@ from scrollbar_frame_qt import ScrollbarFrameWin
 from tools import delete_old_file_and_subdirs, is_admin
 
 from 日志.error_queue_proc_qt import check_error_queue_qt
-from 更新.check_proc import check_for_updates
+from 更新.check_proc_qt import check_for_updates
 
 from 持有物.饰品.jewelrys_win_qt import show_jewelrys_type
 from 持有物.奖杯勋章.trophy_medals_win_qt import show_trophy_medals
