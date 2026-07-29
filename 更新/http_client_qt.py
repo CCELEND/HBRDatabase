@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QDialog, QProgressBar, QLabel, QVBoxLayout,
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QIcon
 
-from tools import creat_directory, confirm_restart, sort_dict_by_key
+from tools import creat_directory, confirm_restart_qt, sort_dict_by_key
 from 更新.hash import save_hashes_to_json
 from 日志.advanced_logger import AdvancedLogger
 
@@ -137,7 +137,7 @@ class UpdateProgressDialog(QDialog):
         self.percent_label.setText("100%")
         # 询问重启
         self.close()
-        confirm_restart("更新完成")   # 该函数应改为 PyQt5 版本（稍后说明）
+        confirm_restart_qt("更新完成")   # 该函数应改为 PyQt5 版本（稍后说明）
 
     def on_error(self, error_msg):
         self.status_label.setText("下载出错")
