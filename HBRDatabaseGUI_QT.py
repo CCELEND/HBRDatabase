@@ -341,6 +341,9 @@ if __name__ == "__main__":
     while True:
         app = QApplication(sys.argv)
 
+        with open('./QSS/QMessageBox_qss/style.qss', 'r', encoding='utf-8') as f:
+            app.setStyleSheet(f.read())
+
         if is_admin():
             root_win_name = "HBRDatabase - 以管理员身份运行"
         else:

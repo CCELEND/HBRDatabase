@@ -1,0 +1,84 @@
+/* ===== 全局基础样式 ===== */
+QMessageBox {
+    background-color: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 12px;
+    padding: 16px 20px;
+    min-width: 320px;
+}
+
+/* ===== 消息文本 ===== */
+QMessageBox QLabel {
+    color: #1f2328;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 4px 0;
+}
+
+/* ===== 信息图标（调整大小和颜色） ===== */
+QMessageBox QLabel[text=""] {
+    /* 图标占位标签通常无文本，通过属性选择器微调 */
+    qproperty-pixmap: /* 保留系统图标，但可调整大小 */;
+}
+
+/* ===== 所有按钮基础样式 ===== */
+QMessageBox QPushButton {
+    background-color: #f6f8fa;
+    color: #1f2328;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    padding: 6px 16px;
+    min-width: 72px;
+    min-height: 28px;
+    font-size: 13px;
+    font-weight: 500;
+    margin: 4px 2px;
+}
+
+/* ===== 按钮悬停 ===== */
+QMessageBox QPushButton:hover {
+    background-color: #eaeef2;
+    border-color: #b0b8c0;
+}
+
+/* ===== 按钮按下 ===== */
+QMessageBox QPushButton:pressed {
+    background-color: #d0d7de;
+}
+
+/* ===== 默认按钮（通常为 "OK"/"Yes" 等） ===== */
+QMessageBox QPushButton[default="1"] {
+    background-color: #2d7aff;
+    color: #ffffff;
+    border-color: #2d7aff;
+}
+
+QMessageBox QPushButton[default="1"]:hover {
+    background-color: #1c6ae8;
+    border-color: #1c6ae8;
+}
+
+QMessageBox QPushButton[default="1"]:pressed {
+    background-color: #1558c4;
+    border-color: #1558c4;
+}
+
+/* ===== “取消”或“No”按钮（次要操作） ===== */
+/* 这里可以通过 text 属性选择器区分，但更推荐使用角色 */
+QMessageBox QPushButton[text="Cancel"],
+QMessageBox QPushButton[text="No"] {
+    background-color: #ffffff;
+    border-color: #d0d7de;
+}
+
+QMessageBox QPushButton[text="Cancel"]:hover,
+QMessageBox QPushButton[text="No"]:hover {
+    background-color: #f6f8fa;
+}
+
+/* ===== 设置按钮间距 ===== */
+QMessageBox QDialogButtonBox {
+    spacing: 8px;
+    margin-top: 12px;
+}
