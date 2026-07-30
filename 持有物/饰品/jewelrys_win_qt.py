@@ -1,5 +1,6 @@
 
 import os
+import types
 
 from PyQt5.QtWidgets import QLabel, QWidget, QGroupBox, QGridLayout, QVBoxLayout
 from PyQt5.QtCore import Qt
@@ -42,10 +43,29 @@ def _create_jewelry_image_widget(parent, jewelry):
         if not jewelry_pixmap.isNull():
             jewelry_label.setPixmap(jewelry_pixmap)
         jewelry_label.setAlignment(Qt.AlignCenter)
+        
+        # 重写 mousePressEvent 以阻止事件冒泡到父窗口
+        original_mouse_press = jewelry_label.mousePressEvent
+        def safe_mouse_press(ev):
+            # 先执行原有的点击逻辑（打开技能窗口）
+            if original_mouse_press:
+                original_mouse_press(ev)
+            # 接受事件，阻止其继续向父级 QGroupBox/QWidget 传播
+            ev.accept() 
+        
+        jewelry_label.mousePressEvent = safe_mouse_press
+        
+        # 注意：如果 bind_canvas_events 内部已经处理了点击，
+        # 确保它不会再次触发父级的 mousePressEvent
         mouse_bind_canvas_events2(jewelry_label)
         bind_canvas_events(jewelry_label, creat_orb_skill_win, parent_frame=parent, orb=jewelry)
+    else:
+        jewelry_label = QLabel(widget)
+        jewelry_label.setPixmap(jewelry_pixmap)
+        jewelry_label.setGeometry(10, 10, 80, 80)
 
     return widget
+
 
 
 def show_jewelrys(scrollbar_frame_obj, jewelrys):
@@ -130,13 +150,20 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
     scrollbar_frame_obj = ScrollbarFrameWin(jewelry_win_frame, columnspan=2)
     show_jewelrys(scrollbar_frame_obj, jewelrys)
 
-    jewelry_win_frame.mousePressEvent = lambda ev: win_set_top(jewelry_win_frame, __name__)
+
+    def safe_mouse_press(ev):
+        # 只有当点击的是窗口背景本身时才置顶
+        # 如果点击的是子控件，Qt 通常会将 event 发送给子控件，这里作为兜底
+        if ev.isAccepted():
+            return 
+        win_set_top(jewelry_win_frame, __name__)
+        ev.accept()
 
     # 正确关闭事件
-    def on_close(ev):
+    def on_close(self, ev):
         win_close_manage(jewelry_win_frame, __name__)
         ev.accept()
-    jewelry_win_frame.closeEvent = on_close
+    jewelry_win_frame.closeEvent = types.MethodType(on_close, jewelry_win_frame)
 
     return "break"
 
