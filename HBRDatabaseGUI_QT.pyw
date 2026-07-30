@@ -131,7 +131,8 @@ def add_top_menu_button(menu_bar: QToolBar, text: str, menu_title: str,
     menu = QMenu(menu_title, menu_bar)
     btn = QToolButton(menu_bar)
     btn.setText(text)
-    # btn.setIcon(load_menu_icon(icon_path, text))
+    if icon_path:
+        btn.setIcon(load_menu_icon(icon_path, text))
     btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
     btn.setPopupMode(QToolButton.InstantPopup)
     btn.setMenu(menu)
@@ -174,8 +175,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     """)
     root.addToolBar(menu_bar)
 
-    team_menu = add_top_menu_button(menu_bar, "👤角色", "👤角色",
-                                    "./角色/31A/DioramaStamp31a.ico")[0]
+    team_menu = add_top_menu_button(menu_bar, "👤角色", "👤角色", None)[0]
     team_names = [
         "31A", "31B", "31C", "30G", "31D", "31E", "31F", "31X",
         "Angel Beats!", "司令部", "persona5r"
@@ -186,8 +186,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         add_menu_action(team_menu, team_name, icon,
                         creat_team_win, None, root, team_name)
 
-    item_menu = add_top_menu_button(menu_bar, "📜持有物", "📜持有物",
-                                    "./持有物/强化素材/EternalDaphne.png")[0]
+    item_menu = add_top_menu_button(menu_bar, "📜持有物", "📜持有物", None)[0]
     item_names = ["活动道具"]
     for item_name in item_names:
         add_menu_action(item_menu, item_name, QIcon(), update_output, None, item_name)
@@ -214,8 +213,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         add_menu_action(item_menu, item_call_name, icon,
                         callback, None, scrollbar_frame_obj)
 
-    enemy_menu = add_top_menu_button(menu_bar, "👾敌人", "👾敌人",
-                                     "./敌人/恒星战/DimensionBattleCentralTop_001.png")[0]
+    enemy_menu = add_top_menu_button(menu_bar, "👾敌人", "👾敌人", None)[0]
     enemy_names = ["活动棱镜战", "废域"]
     for enemy_name in enemy_names:
         add_menu_action(enemy_menu, enemy_name, QIcon(), update_output, None, enemy_name)
@@ -238,8 +236,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         add_menu_action(enemy_menu, enemy_call_name, icon,
                         callback, None, scrollbar_frame_obj)
 
-    battle_menu = add_top_menu_button(menu_bar, "⚔战斗系统", "⚔战斗系统",
-                                      "./战斗系统/武器/Scythe.png")[0]
+    battle_menu = add_top_menu_button(menu_bar, "⚔战斗系统", "⚔战斗系统", None)[0]
     menu_battle_calls = [
         ("共鸣天赋", creat_gmtf_win),
         ("基础", creat_jc_win),
@@ -294,8 +291,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     music_btn.clicked.connect(lambda: creat_music_win())
     menu_bar.addWidget(music_btn)
 
-    tool_menu = add_top_menu_button(menu_bar, "🛠️工具", "🛠️工具",
-                                    "./工具/w1.ico")[0]
+    tool_menu = add_top_menu_button(menu_bar, "🛠️工具", "🛠️工具", None)[0]
     menu_tool_calls = [
         ("图片转线稿工具2.0", load_LineArtGUI2_QT),
         ("seed tools", load_seed_tools),
@@ -369,7 +365,7 @@ if __name__ == "__main__":
         )
 
         check_error_queue_qt(root)
-        # check_for_updates()
+        check_for_updates()
 
         root.show()
         
