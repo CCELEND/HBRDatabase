@@ -54,7 +54,7 @@ def show_jewelrys(scrollbar_frame_obj, jewelrys):
     parent_layout = scrollbar_frame_obj.scrollable_frame.layout()
     if parent_layout is None:
         parent_layout = QVBoxLayout(scrollbar_frame_obj.scrollable_frame)
-    parent_layout.setContentsMargins(0, 0, 0, 0)
+    parent_layout.setContentsMargins(10, 10, 10, 10)
     parent_layout.setSpacing(5)
     parent_layout.setAlignment(Qt.AlignTop)
 
@@ -131,7 +131,12 @@ def creat_jewelrys_win(event, parent_frame, jewelry_type_json):
     show_jewelrys(scrollbar_frame_obj, jewelrys)
 
     jewelry_win_frame.mousePressEvent = lambda ev: win_set_top(jewelry_win_frame, __name__)
-    jewelry_win_frame.closeEvent = lambda ev: (win_close_manage(jewelry_win_frame, __name__), ev.accept())
+
+    # 正确关闭事件
+    def on_close(ev):
+        win_close_manage(jewelry_win_frame, __name__)
+        ev.accept()
+    jewelry_win_frame.closeEvent = on_close
 
     return "break"
 
