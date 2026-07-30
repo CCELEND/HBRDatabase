@@ -42,7 +42,7 @@ def creat_about_win(parent_frame):
     describe = f"HBRDatabase2.0a (build-{file_hash[0:8]})"
     label = QLabel(describe)
     label.setFont(MONO_FONT)
-    label.setAlignment(Qt.AlignCenter)
+    label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     ver_layout.addWidget(label, 0, 0)
     layout.addWidget(ver_frame, 0, 0, 1, 2)
 
@@ -55,7 +55,7 @@ def creat_about_win(parent_frame):
                 "GitHub：https://github.com/CCELEND/HBRDatabase\n协议：GPL-3.0 license")
     label = QLabel(describe)
     label.setFont(MONO_FONT)
-    label.setAlignment(Qt.AlignCenter)
+    label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     develop_layout.addWidget(label, 0, 0)
     layout.addWidget(develop_frame, 1, 0, 1, 2)
 
@@ -73,7 +73,7 @@ def creat_about_win(parent_frame):
                 "茅森月哥（B站空间：https://space.bilibili.com/535889）")
     label = QLabel(describe)
     label.setFont(MONO_FONT)
-    label.setAlignment(Qt.AlignCenter)
+    label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     info_layout.addWidget(label, 0, 0)
     layout.addWidget(info_frame, 2, 0, 1, 2)
 
