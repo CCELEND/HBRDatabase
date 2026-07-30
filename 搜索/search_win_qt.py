@@ -160,7 +160,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     get_all_team_obj()
 
     search_win_frame = creat_Toplevel("搜索", 730, 570, 190, 210)
-    set_window_icon(search_win_frame, "./搜索/search.png")
+    set_window_icon(search_win_frame, "./搜索/search_temp.ico")
 
 
     search_win_frame.setStyleSheet("""
