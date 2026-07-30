@@ -340,8 +340,10 @@ if __name__ == "__main__":
     
     while True:
         app = QApplication(sys.argv)
-
-        with open('./QSS/QMessageBox_qss/style.qss', 'r', encoding='utf-8') as f:
+        app.setStyle('Fusion')
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        qss_path = os.path.join(base_dir, 'QSS', 'QMessageBox_qss', 'style.qss')
+        with open(qss_path, 'r', encoding='utf-8') as f:
             app.setStyleSheet(f.read())
 
         if is_admin():
