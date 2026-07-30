@@ -249,7 +249,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     ]
     for battle_call_name, callback in menu_battle_calls:
         if battle_call_name in ['共鸣天赋', '基础', 'Hit', '乘区']:
-            icon = load_menu_icon("./战斗系统/help.ico", battle_call_name)
+            icon = load_menu_icon("./工具/help.png", battle_call_name)
             add_menu_action(battle_menu, battle_call_name, icon,
                             callback, None, root)
         else:
@@ -313,7 +313,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         ("game8", load_game8_hbr),
     ]
     for tool_call_name, callback in menu_tool_calls:
-        icon = load_menu_icon("./工具/w1.ico", tool_call_name)
+        icon = load_menu_icon("./工具/settings.png", tool_call_name)
         add_menu_action(tool_menu, tool_call_name, icon, callback)
 
     # 更新
