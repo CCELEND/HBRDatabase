@@ -5,12 +5,12 @@ from PIL import Image
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QMenu, QTextEdit, QLineEdit,
-    QMessageBox, QLabel, QGridLayout, QVBoxLayout,
+    QMessageBox, QLabel, QGridLayout,
     QGraphicsView, QGraphicsScene, QGraphicsPixmapItem,
     QSizePolicy, QStatusBar
 )
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
+from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter
 
 
 def set_global_bg(parent: QApplication, bg="#f0f0f0"):
