@@ -56,8 +56,8 @@ def creat_weapon_win(event, parent_frame, weapon):
     layout = central.layout()
     if layout is None:
         layout = QGridLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+    layout.setContentsMargins(10, 10, 10, 10)
+    layout.setSpacing(5)
     layout.addWidget(weapon_frame, 0, 0)
 
     # 正确关闭事件
@@ -85,7 +85,7 @@ def show_weapon(scrollbar_frame_obj):
 
     column_count = 0
     for item_num, item_name in enumerate(武器.weapons_info.weapons):
-        item = weapons.weapons_info.weapons[item_name]
+        item = 武器.weapons_info.weapons[item_name]
 
         item_frame = QGroupBox(item_name)
         frame_layout = QGridLayout(item_frame)

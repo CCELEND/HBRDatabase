@@ -51,8 +51,8 @@ def creat_career_win(event, parent_frame, career):
     layout = central.layout()
     if layout is None:
         layout = QGridLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+    layout.setContentsMargins(10, 10, 10, 10)
+    layout.setSpacing(5)
     layout.addWidget(career_frame, 0, 0)
 
     # 正确关闭事件

@@ -51,8 +51,8 @@ def creat_attribute_win(event, parent_frame, attribute):
     layout = central.layout()
     if layout is None:
         layout = QGridLayout(central)
-        layout.setContentsMargins(0, 0, 0, 0)
-        layout.setSpacing(0)
+    layout.setContentsMargins(10, 10, 10, 10)
+    layout.setSpacing(5)
     layout.addWidget(attribute_frame, 0, 0)
 
     # 正确关闭事件
@@ -81,7 +81,7 @@ def show_attribute(scrollbar_frame_obj):
 
     column_count = 0
     for item_num, item_name in enumerate(属性.attributes_info.attributes):
-        item = attributes.attributes_info.attributes[item_name]
+        item = 属性.attributes_info.attributes[item_name]
 
         item_frame = QGroupBox(item_name)
         frame_layout = QGridLayout(item_frame)
