@@ -2,11 +2,11 @@
 import os
 import types
 
-from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QVBoxLayout, QMenu
+from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QMenu
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont
 
-from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label, ClickableLabel
+from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label
 from canvas_events_qt import mouse_bind_canvas_events2, right_click_bind_canvas_events, set_tooltip
 from canvas_events_qt import ArtworkDisplayerHeight
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
