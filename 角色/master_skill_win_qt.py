@@ -64,9 +64,9 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     parent_layout = parent_frame.layout()
     if parent_layout is None:
         parent_layout = QGridLayout(parent_frame)
-        parent_layout.setSpacing(10)
-        parent_layout.setContentsMargins(10, 10, 10, 10)
-        parent_layout.setAlignment(Qt.AlignTop)
+    parent_layout.setSpacing(10)
+    parent_layout.setContentsMargins(10, 10, 10, 10)
+    parent_layout.setAlignment(Qt.AlignTop)
 
     row_frame = QGroupBox(master_skill.name)
     row_frame.setFont(MONO_FONT)
