@@ -106,12 +106,12 @@ def bind_shortcuts(root: QMainWindow, scrollbar_frame_obj):
     #           lambda: creat_search_win(root, scrollbar_frame_obj))
     QShortcut(QKeySequence("F1"), root,
               lambda: creat_search_win(root, scrollbar_frame_obj))
-    # QShortcut(QKeySequence("Ctrl+U"), root,
-    #           lambda: http_update_data())
-    # QShortcut(QKeySequence("Ctrl+A"), root,
-    #           lambda: creat_about_win(root))
-    # QShortcut(QKeySequence("Ctrl+M"), root,
-    #           lambda: creat_music_win())
+    QShortcut(QKeySequence("Ctrl+U"), root,
+              lambda: http_update_data(root))
+    QShortcut(QKeySequence("Ctrl+A"), root,
+              lambda: creat_about_win(root))
+    QShortcut(QKeySequence("Ctrl+M"), root,
+              lambda: creat_music_win())
     QShortcut(QKeySequence("Ctrl+Q"), root,
               lambda: QApplication.quit())
 
