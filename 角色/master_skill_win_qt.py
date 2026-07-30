@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
-from canvas_events_qt import get_pixmap, create_image_label
+from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
 from window_qt import set_window_expand, creat_Toplevel, set_window_icon
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_qt import ScrollbarFrameWin
@@ -117,7 +117,8 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
                 skill.attribute_difference, skill.destructive_multiplier
             )
 
-        desc_lab = QLabel(text)
+        # desc_lab = QLabel(text)
+        desc_lab = WrappedLabel(text)
         desc_lab.setFont(MONO_FONT)
         desc_lab.setWordWrap(True)
         desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)

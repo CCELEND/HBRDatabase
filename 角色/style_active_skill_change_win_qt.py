@@ -116,7 +116,6 @@ class ChangeButtonManager:
 
 
 def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill) -> list:
-    from PyQt5.QtWidgets import QLabel
 
     button_manager = ChangeButtonManager()
 
