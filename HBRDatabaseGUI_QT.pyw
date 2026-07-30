@@ -261,22 +261,38 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
             add_menu_action(battle_menu, battle_call_name, icon,
                             callback, None, scrollbar_frame_obj)
 
-    search_icon = load_menu_icon("./搜索/search.ico", "搜索")
-    search_menu = add_top_menu_button(menu_bar, "🔍搜索", "🔍搜索",
-                                      "./搜索/search.ico")[0]
-    search_action2 = QAction(search_icon, "搜索", root)
-    search_action2.setShortcut("Ctrl+S")
-    search_action2.triggered.connect(
-        lambda: creat_search_win(root, scrollbar_frame_obj))
-    search_menu.addAction(search_action2)
 
-    music_icon = load_menu_icon("./音乐/Sound.ico", "音乐")
-    music_menu = add_top_menu_button(menu_bar, "🎧音乐", "🎧音乐",
-                                     "./音乐/Sound.ico")[0]
-    music_action2 = QAction(music_icon, "音乐", root)
-    music_action2.setShortcut("Ctrl+M")
-    music_action2.triggered.connect(lambda: creat_music_win())
-    music_menu.addAction(music_action2)
+    # 搜索
+    search_btn = QToolButton()
+    search_btn.setText("🔍搜索")
+    search_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+    search_btn.setStyleSheet("""
+        QToolButton {
+            padding: 4px 10px;
+            border: none;
+            color: #333333;
+            background-color: transparent;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        QToolButton:hover {
+            background-color: #e0e0e0;
+        }
+        QToolButton:pressed {
+            background-color: #d0d0d0;
+        }
+    """)
+    search_btn.clicked.connect(lambda: creat_search_win(root, scrollbar_frame_obj))
+    menu_bar.addWidget(search_btn)
+
+    # 音乐
+    music_btn = QToolButton()
+    music_btn.setText("🎧音乐")
+    music_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+    music_btn.setStyleSheet(search_btn.styleSheet())  # 复用样式
+    music_btn.clicked.connect(lambda: creat_music_win())
+    menu_bar.addWidget(music_btn)
 
     tool_menu = add_top_menu_button(menu_bar, "🛠️工具", "🛠️工具",
                                     "./工具/w1.ico")[0]
@@ -304,21 +320,21 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         icon = load_menu_icon("./工具/w1.ico", tool_call_name)
         add_menu_action(tool_menu, tool_call_name, icon, callback)
 
-    update_icon = load_menu_icon("./更新/net.ico", "更新")
-    update_menu = add_top_menu_button(menu_bar, "📲更新", "📲更新",
-                                      "./更新/net.ico")[0]
-    update_action2 = QAction(update_icon, "更新", root)
-    update_action2.setShortcut("Ctrl+U")
-    update_action2.triggered.connect(lambda: http_update_data(root))
-    update_menu.addAction(update_action2)
+    # 更新
+    update_btn = QToolButton()
+    update_btn.setText("📲更新")
+    update_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+    update_btn.setStyleSheet(search_btn.styleSheet())
+    update_btn.clicked.connect(lambda: http_update_data(root))
+    menu_bar.addWidget(update_btn)
 
-    about_icon = load_menu_icon("./关于/KamiSama.ico", "关于")
-    about_menu = add_top_menu_button(menu_bar, "🏷️关于", "🏷️关于",
-                                     "./关于/KamiSama.ico")[0]
-    about_action2 = QAction(about_icon, "关于", root)
-    about_action2.setShortcut("Ctrl+A")
-    about_action2.triggered.connect(lambda: creat_about_win(root))
-    about_menu.addAction(about_action2)
+    # 关于
+    about_btn = QToolButton()
+    about_btn.setText("🏷️关于")
+    about_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+    about_btn.setStyleSheet(search_btn.styleSheet())
+    about_btn.clicked.connect(lambda: creat_about_win(root))
+    menu_bar.addWidget(about_btn)
 
     bind_shortcuts(root, scrollbar_frame_obj)
 
@@ -353,7 +369,7 @@ if __name__ == "__main__":
         )
 
         check_error_queue_qt(root)
-        check_for_updates()
+        # check_for_updates()
 
         root.show()
         
