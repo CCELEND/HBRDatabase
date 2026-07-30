@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
-from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
+from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel, QLabel
 
 from 角色.style_text import output_attack_skill, output_skill_effect
 from 角色.style_info import is_skill_effect
@@ -106,7 +106,8 @@ def creat_effect_frame(effect_frames, effect_frame_row, skill):
         is_attack_skill = True
 
     # 靠左上下居中
-    desc_lab = WrappedLabel(text)
+    # desc_lab = WrappedLabel(text)
+    desc_lab = QLabel(text)
     desc_lab.setFont(MONO_FONT)
     layout.addWidget(desc_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 

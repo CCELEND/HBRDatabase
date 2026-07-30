@@ -58,7 +58,8 @@ def creat_passive_effect_frame(effect_frames, effect_frame_row, passive_skill_ef
             attack_skill.attribute_difference, attack_skill.destructive_multiplier
         )
 
-    desc_lab = WrappedLabel(text)
+    # desc_lab = WrappedLabel(text)
+    desc_lab = QLabel(text)
     desc_lab.setFont(MONO_FONT)
     layout.addWidget(desc_lab, 0, 1)
 
@@ -115,7 +116,8 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
         desc_layout.setColumnStretch(1, 1)
         row_layout.addWidget(desc_frame, 0, 0, 1, 4)
 
-        desc_lab = WrappedLabel(passive_skill.description)
+        # desc_lab = WrappedLabel(passive_skill.description)
+        desc_lab = QLabel(passive_skill.description)
         desc_lab.setFont(MONO_FONT)
         desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
@@ -152,7 +154,8 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
                 passive_skill.value,
                 IsActive=False
             )
-            effect_lab = WrappedLabel(text)
+            # effect_lab = WrappedLabel(text)
+            effect_lab = QLabel(text)
             effect_lab.setFont(MONO_FONT)
             # effect_frame_layout.addWidget(effect_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignTop)
             #靠左垂直居中

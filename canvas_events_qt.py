@@ -742,7 +742,7 @@ class WrappedLabel(QLabel):
     def minimumSizeHint(self):
         # 始终基于合理的最小宽度计算，而非当前宽度
         # min_w = 150  # 根据实际业务调整
-        min_w = 400
+        min_w = 500
         return QSize(min_w, self.heightForWidth(min_w))
 
     def hasHeightForWidth(self):

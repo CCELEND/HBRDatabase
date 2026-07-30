@@ -29,7 +29,8 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     desc_layout.setColumnStretch(1, 1)
     desc_layout.setColumnStretch(2, 1)
 
-    desc_lab = WrappedLabel(active_skill.description)
+    # desc_lab = WrappedLabel(active_skill.description)
+    desc_lab = QLabel(active_skill.description)
     desc_lab.setObjectName("desc_frame_desc_lab")
     desc_lab.setFont(MONO_FONT)
     desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignVCenter)

@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QMenu
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
-from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label
+from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label, WrappedLabel
 from canvas_events_qt import mouse_bind_canvas_events2, right_click_bind_canvas_events, set_tooltip
 from canvas_events_qt import ArtworkDisplayerHeight
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
@@ -231,7 +231,8 @@ def creat_team_desc_frame(parent_frame, team: Team):
     team_desc_label = create_image_label(team_desc_frame, team_desc_pixmap, 100, 64)
     desc_layout.addWidget(team_desc_label, 0, 0, alignment=Qt.AlignCenter)
 
-    team_desc_text = QLabel(team.description)
+    team_desc_text = WrappedLabel(team.description)
+    # team_desc_text = QLabel(team.description)
     team_desc_text.setFont(MONO_FONT)
     team_desc_text.setWordWrap(True)
     team_desc_text.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
@@ -332,8 +333,8 @@ def show_team(scrollbar_frame_obj, team: Team):
         label = QLabel(role.description)
         label.setFont(MONO_FONT)
         label.setWordWrap(True)
-        label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        desc_layout.addWidget(label, 0, 1, alignment=Qt.AlignLeft | Qt.AlignTop)
+        label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        desc_layout.addWidget(label, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
         creat_weapon_frame(desc_frame, role)
 
