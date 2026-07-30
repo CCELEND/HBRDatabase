@@ -710,45 +710,6 @@ class VideoPlayerWithScrollbar:
         self.cap.release()
 
 
-# class WrappedLabel(QLabel):
-#     """自动换行并根据宽度调整高度的标签"""
-#     def __init__(self, text="", parent=None):
-#         super().__init__(text, parent)
-#         self.setWordWrap(True)
-#         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-#         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-#         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-#         sp.setHeightForWidth(True)
-#         self.setSizePolicy(sp)
-#         self.setMinimumHeight(1)
-#         self._last_height = -1
-
-#     def heightForWidth(self, width):
-#         if width <= 0:
-#             return 1
-#         margins = self.contentsMargins()
-#         effective_width = width - margins.left() - margins.right()
-#         if effective_width <= 0:
-#             effective_width = width
-#         fm = self.fontMetrics()
-#         rect = fm.boundingRect(
-#             QRect(0, 0, effective_width, 0),
-#             Qt.TextWordWrap | Qt.AlignLeft | Qt.AlignTop,
-#             self.text()
-#         )
-#         return max(1, rect.height() + margins.top() + margins.bottom())
-
-#     def minimumSizeHint(self):
-#         width = max(200, self.width() if self.width() > 0 else 200)
-#         return QSize(200, self.heightForWidth(width))
-
-#     def resizeEvent(self, event):
-#         target = self.heightForWidth(event.size().width())
-#         if abs(self._last_height - target) > 1:
-#             self._last_height = target
-#             self.setMinimumHeight(target)
-#         super().resizeEvent(event)
-
 class WrappedLabel(QLabel):
     """自动换行并根据宽度调整高度的标签"""
     def __init__(self, text="", parent=None):
