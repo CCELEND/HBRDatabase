@@ -2,14 +2,13 @@
 import types
 
 from PyQt5.QtWidgets import (
-    QLabel, QWidget, QGroupBox, QGridLayout, QVBoxLayout, QHBoxLayout,
+    QLabel, QWidget, QGroupBox, QGridLayout, QVBoxLayout, 
     QPushButton, QCheckBox, QTextEdit, QMessageBox
 )
 from PyQt5.QtCore import Qt
 
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
-from scrollbar_frame_qt import ScrollbarFrameWin
 
 from 角色.team_info import get_all_team_obj
 from 角色.team_win_qt import bind_style_canvas, bind_master_skill_canvas
@@ -161,7 +160,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     get_all_team_obj()
 
     search_win_frame = creat_Toplevel("搜索", 730, 570, 190, 210)
-    set_window_icon(search_win_frame, "./搜索/search.ico")
+    set_window_icon(search_win_frame, "./搜索/search.png")
 
 
     search_win_frame.setStyleSheet("""
