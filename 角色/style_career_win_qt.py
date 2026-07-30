@@ -19,7 +19,7 @@ def _create_single_element_attribute(parent_frame, element_attribute, weapon_att
 
     weapon_attribute_path = attributes_info[weapon_attribute].path
     weapon_attribute_pixmap = get_pixmap(weapon_attribute_path, (40, 40))
-    weapon_attribute_label = create_image_label(parent_frame, weapon_attribute_pixmap, 40, 40)
+    weapon_attribute_label = create_image_label(parent_frame, weapon_attribute_pixmap, 60, 40)
 
     return element_attribute_label, weapon_attribute_label
 
@@ -35,7 +35,7 @@ def _create_double_element_attribute(parent_frame, element_attribute, weapon_att
 
     weapon_attribute_path = attributes_info[weapon_attribute].path
     weapon_attribute_pixmap = get_pixmap(weapon_attribute_path, (40, 40))
-    weapon_attribute_label = create_image_label(parent_frame, weapon_attribute_pixmap, 40, 40)
+    weapon_attribute_label = create_image_label(parent_frame, weapon_attribute_pixmap, 60, 40)
 
     return element_attribute_label0, element_attribute_label1, weapon_attribute_label
 
