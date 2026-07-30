@@ -32,7 +32,7 @@ def creat_desc_frame(row_frame, master_skill):
     desc_layout.setColumnStretch(0, 4)
     desc_layout.setColumnStretch(1, 1)
 
-    desc_lab = QLabel(master_skill.description)
+    desc_lab = WrappedLabel(master_skill.description)
     desc_lab.setFont(MONO_FONT)
     desc_lab.setWordWrap(True)
     desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
