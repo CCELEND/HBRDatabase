@@ -6,8 +6,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
 from canvas_events_qt import get_pixmap, create_image_label
-from canvas_events_qt import bind_canvas_events, mouse_bind_canvas_events2, set_tooltip
-from window_qt import set_window_expand, creat_Toplevel, set_window_top, set_window_icon
+from window_qt import set_window_expand, creat_Toplevel, set_window_icon
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_qt import ScrollbarFrameWin
 
@@ -36,8 +35,8 @@ def creat_desc_frame(row_frame, master_skill):
     desc_lab = QLabel(master_skill.description)
     desc_lab.setFont(MONO_FONT)
     desc_lab.setWordWrap(True)
-    desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-    desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignTop)
+    desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+    desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     if master_skill.max_uses:
         text = "SP" + master_skill.sp_cost + '\n' + master_skill.max_uses
@@ -48,8 +47,8 @@ def creat_desc_frame(row_frame, master_skill):
             text = "SP" + master_skill.sp_cost + '\n' + "∞"
     sp_use_lab = QLabel(text)
     sp_use_lab.setFont(MONO_FONT)
-    sp_use_lab.setAlignment(Qt.AlignRight | Qt.AlignTop)
-    desc_layout.addWidget(sp_use_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignTop)
+    sp_use_lab.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    desc_layout.addWidget(sp_use_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignVCenter)
 
     row_layout = row_frame.layout()
     if row_layout is not None:
@@ -121,15 +120,15 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
         desc_lab = QLabel(text)
         desc_lab.setFont(MONO_FONT)
         desc_lab.setWordWrap(True)
-        desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        effect_layout.addWidget(desc_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignTop)
+        desc_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+        effect_layout.addWidget(desc_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     missions_row = 1 + len(master_skill.effects)
     missions_lab = QLabel(master_skill.missions)
     missions_lab.setFont(MONO_FONT)
     missions_lab.setWordWrap(True)
-    missions_lab.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-    row_layout.addWidget(missions_lab, missions_row, 0, 1, 4, alignment=Qt.AlignLeft | Qt.AlignTop)
+    missions_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+    row_layout.addWidget(missions_lab, missions_row, 0, 1, 4, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     return row_frame
 
