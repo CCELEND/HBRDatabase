@@ -18,7 +18,63 @@ from PyQt5.QtGui import (
 
 
 pixmap_cache = {}
+# def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
+#     unique_key = f"{img_path}_{img_resize}"
+#     if unique_key in pixmap_cache:
+#         return pixmap_cache[unique_key]
+
+#     if not os.path.exists(img_path):
+#         return QPixmap()
+
+#     try:
+#         np_arr = np.fromfile(img_path, dtype=np.uint8)
+#         img_array = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
+
+#         if img_array is None:
+#             raise Exception("OpenCV decode failed")
+
+#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_LANCZOS4)
+#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_CUBIC)
+#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_LINEAR) 
+#         img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_AREA)
+#         if img_resized.ndim == 2:
+#             h, w = img_resized.shape
+#             qimg = QImage(img_resized.data, w, h, w, QImage.Format_Grayscale8)
+#         elif img_resized.shape[2] == 4:
+#             h, w, ch = img_resized.shape
+#             rgba = cv2.cvtColor(img_resized, cv2.COLOR_BGRA2RGBA)
+#             qimg = QImage(rgba.data, w, h, ch * w, QImage.Format_RGBA8888)
+#         else:
+#             h, w, ch = img_resized.shape
+#             rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB)
+#             qimg = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
+#         pixmap = QPixmap.fromImage(qimg.copy())
+#     except Exception:
+#         try:
+#             pil_image = Image.open(img_path)
+#             pil_image = pil_image.resize(img_resize, Image.LANCZOS)
+#             if pil_image.mode == 'RGBA':
+#                 qimg = QImage(pil_image.tobytes("raw", "RGBA"),
+#                               pil_image.width, pil_image.height,
+#                               pil_image.width * 4, QImage.Format_RGBA8888)
+#             else:
+#                 pil_image = pil_image.convert('RGB')
+#                 qimg = QImage(pil_image.tobytes("raw", "RGB"),
+#                               pil_image.width, pil_image.height,
+#                               pil_image.width * 3, QImage.Format_RGB888)
+#             pixmap = QPixmap.fromImage(qimg.copy())
+#         except Exception:
+#             return QPixmap()
+
+#     pixmap_cache[unique_key] = pixmap
+#     return pixmap
+
 def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
+    """
+    加载图片并缩放为指定尺寸的 QPixmap，带缓存。
+    缩小时使用 INTER_AREA 保证平滑，放大时使用 INTER_CUBIC 保证质量。
+    """
+    # 将插值策略纳入缓存key，避免切换算法后命中旧缓存
     unique_key = f"{img_path}_{img_resize}"
     if unique_key in pixmap_cache:
         return pixmap_cache[unique_key]
@@ -33,7 +89,24 @@ def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
         if img_array is None:
             raise Exception("OpenCV decode failed")
 
-        img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_LANCZOS4)
+        # ---------- 动态选择插值方式 ----------
+        h_orig, w_orig = img_array.shape[:2]
+        is_downscale = img_resize[0] < w_orig or img_resize[1] < h_orig
+
+        if is_downscale:
+            # 缩小：INTER_AREA 基于区域重采样，最平滑无锯齿
+            interpolation = cv2.INTER_AREA
+        else:
+            # 放大：INTER_CUBIC 比 INTER_LINEAR 更细腻
+            interpolation = cv2.INTER_CUBIC
+
+        img_resized = cv2.resize(img_array, img_resize, interpolation=interpolation)
+
+        # ---------- 可选：对极小图做轻微抗锯齿平滑 ----------
+        if is_downscale and max(img_resize) <= 128:
+            img_resized = cv2.GaussianBlur(img_resized, (3, 3), sigmaX=0.35)
+
+        # ---------- 转换为 QImage ----------
         if img_resized.ndim == 2:
             h, w = img_resized.shape
             qimg = QImage(img_resized.data, w, h, w, QImage.Format_Grayscale8)
@@ -45,20 +118,30 @@ def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
             h, w, ch = img_resized.shape
             rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB)
             qimg = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
+
+        # copy() 是必须的：OpenCV 数组内存会被回收，不 copy 会导致花屏/崩溃
         pixmap = QPixmap.fromImage(qimg.copy())
+
     except Exception:
+        # ---------- PIL Fallback ----------
         try:
             pil_image = Image.open(img_path)
-            pil_image = pil_image.resize(img_resize, Image.LANCZOS)
+            # PIL LANCZOS 在缩小和放大场景下质量都很好
+            pil_image = pil_image.resize(img_resize, Image.Resampling.LANCZOS)
+
             if pil_image.mode == 'RGBA':
-                qimg = QImage(pil_image.tobytes("raw", "RGBA"),
-                              pil_image.width, pil_image.height,
-                              pil_image.width * 4, QImage.Format_RGBA8888)
+                qimg = QImage(
+                    pil_image.tobytes("raw", "RGBA"),
+                    pil_image.width, pil_image.height,
+                    pil_image.width * 4, QImage.Format_RGBA8888
+                )
             else:
                 pil_image = pil_image.convert('RGB')
-                qimg = QImage(pil_image.tobytes("raw", "RGB"),
-                              pil_image.width, pil_image.height,
-                              pil_image.width * 3, QImage.Format_RGB888)
+                qimg = QImage(
+                    pil_image.tobytes("raw", "RGB"),
+                    pil_image.width, pil_image.height,
+                    pil_image.width * 3, QImage.Format_RGB888
+                )
             pixmap = QPixmap.fromImage(qimg.copy())
         except Exception:
             return QPixmap()
@@ -667,7 +750,7 @@ class VideoPlayerWithScrollbar:
 #         super().resizeEvent(event)
 
 class WrappedLabel(QLabel):
-    """自动换行并根据宽度调整高度的标签（修复版）"""
+    """自动换行并根据宽度调整高度的标签"""
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
         self.setWordWrap(True)
@@ -697,7 +780,8 @@ class WrappedLabel(QLabel):
 
     def minimumSizeHint(self):
         # 始终基于合理的最小宽度计算，而非当前宽度
-        min_w = 150  # 根据实际业务调整
+        # min_w = 150  # 根据实际业务调整
+        min_w = 400
         return QSize(min_w, self.heightForWidth(min_w))
 
     def hasHeightForWidth(self):
@@ -705,12 +789,12 @@ class WrappedLabel(QLabel):
 
     def resizeEvent(self, event):
         new_width = event.size().width()
-        # 宽度变化时重新计算并更新最小高度（允许收缩）
+        # 宽度变化时重新计算并更新最小高度
         if abs(new_width - self._last_width) > 1:
             self._last_width = new_width
             target_h = self.heightForWidth(new_width)
             self.setMinimumHeight(target_h)
-            self.setMaximumHeight(target_h)  # ✅ 关键修改4: 同时限制最大高度，防止残留空白
+            self.setMaximumHeight(target_h)  # 同时限制最大高度，防止残留空白
         super().resizeEvent(event)
 
 
