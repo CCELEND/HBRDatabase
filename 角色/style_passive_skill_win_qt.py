@@ -60,8 +60,6 @@ def creat_passive_effect_frame(effect_frames, effect_frame_row, passive_skill_ef
 
     desc_lab = WrappedLabel(text)
     desc_lab.setFont(MONO_FONT)
-    # desc_lab.setAlignment(Qt.AlignCenter)   # 水平居中
-    # desc_lab.setWordWrap(True)              # 自动换行
     layout.addWidget(desc_lab, 0, 1)
 
     layout.setColumnStretch(0, 0)
