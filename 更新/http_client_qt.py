@@ -94,7 +94,7 @@ class UpdateProgressDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("更新")
         self.resize(600, 180)
-        self.setWindowIcon(QIcon("./更新/net.ico"))  # 假设存在
+        self.setWindowIcon(QIcon("./更新/net.png"))  # 假设存在
         self.setModal(True)
 
         layout = QVBoxLayout(self)
