@@ -8,13 +8,12 @@ import time
 from PIL import Image
 
 from PyQt5.QtWidgets import (
-    QLabel, QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QSizePolicy, QToolTip, QApplication, QGraphicsView,
-    QGraphicsScene, QGraphicsPixmapItem, QMainWindow
+    QLabel, QWidget, QScrollArea, QVBoxLayout, QGridLayout,
+    QSizePolicy, QMainWindow
 )
 from PyQt5.QtCore import Qt, QObject, QTimer, QSize, QRect, pyqtSignal, QEvent
 from PyQt5.QtGui import (
-    QPixmap, QImage, QPainter, QCursor, QFont, QPalette, QColor
+    QPixmap, QImage, QPainter, QCursor
 )
 
 
@@ -130,7 +129,6 @@ def create_image_label(parent: QWidget, pixmap: QPixmap,
 def create_canvas_with_image(parent_frame: QWidget,
                              pixmap: QPixmap,
                              canvas_width, canvas_height,
-                             create_image_x, create_image_y,
                              row, column,
                              rowspan=1, columnspan=1,
                              padx=5, pady=5) -> ClickableLabel:
@@ -239,77 +237,6 @@ class ArtworkDisplayerHeight:
         self.label.deleteLater()
         self._pixmap = None
         self.original_image.close()
-
-
-# class _ResizableArtworkLabel(QLabel):
-#     """随父容器宽度自动缩放并保持宽高比的图片标签"""
-#     def __init__(self, parent_widget, artwork_path, opacity_value):
-#         super().__init__(parent_widget)
-#         self.opacity_value = opacity_value
-#         self.original_image = Image.open(artwork_path)
-#         self.setAlignment(Qt.AlignCenter)
-#         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-#         self._cached_size = None
-#         self._cached_pixmap = None
-#         self._updating_height = False
-#         self._update_height()
-
-#     def _target_height(self, width=None):
-#         if width is None:
-#             width = self.width()
-#         if width <= 0:
-#             return 1
-#         orig_w, orig_h = self.original_image.size
-#         return max(1, int(width * orig_h / orig_w))
-
-#     def _update_height(self):
-#         if self._updating_height:
-#             return
-#         self._updating_height = True
-#         try:
-#             target = self._target_height()
-#             if self.height() != target:
-#                 self.setFixedHeight(target)
-#         finally:
-#             self._updating_height = False
-
-#     def resizeEvent(self, event):
-#         self._update_height()
-#         self._cached_size = None
-#         self.update()
-#         super().resizeEvent(event)
-
-#     def paintEvent(self, event):
-#         painter = QPainter(self)
-#         if not painter.isActive():
-#             return
-#         rect = self.rect()
-#         size = rect.size()
-#         if self._cached_pixmap is None or self._cached_size != size:
-#             self._cached_size = size
-#             self._cached_pixmap = self._scaled_pixmap(size.width(), size.height())
-#         if self._cached_pixmap and not self._cached_pixmap.isNull():
-#             painter.drawPixmap(rect, self._cached_pixmap)
-#         painter.end()
-
-#     def _scaled_pixmap(self, width, height):
-#         if width <= 0 or height <= 0:
-#             return QPixmap()
-#         resized = self.original_image.resize((width, height), Image.LANCZOS)
-#         if self.opacity_value != 255:
-#             mask = Image.new('L', resized.size, self.opacity_value)
-#             resized.putalpha(mask)
-#         if resized.mode == 'RGBA':
-#             qimg = QImage(resized.tobytes("raw", "RGBA"),
-#                           resized.width, resized.height,
-#                           resized.width * 4, QImage.Format_RGBA8888)
-#         else:
-#             resized = resized.convert('RGB')
-#             qimg = QImage(resized.tobytes("raw", "RGB"),
-#                           resized.width, resized.height,
-#                           resized.width * 3, QImage.Format_RGB888)
-#         return QPixmap.fromImage(qimg.copy())
-
 
 class _ResizableArtworkLabel(QLabel):
     def __init__(self, parent_widget, artwork_path, opacity_value):
@@ -700,18 +627,58 @@ class VideoPlayerWithScrollbar:
         self.cap.release()
 
 
+# class WrappedLabel(QLabel):
+#     """自动换行并根据宽度调整高度的标签"""
+#     def __init__(self, text="", parent=None):
+#         super().__init__(text, parent)
+#         self.setWordWrap(True)
+#         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+#         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
+#         sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+#         sp.setHeightForWidth(True)
+#         self.setSizePolicy(sp)
+#         self.setMinimumHeight(1)
+#         self._last_height = -1
+
+#     def heightForWidth(self, width):
+#         if width <= 0:
+#             return 1
+#         margins = self.contentsMargins()
+#         effective_width = width - margins.left() - margins.right()
+#         if effective_width <= 0:
+#             effective_width = width
+#         fm = self.fontMetrics()
+#         rect = fm.boundingRect(
+#             QRect(0, 0, effective_width, 0),
+#             Qt.TextWordWrap | Qt.AlignLeft | Qt.AlignTop,
+#             self.text()
+#         )
+#         return max(1, rect.height() + margins.top() + margins.bottom())
+
+#     def minimumSizeHint(self):
+#         width = max(200, self.width() if self.width() > 0 else 200)
+#         return QSize(200, self.heightForWidth(width))
+
+#     def resizeEvent(self, event):
+#         target = self.heightForWidth(event.size().width())
+#         if abs(self._last_height - target) > 1:
+#             self._last_height = target
+#             self.setMinimumHeight(target)
+#         super().resizeEvent(event)
+
 class WrappedLabel(QLabel):
-    """自动换行并根据宽度调整高度的标签"""
+    """自动换行并根据宽度调整高度的标签（修复版）"""
     def __init__(self, text="", parent=None):
         super().__init__(text, parent)
         self.setWordWrap(True)
         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.setTextInteractionFlags(Qt.TextSelectableByMouse)
-        sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # Preferred 替代 Expanding，避免 Grid 拉伸冲突
+        sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
         sp.setHeightForWidth(True)
         self.setSizePolicy(sp)
         self.setMinimumHeight(1)
-        self._last_height = -1
+        self._last_width = -1
 
     def heightForWidth(self, width):
         if width <= 0:
@@ -719,102 +686,32 @@ class WrappedLabel(QLabel):
         margins = self.contentsMargins()
         effective_width = width - margins.left() - margins.right()
         if effective_width <= 0:
-            effective_width = width
+            effective_width = 1
         fm = self.fontMetrics()
         rect = fm.boundingRect(
-            QRect(0, 0, effective_width, 0),
+            QRect(0, 0, effective_width, 10000),
             Qt.TextWordWrap | Qt.AlignLeft | Qt.AlignTop,
             self.text()
         )
         return max(1, rect.height() + margins.top() + margins.bottom())
 
     def minimumSizeHint(self):
-        width = max(200, self.width() if self.width() > 0 else 200)
-        return QSize(200, self.heightForWidth(width))
+        # 始终基于合理的最小宽度计算，而非当前宽度
+        min_w = 150  # 根据实际业务调整
+        return QSize(min_w, self.heightForWidth(min_w))
+
+    def hasHeightForWidth(self):
+        return True
 
     def resizeEvent(self, event):
-        target = self.heightForWidth(event.size().width())
-        if abs(self._last_height - target) > 1:
-            self._last_height = target
-            self.setMinimumHeight(target)
+        new_width = event.size().width()
+        # 宽度变化时重新计算并更新最小高度（允许收缩）
+        if abs(new_width - self._last_width) > 1:
+            self._last_width = new_width
+            target_h = self.heightForWidth(new_width)
+            self.setMinimumHeight(target_h)
+            self.setMaximumHeight(target_h)  # ✅ 关键修改4: 同时限制最大高度，防止残留空白
         super().resizeEvent(event)
-
-
-# class BackgroundFrame(QWidget):
-#     """带背景图片的容器，子控件会显示在背景之上"""
-#     def __init__(self, parent_widget: QWidget, image_path: str, opacity: str = "100%"):
-#         super().__init__(parent_widget)
-#         self._original_pixmap = QPixmap(image_path)
-#         opacity_percentage = int(opacity.strip('%')) / 100
-#         self.opacity_value = opacity_percentage
-
-#         self.main_layout = QVBoxLayout(self)
-#         self.main_layout.setSpacing(10)
-#         self.main_layout.setContentsMargins(10, 10, 10, 10)
-#         self.main_layout.setAlignment(Qt.AlignTop)
-
-#         self.setStyleSheet("""
-#             BackgroundFrame {
-#                 background-color: transparent;
-#             }
-#             QGroupBox {
-#                 background-color: transparent;
-#                 border: 1px solid rgba(200, 200, 200, 120);
-#                 border-radius: 6px;
-#                 margin-top: 10px;
-#             }
-#             QGroupBox::title {
-#                 subcontrol-origin: margin;
-#                 left: 10px;
-#                 padding: 2px 8px;
-#                 background-color: rgba(255, 255, 255, 160);
-#                 border-radius: 4px;
-#                 color: #222222;
-#                 font-weight: bold;
-#             }
-#             QLabel {
-#                 background-color: transparent;
-#                 color: #222222;
-#                 font-weight: bold;
-#             }
-#         """)
-
-#         self._cached_pixmap = None
-#         self._cached_size = None
-
-#     def paintEvent(self, event):
-#         if self._original_pixmap.isNull():
-#             super().paintEvent(event)
-#             return
-
-#         painter = QPainter(self)
-#         if not painter.isActive():
-#             return
-
-#         rect = self.rect()
-#         frame_w, frame_h = rect.width(), rect.height()
-#         if frame_w <= 0 or frame_h <= 0:
-#             painter.end()
-#             return
-
-#         if self._cached_pixmap is None or self._cached_size != (frame_w, frame_h):
-#             self._cached_size = (frame_w, frame_h)
-#             self._cached_pixmap = self._original_pixmap.scaled(
-#                 frame_w, frame_h,
-#                 Qt.KeepAspectRatioByExpanding,
-#                 Qt.SmoothTransformation
-#             )
-
-#         offset_x = (self._cached_pixmap.width() - frame_w) // 2
-#         offset_y = (self._cached_pixmap.height() - frame_h) // 2
-
-#         painter.setOpacity(self.opacity_value)
-#         painter.drawPixmap(rect, self._cached_pixmap, QRect(offset_x, offset_y, frame_w, frame_h))
-#         painter.end()
-#         super().paintEvent(event)
-
-
-
 
 
 class BackgroundFrame(QWidget):

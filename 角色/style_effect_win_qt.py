@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QWidget, QGroupBox, QGridLayout, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
@@ -105,15 +105,16 @@ def creat_effect_frame(effect_frames, effect_frame_row, skill):
         )
         is_attack_skill = True
 
+    # 靠左上下居中
     desc_lab = WrappedLabel(text)
     desc_lab.setFont(MONO_FONT)
-    layout.addWidget(desc_lab, 0, 1)
+    layout.addWidget(desc_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     layout.setColumnStretch(0, 0)
     layout.setColumnStretch(1, 1)
     layout.setRowStretch(0, 1)
 
-    effect_frame_sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    effect_frame_sp = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
     effect_frame_sp.setHeightForWidth(True)
     effect_frame.setSizePolicy(effect_frame_sp)
 

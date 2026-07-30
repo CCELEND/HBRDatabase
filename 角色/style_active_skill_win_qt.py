@@ -1,5 +1,5 @@
 
-from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout, QVBoxLayout, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 
@@ -32,15 +32,15 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     desc_lab = WrappedLabel(active_skill.description)
     desc_lab.setObjectName("desc_frame_desc_lab")
     desc_lab.setFont(MONO_FONT)
-    desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignTop)
+    desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     text = ""
     for level_req in active_skill.level_reqs:
         text += "Lv" + level_req + " "
     level_req_lab = QLabel(text)
     level_req_lab.setFont(MONO_FONT)
-    level_req_lab.setAlignment(Qt.AlignRight | Qt.AlignTop)
-    desc_layout.addWidget(level_req_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignTop)
+    level_req_lab.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    desc_layout.addWidget(level_req_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignVCenter)
 
     sp_cost_text = "SP" + active_skill.sp_cost if not_letter(active_skill.sp_cost) else active_skill.sp_cost
     uses_text = active_skill.max_uses if active_skill.max_uses else "∞"
@@ -49,8 +49,8 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     sp_use_lab = QLabel(text)
     sp_use_lab.setObjectName("desc_frame_sp_use_lab")
     sp_use_lab.setFont(MONO_FONT)
-    sp_use_lab.setAlignment(Qt.AlignRight | Qt.AlignTop)
-    desc_layout.addWidget(sp_use_lab, 0, 2, alignment=Qt.AlignRight | Qt.AlignTop)
+    sp_use_lab.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+    desc_layout.addWidget(sp_use_lab, 0, 2, alignment=Qt.AlignRight | Qt.AlignVCenter)
 
     desc_layout.setRowStretch(0, 1)
     desc_frame_sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)

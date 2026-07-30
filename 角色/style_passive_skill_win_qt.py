@@ -60,6 +60,8 @@ def creat_passive_effect_frame(effect_frames, effect_frame_row, passive_skill_ef
 
     desc_lab = WrappedLabel(text)
     desc_lab.setFont(MONO_FONT)
+    # desc_lab.setAlignment(Qt.AlignCenter)   # 水平居中
+    # desc_lab.setWordWrap(True)              # 自动换行
     layout.addWidget(desc_lab, 0, 1)
 
     layout.setColumnStretch(0, 0)
@@ -117,12 +119,12 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
 
         desc_lab = WrappedLabel(passive_skill.description)
         desc_lab.setFont(MONO_FONT)
-        desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignTop)
+        desc_layout.addWidget(desc_lab, 0, 0, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
         lb_lab = QLabel("LB" + passive_skill.LB)
         lb_lab.setFont(MONO_FONT)
-        lb_lab.setAlignment(Qt.AlignRight | Qt.AlignTop)
-        desc_layout.addWidget(lb_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignTop)
+        lb_lab.setAlignment(Qt.AlignRight | Qt.AlignVCenter)
+        desc_layout.addWidget(lb_lab, 0, 1, alignment=Qt.AlignRight | Qt.AlignVCenter)
 
         desc_layout.setRowStretch(0, 1)
         desc_frame_sp = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -154,7 +156,9 @@ def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
             )
             effect_lab = WrappedLabel(text)
             effect_lab.setFont(MONO_FONT)
-            effect_frame_layout.addWidget(effect_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignTop)
+            # effect_frame_layout.addWidget(effect_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignTop)
+            #靠左垂直居中
+            effect_frame_layout.addWidget(effect_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
         else:
             effect_frame_layout.setColumnStretch(0, 1)
             if has_sublist(passive_skill.effect_type):
