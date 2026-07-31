@@ -186,20 +186,48 @@ def get_hit_damage_expand_str(hit_damage) -> str:
     return hit_damage_expand_str
 
 # 兼容 tkinter/ttkbootstrap 的 Label 与 PyQt5 的 QLabel
+# def set_label_text(label, text):
+#     if hasattr(label, "setText"):
+#         label.setText(text)
+#         if hasattr(label, "updateGeometry"):
+#             label.updateGeometry()
+#             parent = label.parentWidget() if hasattr(label, "parentWidget") else None
+#             while parent is not None:
+#                 if hasattr(parent, "updateGeometry"):
+#                     parent.updateGeometry()
+#                 if hasattr(parent, "layout") and parent.layout() is not None:
+#                     parent.layout().activate()
+#                 parent = parent.parentWidget() if hasattr(parent, "parentWidget") else None
+#     else:
+#         label["text"] = text
+
 def set_label_text(label, text):
-    if hasattr(label, "setText"):
-        label.setText(text)
-        if hasattr(label, "updateGeometry"):
-            label.updateGeometry()
-            parent = label.parentWidget() if hasattr(label, "parentWidget") else None
-            while parent is not None:
-                if hasattr(parent, "updateGeometry"):
-                    parent.updateGeometry()
-                if hasattr(parent, "layout") and parent.layout() is not None:
-                    parent.layout().activate()
-                parent = parent.parentWidget() if hasattr(parent, "parentWidget") else None
-    else:
-        label["text"] = text
+    # 检查 PyQt 控件是否已被删除
+    try:
+        from PyQt5.QtWidgets import QWidget
+        if isinstance(label, QWidget) and not label.isVisible() and not label.parent():
+            pass
+    except:
+        pass
+    
+    try:
+        if hasattr(label, "setText"):
+            # 这行会触发 RuntimeError: wrapped C/C++ object has been deleted
+            label.setText(text)
+            if hasattr(label, "updateGeometry"):
+                label.updateGeometry()
+                parent = label.parentWidget() if hasattr(label, "parentWidget") else None
+                while parent is not None:
+                    if hasattr(parent, "updateGeometry"):
+                        parent.updateGeometry()
+                    if hasattr(parent, "layout") and parent.layout() is not None:
+                        parent.layout().activate()
+                    parent = parent.parentWidget() if hasattr(parent, "parentWidget") else None
+        else:
+            label["text"] = text
+    except RuntimeError as e:
+        # logger.debug(f"Label already deleted, skipping update: {e}")
+        return
 
 # 暗忍用
 def on_buff_attack_combo_select(event, desc_labs, lv1_skill_strengths):
