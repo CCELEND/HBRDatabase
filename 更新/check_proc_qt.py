@@ -15,6 +15,7 @@ def check_for_updates_proc():
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"
 
+    response = None
     try:
         # 发送哈希值到服务器
         response = send_hashes_to_server(server_url, current_file_hashes)
@@ -22,9 +23,10 @@ def check_for_updates_proc():
         logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
         # messagebox.showerror("错误", f"连接失败：{str(e)}\n请重试或联系开发者")
         QMessageBox.critical(None, "错误", f"连接失败：{str(e)}\n请重试或联系开发者")
+        return
 
     # 下载服务器返回的需要更新的文件
-    if 'files_to_download' in response:
+    if response and 'files_to_download' in response:
         if response['files_to_download']:
             server_file_datetime = response.get('server_file_datetime', None)
             print(f"[!] 检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
