@@ -313,7 +313,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         ("game8", load_game8_hbr),
     ]
     for tool_call_name, callback in menu_tool_calls:
-        icon = load_menu_icon("./工具/settings.png", tool_call_name)
+        icon = load_menu_icon("./工具/developer_mode.png", tool_call_name)
         add_menu_action(tool_menu, tool_call_name, icon, callback)
 
     # 更新
