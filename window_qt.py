@@ -298,8 +298,6 @@ def set_bg_opacity(parent_frame, parent_width, parent_height, bg_path, opacity):
 
 
 open_wins = {}
-
-
 def win_open_manage(open_win_frame: QMainWindow, module: str):
     open_win_name = f"{module}_{open_win_frame.windowTitle()}"
     open_wins[open_win_name] = open_win_frame
