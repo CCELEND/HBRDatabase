@@ -678,7 +678,7 @@ def get_database_version() -> str:
     from 更新.hash import calculate_file_hash
     try:
         key, file_hash = calculate_file_hash("./关于/server_file_hashes.json", "server_file_hashes")
-        describe = f"HBRDatabase2.0a (build-{file_hash[0:8]})"
+        describe = f"HBRDatabase (build-{file_hash[0:8]})"
         return describe
     except Exception as e:
         logger.error(f"计算版本时发生错误: {e}")
