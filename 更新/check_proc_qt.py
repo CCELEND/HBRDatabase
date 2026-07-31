@@ -35,9 +35,7 @@ def check_for_updates_proc():
         if server_file_hashes:
             server_file_hashes = sort_dict_by_key(server_file_hashes)
             save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")
-
-
-        print(f"[+] 已是最新版本:{get_database_version()}")
+            print(f"[+] 服务器版本：{get_database_version()}")
     else:
         # messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
         QMessageBox.critical(None, "错误", f"错误响应：{response}\n请重试或联系开发者")
