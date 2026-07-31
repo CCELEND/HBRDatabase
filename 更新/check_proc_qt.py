@@ -30,6 +30,8 @@ def check_for_updates_proc():
             print(f"[!] 检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
             # messagebox.showinfo("提示", f"检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
             QMessageBox.information(None, "提示", f"检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
+        else:
+            print("[+] 已是最新版本")
 
         server_file_hashes = response.get('server_file_hashes', None)
         if server_file_hashes:
