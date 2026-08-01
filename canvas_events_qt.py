@@ -83,6 +83,26 @@ def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
         return QPixmap()
 
     try:
+
+        if img_path.lower().endswith('.ico'):
+            pil_img = Image.open(img_path)
+            # ICO 可能包含多尺寸，选择最接近目标尺寸的帧
+            target_w, target_h = img_resize
+            best_size = min(pil_img.info.get('sizes', {(pil_img.width, pil_img.height)}),
+                            key=lambda s: abs(s[0] - target_w) + abs(s[1] - target_h))
+            pil_img.size_to_load = best_size  # Pillow 4.2+ 支持指定加载尺寸
+            pil_img = Image.open(img_path)     # 重新打开以应用尺寸选择
+            pil_img = pil_img.resize(img_resize, Image.LANCZOS)
+            
+            # PIL Image → QPixmap
+            if pil_img.mode != 'RGBA':
+                pil_img = pil_img.convert('RGBA')
+            qimg = QImage(pil_img.tobytes(), pil_img.width, pil_img.height, QImage.Format_RGBA8888)
+            pixmap = QPixmap.fromImage(qimg)
+            pixmap_cache[unique_key] = pixmap
+            return pixmap
+
+
         np_arr = np.fromfile(img_path, dtype=np.uint8)
         img_array = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
 
