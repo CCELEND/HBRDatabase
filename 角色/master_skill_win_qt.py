@@ -126,7 +126,7 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
         effect_layout.addWidget(desc_lab, 0, 1, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     missions_row = 1 + len(master_skill.effects)
-    missions_lab = QLabel(master_skill.missions)
+    missions_lab = WrappedLabel(master_skill.missions)
     missions_lab.setFont(MONO_FONT)
     missions_lab.setWordWrap(True)
     missions_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
