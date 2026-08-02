@@ -19,7 +19,8 @@ is_updating = False
 # 将文件哈希值字典发送到服务器
 def send_hashes_to_server(server_url, client_file_hashes):
     headers = {'Content-Type': 'application/json'}
-    response = requests.post(server_url, data=json.dumps(client_file_hashes), headers=headers, timeout=5)
+    payload = {"ver": "tkinter", "hashes": client_file_hashes}
+    response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
     return response.json()
 
 def download_files_with_progress(files_to_download, server_url):
