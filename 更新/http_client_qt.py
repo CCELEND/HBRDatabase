@@ -155,7 +155,7 @@ class UpdateProgressDialog(QDialog):
 def send_hashes_to_server(server_url, client_file_hashes):
     headers = {'Content-Type': 'application/json'}
     payload = {"ver": "PyQT5", "hashes": client_file_hashes}
-    response = requests.post(server_url, data=json.dumps(payload), headers=headeras, timeout=5)
+    response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
     return response.json()
 
 
