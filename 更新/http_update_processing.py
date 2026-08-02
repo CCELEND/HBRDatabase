@@ -17,6 +17,7 @@ def http_update_data():
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"
 
+    response = None
     try:
         # 发送哈希值到服务器
         response = send_hashes_to_server(server_url, current_file_hashes)
@@ -25,7 +26,7 @@ def http_update_data():
         messagebox.showerror("错误", f"连接失败：{str(e)}\n请重试或联系开发者")
 
     # 下载服务器返回的需要更新的文件
-    if 'files_to_download' in response:
+    if response and 'files_to_download' in response:
         download_files_from_server(server_url, response['files_to_download'], response.get('server_file_hashes', None))
     else:
         messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")

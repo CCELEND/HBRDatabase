@@ -13,6 +13,7 @@ def http_update_data(parent_widget):
     current_file_hashes = calculate_file_hashes("./")
     server_url = "http://47.96.235.36:65433"
 
+    response = None
     try:
         response = send_hashes_to_server(server_url, current_file_hashes)
     except Exception as e:
@@ -20,7 +21,7 @@ def http_update_data(parent_widget):
         QMessageBox.critical(parent_widget, "错误", f"连接失败：{str(e)}\n请重试或联系开发者")
         return
 
-    if 'files_to_download' in response:
+    if response and 'files_to_download' in response:
         http_client_qt.download_files_from_server(parent_widget, server_url,
                                    response['files_to_download'],
                                    response.get('server_file_hashes', None))
