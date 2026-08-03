@@ -3,16 +3,10 @@ import types
 
 from PyQt5.QtWidgets import QLabel, QGroupBox, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
-from window_qt import set_window_expand, set_window_icon, creat_Toplevel
+from window_qt import set_window_expand, set_window_icon, creat_Toplevel, MONO_FONT
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 更新.hash import calculate_file_hash
-
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def creat_about_win(parent_frame):
     if is_win_open("关于 HBRDatabase", __name__):
@@ -36,7 +30,7 @@ def creat_about_win(parent_frame):
         layout.setSpacing(5)
 
     ver_frame = QGroupBox("🧰版本")
-    ver_frame.setStyleSheet("QGroupBox::title { font-size: 10px; }")
+    ver_frame.setProperty("smallTitle", True)
     ver_layout = QGridLayout(ver_frame)
     ver_layout.setContentsMargins(10, 10, 10, 10)
     describe = f"HBRDatabase2.0a (build-{file_hash[0:8]})"
@@ -47,7 +41,7 @@ def creat_about_win(parent_frame):
     layout.addWidget(ver_frame, 0, 0, 1, 2)
 
     develop_frame = QGroupBox("🔧开发")
-    develop_frame.setStyleSheet("QGroupBox::title { font-size: 10px; }")
+    develop_frame.setProperty("smallTitle", True)
     develop_layout = QGridLayout(develop_frame)
     develop_layout.setContentsMargins(10, 10, 10, 10)
     describe = ("如有疑问请与我联系：\n不吃花椒的汪汪队（B站空间：https://space.bilibili.com/442776860）\n"
@@ -60,7 +54,7 @@ def creat_about_win(parent_frame):
     layout.addWidget(develop_frame, 1, 0, 1, 2)
 
     info_frame = QGroupBox("📰参考资料")
-    info_frame.setStyleSheet("QGroupBox::title { font-size: 10px; }")
+    info_frame.setProperty("smallTitle", True)
     info_layout = QGridLayout(info_frame)
     info_layout.setContentsMargins(10, 10, 10, 10)
     describe = ("资料站：https://hbr.quest/\n资料站v5.10：https://o.hbr.quest/\n"

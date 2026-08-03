@@ -3,10 +3,8 @@ import types
 
 from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
 from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
-from window_qt import set_window_expand, creat_Toplevel, set_window_icon
+from window_qt import set_window_expand, creat_Toplevel, set_window_icon, MONO_FONT
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_qt import ScrollbarFrameWin
 
@@ -16,13 +14,9 @@ from 角色.team_info import get_team_logo_path
 import 战斗系统.状态.status_info
 import 战斗系统.属性.attributes_info
 
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
-
 def load_resources():
     战斗系统.状态.status_info.get_all_statu_obj()
     战斗系统.属性.attributes_info.get_all_attribute_obj()
-
 
 def creat_desc_frame(row_frame, master_skill):
     desc_frame = QWidget()
@@ -56,7 +50,6 @@ def creat_desc_frame(row_frame, master_skill):
         row_layout.addWidget(desc_frame, 0, 0, 1, 4)
 
     return desc_frame
-
 
 def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     scrollbar_frame_obj.destroy_components()
@@ -133,7 +126,6 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     row_layout.addWidget(missions_lab, missions_row, 0, 1, 4, alignment=Qt.AlignLeft | Qt.AlignVCenter)
 
     return row_frame
-
 
 def creat_master_skill_win(event, parent_frame, role):
     load_resources()

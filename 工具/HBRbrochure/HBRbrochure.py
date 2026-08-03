@@ -299,5 +299,5 @@ def get_hbr_brochure():
     # 加载资源文件
     load_resources()
     # 启动独立线程执行浏览器操作
-    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=True)
     browser_thread.start()

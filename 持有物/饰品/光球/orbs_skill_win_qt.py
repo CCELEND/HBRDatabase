@@ -2,22 +2,16 @@ import types
 
 from PyQt5.QtWidgets import QGroupBox, QWidget, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
 from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
-from window_qt import set_window_expand, creat_Toplevel, set_window_icon_webp
+from window_qt import set_window_expand, creat_Toplevel, set_window_icon_webp, MONO_FONT
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_qt import ScrollbarFrameWin
 
 from 角色.style_text import output_skill_effect
 import 战斗系统.状态.status_info
 
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
-
 def load_resources():
     战斗系统.状态.status_info.get_all_statu_obj()
-
 
 def creat_orb_skill_frame(scrollbar_frame_obj, orb_skill):
     scrollbar_frame_obj.destroy_components()
@@ -89,7 +83,6 @@ def creat_orb_skill_frame(scrollbar_frame_obj, orb_skill):
         current_row += 1
 
     scrollbar_frame_obj.update_canvas()
-
 
 def creat_orb_skill_win(event, parent_frame, orb):
     load_resources()

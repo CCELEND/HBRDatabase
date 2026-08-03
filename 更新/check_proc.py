@@ -40,7 +40,7 @@ def check_for_updates_proc():
 
 def check_for_updates():
     print("[*] 启动更新检查线程...")
-    proc_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
+    proc_thread = threading.Thread(target=check_for_updates_proc, daemon=True)
     proc_thread.start()
 
 

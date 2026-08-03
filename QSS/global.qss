@@ -1,0 +1,26 @@
+/* 全局组件框样式：透明背景 + 浅灰半透明边框 + 白色圆角标题背景 */
+QGroupBox {
+    background-color: transparent;
+    border: 1px solid rgba(200, 200, 200, 120);
+    border-radius: 6px;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 2px 8px;
+    background-color: rgba(255, 255, 255, 160);
+    border-radius: 4px;
+    color: #222222;
+}
+
+QGroupBox[smallTitle="true"]::title {
+    font-size: 10px;
+}
+
+/* BackgroundFrame 内部所有 QWidget 后裔默认透明，避免灰色容器挡住背景图 */
+BackgroundFrame QWidget {
+    background-color: transparent;
+}

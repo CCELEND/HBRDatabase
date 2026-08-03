@@ -10,29 +10,23 @@ from PyQt5.QtWidgets import (
     QSizePolicy, QStatusBar
 )
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter
+from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
+
+
+MONO_FONT = QFont("Monospace", 10, QFont.Bold)
 
 
 def set_global_bg(parent: QApplication, bg="#f0f0f0"):
-    parent.setStyleSheet(f"""
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    global_qss_path = os.path.join(base_dir, "QSS", "global.qss")
+    global_qss = ""
+    if os.path.exists(global_qss_path):
+        with open(global_qss_path, "r", encoding="utf-8") as f:
+            global_qss = f.read()
+
+    parent.setStyleSheet(global_qss + f"""
         QMainWindow, QDialog {{
             background-color: {bg};
-        }}
-        QGroupBox {{
-            background-color: transparent;
-            border: 1px solid rgba(200, 200, 200, 120);
-            border-radius: 6px;
-            margin-top: 10px;
-            font-weight: bold;
-        }}
-        QGroupBox::title {{
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 2px 8px;
-            background-color: rgba(255, 255, 255, 160);
-            border-radius: 4px;
-            color: #222222;
-            font-weight: bold;
         }}
 
         QMenuBar {{

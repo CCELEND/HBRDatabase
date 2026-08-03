@@ -4,6 +4,7 @@ import numpy as np
 import threading
 import queue
 import time
+from functools import lru_cache
 
 from PIL import Image
 
@@ -17,68 +18,12 @@ from PyQt5.QtGui import (
 )
 
 
-pixmap_cache = {}
-# def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
-#     unique_key = f"{img_path}_{img_resize}"
-#     if unique_key in pixmap_cache:
-#         return pixmap_cache[unique_key]
-
-#     if not os.path.exists(img_path):
-#         return QPixmap()
-
-#     try:
-#         np_arr = np.fromfile(img_path, dtype=np.uint8)
-#         img_array = cv2.imdecode(np_arr, cv2.IMREAD_UNCHANGED)
-
-#         if img_array is None:
-#             raise Exception("OpenCV decode failed")
-
-#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_LANCZOS4)
-#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_CUBIC)
-#         # img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_LINEAR) 
-#         img_resized = cv2.resize(img_array, img_resize, interpolation=cv2.INTER_AREA)
-#         if img_resized.ndim == 2:
-#             h, w = img_resized.shape
-#             qimg = QImage(img_resized.data, w, h, w, QImage.Format_Grayscale8)
-#         elif img_resized.shape[2] == 4:
-#             h, w, ch = img_resized.shape
-#             rgba = cv2.cvtColor(img_resized, cv2.COLOR_BGRA2RGBA)
-#             qimg = QImage(rgba.data, w, h, ch * w, QImage.Format_RGBA8888)
-#         else:
-#             h, w, ch = img_resized.shape
-#             rgb = cv2.cvtColor(img_resized, cv2.COLOR_BGR2RGB)
-#             qimg = QImage(rgb.data, w, h, ch * w, QImage.Format_RGB888)
-#         pixmap = QPixmap.fromImage(qimg.copy())
-#     except Exception:
-#         try:
-#             pil_image = Image.open(img_path)
-#             pil_image = pil_image.resize(img_resize, Image.LANCZOS)
-#             if pil_image.mode == 'RGBA':
-#                 qimg = QImage(pil_image.tobytes("raw", "RGBA"),
-#                               pil_image.width, pil_image.height,
-#                               pil_image.width * 4, QImage.Format_RGBA8888)
-#             else:
-#                 pil_image = pil_image.convert('RGB')
-#                 qimg = QImage(pil_image.tobytes("raw", "RGB"),
-#                               pil_image.width, pil_image.height,
-#                               pil_image.width * 3, QImage.Format_RGB888)
-#             pixmap = QPixmap.fromImage(qimg.copy())
-#         except Exception:
-#             return QPixmap()
-
-#     pixmap_cache[unique_key] = pixmap
-#     return pixmap
-
+@lru_cache(maxsize=128)
 def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
     """
     加载图片并缩放为指定尺寸的 QPixmap，带缓存。
     缩小时使用 INTER_AREA 保证平滑，放大时使用 INTER_CUBIC 保证质量。
     """
-    # 将插值策略纳入缓存key，避免切换算法后命中旧缓存
-    unique_key = f"{img_path}_{img_resize}"
-    if unique_key in pixmap_cache:
-        return pixmap_cache[unique_key]
-
     if not os.path.exists(img_path):
         return QPixmap()
 
@@ -99,7 +44,6 @@ def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
                 pil_img = pil_img.convert('RGBA')
             qimg = QImage(pil_img.tobytes(), pil_img.width, pil_img.height, QImage.Format_RGBA8888)
             pixmap = QPixmap.fromImage(qimg)
-            pixmap_cache[unique_key] = pixmap
             return pixmap
 
 
@@ -166,7 +110,6 @@ def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
         except Exception:
             return QPixmap()
 
-    pixmap_cache[unique_key] = pixmap
     return pixmap
 
 
@@ -803,26 +746,6 @@ class BackgroundFrame(QWidget):
         self.setStyleSheet("""
             BackgroundFrame {
                 background-color: transparent;
-            }
-            QGroupBox {
-                background-color: transparent;
-                border: 1px solid rgba(200, 200, 200, 120);
-                border-radius: 6px;
-                margin-top: 10px;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 2px 8px;
-                background-color: rgba(255, 255, 255, 160);
-                border-radius: 4px;
-                color: #222222;
-                font-weight: bold;
-            }
-            QLabel {
-                background-color: transparent;
-                color: #222222;
-                font-weight: bold;
             }
         """)
 

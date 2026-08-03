@@ -2,7 +2,9 @@ from PyQt5.QtWidgets import (
     QScrollArea, QWidget, QFrame, QMainWindow,
     QGridLayout, QSizePolicy
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, QEvent
+
+from canvas_events_qt import BackgroundFrame
 
 
 class _VerticalGridLayout(QGridLayout):
@@ -23,8 +25,10 @@ class _VerticalGridLayout(QGridLayout):
             super().addWidget(widget, *args, **kwargs)
 
 
-class ScrollbarFrameWin:
-    def __init__(self, parent_widget: QWidget, columnspan: int = 6):
+class ScrollbarFrameWin(QObject):
+    def __init__(self, parent_widget: QWidget, columnspan: int = 6,
+                 bg_image_path: str = None, bg_opacity: str = "100%"):
+        super().__init__(parent_widget)
         self.root = parent_widget
         self.columnspan = columnspan
 
@@ -35,6 +39,15 @@ class ScrollbarFrameWin:
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.scroll_area.setFrameShape(QFrame.NoFrame)
 
+        # 若指定了背景图，在滚动区域视口内创建固定的 BackgroundFrame
+        self._bg_frame = None
+        if bg_image_path and __import__("os").path.exists(bg_image_path):
+            viewport = self.scroll_area.viewport()
+            self._bg_frame = BackgroundFrame(viewport, bg_image_path, bg_opacity)
+            self._bg_frame.setGeometry(viewport.rect())
+            self._bg_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+            # 监听视口尺寸变化，保持背景铺满
+            viewport.installEventFilter(self)
 
         # 滚动条样式
         self.scroll_area.setStyleSheet("""
@@ -114,6 +127,13 @@ class ScrollbarFrameWin:
 
         self.scrollable_frame = QWidget()
         self.scrollable_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        if self._bg_frame is not None:
+            # 滚动内容区域透明，让视口层的背景图透出来
+            self.scrollable_frame.setStyleSheet("""
+                QWidget {
+                    background-color: transparent;
+                }
+            """)
         self.scroll_area.setWidget(self.scrollable_frame)
 
         self.layout = _VerticalGridLayout(self.scrollable_frame)
@@ -140,6 +160,20 @@ class ScrollbarFrameWin:
             parent_layout.addWidget(self.scroll_area, 0, 0, 1, self.columnspan)
         else:
             parent_layout.addWidget(self.scroll_area)
+
+    def eventFilter(self, watched, event):
+        if self._bg_frame is not None:
+            try:
+                viewport = self.scroll_area.viewport()
+            except RuntimeError:
+                # 窗口关闭/销毁过程中，滚动区域可能已被释放
+                return False
+            if watched is viewport and event.type() == QEvent.Resize:
+                try:
+                    self._bg_frame.setGeometry(viewport.rect())
+                except RuntimeError:
+                    pass
+        return super().eventFilter(watched, event)
 
     def destroy_components(self):
         layout = self.scrollable_frame.layout()

@@ -2,12 +2,12 @@
 import os
 import types
 
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMenu
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMenu, QSizePolicy
 from PyQt5.QtCore import Qt
 
 from canvas_events_qt import get_pixmap, create_image_label, ClickableLabel
 from canvas_events_qt import bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2, set_tooltip
-from canvas_events_qt import ImageViewerWithScrollbar, VideoPlayerWithScrollbar, BackgroundFrame
+from canvas_events_qt import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top, PreviewWindow
 from scrollbar_frame_qt import ScrollbarFrameWin
@@ -44,19 +44,18 @@ def show_style(scrollbar_frame_obj, style):
         parent_layout.setContentsMargins(10, 10, 10, 10)
         parent_layout.setAlignment(Qt.AlignTop)
 
-    # 技能信息背景（风格立绘，70%透明度），职业和技能都放在里面以保持风格一致
-    artwork_path = style.path.replace("_Thumbnail", "")
-    if os.path.exists(artwork_path):
-        skill_bg_frame = BackgroundFrame(parent_frame, artwork_path, "70%")
-    else:
-        skill_bg_frame = QWidget(parent_frame)
-        skill_bg_layout = QVBoxLayout(skill_bg_frame)
-        skill_bg_layout.setSpacing(10)
-        skill_bg_layout.setContentsMargins(10, 10, 10, 10)
-        skill_bg_layout.setAlignment(Qt.AlignTop)
+    # 技能信息背景容器（背景图由 ScrollbarFrameWin 在视口层固定绘制，不随内容滚动/缩放）
+    skill_bg_frame = QWidget(parent_frame)
+    skill_bg_layout = QVBoxLayout(skill_bg_frame)
+    skill_bg_layout.setSpacing(10)
+    skill_bg_layout.setContentsMargins(10, 10, 10, 10)
+    skill_bg_layout.setAlignment(Qt.AlignTop)
     parent_layout = parent_frame.layout()
     if parent_layout is not None:
-        parent_layout.addWidget(skill_bg_frame)
+        parent_layout.addWidget(skill_bg_frame, 0, 0, 1, 1)
+        parent_layout.setRowStretch(0, 1)
+        parent_layout.setColumnStretch(0, 1)
+        skill_bg_frame.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
     # 职业
     creat_career_frame(skill_bg_frame, 0, style)
@@ -108,7 +107,9 @@ def creat_style_skill_win(event, parent_frame, team, style):
     style_win_frame = creat_Toplevel(open_style_win, 812, 880, 650, 70)
     set_window_icon(style_win_frame, team.logo_path)
     set_window_expand(style_win_frame, rowspan=1, columnspan=2)
-    scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2)
+    artwork_path = style.path.replace("_Thumbnail", "")
+    bg_image_path = artwork_path if os.path.exists(artwork_path) else None
+    scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2, bg_image_path=bg_image_path, bg_opacity="70%")
 
     win_open_manage(style_win_frame, __name__)
 

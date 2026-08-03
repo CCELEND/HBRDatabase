@@ -256,7 +256,7 @@ def delete_mp3_files(directory: str) -> None:
 
 def delete_all_files_and_subdirs(directory: str) -> bool:
     if not os.path.isdir(directory):
-        return
+        return False
     try:
         # 删除目录及其所有内容
         shutil.rmtree(directory)
@@ -283,12 +283,12 @@ def delete_old_file_and_subdirs_proc():
 import threading 
 def delete_old_file_and_subdirs():
     print("[*] 启动旧文件清理线程...")
-    proc_thread = threading.Thread(target=delete_old_file_and_subdirs_proc, daemon=False)
+    proc_thread = threading.Thread(target=delete_old_file_and_subdirs_proc, daemon=True)
     proc_thread.start()
 
 def delete_file(file: str) -> bool:
     if not os.path.isfile(file):
-        return
+        return False
     try:
         # 删除文件
         os.remove(file)
@@ -318,20 +318,20 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
     
     # 检查文件是否存在
     if not file_path.exists():
-        logger.error(f"文件不存在: {file_path}\n{e}")
-        messagebox.showerror("错误", f"文件不存在: {file_path}\n{e}")
+        logger.error(f"文件不存在: {file_path}")
+        messagebox.showerror("错误", f"文件不存在: {file_path}")
         return None
     
     # 检查是否为文件
     if not file_path.is_file():
-        logger.error(f"不是有效的文件: {file_path}\n{e}")
-        messagebox.showerror("错误", f"不是有效的文件: {file_path}\n{e}")
+        logger.error(f"不是有效的文件: {file_path}")
+        messagebox.showerror("错误", f"不是有效的文件: {file_path}")
         return None
     
     # 检查文件是否可读
     if not os.access(file_path, os.R_OK):
-        logger.error(f"文件不可读: {file_path}\n{e}")
-        messagebox.showerror("错误", f"文件不可读: {file_path}\n{e}")
+        logger.error(f"文件不可读: {file_path}")
+        messagebox.showerror("错误", f"文件不可读: {file_path}")
         return None
     
     try:
@@ -349,8 +349,8 @@ def read_txt_file(file_path: str, mode: str = 'text') -> str | list[str] | None:
             with open(file_path, 'r', encoding='utf-8') as file:
                 return file.readlines()
     except UnicodeDecodeError:
-        logger.error(f"文件不是有效的UTF-8编码: {file_path}\n{e}")
-        messagebox.showerror("错误", f"文件不是有效的UTF-8编码: {file_path}\n{e}")
+        logger.error(f"文件不是有效的UTF-8编码: {file_path}")
+        messagebox.showerror("错误", f"文件不是有效的UTF-8编码: {file_path}")
         return None
     except Exception as e:
         logger.error(f"读取文件时发生意外错误: {file_path}\n{e}")

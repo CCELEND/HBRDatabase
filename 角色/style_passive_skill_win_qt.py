@@ -1,8 +1,7 @@
 
 from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
 from tools import has_sublist
 from 角色.style_info import AttackSkill, SkillEffect
@@ -11,14 +10,10 @@ from 角色.style_text import output_skill_effect, output_attack_skill
 import 战斗系统.状态.status_info
 import 战斗系统.属性.attributes_info
 
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
-
 def is_passive_skill_effect(passive_skill_effect_type: list):
     if not passive_skill_effect_type[0] in ["斩", "突", "打"]:
         return True
     return False
-
 
 def creat_passive_effect_frame(effect_frames, effect_frame_row, passive_skill_effect_type: list):
     effect_frame = QWidget()
@@ -79,7 +74,6 @@ def creat_passive_effect_frame(effect_frames, effect_frame_row, passive_skill_ef
     effect_frames_layout.setColumnStretch(0, 1)
 
     return desc_lab, text
-
 
 def creat_passive_skill_frame(parent_frame, passive_skill_frame_row, style):
     passive_skill_frame = QGroupBox("天赋")

@@ -1,16 +1,11 @@
 
 from PyQt5.QtWidgets import QGroupBox, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from canvas_events_qt import get_pixmap, create_image_label, set_tooltip
 
 import 战斗系统.职业.careers_info
 import 战斗系统.属性.attributes_info
-
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def _create_single_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info):
     element_attribute_path = attributes_info[element_attribute].path
@@ -22,7 +17,6 @@ def _create_single_element_attribute(parent_frame, element_attribute, weapon_att
     weapon_attribute_label = create_image_label(parent_frame, weapon_attribute_pixmap, 60, 40)
 
     return element_attribute_label, weapon_attribute_label
-
 
 def _create_double_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info):
     element_attribute_path0 = attributes_info[element_attribute[0]].path
@@ -39,14 +33,12 @@ def _create_double_element_attribute(parent_frame, element_attribute, weapon_att
 
     return element_attribute_label0, element_attribute_label1, weapon_attribute_label
 
-
 def _create_attribute_widgets(parent_frame, element_attribute, weapon_attribute):
     attributes_info = 战斗系统.属性.attributes_info.attributes
     if len(element_attribute) == 1:
         return _create_single_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info)
     else:
         return _create_double_element_attribute(parent_frame, element_attribute, weapon_attribute, attributes_info)
-
 
 def creat_career_frame(parent_frame, career_frame_row, style):
     element_attribute = style.element_attribute if style.element_attribute is not None else "无"

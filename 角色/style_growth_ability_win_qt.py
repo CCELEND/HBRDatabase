@@ -1,14 +1,10 @@
 
 from PyQt5.QtWidgets import QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from canvas_events_qt import get_pixmap, create_image_label
 
 import 持有物.强化素材.strengthen_materials
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def creat_growth_ability_frame(parent_frame, growth_ability_frame_row, style):
     growth_ability_frame = QGroupBox("强化")

@@ -3,13 +3,10 @@ import types
 
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QHBoxLayout, QComboBox
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from tools import get_list_not_isinstance_index
 from 角色.style_effect_win_qt import delete_all_effect_frame, set_effect_frames
 from 角色.style_combobox_win_qt import bind_lv_combo_lab
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
 
 SELECTED_STYLE = """
     QPushButton {
@@ -40,12 +37,10 @@ UNSELECTED_STYLE = """
     }
 """
 
-
 def is_skill_change(active_skill) -> bool:
     if active_skill.switch:
         return True
     return False
-
 
 def active_skill_change_proc(scrollbar_frame_obj, row_frame, change_effects_infos, active_skill):
     desc_index = get_list_not_isinstance_index(change_effects_infos)
@@ -96,7 +91,6 @@ def active_skill_change_proc(scrollbar_frame_obj, row_frame, change_effects_info
 
     scrollbar_frame_obj.update_canvas()
 
-
 class ChangeButtonManager:
     def __init__(self):
         self.current_button = None
@@ -113,7 +107,6 @@ class ChangeButtonManager:
         button.setStyleSheet(SELECTED_STYLE)
         self.current_button = button
         self.current_name = change_name
-
 
 def creat_active_skill_change_frame(scrollbar_frame_obj, parent_frame, active_skill) -> list:
 

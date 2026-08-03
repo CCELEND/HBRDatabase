@@ -72,7 +72,6 @@ def creat_select_frame(label_content, options, selected_values, parent_frame, ro
 
     for i, value in enumerate(options):
         check_box = QCheckBox(value)
-        check_box.setStyleSheet("QCheckBox { background-color: #f0f0f0; color: #333333; }")
         check_box.stateChanged.connect(lambda: on_select(check_vars, options, last, selected_values))
 
         r = i // n

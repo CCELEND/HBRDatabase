@@ -1,11 +1,7 @@
 
 from PyQt5.QtWidgets import QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
-
+from window_qt import MONO_FONT
 def creat_growth_status_frame(parent_frame, growth_status_frame_row, style):
     growth_status_frame = QGroupBox("成长状态")
     growth_status_frame.setFont(MONO_FONT)

@@ -4,12 +4,10 @@ import types
 
 from PyQt5.QtWidgets import QWidget, QLabel, QGroupBox, QGridLayout, QMenu
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
 from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label, WrappedLabel
 from canvas_events_qt import mouse_bind_canvas_events2, right_click_bind_canvas_events, set_tooltip
 from canvas_events_qt import ArtworkDisplayerHeight
-from window_qt import set_window_expand, set_window_icon, creat_Toplevel
+from window_qt import set_window_expand, set_window_icon, creat_Toplevel, MONO_FONT
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 from scrollbar_frame_qt import ScrollbarFrameWin
 
@@ -20,18 +18,13 @@ from 角色.master_skill_win_qt import creat_master_skill_win
 
 import 战斗系统.武器.weapons_info
 
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
-
 def load_resources():
     战斗系统.武器.weapons_info.get_all_weapon_obj()
-
 
 def creat_role_right_menu(event, parent_frame, role: Role, team: Team):
     right_click_menu = QMenu(parent_frame)
     right_click_menu.addAction("全身画", lambda: show_role_full_img(event, parent_frame, role, team))
     right_click_menu.exec_(event.globalPos())
-
 
 def show_role_full_img(event, parent_frame, role: Role, team: Team):
     open_role_win = role.name + "-full"
@@ -54,7 +47,6 @@ def show_role_full_img(event, parent_frame, role: Role, team: Team):
 
     return "break"
 
-
 def show_role_img(event, parent_frame, role: Role, team: Team):
     open_role_win = role.name
     if is_win_open(open_role_win, __name__):
@@ -68,7 +60,6 @@ def show_role_img(event, parent_frame, role: Role, team: Team):
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
 
     return "break"
-
 
 def bind_style_canvas(parent_frame, team: Team, style, x, y):
     outer_frame = QWidget(parent_frame)
@@ -96,7 +87,6 @@ def bind_style_canvas(parent_frame, team: Team, style, x, y):
 
     return outer_frame
 
-
 def bind_master_skill_canvas(parent_frame, role: Role, x, y):
     photo_path = get_role_master_img(role)
 
@@ -122,7 +112,6 @@ def bind_master_skill_canvas(parent_frame, role: Role, x, y):
         parent_layout.addWidget(outer_frame, x, y, alignment=Qt.AlignCenter)
 
     return outer_frame
-
 
 def show_rarity(frame, role: Role, team: Team, row=2):
     frame_layout = frame.layout()
@@ -212,7 +201,6 @@ def show_rarity(frame, role: Role, team: Team, row=2):
 
     return row
 
-
 def creat_team_desc_frame(parent_frame, team: Team):
     team_desc_frame = QGroupBox(team.name)
     team_desc_frame.setFont(MONO_FONT)
@@ -240,7 +228,6 @@ def creat_team_desc_frame(parent_frame, team: Team):
 
     return team_desc_frame
 
-
 def creat_weapon_frame(parent_frame, role: Role):
     weapon = 战斗系统.武器.weapons_info.weapons[role.weapon]
 
@@ -258,7 +245,6 @@ def creat_weapon_frame(parent_frame, role: Role):
     weapon_layout.addWidget(weapon_label, 0, 0, alignment=Qt.AlignCenter)
 
     return weapon_frame
-
 
 def _ensure_grid_layout(widget):
     layout = widget.layout()
@@ -284,7 +270,6 @@ def _ensure_grid_layout(widget):
         layout.deleteLater()
     new_layout = QGridLayout(widget)
     return new_layout
-
 
 def show_team(scrollbar_frame_obj, team: Team):
     scrollbar_frame_obj.destroy_components()
@@ -341,7 +326,6 @@ def show_team(scrollbar_frame_obj, team: Team):
         show_rarity(frame, role, team)
 
     scrollbar_frame_obj.update_canvas()
-
 
 def creat_team_win(parent_frame, team_name):
     if is_win_open(team_name, __name__):

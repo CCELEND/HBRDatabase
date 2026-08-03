@@ -1,17 +1,13 @@
 
 from PyQt5.QtWidgets import QWidget, QGroupBox, QLabel, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from tools import not_letter
 
 from canvas_events_qt import WrappedLabel
 from 角色.style_combobox_win_qt import creat_lv_combo_lab, bind_lv_combo_lab
 from 角色.style_active_skill_change_win_qt import creat_active_skill_change_frame, is_skill_change
 from 角色.style_effect_win_qt import set_effect_frames
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     desc_frame = QWidget()
@@ -59,7 +55,6 @@ def creat_desc_frame(row_frame, desc_frame_row, active_skill):
     desc_frame.setSizePolicy(desc_frame_sp)
 
     return desc_frame
-
 
 def creat_active_skill_frame(scrollbar_frame_obj, parent_frame, active_skill_frame_row, style):
     active_skill_frame = QGroupBox("主动技能 / 被动技能")

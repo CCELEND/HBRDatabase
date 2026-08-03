@@ -44,5 +44,5 @@ def run_browser_in_thread():
 
 def load_game_bilibili_com():
     # 启动独立线程执行浏览器操作
-    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=False)
+    browser_thread = threading.Thread(target=run_browser_in_thread, daemon=True)
     browser_thread.start()

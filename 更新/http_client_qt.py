@@ -51,7 +51,7 @@ class DownloadThread(QThread):
 
                 encoded_name = quote(file_name)
                 url = f"{self.server_url}/download/{encoded_name}"
-                with requests.get(url, stream=True) as response:
+                with requests.get(url, stream=True, timeout=30) as response:
                     response.raise_for_status()
                     if response.status_code != 200:
                         err_info = response.json()

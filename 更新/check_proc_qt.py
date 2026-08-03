@@ -5,13 +5,20 @@ import threading
 from 更新.http_client_qt import send_hashes_to_server
 from tools import sort_dict_by_key, get_database_version
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QMessageBox, QApplication
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
+def _app_is_closing():
+    qapp = QApplication.instance()
+    return qapp is None or qapp.closingDown()
+
 def check_for_updates_proc():
     current_file_hashes = calculate_file_hashes("./")
+    if _app_is_closing():
+        return
+
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"
 
@@ -20,9 +27,14 @@ def check_for_updates_proc():
         # 发送哈希值到服务器
         response = send_hashes_to_server(server_url, current_file_hashes)
     except Exception as e:
+        if _app_is_closing():
+            return
         logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
         # messagebox.showerror("错误", f"连接失败：{str(e)}\n请重试或联系开发者")
         QMessageBox.critical(None, "错误", f"连接失败：{str(e)}\n请重试或联系开发者")
+        return
+
+    if _app_is_closing():
         return
 
     # 下载服务器返回的需要更新的文件
@@ -39,13 +51,15 @@ def check_for_updates_proc():
             save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")
             print(f"[+] 服务器构建版本：{get_database_version()}")
     else:
+        if _app_is_closing():
+            return
         # messagebox.showerror("错误", f"错误响应：{response}\n请重试或联系开发者")
         QMessageBox.critical(None, "错误", f"错误响应：{response}\n请重试或联系开发者")
         logger.error(f"错误响应：{response}\n请重试或联系开发者")
 
 def check_for_updates():
     print("[*] 启动更新检查线程...")
-    proc_thread = threading.Thread(target=check_for_updates_proc, daemon=False)
+    proc_thread = threading.Thread(target=check_for_updates_proc, daemon=True)
     proc_thread.start()
 
 

@@ -1,12 +1,8 @@
 
 from PyQt5.QtWidgets import QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from canvas_events_qt import get_pixmap, create_image_label
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def creat_resonance_frame(parent_frame, resonance_frame_row, style):
     name = style.resonance['name']

@@ -1,8 +1,7 @@
 
 from PyQt5.QtWidgets import QWidget, QGridLayout, QSizePolicy
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
-
+from window_qt import MONO_FONT
 from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel, QLabel
 
 from 角色.style_text import output_attack_skill, output_skill_effect
@@ -10,9 +9,6 @@ from 角色.style_info import is_skill_effect
 
 import 战斗系统.属性.attributes_info
 import 战斗系统.状态.status_info
-
-MONO_FONT = QFont("Monospace", 10, QFont.Bold)
-
 
 def set_effect_frames(effect_frames, show_effects):
     main_effect_lv_combo_lab = []
@@ -39,7 +35,6 @@ def set_effect_frames(effect_frames, show_effects):
 
     return lv_combo_labs, lv_combo_texts
 
-
 def delete_all_effect_frame(effect_frames):
     layout = effect_frames.layout()
     if layout is None:
@@ -49,7 +44,6 @@ def delete_all_effect_frame(effect_frames):
         widget = item.widget()
         if widget is not None:
             widget.deleteLater()
-
 
 def delete_effect_frame(effect_frames, effect_frame_row):
     layout = effect_frames.layout()
@@ -65,7 +59,6 @@ def delete_effect_frame(effect_frames, effect_frame_row):
             if row == effect_frame_row:
                 widget.deleteLater()
                 return
-
 
 def creat_effect_frame(effect_frames, effect_frame_row, skill):
     effect_frame = QWidget()
