@@ -1,9 +1,9 @@
 # HBRDatabase — 炽焰天穹本地数据库
 
 **基于 Python Tkinter‌ 的 GUI 应用，支持角色风格搜索、seed 自动获取、词条计算、红烧 BOX 自动获取、HBR 音乐资源下载等**
->基于 Python 的 PyQT5 版本已重构完成  
 
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show.png)
+>基于 Python 的 PyQT5 版本已重构完成  
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show2.png)
 
 ## 安装依赖
