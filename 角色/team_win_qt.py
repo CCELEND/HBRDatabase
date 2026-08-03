@@ -37,7 +37,7 @@ def show_role_full_img(event, parent_frame, role: Role, team: Team):
     win_open_manage(role_full_img_frame, __name__)
 
     role_full_path = role.img_path.replace("Profile", "")
-    displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840, padding=70)
+    displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840, padding=100)
 
     def on_close(self, event):
         win_close_manage(role_full_img_frame, __name__, displayer)
