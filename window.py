@@ -15,7 +15,7 @@ def set_window_disable_size(parent_frame: ttk.Window):
 
 menu_icons = {}
 def load_menu_icon(path: str, name: str) -> ImageTk.PhotoImage:
-    if not path:
+    if not path or not os.path.exists(path):
         return None
     if name in menu_icons:
         return menu_icons[name]
