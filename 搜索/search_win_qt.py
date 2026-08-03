@@ -101,40 +101,9 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         for col in range(5):
             scroll_layout.setColumnStretch(col, 1)
 
-    # scroll_layout.setContentsMargins(10, 10, 10, 10)
-    # scroll_layout.setSpacing(5)
+    scroll_layout.setContentsMargins(10, 10, 10, 10)
+    scroll_layout.setSpacing(5)
     scroll_layout.setAlignment(Qt.AlignTop)
-
-    results_container = QWidget()
-    results_container.setStyleSheet("""
-        QGroupBox {
-            background-color: transparent;
-            border: 1px solid rgba(200, 200, 200, 120);
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 2px 8px;
-            background-color: rgba(255, 255, 255, 160);
-            border-radius: 4px;
-            color: #222222;
-            font-weight: bold;
-        }
-        QLabel {
-            background-color: transparent;
-            color: #222222;
-            font-weight: bold;
-        }
-    """)
-    results_layout = QGridLayout(results_container)
-    results_layout.setContentsMargins(10, 10, 10, 10)
-    results_layout.setSpacing(5)
-    results_layout.setAlignment(Qt.AlignTop)
-    for col in range(5):
-        results_layout.setColumnStretch(col, 1)
-    scroll_layout.addWidget(results_container, 0, 0, 1, 5)
 
     if selected_values_dir["大师技能"]:
         filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
@@ -158,7 +127,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 
             row = i // 6
             column = i % 6
-            results_layout.addWidget(master_skill_frame, row, column)
+            scroll_layout.addWidget(master_skill_frame, row, column)
 
         scrollbar_frame_obj.update_canvas()
         return "break"
@@ -177,7 +146,7 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 
         row = i // 5
         column = i % 5
-        results_layout.addWidget(style_frame, row, column)
+        scroll_layout.addWidget(style_frame, row, column)
 
     scrollbar_frame_obj.update_canvas()
     return "break"
@@ -263,28 +232,6 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
         QTextEdit:focus {
             border-color: #0078d4;
             background-color: #fafcff;
-        }
-
-        /* ----- 组件框 ----- */
-        QGroupBox {
-            background-color: transparent;
-            border: 1px solid rgba(200, 200, 200, 120);
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 2px 8px;
-            background-color: rgba(255, 255, 255, 160);
-            border-radius: 4px;
-            color: #222222;
-            font-weight: bold;
-        }
-        QLabel {
-            background-color: transparent;
-            color: #222222;
-            font-weight: bold;
         }
 
         /* ----- 窗口背景（保持与主窗口一致） ----- */

@@ -291,28 +291,6 @@ def show_team(scrollbar_frame_obj, team: Team):
 
     scrollable_frame = scrollbar_frame_obj.scrollable_frame
     grid_container = QWidget(scrollable_frame)
-    grid_container.setStyleSheet("""
-        QGroupBox {
-            background-color: transparent;
-            border: 1px solid rgba(200, 200, 200, 120);
-            border-radius: 6px;
-            margin-top: 10px;
-        }
-        QGroupBox::title {
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 2px 8px;
-            background-color: rgba(255, 255, 255, 160);
-            border-radius: 4px;
-            color: #222222;
-            font-weight: bold;
-        }
-        QLabel {
-            background-color: transparent;
-            color: #222222;
-            font-weight: bold;
-        }
-    """)
     scroll_layout = QGridLayout(grid_container)
     scroll_layout.setSpacing(10)
     scroll_layout.setContentsMargins(10, 10, 10, 10)

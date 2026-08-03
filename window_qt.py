@@ -19,17 +19,20 @@ def set_global_bg(parent: QApplication, bg="#f0f0f0"):
             background-color: {bg};
         }}
         QGroupBox {{
-            background-color: {bg};
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-top: 12px;
-            padding-top: 12px;
+            background-color: transparent;
+            border: 1px solid rgba(200, 200, 200, 120);
+            border-radius: 6px;
+            margin-top: 10px;
             font-weight: bold;
         }}
         QGroupBox::title {{
             subcontrol-origin: margin;
             left: 10px;
-            padding: 0 5px;
+            padding: 2px 8px;
+            background-color: rgba(255, 255, 255, 160);
+            border-radius: 4px;
+            color: #222222;
+            font-weight: bold;
         }}
 
         QMenuBar {{
