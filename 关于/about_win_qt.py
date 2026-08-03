@@ -33,7 +33,7 @@ def creat_about_win(parent_frame):
     ver_frame.setProperty("smallTitle", True)
     ver_layout = QGridLayout(ver_frame)
     ver_layout.setContentsMargins(10, 10, 10, 10)
-    describe = f"HBRDatabase2.0a (build-{file_hash[0:8]})"
+    describe = f"HBRDatabase2.1 (build-{file_hash[0:8]})"
     label = QLabel(describe)
     label.setFont(MONO_FONT)
     label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
