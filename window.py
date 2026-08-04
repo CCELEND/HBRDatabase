@@ -100,18 +100,20 @@ def set_window_icon(frame: ttk.Window, icon_path: str):
             # 加载图像并调整为64×64像素
             image = Image.open(icon_path)
             image = image.resize((64, 64), Image.LANCZOS)
-            
+
             # 创建临时ICO文件路径
             temp_ico_path = os.path.splitext(icon_path)[0] + '_temp.ico'
-            
-            # 保存为ICO格式
-            image.save(temp_ico_path, format='ICO', sizes=[(64, 64)])
-            
-            # 设置窗口图标
-            frame.iconbitmap(temp_ico_path)
-            
-            # 清理临时文件（可选）
-            os.remove(temp_ico_path)
+
+            try:
+                # 保存为ICO格式
+                image.save(temp_ico_path, format='ICO', sizes=[(64, 64)])
+
+                # 设置窗口图标
+                frame.iconbitmap(temp_ico_path)
+            finally:
+                # 无论是否出错都清理临时文件
+                if os.path.exists(temp_ico_path):
+                    os.remove(temp_ico_path)
         else:
             messagebox.showerror("错误", "不支持的文件格式，请使用ICO、PNG、JPG或BMP格式")
     except Exception as e:
@@ -124,11 +126,17 @@ def set_window_icon_webp_save(frame: ttk.Window, webp_path: str, size=(64, 64)):
         icon_image = Image.open(webp_path).convert("RGBA")
         # 调整图片大小
         icon_image = icon_image.resize(size, Image.LANCZOS)
-        # 保存为临时 .ico 文件
-        temp_icon_path = webp_path[-4:] + ".ico"
-        icon_image.save(temp_icon_path, format="ICO", sizes=[(size[0], size[1])])
-        # 设置窗口图标
-        frame.iconbitmap(temp_icon_path)
+        # 保存为临时 .ico 文件（与源文件同目录）
+        temp_icon_path = os.path.splitext(webp_path)[0] + ".ico"
+
+        try:
+            icon_image.save(temp_icon_path, format="ICO", sizes=[(size[0], size[1])])
+            # 设置窗口图标
+            frame.iconbitmap(temp_icon_path)
+        finally:
+            # 无论是否出错都清理临时文件
+            if os.path.exists(temp_icon_path):
+                os.remove(temp_icon_path)
     except FileNotFoundError:
         messagebox.showerror("错误", "图标文件未找到")
     except Exception as e:

@@ -160,15 +160,18 @@ def set_window_disable_size(parent_frame: QMainWindow):
     parent_frame.setFixedSize(parent_frame.size())
 
 
-def _save_ico(icon_path: str, size=(64, 64)) -> str:
+def _load_icon(icon_path: str, size=(64, 64)) -> QIcon:
     file_ext = os.path.splitext(icon_path)[1].lower()
     if file_ext == '.ico':
-        return icon_path
-    temp_ico_path = os.path.splitext(icon_path)[0] + '_temp.ico'
-    image = Image.open(icon_path)
+        return QIcon(icon_path)
+    image = Image.open(icon_path).convert("RGBA")
     image = image.resize(size, Image.LANCZOS)
-    image.save(temp_ico_path, format='ICO', sizes=[size])
-    return temp_ico_path
+    data = image.tobytes("raw", "RGBA")
+    pixmap = QPixmap.fromImage(
+        QImage(data, image.width, image.height,
+               image.width * 4, QImage.Format_RGBA8888)
+    )
+    return QIcon(pixmap)
 
 
 def set_window_icon(frame: QMainWindow, icon_path: str):
@@ -176,8 +179,7 @@ def set_window_icon(frame: QMainWindow, icon_path: str):
         QMessageBox.critical(frame, "错误", "图标文件未找到")
         return
     try:
-        ico_path = _save_ico(icon_path)
-        frame.setWindowIcon(QIcon(ico_path))
+        frame.setWindowIcon(_load_icon(icon_path))
     except Exception as e:
         QMessageBox.critical(frame, "错误", f"设置图标时出错: {str(e)}")
 
