@@ -26,7 +26,12 @@ class CheckBoxVar:
         return self.cb.isChecked()
 
     def set(self, v):
-        self.cb.setChecked(v)
+        # 程序同步状态时阻塞信号，避免触发 stateChanged 导致 on_select 递归
+        self.cb.blockSignals(True)
+        try:
+            self.cb.setChecked(v)
+        finally:
+            self.cb.blockSignals(False)
 
 
 has_shown_warning = False
