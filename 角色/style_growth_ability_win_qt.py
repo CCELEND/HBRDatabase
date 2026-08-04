@@ -2,7 +2,7 @@
 from PyQt5.QtWidgets import QGroupBox, QLabel, QGridLayout
 from PyQt5.QtCore import Qt
 from window_qt import MONO_FONT
-from canvas_events_qt import get_pixmap, create_image_label
+from canvas_events_qt import get_pixmap, create_image_label, WrappedLabel
 
 import 持有物.强化素材.strengthen_materials
 
@@ -37,7 +37,8 @@ def creat_growth_ability_frame(parent_frame, growth_ability_frame_row, style):
         layout.addWidget(hoju_label, 0, 0, alignment=Qt.AlignCenter)
 
         text = style.growth_ability.description
-        growth_ability_lab = QLabel(text)
+        # growth_ability_lab = QLabel(text)
+        growth_ability_lab = WrappedLabel(text)
         growth_ability_lab.setFont(MONO_FONT)
         growth_ability_lab.setWordWrap(True)
         growth_ability_lab.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
