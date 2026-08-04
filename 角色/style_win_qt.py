@@ -5,9 +5,7 @@ import types
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QMenu, QSizePolicy
 from PyQt5.QtCore import Qt
 
-from canvas_events_qt import get_pixmap, create_image_label, ClickableLabel
-from canvas_events_qt import bind_canvas_events, right_click_bind_canvas_events, mouse_bind_canvas_events2, set_tooltip
-from canvas_events_qt import ImageViewerWithScrollbar, VideoPlayerWithScrollbar
+from canvas_events_qt import VideoPlayerWithScrollbar
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top, PreviewWindow
 from scrollbar_frame_qt import ScrollbarFrameWin
