@@ -49,75 +49,12 @@ class ScrollbarFrameWin(QObject):
             # 监听视口尺寸变化，保持背景铺满
             viewport.installEventFilter(self)
 
-        # 滚动条样式
+        # 滚动区域无边框/透明背景（滚动条样式由全局 QSS 统一控制）
         self.scroll_area.setStyleSheet("""
             /* 滚动区域本身无边框无背景 */
             QScrollArea {
                 border: none;
                 background: transparent;
-            }
-
-            /* ----- 垂直滚动条 ----- */
-            QScrollBar:vertical {
-                border: none;
-                background: rgba(0, 0, 0, 0.06);   /* 极浅的灰色底 */
-                width: 8px;
-                margin: 0px;
-                border-radius: 4px;
-            }
-            QScrollBar::handle:vertical {
-                background: rgba(0, 0, 0, 0.25);   /* 手柄半透明深灰 */
-                min-height: 30px;
-                border-radius: 4px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: rgba(0, 0, 0, 0.40);   /* 悬停变深 */
-            }
-            QScrollBar::handle:vertical:pressed {
-                background: rgba(0, 0, 0, 0.60);   /* 按下更深 */
-            }
-            /* 隐藏上下箭头按钮，更简洁 */
-            QScrollBar::add-line:vertical,
-            QScrollBar::sub-line:vertical {
-                border: none;
-                background: none;
-                height: 0px;
-            }
-            /* 隐藏滚动条占位区域（页眉/页脚） */
-            QScrollBar::add-page:vertical,
-            QScrollBar::sub-page:vertical {
-                background: none;
-            }
-
-            /* ----- 水平滚动条 ----- */
-            QScrollBar:horizontal {
-                border: none;
-                background: rgba(0, 0, 0, 0.06);
-                height: 8px;
-                margin: 0px;
-                border-radius: 4px;
-            }
-            QScrollBar::handle:horizontal {
-                background: rgba(0, 0, 0, 0.25);
-                min-width: 30px;
-                border-radius: 4px;
-            }
-            QScrollBar::handle:horizontal:hover {
-                background: rgba(0, 0, 0, 0.40);
-            }
-            QScrollBar::handle:horizontal:pressed {
-                background: rgba(0, 0, 0, 0.60);
-            }
-            /* 隐藏左右箭头按钮 */
-            QScrollBar::add-line:horizontal,
-            QScrollBar::sub-line:horizontal {
-                border: none;
-                background: none;
-                width: 0px;
-            }
-            QScrollBar::add-page:horizontal,
-            QScrollBar::sub-page:horizontal {
-                background: none;
             }
         """)
 
