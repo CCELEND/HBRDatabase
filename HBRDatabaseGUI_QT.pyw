@@ -1,4 +1,21 @@
 import sys
+
+# 兼容 CPython 3.12/3.13 早期版本：退出时 _active_limbo_lock 可能为 None，
+# 导致 DummyThread 清理抛出 TypeError。此处安全地忽略该异常。
+try:
+    import threading
+    _dtd_cls = getattr(threading, "_DeleteDummyThreadOnDel", None)
+    if _dtd_cls is not None:
+        _orig_del = _dtd_cls.__del__
+        def _safe_dummy_thread_del(self):
+            try:
+                _orig_del(self)
+            except TypeError:
+                pass
+        _dtd_cls.__del__ = _safe_dummy_thread_del
+except Exception:
+    pass
+
 import os
 import subprocess
 
