@@ -51,7 +51,7 @@ def check_for_updates_proc(messenger):
     response = None
     try:
         # 发送哈希值到服务器
-        response = send_hashes_to_server(server_url, current_file_hashes)
+        response = send_hashes_to_server(server_url, current_file_hashes, "check")
     except Exception as e:
         if _app_is_closing():
             return

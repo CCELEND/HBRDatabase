@@ -15,7 +15,7 @@ def http_update_data(parent_widget):
 
     response = None
     try:
-        response = send_hashes_to_server(server_url, current_file_hashes)
+        response = send_hashes_to_server(server_url, current_file_hashes, "update")
     except Exception as e:
         logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
         QMessageBox.critical(parent_widget, "错误", f"连接失败：{str(e)}\n请重试或联系开发者")

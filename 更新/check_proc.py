@@ -17,7 +17,7 @@ def check_for_updates_proc():
     response = None
     try:
         # 发送哈希值到服务器
-        response = send_hashes_to_server(server_url, current_file_hashes)
+        response = send_hashes_to_server(server_url, current_file_hashes, "check")
     except Exception as e:
         logger.error(f"连接失败：{str(e)}\n请重试或联系开发者")
         messagebox.showerror("错误", f"连接失败：{str(e)}\n请重试或联系开发者")

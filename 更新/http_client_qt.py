@@ -152,9 +152,9 @@ class UpdateProgressDialog(QDialog):
 
 
 # ---------- 对外接口 ----------
-def send_hashes_to_server(server_url, client_file_hashes):
+def send_hashes_to_server(server_url, client_file_hashes, oper="update"):
     headers = {'Content-Type': 'application/json'}
-    payload = {"ver": "PyQT5", "hashes": client_file_hashes}
+    payload = {"ver": "PyQT5", "oper": oper, "hashes": client_file_hashes}
     response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
     return response.json()
 
