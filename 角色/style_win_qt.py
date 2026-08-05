@@ -194,9 +194,9 @@ def show_style_artwork(parent_frame, team, style):
         _qt_app = app
     else:
         _qt_app = app
-    app.setQuitOnLastWindowClosed(False)
 
     preview_win = PreviewWindow(title_name=open_style_win)
+    preview_win.setAttribute(Qt.WA_DeleteOnClose, True)
 
     if hasattr(team, 'logo_path') and os.path.exists(team.logo_path):
         preview_win.setWindowIcon(QIcon(team.logo_path))

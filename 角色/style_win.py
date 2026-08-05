@@ -174,7 +174,6 @@ def show_style_artwork(parent_frame, team, style):
         _qt_app = app  # 保存到全局，防止被回收
     else:
         _qt_app = app
-    app.setQuitOnLastWindowClosed(False)
 
     # 创建新的 PreviewWindow
     preview_win = PreviewWindow(title_name=open_style_win)
