@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import (
     QGridLayout, QSizePolicy
 )
 from PyQt5.QtCore import Qt, QObject, QEvent
+from PyQt5 import sip
 
 from canvas_events_qt import BackgroundFrame
 
@@ -99,18 +100,31 @@ class ScrollbarFrameWin(QObject):
             parent_layout.addWidget(self.scroll_area)
 
     def eventFilter(self, watched, event):
-        if self._bg_frame is not None:
+        # 窗口销毁期间，C++ 对象可能已被释放，统一做安全访问
+        try:
+            if self._bg_frame is None:
+                return super().eventFilter(watched, event)
+
+            if sip.isdeleted(self.scroll_area) or sip.isdeleted(self._bg_frame):
+                return False
+
             try:
                 viewport = self.scroll_area.viewport()
             except RuntimeError:
-                # 窗口关闭/销毁过程中，滚动区域可能已被释放
                 return False
+            if viewport is None or sip.isdeleted(viewport):
+                return False
+
             if watched is viewport and event.type() == QEvent.Resize:
                 try:
                     self._bg_frame.setGeometry(viewport.rect())
                 except RuntimeError:
                     pass
-        return super().eventFilter(watched, event)
+
+            return super().eventFilter(watched, event)
+        except RuntimeError:
+            # 销毁过程中访问已删除对象，直接放行
+            return False
 
     def destroy_components(self):
         layout = self.scrollable_frame.layout()

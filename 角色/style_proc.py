@@ -205,11 +205,12 @@ def set_label_text(label, text):
     # 检查 PyQt 控件是否已被删除
     try:
         from PyQt5.QtWidgets import QWidget
-        if isinstance(label, QWidget) and not label.isVisible() and not label.parent():
-            pass
-    except:
+        from PyQt5 import sip
+        if isinstance(label, QWidget) and sip.isdeleted(label):
+            return
+    except Exception:
         pass
-    
+
     try:
         if hasattr(label, "setText"):
             # 这行会触发 RuntimeError: wrapped C/C++ object has been deleted
