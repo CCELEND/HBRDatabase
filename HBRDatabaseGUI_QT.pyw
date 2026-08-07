@@ -46,6 +46,25 @@ from window_qt import (
 from scrollbar_frame_qt import ScrollbarFrameWin
 from tools import delete_old_file_and_subdirs, is_admin
 
+
+TOOL_BUTTON_STYLE = """
+    QToolButton {
+        padding: 4px 10px;
+        border: none;
+        color: #333333;
+        background-color: transparent;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+    }
+    QToolButton:hover {
+        background-color: #e0e0e0;
+    }
+    QToolButton:pressed {
+        background-color: #d0d0d0;
+    }
+"""
+
 from 日志.error_queue_proc_qt import check_error_queue_qt
 from 更新.check_proc_qt import check_for_updates
 
@@ -280,23 +299,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     search_btn = QToolButton()
     search_btn.setText("🔍搜索")
     search_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-    search_btn.setStyleSheet("""
-        QToolButton {
-            padding: 4px 10px;
-            border: none;
-            color: #333333;
-            background-color: transparent;
-            border-radius: 4px;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        QToolButton:hover {
-            background-color: #e0e0e0;
-        }
-        QToolButton:pressed {
-            background-color: #d0d0d0;
-        }
-    """)
+    search_btn.setStyleSheet(TOOL_BUTTON_STYLE)
     search_btn.clicked.connect(lambda: creat_search_win(root, scrollbar_frame_obj))
     menu_bar.addWidget(search_btn)
 
@@ -304,7 +307,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     music_btn = QToolButton()
     music_btn.setText("🎧音乐")
     music_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-    music_btn.setStyleSheet(search_btn.styleSheet())  # 复用样式
+    music_btn.setStyleSheet(TOOL_BUTTON_STYLE)
     music_btn.clicked.connect(lambda: creat_music_win())
     menu_bar.addWidget(music_btn)
 
@@ -337,7 +340,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     update_btn = QToolButton()
     update_btn.setText("📲更新")
     update_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-    update_btn.setStyleSheet(search_btn.styleSheet())
+    update_btn.setStyleSheet(TOOL_BUTTON_STYLE)
     update_btn.clicked.connect(lambda: http_update_data(root))
     menu_bar.addWidget(update_btn)
 
@@ -345,7 +348,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     about_btn = QToolButton()
     about_btn.setText("🏷️关于")
     about_btn.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-    about_btn.setStyleSheet(search_btn.styleSheet())
+    about_btn.setStyleSheet(TOOL_BUTTON_STYLE)
     about_btn.clicked.connect(lambda: creat_about_win(root))
     menu_bar.addWidget(about_btn)
 
@@ -361,15 +364,19 @@ if __name__ == "__main__":
         base_dir = os.path.dirname(os.path.abspath(__file__))
         qss_path = os.path.join(base_dir, 'QSS', 'QMessageBox_qss', 'style.qss')
         with open(qss_path, 'r', encoding='utf-8') as f:
-            app.setStyleSheet(f.read())
+            qss_content = f.read()
 
         if is_admin():
             root_win_name = "HBRDatabase - 以管理员身份运行"
         else:
             root_win_name = "HBRDatabase"
 
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(None, "提示", "由于作者工作性质特殊等原因，本数据库客户端、服务端即将停止更新及维护。")
+
         delete_old_file_and_subdirs()
         set_global_bg(app)
+        app.setStyleSheet(app.styleSheet() + "\n" + qss_content)
 
         root = creat_window(root_win_name, 1160, 700, 440, 50)
         set_window_icon(root, "./favicon.ico")
