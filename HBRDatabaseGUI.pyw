@@ -309,7 +309,7 @@ if __name__ == "__main__":
         root_win_name = "HBRDatabase"
 
     from tkinter import messagebox
-    messagebox.showinfo("提示",  "由于作者工作性质特殊等原因，本数据库客户端、服务端即将停止更新及维护。")
+    messagebox.showinfo("提示",  "由于作者工作性质涉密等原因，本数据库客户端、服务端即将停止更新及维护。")
 
 
     delete_old_file_and_subdirs()
