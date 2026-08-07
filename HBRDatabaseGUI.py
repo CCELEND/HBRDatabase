@@ -308,8 +308,8 @@ if __name__ == "__main__":
     else:
         root_win_name = "HBRDatabase"
 
-    from tkinter import messagebox
-    messagebox.showinfo("提示",  "  由于作者工作性质涉密等原因，本数据库客户端、服务端即将停止更新及维护。\n  如有同好玩家想要继续使用以及维护服务器，请与我联系。感谢大家一直以来的支持！\n  作者：不吃花椒的汪汪队")
+    # from tkinter import messagebox
+    # messagebox.showinfo("提示",  "  由于作者工作性质涉密等原因，本数据库客户端、服务端即将停止更新及维护。\n  如有同好玩家想要继续使用以及维护服务器，请与我联系。感谢大家一直以来的支持！\n  作者：不吃花椒的汪汪队")
 
 
     delete_old_file_and_subdirs()
