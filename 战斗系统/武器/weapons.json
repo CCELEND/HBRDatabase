@@ -73,7 +73,7 @@
 
     "槊":{
         "name":"槊","en":"Lance",
-        "path":"./战斗系统/武器/Lance.webp",
+        "path":"./战斗系统/武器/Lance.png",
         "description":"槊（突武器属性）","hit":"3"
     }
 
