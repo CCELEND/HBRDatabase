@@ -11,7 +11,7 @@ QMessageBox {
 QMessageBox QLabel {
     color: #1f2328;
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1.5;
     padding: 4px 0;
 }
@@ -30,9 +30,10 @@ QMessageBox QPushButton {
     border-radius: 6px;
     padding: 6px 16px;
     min-width: 72px;
-    min-height: 28px;
-    font-size: 13px;
-    font-weight: 500;
+    min-height: 10px;
+    max-height: 30px;
+    font-size: 14px;
+    font-weight: 600;
     margin: 4px 2px;
 }
 
