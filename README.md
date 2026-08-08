@@ -1,6 +1,6 @@
 # HBRDatabase — 炽焰天穹本地数据库
 
-**基于 Python Tkinter‌ 的 GUI 应用，支持角色风格搜索、seed 自动获取、词条计算、红烧 BOX 自动获取、HBR 音乐资源下载等**
+**基于 Python Tkinter 的 GUI 应用，支持角色风格搜索、seed 自动获取、词条计算、红烧 BOX 自动获取、HBR 音乐资源下载等**
 
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/show.png)
 >基于 Python 的 PyQT5 版本已重构完成  
@@ -31,7 +31,8 @@
 
 * 点击搜索菜单栏，目前支持搜索**角色风格**、**大师技能**和**共鸣天赋**，可以根据关键词的**技能**、**风格名称**和**俗称**进行搜索，多个关键词用逗号分隔  
 * 搜索技能或者效果时，需要指定**主动**或者**被动**
->关键词如有疏漏请与我联系
+>关键词如有疏漏请与我联系  
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/search_show.png)
 
 ### 持有物
 
@@ -84,7 +85,8 @@ Web 版全能红烧天堂计算工具箱，支持伤害计算、白值计算、O
 
 ### 音乐
 
-* 点击音乐菜单栏，双击想听的歌，等待从服务器下载，然后播放即可
+* 点击音乐菜单栏，双击想听的歌，等待从服务器下载，然后播放即可  
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/music_show.png)
 
 ### 更新
 
