@@ -128,7 +128,7 @@ def show_statu(scrollbar_frame_obj):
                             statu_column_count = set_frame_newline(statu_frame, statu_num, 3, statu_column_count)
                         else:
                             statu_frame.setParent(series_frame)
-                            statu_column_count = set_frame_newline(statu_frame, statu_num, 4, statu_column_count)
+                            statu_column_count = set_frame_newline(statu_frame, statu_num, 3, statu_column_count)
                     else:
                         series_layout.addWidget(statu_frame, 0, statu_num)
 
@@ -137,7 +137,7 @@ def show_statu(scrollbar_frame_obj):
                 series_column_count = set_frame_newline(series_frame, series_num, 3, series_column_count)
             elif type_name in ['减益']:
                 series_frame.setParent(type_frame)
-                series_column_count = set_frame_newline(series_frame, series_num, 4, series_column_count)
+                series_column_count = set_frame_newline(series_frame, series_num, 3, series_column_count)
             elif type_name in ['其他']:
                 series_frame.setParent(type_frame)
                 series_column_count = set_frame_newline(series_frame, series_num, 5, series_column_count)
