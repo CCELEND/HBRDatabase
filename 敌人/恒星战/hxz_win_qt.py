@@ -90,7 +90,7 @@ def show_hxz_enemys(scrollbar_frame_obj):
         enemy_photo = get_pixmap(hxz.img_path_enemy, enemy_size)
         enemy_label = QLabel(base_label)
         enemy_label.setPixmap(enemy_photo)
-        enemy_label.setGeometry(7, 22, enemy_size[0], enemy_size[1])
+        enemy_label.setGeometry(22, 22, enemy_size[0], enemy_size[1])
         mouse_bind_canvas_events2(base_label)
         if hxz.guide_path:
             bind_canvas_events(base_label, creat_hxz_win, parent_frame=hxz_frame, hxz=hxz)

@@ -90,6 +90,15 @@
     "logo_path":"./敌人/恒星战/栖息于峡谷的幽鬼#4/DimensionBattleCentralTop_005.ico",
     "name":"栖息于峡谷的幽鬼Ⅱ#10",
     "guide_path":"./敌人/恒星战/栖息于峡谷的幽鬼Ⅱ#10/10.jpg"
+},
+
+"佇立虚空的狂风#11":
+{
+    "img_path":"./敌人/恒星战/佇立虚空的狂风#11/hxz11.png",
+    "img_path_enemy":"./敌人/恒星战/佇立虚空的狂风#11/DimensionBattleCentralTop_012.png",
+    "logo_path":"./敌人/恒星战/佇立虚空的狂风#11/DimensionBattleCentralTop_012.ico",
+    "name":"佇立虚空的狂风#11",
+    "guide_path":"./敌人/恒星战/佇立虚空的狂风#11/11.png"
 }
 
 }

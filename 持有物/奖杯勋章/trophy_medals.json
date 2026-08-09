@@ -182,6 +182,44 @@
         "description":"在20回合内通关X层级时\n可在恒星扫荡战线#8获得的勋章", 
         "price":"", 
         "location":"恒星扫荡战线#8"
+    },
+
+    "斩断妖花者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension10_Bronze.png", 
+        "description":"通关B层级时\n可在恒星扫荡战线#9获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#9"
+    },
+    "灼烧妖花者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension10_Silver.png", 
+        "description":"通关X层级时\n可在恒星扫荡战线#9获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#9"
+    },
+    "诛灭妖花者之证":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension10_Gold.png", 
+        "description":"在20回合内通关X层级时\n可在恒星扫荡战线#9获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#9"
+    },
+
+    "封印幽鬼者之证Ⅱ":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension11_Bronze.png", 
+        "description":"通关B层级时\n可在恒星扫荡战线#10获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#10"
+    },
+    "平定幽鬼者之证Ⅱ":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension11_Silver.png", 
+        "description":"通关X层级时\n可在恒星扫荡战线#10获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#10"
+    },
+    "祓除幽鬼者之证Ⅱ":{
+        "path":"./持有物/奖杯勋章/ThumbnailHonor_Dimension11_Gold.png", 
+        "description":"在20回合内通关X层级时\n可在恒星扫荡战线#10获得的勋章", 
+        "price":"", 
+        "location":"恒星扫荡战线#10"
     }
 
 } 
