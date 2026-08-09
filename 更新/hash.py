@@ -1,7 +1,6 @@
 
 import os
 import hashlib
-from tkinter import messagebox
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 
@@ -110,10 +109,13 @@ def calculate_file_hashes(directory):
         for future in as_completed(futures):
             key = futures[future]
             try:
-                key, file_hash = future.result()
-                file_hashes[key] = file_hash
-            except Exception as e:
-                logger.error(f"计算文件：{key}的哈希值时出错：{e}")
-                messagebox.showerror("错误", f"计算文件：{key}的哈希值时出错：{e}")
+                result_key, file_hash = future.result()
+                if result_key is not None:
+                    file_hashes[result_key] = file_hash
+            except FileNotFoundError as e:
+                # 文件在遍历后被删除/移动，直接跳过，不再弹窗
+                logger.warning(f"文件已被删除或移动，跳过哈希计算：{key} ({e})")
+            except (PermissionError, OSError) as e:
+                logger.error(f"计算文件 {key} 的哈希值时出错：{e}")
 
     return file_hashes

@@ -280,11 +280,10 @@ def delete_old_file_and_subdirs_proc():
     for dir in delete_dirs:
         delete_all_files_and_subdirs(dir)
 
-import threading 
 def delete_old_file_and_subdirs():
-    print("[*] 启动旧文件清理线程...")
-    proc_thread = threading.Thread(target=delete_old_file_and_subdirs_proc, daemon=True)
-    proc_thread.start()
+    print("[*] 正在清理旧文件...")
+    delete_old_file_and_subdirs_proc()
+    print("[+] 旧文件清理完成")
 
 def delete_file(file: str) -> bool:
     if not os.path.isfile(file):
