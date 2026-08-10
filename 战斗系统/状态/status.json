@@ -1341,6 +1341,15 @@
         "stack":"-",
         "type":"其他",
         "series":"属性上升"        
+    },
+
+    "EP上限增加":{
+        "name":"EP上限增加",
+        "path":"./战斗系统/状态/EpLimitOverwrite.webp",
+        "effect":"EP上限变为20（默认限制为10）","description":"EP上限变为20（默认限制为10）",
+        "stack":"-",
+        "type":"其他",
+        "series":"EP上限增加"         
     }
 
 }
