@@ -626,7 +626,7 @@ class VideoPlayerWithScrollbar:
         self.resize_filter = None
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(20)
+        self.timer.start(30)
 
         self.resize_filter = _ResizeEventFilter(self, parent_widget)
         parent_widget.installEventFilter(self.resize_filter)
