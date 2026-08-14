@@ -682,3 +682,23 @@ def get_database_version() -> str:
     except Exception as e:
         logger.error(f"计算版本时发生错误: {e}")
         return "未知版本"
+
+
+import platform
+def get_os_info():
+    system = platform.system()
+    
+    if system == 'Windows':
+        return f"Windows {platform.release()}"
+    elif system == 'Linux':
+        # 尝试读取发行版名称
+        try:
+            dist = platform.freedesktop_os_release().get('NAME', 'Linux')
+            return dist
+        except:
+            return 'Linux'
+    elif system == 'Darwin':
+        version = platform.mac_ver()[0]
+        return f"macOS {version}"
+    else:
+        return system

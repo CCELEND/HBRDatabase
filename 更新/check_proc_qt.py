@@ -3,7 +3,7 @@ from 更新.hash import calculate_file_hashes, save_hashes_to_json
 import threading
 
 from 更新.http_client_qt import send_hashes_to_server
-from tools import sort_dict_by_key, get_database_version
+from tools import sort_dict_by_key, get_database_version, get_os_info
 
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from PyQt5.QtCore import QObject, pyqtSignal
@@ -47,11 +47,11 @@ def check_for_updates_proc(messenger):
 
     # server_url = "http://127.0.0.1:65433"
     server_url = "http://47.96.235.36:65433"
-
+    sys = get_os_info()
     response = None
     try:
         # 发送哈希值到服务器
-        response = send_hashes_to_server(server_url, current_file_hashes, "check")
+        response = send_hashes_to_server(server_url, current_file_hashes, "check", sys)
     except Exception as e:
         if _app_is_closing():
             return
