@@ -59,6 +59,8 @@ class ScrollbarFrameWin(QObject):
             }
         """)
 
+        # 拦截视口滚轮事件，使用自定义滚动速度
+        self.scroll_area.viewport().installEventFilter(self)
 
         # 将垂直滚动条设为始终显示
         # self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
@@ -102,17 +104,22 @@ class ScrollbarFrameWin(QObject):
     def eventFilter(self, watched, event):
         # 窗口销毁期间，C++ 对象可能已被释放，统一做安全访问
         try:
-            if self._bg_frame is None:
-                return super().eventFilter(watched, event)
-
-            if sip.isdeleted(self.scroll_area) or sip.isdeleted(self._bg_frame):
-                return False
-
             try:
                 viewport = self.scroll_area.viewport()
             except RuntimeError:
                 return False
             if viewport is None or sip.isdeleted(viewport):
+                return False
+
+            if watched is viewport and event.type() == QEvent.Wheel:
+                # 自定义滚轮滚动速度，并阻止默认滚动行为
+                self.on_mousewheel(event)
+                return True
+
+            if self._bg_frame is None:
+                return super().eventFilter(watched, event)
+
+            if sip.isdeleted(self.scroll_area) or sip.isdeleted(self._bg_frame):
                 return False
 
             if watched is viewport and event.type() == QEvent.Resize:
@@ -156,6 +163,7 @@ class ScrollbarFrameWin(QObject):
 
     def on_mousewheel(self, event):
         delta = event.angleDelta().y()
+        # 加快滚轮滚动速度（系数越小速度越快）
         self.scroll_area.verticalScrollBar().setValue(
-            self.scroll_area.verticalScrollBar().value() - int(delta / 40)
+            self.scroll_area.verticalScrollBar().value() - int(delta / 1.5)
         )
