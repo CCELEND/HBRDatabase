@@ -64,6 +64,8 @@ def get_album_cover_path(all_albun_name, file_name):
         return album_cover_paths["麻枝准_rionos"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "佐々木恵梨":
         return album_cover_paths["佐々木恵梨"] + file_name.replace("flac", "jpg")
+    elif all_albun_name == "愛美":
+        return album_cover_paths["愛美"] + file_name.replace("flac", "jpg")
     elif all_albun_name == "She_is_Legend":
         file_name = file_name.replace("03.陽のさす向こうへ", "02.春眠旅団")
         file_name = file_name.replace("11.World We Changed", "02.春眠旅団")
