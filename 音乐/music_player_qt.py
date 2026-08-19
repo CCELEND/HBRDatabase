@@ -26,6 +26,7 @@ music_dir = {
     "麻枝准_やなぎなぎ": "麻枝准_やなぎなぎ",
     "麻枝准_rionos": "麻枝准_rionos",
     "佐々木恵梨": "佐々木恵梨",
+    "愛美": "愛美",
     "She_is_Legend": "She_is_Legend",
     "Stargazer": "Stargazer",
     "Summer_Pockets_Original_Sound_Track": "Summer_Pockets_Original_Sound_Track",

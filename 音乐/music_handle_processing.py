@@ -46,6 +46,7 @@ album_cover_paths={
     "麻枝准_やなぎなぎ":"./音乐/下载/麻枝准_やなぎなぎ/",
     "麻枝准_rionos":"./音乐/下载/麻枝准_rionos/",
     "佐々木恵梨":"./音乐/下载/佐々木恵梨/",
+    "愛美": "./音乐/下载/愛美/",
     "She_is_Legend":"./音乐/下载/She_is_Legend/",
     "Stargazer":"./音乐/下载/Stargazer/",
     "Summer_Pockets_Original_Sound_Track":"./音乐/下载/Summer_Pockets_Original_Sound_Track/Summer_Pockets_Original_Sound_Track.jpg",
