@@ -3,6 +3,9 @@ chrome_user_data/
 .vscode/
 .vs
 .idea/
+venv/
+.venv/
+*.pyc
 *.flac
 *.mp3
 index_equipments.xlsx
