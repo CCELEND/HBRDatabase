@@ -15,7 +15,7 @@ if not exist "%VENV_DIR%\Scripts\activate" (
     echo [*] Virtual environment not found, creating...
     python -m venv %VENV_DIR%
     if errorlevel 1 (
-        echo [ERROR] Failed to create venv. Please make sure Python is installed.
+        echo [-] Failed to create venv. Please make sure Python is installed.
         pause
         exit /b 1
     )
@@ -26,7 +26,7 @@ if not exist "%VENV_DIR%\Scripts\activate" (
 echo [*] Activating virtual environment...
 call "%VENV_DIR%\Scripts\activate"
 if errorlevel 1 (
-    echo [ERROR] Failed to activate venv.
+    echo [-] Failed to activate venv.
     pause
     exit /b 1
 )
@@ -36,7 +36,7 @@ if exist "%INSTALL_SCRIPT%" (
     echo [*] Installing/checking dependencies via %INSTALL_SCRIPT%...
     python "%INSTALL_SCRIPT%"
     if errorlevel 1 (
-        echo [WARN] Dependency installation had issues, continuing...
+        echo [!] Dependency installation had issues, continuing...
     )
 ) else (
     if exist "requirements.txt" (
@@ -44,7 +44,7 @@ if exist "%INSTALL_SCRIPT%" (
         pip install --upgrade pip
         pip install -r requirements.txt
         if errorlevel 1 (
-            echo [WARN] Dependency installation failed, continuing...
+            echo [!] Dependency installation failed, continuing...
         )
     ) else (
         echo [*] No dependency script or requirements.txt found, skipping.
@@ -85,7 +85,7 @@ python "%TARGET_SCRIPT%"
 set EXIT_CODE=%errorlevel%
 
 if %EXIT_CODE% neq 0 (
-    echo [ERROR] Script failed with exit code: %EXIT_CODE%
+    echo [-] Script failed with exit code: %EXIT_CODE%
 ) else (
     echo [+] Script finished successfully.
 )
