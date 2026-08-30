@@ -14,8 +14,9 @@
 ## 使用
 
 * 运行 `HBRDatabaseGUI.py` 即可，PyQT5 重构版本：`HBRDatabaseGUI_QT.py`
->无控制台窗口运行：`HBRDatabaseGUI.pyw`
->无控制台窗口运行（PyQT5 重构版本）：`HBRDatabaseGUI_QT.pyw`
+>无控制台窗口运行：`HBRDatabaseGUI.pyw`  
+>无控制台窗口运行（PyQT5 重构版本）：`HBRDatabaseGUI_QT.pyw`  
+* 强烈建议使用 `venv` 虚拟环境运行，直接运行 `run_in_venv.bat` 即可一键安装依赖以及运行
 
 ## 功能模块
 
