@@ -51,12 +51,11 @@ def ensure_venv(venv_dir="venv"):
     except subprocess.CalledProcessError as e:
         print(f"[-] 重新执行失败: {e}")
         sys.exit(1)
-    # 原进程退出（子进程已完成）
+
     sys.exit(0)
 
-# ---------- 原功能函数（未做实质性改动，但会运行在 venv 中） ----------
+
 def check_ttkbootstrap_version():
-    # ... 与原代码完全相同 ...
     try:
         result = subprocess.run(
             [sys.executable, "-c", "import pkg_resources; print(pkg_resources.get_distribution('ttkbootstrap').version)"],
@@ -79,7 +78,7 @@ def check_ttkbootstrap_version():
         return None, None
 
 def uninstall_ttkbootstrap():
-    # ... 与原代码完全相同 ...
+
     try:
         print("[*] 正在卸载 ttkbootstrap...")
         subprocess.run(
@@ -158,7 +157,7 @@ def install_modules():
     messagebox.showerror("错误", "所有镜像源尝试失败，请检查网络连接或手动安装")
     return False
 
-# ---------- 入口修改 ----------
+
 if __name__ == "__main__":
     # 先确保运行在虚拟环境中
     if not ensure_venv():
