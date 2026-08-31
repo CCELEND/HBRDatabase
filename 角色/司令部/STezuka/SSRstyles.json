@@ -55,15 +55,15 @@
     "PassiveSkills":[
 
         ["鬼神", 
-        "在第一场战斗开始时，可以变身成恶魔（每3回合3次）\n在行动选择阶段，可以点击恶魔变身按钮进入恶魔形态。",
+        "处于行动选择阶段时\n选择鬼神化按钮即可发动\n3回合内进入鬼神状态（战斗中3次）",
         "0",
         [
-            ["复活并回复DP","回复并完全回复自身DP",null,null,null,null,"自身"],
-            ["净化减益","移除自身所有减益效果",null,null,null,null,"自身"],
-            ["降低SP消耗","技能SP消耗变为0",null,null,null,null,"自身"],
+            ["OD条上升","15%",null,null,null,null,null],
+            ["净化减益","解除自身所有DEBUFF效果",null,null,null,null,"自身"],
+            ["复活并回复DP","修复自身DP全额回复",null,null,null,null,"自身"],
+            ["降低SP消耗","技能消耗SP变为0",null,null,null,null,"自身"],
             ["连击数上升（大）", "3，不叠加", null, null, null, null, "自身"],
-            ["攻击上升", "25%", null, null, null,null, "自身"],
-            ["心眼", "12%，不叠加", null, null, null, null, "自身"]
+            ["心眼", "120%，不叠加", null, null, null, null, "自身"]
         ],
         null,
 

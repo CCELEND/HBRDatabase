@@ -1092,6 +1092,14 @@
         "type":"其他",
         "series":"特殊状态" 
     },
+    "突破DR上限":{
+        "name":"突破DR上限",
+        "path":"./战斗系统/状态/DrLimitOverwrite.png",
+        "effect":"突破DR上限","description":"突破DR上限",
+        "stack":"-",
+        "type":"其他",
+        "series":"突破DR上限" 
+    },
     "攻击切换":{
         "name":"攻击切换",
         "path":"./战斗系统/状态/Nonelement.png",
