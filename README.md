@@ -11,7 +11,8 @@
 * Python3.10 以上  
 * opencv-python、Pillow、requests、pygame、ttkbootstrap、numpy、pandas、openpyxl、selenium、webdriver-manager
 >运行 `install_module.py` 安装依赖模块  
->高版本 ttkbootstrap 会导致异常，需要卸载高版本 ttkbootstrap，再安装 ttkbootstrap==1.12.0
+>高版本 ttkbootstrap 会导致异常，需要卸载高版本 ttkbootstrap，再安装 ttkbootstrap==1.12.0  
+* 强烈建议使用 `venv` 虚拟环境运行，直接运行 `run_in_venv.bat` 即可一键安装依赖以及运行
 
 ## 使用
 
