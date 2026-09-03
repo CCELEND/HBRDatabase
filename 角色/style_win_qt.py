@@ -107,7 +107,7 @@ def creat_style_skill_win(event, parent_frame, team, style):
     set_window_expand(style_win_frame, rowspan=1, columnspan=2)
     artwork_path = style.path.replace("_Thumbnail", "")
     bg_image_path = artwork_path if os.path.exists(artwork_path) else None
-    scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2, bg_image_path=bg_image_path, bg_opacity="70%")
+    scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2, bg_image_path=bg_image_path, bg_opacity="50%")
 
     win_open_manage(style_win_frame, __name__)
 
