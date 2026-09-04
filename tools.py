@@ -416,10 +416,51 @@ def get_list_not_isinstance_index(a: list) -> int | None:
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+
+import psutil
+def kill_chrome_using_profile(user_data_dir: str):
+    """终止占用指定 --user-data-dir 的残留 Chrome 进程，避免 profile 被锁"""
+    if not user_data_dir:
+        return
+    target = os.path.normcase(os.path.normpath(user_data_dir))
+    killed = False
+    for proc in psutil.process_iter(['name', 'cmdline']):
+        try:
+            name = proc.info['name']
+            if name and name.lower() not in ('chrome.exe', 'chrome_proxy.exe'):
+                continue
+            for arg in (proc.info['cmdline'] or []):
+                if arg.startswith('--user-data-dir='):
+                    profile = os.path.normcase(os.path.normpath(arg.split('=', 1)[1]))
+                    if profile == target:
+                        proc.terminate()
+                        killed = True
+                        break
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    if killed:
+        import time
+        time.sleep(1)
+        for lock_name in ('SingletonLock', 'SingletonCookie', 'SingletonSocket'):
+            lock_path = os.path.join(user_data_dir, lock_name)
+            if os.path.exists(lock_path):
+                try:
+                    os.remove(lock_path)
+                except OSError:
+                    pass
+
 def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
 
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
+
+    user_data_dir = None
+    for arg in chrome_options.arguments:
+        if arg.startswith("--user-data-dir="):
+            user_data_dir = arg.split("=", 1)[1]
+            break
+    if user_data_dir:
+        kill_chrome_using_profile(user_data_dir)
 
     if not check_dir_exists_pathlib('./工具/chrome/chrome-win64'):
         merge_and_extract_chrome_zip(
