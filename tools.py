@@ -418,6 +418,9 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
 
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+
     if not check_dir_exists_pathlib('./工具/chrome/chrome-win64'):
         merge_and_extract_chrome_zip(
             folder_path='./工具/chrome',

@@ -284,8 +284,8 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
 
     sleep(1)
 
-    # 网页缩略到60%
-    web_abbreviation(driver, 60)
+    # 网页缩略到50%
+    web_abbreviation(driver, 50)
 
     # 点击图鉴
     # click_brochure(driver, style_infos)
