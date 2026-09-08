@@ -47,6 +47,14 @@
         "type":"回复",
         "series":"回复DP" 
     },
+    "小玉合奏":{
+        "name":"小玉合奏",
+        "path":"./战斗系统/状态/ExecuteSkillOnPreTurn.webp",
+        "effect":"回合开始时若有处于击破状态的友方\n发动技能【炸裂！！贝斯独奏】\n【炸裂！！贝斯独奏：复活友方全体的DP并回复50%的DP】","description":"回合开始时若有处于击破状态的友方\n发动技能【炸裂！！贝斯独奏】\n【炸裂！！贝斯独奏：复活友方全体的DP并回复50%的DP】",
+        "stack":"-",
+        "type":"回复",
+        "series":"回复DP" 
+    },
     "回复SP":{
         "name":"回复SP",
         "path":"./战斗系统/状态/HealSp.webp",
