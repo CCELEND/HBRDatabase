@@ -1326,6 +1326,22 @@
         "type":"其他",
         "series":"白菜汤"           
     },
+    "牛排":{
+        "name":"牛排",
+        "path":"./战斗系统/状态/Steak.webp",
+        "effect":"技能攻击上升50%\n回复等于造成伤害10%的DP","description":"技能攻击上升50%\n回复等于造成伤害10%的DP",
+        "stack":"-",
+        "type":"其他",
+        "series":"牛排"           
+    },
+    "意式冰淇淋":{
+        "name":"意式冰淇淋",
+        "path":"./战斗系统/状态/Gelato.webp",
+        "effect":"技能攻击上升50%\n回复等于造成伤害10%的DP","description":"技能攻击上升50%\n回复等于造成伤害10%的DP",
+        "stack":"-",
+        "type":"其他",
+        "series":"意式冰淇淋"           
+    },
     "干劲":{
         "name":"干劲",
         "path":"./战斗系统/状态/Motivation.webp",
