@@ -118,6 +118,7 @@ from 工具.AFSGTools.Load import load_AFSGTools
 from 工具.hbr_tool.Load import load_hbr_tool
 from 工具.hbr_tool_old_damage_calculator.Load import load_hbr_tool_old_damage_calculator
 from 工具.hbr_axletool.Load import load_hbr_axletool
+from 工具.排轴.Load import load_hbr_axle_od
 from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
 from 工具.词条计算器.Load import load_entry_calculator
 from 工具.o_hbr_quest.Load import load_o_hbr_quest
@@ -324,6 +325,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         ("hbr-tool", load_hbr_tool),
         ("hbr-tool伤害计算", load_hbr_tool_old_damage_calculator),
         ("hbr-axletool", load_hbr_axletool),
+        ("排轴OD计算", load_hbr_axle_od),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
         ("o.hbr.quest（v5.10）", load_o_hbr_quest),
@@ -394,7 +396,7 @@ if __name__ == "__main__":
         )
 
         check_error_queue_qt(root)
-        check_for_updates()
+        # check_for_updates()
 
         root.show()
         
