@@ -53,13 +53,12 @@ MAX_ACTIONS_PER_TURN = 3
 TURN_OPTIONS = ["通常回合", "切换", "追加回合"]
 
 # 与参考站点一致的 OD 选项
+# OD 最高 3 级
 OD_OPTIONS = [
     "无",
     "OD1", "OD1/Bonus1",
     "OD2", "OD2/Bonus1", "OD2/Bonus2",
     "OD3", "OD3/Bonus1", "OD3/Bonus2", "OD3/Bonus3",
-    "OD4", "OD4/Bonus1", "OD4/Bonus2", "OD4/Bonus3",
-    "OD5", "OD5/Bonus1", "OD5/Bonus2", "OD5/Bonus3",
 ]
 
 # 发动 OD 时全队获得的 SP（下标为 OD 等级，参考 hbr-tool）
@@ -78,12 +77,12 @@ OD_COLORS = {
 MEMBER_W, SKILL_W = 150, 200
 HIT_W, COMBO_W = 58, 58
 FIXED_W, RES_W, EARRING_W = 72, 72, 72
-SP_W, RESULT_W = 62, 66
+BREAK_W, SP_W, RESULT_W = 48, 62, 66
 DEL_W = 26
 ACTION_COLUMNS = [
     ("角色", MEMBER_W), ("行动", SKILL_W), ("原始Hit", HIT_W), ("连击", COMBO_W),
     ("固定OD", FIXED_W), ("31X共鸣", RES_W), ("OD耳环", EARRING_W),
-    ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
+    ("击破", BREAK_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
 ]
 
 # 下拉框样式：显式指定文字与选中项配色，避免因全局 QSS 只给滚动条设样式
@@ -347,6 +346,13 @@ class ActionRow(QFrame):
         self.earring_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.earring_spin)
 
+        self.break_check = QCheckBox("破")
+        self.break_check.setFixedWidth(BREAK_W)
+        self.break_check.setToolTip(
+            "本次行动击破敌人（触发「击破时回复SP」的技能/被动）")
+        self.break_check.stateChanged.connect(self._emit_changed)
+        layout.addWidget(self.break_check)
+
         self.sp_label = QLabel("-")
         self.sp_label.setFixedWidth(SP_W)
         self.sp_label.setAlignment(Qt.AlignCenter)
@@ -523,6 +529,16 @@ class ActionRow(QFrame):
                     skill.sp_recover_element)
         return 0, None, None
 
+    def is_break(self):
+        return self.break_check.isChecked()
+
+    def get_break_skill_recover(self):
+        """本次行动击破敌人时，技能自带的 SP 回复 (回复量, 范围)。"""
+        skill = self._find_skill()
+        if skill and skill.sp_break_recover and skill.sp_break_scope:
+            return skill.sp_break_recover, skill.sp_break_scope
+        return 0, None
+
     def set_sp_result(self, remaining, enough=True):
         """显示该次行动后的剩余 SP；不足时标红。"""
         if remaining is None:
@@ -551,6 +567,7 @@ class ActionRow(QFrame):
             "fixed_od": self.fixed_od_spin.value(),
             "resonance_31x": self.resonance_spin.value(),
             "od_earring": self.earring_spin.value(),
+            "break": self.break_check.isChecked(),
         }
 
     def set_data(self, data):
@@ -575,6 +592,7 @@ class ActionRow(QFrame):
             self.resonance_spin.setValue(float(data.get("resonance_31x", 0) or 0))
             if not self.is_normal_attack():
                 self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
+            self.break_check.setChecked(bool(data.get("break", False)))
 
 
 # ======================================================================
@@ -612,7 +630,7 @@ class TurnCard(QFrame):
 
         self.type_combo = QComboBox()
         self.type_combo.addItems(TURN_OPTIONS)
-        self.type_combo.setFixedWidth(84)
+        self.type_combo.setFixedWidth(104)
         self.type_combo.currentTextChanged.connect(self._on_type_changed)
         header.addWidget(self.type_combo)
 
@@ -1102,8 +1120,9 @@ class AxleODWindow(QFrame):
             "总系数 = 耳环系数 + 其他OD增量。通常攻击不享受 OD 耳环加成。\n"
             "SP：第1回合按队伍配置顺序（前 3 人为前锋），其后以「上一回合行动的队员」为前锋；"
             "回合开始前锋 +3、后卫 +2（上限默认 20）；"
-            "发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3~5 +20；行动扣除技能 SP"
-            "（「剩余SP」列红色表示不足；技能自带的 SP 回复会自动结算）。"
+            "发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20；行动扣除技能 SP"
+            "（「剩余SP」列红色表示不足；技能自带的 SP 回复会自动结算；"
+            "勾选行动的「破」表示该行动击破敌人，会触发「击破时回复SP」的技能/被动）。"
             "队伍≥3人时每回合固定 3 人行动；新增回合会自动沿用上一回合行动的队员；"
             "追加回合不计回合数、不触发回合开始回复，但行动消耗与技能 SP 回复照常生效；"
             "每个回合下方显示全队 SP（含未行动的后卫）。"
@@ -1323,6 +1342,7 @@ class AxleODWindow(QFrame):
         sp = [self.sp_init_spin.value()] * count
         # 第 1 回合开始时的前锋 = 队伍配置顺序的前 3 人
         front = self._initial_front()
+        break_seen = False   # 是否已经发生过击破（用于「首次击破」类被动）
 
         for turn in self.turns:
             # 追加回合不计回合数：不触发「回合开始回复」与 OD 回复，
@@ -1362,6 +1382,11 @@ class AxleODWindow(QFrame):
                         sp[i] -= cost
                         self._apply_sp_recover(action, i, sp, active,
                                                front_set, limit)
+                        if action.is_break():
+                            self._apply_break_recover(
+                                action, i, sp, active, front_set, limit,
+                                not break_seen)
+                            break_seen = True
                     action.set_sp_result(sp[i], enough)
 
             # 记录本回合结束时全队 SP（含后卫）
@@ -1398,9 +1423,9 @@ class AxleODWindow(QFrame):
                 return st.element
         return None
 
-    def _apply_sp_recover(self, action, actor, sp, active, front_set, limit):
-        """结算技能自带的 SP 回复效果。"""
-        amount, scope, element = action.get_sp_recover()
+    def _apply_scope_recover(self, amount, scope, element, actor,
+                             sp, active, front_set, limit):
+        """按范围结算一次 SP 回复。"""
         if amount <= 0 or not scope:
             return
         if scope == "self":
@@ -1431,6 +1456,33 @@ class AxleODWindow(QFrame):
         for t in targets:
             if sp[t] < limit:
                 sp[t] = min(limit, sp[t] + amount)
+
+    def _apply_sp_recover(self, action, actor, sp, active, front_set, limit):
+        """结算技能自带的 SP 回复效果。"""
+        amount, scope, element = action.get_sp_recover()
+        self._apply_scope_recover(amount, scope, element, actor,
+                                  sp, active, front_set, limit)
+
+    def _member_break_sp(self, slot):
+        """队员所装备风格里「击破敌人时回复SP」的被动。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return st.break_sp
+        return []
+
+    def _apply_break_recover(self, action, actor, sp, active, front_set,
+                             limit, is_first_break):
+        """结算「击破敌人」触发的 SP 回复（技能 + 装备风格被动）。"""
+        amount, scope = action.get_break_skill_recover()
+        self._apply_scope_recover(amount, scope, None, actor,
+                                  sp, active, front_set, limit)
+        for eff in self._member_break_sp(actor):
+            if eff.get("first_only") and not is_first_break:
+                continue
+            self._apply_scope_recover(eff.get("amount", 0), eff.get("scope"),
+                                      None, actor, sp, active, front_set, limit)
 
     # ------------------------------------------------------------ file I/O
     def to_dict(self):

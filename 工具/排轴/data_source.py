@@ -40,7 +40,8 @@ class SkillInfo:
 
     def __init__(self, name, hits=None, destructive_multiplier=None,
                  is_normal_attack=False, sp_cost=0, sp_cost_note=None,
-                 sp_recover=0, sp_recover_scope=None, sp_recover_element=None):
+                 sp_recover=0, sp_recover_scope=None, sp_recover_element=None,
+                 sp_break_recover=0, sp_break_scope=None):
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
@@ -51,6 +52,9 @@ class SkillInfo:
         # 回复范围：self/all/others/front/front_others/others_element/all_element
         self.sp_recover_scope = sp_recover_scope
         self.sp_recover_element = sp_recover_element  # 元素限定（如「火」）
+        # 击破敌人时回复的 SP（如「攻击导致敌方破盾时回复8SP」）
+        self.sp_break_recover = sp_break_recover or 0
+        self.sp_break_scope = sp_break_scope
 
     def _sp_display(self):
         note = self.sp_cost_note
@@ -90,11 +94,13 @@ class SkillInfo:
 class StyleInfo:
     """风格及其技能列表。"""
 
-    def __init__(self, name, skills, rarity=None, element=None):
+    def __init__(self, name, skills, rarity=None, element=None, break_sp=None):
         self.name = name
         self.skills = skills
         self.rarity = rarity
         self.element = element    # 元素属性（火/冰/雷/光/暗/无…）
+        # 击破敌人时回复 SP 的被动：[{amount, scope, first_only}, ...]
+        self.break_sp = break_sp or []
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -192,6 +198,8 @@ def _extract_skill(group):
     sp_recover = 0
     sp_scope = None
     sp_element = None
+    sp_break_recover = 0
+    sp_break_scope = None
     try:
         name = group[0][0]
         # group[0] = [技能名, 描述, SP消耗, 使用次数, ...]
@@ -214,20 +222,28 @@ def _extract_skill(group):
                 value = _parse_number(effect[8])
                 destructive = float(value) if value is not None else None
             continue
-        # 回复 SP：仅取可确定的固定数值（概率/条件类不解析）
+        # 回复 SP：固定数值；或「攻击导致敌方破盾时回复8SP」这类击破触发
         if effect[0] == "回复SP" and len(effect) > 1:
-            try:
-                amount = int(str(effect[1]).strip())
-            except Exception:
-                amount = 0
+            raw_value = str(effect[1])
             scope_info = _sp_recover_scope(
                 effect[6] if len(effect) > 6 else None)
-            if amount > 0 and scope_info:
+            try:
+                amount = int(raw_value.strip())
+            except Exception:
+                amount = None
+            if amount is not None and amount > 0 and scope_info:
                 sp_recover = amount
                 sp_scope, sp_element = scope_info
+            elif (amount is None and scope_info
+                  and ("破盾" in raw_value or "击破" in raw_value)):
+                nums = re.findall(r'\d+', raw_value)
+                if nums:
+                    sp_break_recover = int(nums[-1])
+                    sp_break_scope = scope_info[0]
 
     return SkillInfo(name, hits, destructive, False, sp_cost, sp_cost_note,
-                     sp_recover, sp_scope, sp_element)
+                     sp_recover, sp_scope, sp_element,
+                     sp_break_recover, sp_break_scope)
 
 
 class HBRDataSource:
@@ -297,7 +313,33 @@ class HBRDataSource:
                                     None, True)]
                 for group in (style_data.get("ActiveSkills") or []):
                     skills.append(_extract_skill(group))
-                styles.append(StyleInfo(style_name, skills, rarity, element))
+                # 解析「击破敌人时回复SP」类被动
+                break_sp = []
+                for passive in (style_data.get("PassiveSkills") or []):
+                    try:
+                        pname = str(passive[0])
+                        pdesc = str(passive[1])
+                        ptype = str(passive[3]) if len(passive) > 3 else ""
+                        pvalue = passive[4] if len(passive) > 4 else None
+                        ptarget = passive[7] if len(passive) > 7 else None
+                    except Exception:
+                        continue
+                    text = pname + pdesc
+                    if ptype != "回复SP" or ("击破" not in text and "破盾" not in text):
+                        continue
+                    try:
+                        amount = int(str(pvalue).strip())
+                    except Exception:
+                        amount = 0
+                    scope_info = _sp_recover_scope(ptarget)
+                    if amount > 0 and scope_info:
+                        break_sp.append({
+                            "amount": amount,
+                            "scope": scope_info[0],
+                            "first_only": "首次" in text,
+                        })
+                styles.append(StyleInfo(style_name, skills, rarity, element,
+                                        break_sp))
 
         self._style_cache[role_path] = styles
         return styles

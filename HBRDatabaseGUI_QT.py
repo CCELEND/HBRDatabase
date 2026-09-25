@@ -396,7 +396,7 @@ if __name__ == "__main__":
         )
 
         check_error_queue_qt(root)
-        # check_for_updates()
+        check_for_updates()
 
         root.show()
         
