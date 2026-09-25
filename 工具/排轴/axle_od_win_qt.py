@@ -16,9 +16,12 @@
       该次行动的 OD 参数（原始Hit数 / 连击数 / 固定OD / 31X共鸣 / OD耳环）。
     * 全局战斗设置：敌人数量、抗性、其他OD增量、敌方OD率。
     * 按公式实时计算每个回合的 OD 与累计总 OD。
-    * SP：参考 https://www.hbr-tool.com/#/simulator 模拟每名队员的 SP，
-      回合开始全队回复（默认 +2，上限默认 20），行动扣除技能 SP，
-      发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3~5 +20，并显示每行动的剩余 SP。
+    * SP：参考 https://www.hbr-tool.com/#/simulator 模拟每名队员的 SP。
+      回合开始按「回合开始时的前锋」回复（第 1 回合 = 队伍配置前 3 人，
+      之后 = 上一回合行动的队员）：前锋 +3 / 后卫 +2（上限默认 20）；
+      技能/被动里的「前锋」回复范围按本回合行动的队员结算；
+      行动扣除技能 SP，发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20，
+      并显示每行动的剩余 SP。
 """
 
 import os
@@ -29,7 +32,8 @@ from contextlib import contextmanager
 from PyQt5.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QComboBox, QSpinBox,
     QDoubleSpinBox, QCheckBox, QHBoxLayout, QVBoxLayout, QGridLayout,
-    QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy
+    QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy,
+    QToolButton, QMenu
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 
@@ -47,12 +51,105 @@ logger = AdvancedLogger.get_logger(__name__)
 WINDOW_TITLE = "排轴OD计算"
 MODULE_NAME = __name__
 DEFAULT_SAVE_PATH = os.path.join("工具", "排轴", "排轴存档.json")
+HELP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "help.txt")
+
+HELP_TEXT = """排轴OD计算 使用说明
+========================================
+
+【排轴】
+- 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数；
+  角色不可重复（已选的角色在其它位置会置灰不可选）。
+- 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
+- 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
+- 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
+- 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
+  已通用化的例外：第一个 SS 风格的专属技能（如 幻象泡影）、星火燎原+。
+- 「（被动技能）」在队伍配置里选择携带（默认全部），选中后全程（所有回合）生效。
+- 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
+- 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
+  「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
+- 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
+- 「单名友方回复SP」的技能（如 日常维护）：行动行的「对象」下拉框选择回复对象
+  （「其他友方」类的对象不含自身）；其它技能该列显示「—」。
+
+【OD 公式】来自「等效破坏率与OD计算表」
+- 耳环系数 = 1 + (5 + MIN(原始Hit,10)×10/9 − 10/9)/100 × OD耳环
+- HIT OD = (原始Hit + 连击数) × ROUNDDOWN(2.5×总系数×敌方OD率, 2) × 敌人数量 × (抗性?0:1)
+- 固定OD = ROUNDDOWN(固定OD×100×总系数, 2) + ROUNDDOWN(31X共鸣×100×总系数, 2)
+- 总系数 = 耳环系数 + 其他OD增量
+- 通常攻击不享受 OD 耳环加成；通常攻击视为「无属性」。
+- 抗性可按属性勾选（含「无」）：行动的攻击元素（技能元素 → 角色风格元素 → 无）被抗性时，
+  该次 HIT OD 记 0。
+- 「OD条下降 X%」为该次行动 OD 的固定扣减（如 50% → −50，可为负）。
+- 风格被动「OD条上升」（如 V字回复）：「回合开始时」每回合结算、「战斗开始时」仅第 1 回合；
+  按「位于前锋/后卫」判定位置；「超频条不足N%」为触发阈值；「出击中1次」整场只触发一次；
+  均为「直接增加超频条」，收益为固定值（不吃 OD 耳环加成）；也需满足突破数。
+  「回合开始时」类在 **OD 回合（含其加成回合）与追加回合**中不结算。
+- 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：勾选行动的「击破敌人」**且该行动是攻击**时，
+  自动同步到该行动的**固定OD**输入框（X% → X/100，如 25% → 0.250），
+  因此会吃到 OD 耳环加成；取消勾选会自动移除（手填值保留）。
+- 技能的「OD条上升 X%」效果：**攻击技能**（带伤害 Hit，如 无限光晕）→ 自动同步到**固定OD**
+  （吃 OD 耳环加成）；**非攻击技能**（如 威严号令）→ 作为**直接增加超频条 +X**，不吃耳环。
+  若限定「以此技能击破敌人时」（如 原子火焰 / 哀伤的雪花莲），则仅在勾选击破敌人时计入。
+  例外：**驱动增益**虽非攻击技能，但实测也会吃 OD 耳环，故同按固定OD结算。
+  换其它技能时会自动移除。
+- 概率类被动（如福运 70%）按必定触发计算；
+  无法判定的条件（干劲/领域/解除BUFF/EX/SP提升等）不计入。
+
+【OD 发动与回合数】
+- 前置OD：当前回合直接发动；后置OD：当前回合结束马上发动（两者 OD 回合都是当前回合）。
+- 后置OD 的回合沿用上一个回合号（显示「第N回合 后置OD」），不计入回合数。
+- 发动消耗 OD 槽 = 等级×100（OD1=100 / OD2=200 / OD3=300）；
+  同一次发动只扣一次（连续相同 OD 等级的回合，如 OD2 / OD2/Bonus1 / OD2/Bonus2 视为同一次）。
+- 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗）、
+  「本回合OD」（仅本回合行动产生的 OD）、「当前OD」= 回合开始OD + 本回合OD；
+  汇总的「净OD」即最后一个回合的当前OD。
+
+【SP】
+- 第 1 回合前锋 = 队伍配置前 3 人；之后 = 上一回合行动的队员。
+- 回合开始：基础回复（前锋/后卫）+ 风格被动的前锋SP（闪光/佳音/机敏/俊敏…，需满足突破数）；
+  以及「回合开始时回复友方SP」的被动（如 与伙伴一起【朝仓可怜专属】：除自身外全体友方 SP+1）。
+- 后置OD 属上一回合：不触发回合开始回复与闪光，仅结算 OD 额外 SP（同一次发动只给一次）。
+- 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
+- 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
+- 行动扣除技能 SP；被动对 SP 消耗的增减（同名只叠加一次）会自动结算；
+  「剩余SP」列红色表示不足。
+- 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
+  它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
+- 部分技能带「N(M)」式条件消耗：当敌人处于**倒地/超倒地**状态（本场已发生击破）时，
+  改用较小值（如 对称·启示 0(16)：未倒地消耗 16、击破敌人后消耗 0）。
+- 每回合下方显示两行全队 SP（含未行动的后卫）：
+  「队伍SP（行动前）」（回合开始回复 / OD 结算之后、行动之前）与
+  「队伍SP（行动后）」（本回合结算结束时）。
+- SP 上限默认 20；若风格有「SP上限变为 N」则自动取较大者（界面显示「（自动 N）」）。
+- 需「状态/加护/领域/印/信念/士气/DP/EX 等」才能判定的 SP 被动暂不计入（避免多算）；
+  可判定的条件会结算：「战斗开始时」类仅第 1 回合、「位于前锋/后卫」按回合开始时的前锋、
+  「SP不大于N」按当前 SP、「超频条不足N%」按回合开始时的超频条、
+  「存在被击破的敌人」（含 SP 消耗增减类，如 算法 / 最佳位置）按是否已发生击破。
+"""
+
+
+def write_help_file():
+    """把使用说明输出到 工具/排轴/help.txt。"""
+    try:
+        with open(HELP_FILE, "w", encoding="utf-8") as f:
+            f.write(HELP_TEXT)
+    except Exception as e:
+        logger.error("写入 help.txt 失败: %s", e)
 
 TEAM_SIZE = 6
 MAX_ACTIONS_PER_TURN = 3
-TURN_OPTIONS = ["通常回合", "切换", "追加回合"]
+TURN_OPTIONS = ["通常回合", "追加回合"]
 
 # 与参考站点一致的 OD 选项
+# 敌人可抗性的属性
+ELEMENTS = ["火", "冰", "雷", "光", "暗", "无"]
+
+# OD 发动时机：前置=当前回合直接发动；后置=当前回合结束马上发动
+OD_TIMING_OPTIONS = ["前置OD", "后置OD"]
+# 每级 OD 消耗的 OD 槽
+OD_GAUGE_PER_LEVEL = 100
+
 # OD 最高 3 级
 OD_OPTIONS = [
     "无",
@@ -74,15 +171,16 @@ OD_COLORS = {
 }
 
 # 行动列宽（表头与数据行共用）
-MEMBER_W, SKILL_W = 150, 200
+MEMBER_W, SKILL_W, TARGET_W = 150, 200, 96
 HIT_W, COMBO_W = 58, 58
 FIXED_W, RES_W, EARRING_W = 72, 72, 72
-BREAK_W, SP_W, RESULT_W = 48, 62, 66
+BREAK_W, SP_W, RESULT_W = 96, 62, 66
 DEL_W = 26
 ACTION_COLUMNS = [
-    ("角色", MEMBER_W), ("行动", SKILL_W), ("原始Hit", HIT_W), ("连击", COMBO_W),
+    ("角色", MEMBER_W), ("行动", SKILL_W), ("对象", TARGET_W),
+    ("原始Hit", HIT_W), ("连击", COMBO_W),
     ("固定OD", FIXED_W), ("31X共鸣", RES_W), ("OD耳环", EARRING_W),
-    ("击破", BREAK_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
+    ("击破敌人", BREAK_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
 ]
 
 # 下拉框样式：显式指定文字与选中项配色，避免因全局 QSS 只给滚动条设样式
@@ -113,6 +211,21 @@ QComboBox QAbstractItemView::item:hover {
 QComboBox QAbstractItemView::item:selected {
     background-color: #0078d4;
     color: #ffffff;
+}
+#passiveButton {
+    color: #222222;
+    background-color: #ffffff;
+    border: 1px solid #c8c8c8;
+    border-radius: 3px;
+    padding: 1px 16px 1px 6px;
+    text-align: left;
+}
+#passiveButton:hover {
+    background-color: #eef3fb;
+}
+#passiveButton:disabled {
+    color: #999999;
+    background-color: #f0f0f0;
 }
 """
 
@@ -187,11 +300,36 @@ class TeamMemberRow(QFrame):
         layout.addWidget(self.role_combo)
 
         self.style_combo = QComboBox()
-        self.style_combo.setFixedWidth(210)
+        self.style_combo.setFixedWidth(190)
         self.style_combo.currentTextChanged.connect(self._on_style_changed)
         self.style_combo.currentTextChanged.connect(
             lambda text: self.style_combo.setToolTip(text))
         layout.addWidget(self.style_combo)
+
+        # 「（被动技能）」选择：配置时携带，之后所有回合都生效
+        self.passive_button = QToolButton()
+        self.passive_button.setObjectName("passiveButton")
+        self.passive_button.setText("被动")
+        self.passive_button.setPopupMode(QToolButton.InstantPopup)
+        self.passive_button.setToolButtonStyle(Qt.ToolButtonTextOnly)
+        self.passive_button.setFixedWidth(64)
+        self.passive_button.setToolTip("选择该风格携带的被动技能（默认全部携带）")
+        self.passive_menu = QMenu(self.passive_button)
+        self.passive_button.setMenu(self.passive_menu)
+        layout.addWidget(self.passive_button)
+
+        lb_label = QLabel("突破")
+        lb_label.setFixedWidth(30)
+        layout.addWidget(lb_label)
+        self.lb_spin = QSpinBox()
+        self.lb_spin.setRange(0, 4)
+        self.lb_spin.setValue(4)   # 默认满突破（被动全生效），可下调
+        self.lb_spin.setFixedWidth(46)
+        self.lb_spin.setToolTip("风格突破数（0~4），部分被动需达到要求才生效（如闪光需突破 1）")
+        self.lb_spin.valueChanged.connect(self._emit_changed)
+        layout.addWidget(self.lb_spin)
+
+        self._selected_passives = None   # None = 全部携带
 
     @contextmanager
     def _suspended(self):
@@ -204,13 +342,80 @@ class TeamMemberRow(QFrame):
     def _on_role_changed(self, role):
         if self._loading:
             return
+        self._selected_passives = None   # 换角色后默认携带全部被动
         self._populate_styles(preserve="")
         self._emit_changed()
+
+    def set_roles_enabled(self, used, my_index):
+        """队伍角色不可重复：禁用其它位置已选的角色。
+
+        used: {role_name: [slot_index, ...]}
+        """
+        model = self.role_combo.model()
+        for j in range(self.role_combo.count()):
+            role = self.role_combo.itemText(j)
+            if not role or role == "无":
+                continue
+            taken = any(idx != my_index for idx in used.get(role, []))
+            item = model.item(j)
+            if item is not None:
+                item.setEnabled(not taken)
 
     def _on_style_changed(self, style):
         if self._loading:
             return
+        self._selected_passives = None   # 换风格后默认携带全部被动
+        self._populate_passives()
         self._emit_changed()
+
+    def _style_info(self):
+        role = self.role()
+        style = self.style()
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return st
+        return None
+
+    def _populate_passives(self):
+        self.passive_menu.clear()
+        style_info = self._style_info()
+        options = style_info.passive_options if style_info else []
+        if not options:
+            action = self.passive_menu.addAction("（无）")
+            action.setEnabled(False)
+            self.passive_button.setToolTip("该风格没有可携带的被动技能")
+            return
+        for name in options:
+            action = self.passive_menu.addAction(name)
+            action.setCheckable(True)
+            action.setChecked(self._selected_passives is None
+                              or name in self._selected_passives)
+            action.toggled.connect(
+                lambda checked, n=name: self._on_passive_toggled(n, checked))
+        self.passive_button.setToolTip(
+            "已携带：%s（点击选择）" % "、".join(self.selected_passives()))
+
+    def selected_passives(self):
+        style_info = self._style_info()
+        options = style_info.passive_options if style_info else []
+        if self._selected_passives is None:
+            return list(options)
+        return [n for n in options if n in self._selected_passives]
+
+    def _on_passive_toggled(self, name, checked):
+        if self._loading:
+            return
+        style_info = self._style_info()
+        options = style_info.passive_options if style_info else []
+        if self._selected_passives is None:
+            self._selected_passives = set(options)
+        if checked:
+            self._selected_passives.add(name)
+        else:
+            self._selected_passives.discard(name)
+        self.passive_button.setToolTip(
+            "已携带：%s（点击选择）" % "、".join(self.selected_passives()))
+        self.changed.emit()
 
     def _populate_styles(self, preserve=None):
         if self.role_combo.currentText() == "无":
@@ -233,6 +438,7 @@ class TeamMemberRow(QFrame):
             elif styles:
                 self.style_combo.setCurrentIndex(0)
             self.style_combo.setToolTip(self.style_combo.currentText())
+        self._populate_passives()
 
     def _emit_changed(self, *args):
         if self._loading:
@@ -262,10 +468,18 @@ class TeamMemberRow(QFrame):
         return data if data else self.style_combo.currentText()
 
     def to_data(self):
-        return {"role": self.role(), "style": self.style()}
+        return {"role": self.role(), "style": self.style(),
+                "passives": self.selected_passives(),
+                "lb": self.lb_spin.value()}
 
     def set_data(self, data):
         with self._suspended():
+            if "passives" in data:
+                self._selected_passives = set(data.get("passives") or [])
+            else:
+                self._selected_passives = None
+            if "lb" in data:
+                self.lb_spin.setValue(int(data.get("lb") or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
             self._populate_styles(preserve=data.get("style", ""))
@@ -273,6 +487,7 @@ class TeamMemberRow(QFrame):
             pos = self.style_combo.findData(style) if style else -1
             if pos >= 0:
                 self.style_combo.setCurrentIndex(pos)
+            self._populate_passives()
 
 
 # ======================================================================
@@ -283,6 +498,7 @@ class ActionRow(QFrame):
 
     changed = pyqtSignal()
     delete_requested = pyqtSignal(object)
+    member_edited = pyqtSignal()   # 用户手动更改了行动角色
 
     def __init__(self, owner, turn=None, data=None, default_member=0,
                  parent=None):
@@ -297,6 +513,8 @@ class ActionRow(QFrame):
         self._populate_members()
         self._populate_skills()
         self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
         if data:
             self.set_data(data)
 
@@ -314,6 +532,13 @@ class ActionRow(QFrame):
         self.skill_combo.setFixedWidth(SKILL_W)
         self.skill_combo.currentTextChanged.connect(self._on_skill_changed)
         layout.addWidget(self.skill_combo)
+
+        self.target_combo = QComboBox()
+        self.target_combo.setFixedWidth(TARGET_W)
+        self.target_combo.setToolTip(
+            "「单名友方回复SP」类技能的回复对象（如 日常维护）；其它技能无效")
+        self.target_combo.currentIndexChanged.connect(self._emit_changed)
+        layout.addWidget(self.target_combo)
 
         self.base_hits_spin = QSpinBox()
         self.base_hits_spin.setRange(0, 999)
@@ -346,11 +571,11 @@ class ActionRow(QFrame):
         self.earring_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.earring_spin)
 
-        self.break_check = QCheckBox("破")
+        self.break_check = QCheckBox("击破敌人")
         self.break_check.setFixedWidth(BREAK_W)
         self.break_check.setToolTip(
             "本次行动击破敌人（触发「击破时回复SP」的技能/被动）")
-        self.break_check.stateChanged.connect(self._emit_changed)
+        self.break_check.stateChanged.connect(self._on_break_toggled)
         layout.addWidget(self.break_check)
 
         self.sp_label = QLabel("-")
@@ -429,14 +654,43 @@ class ActionRow(QFrame):
         data = self.skill_combo.currentData()
         return data if data else self.skill_combo.currentText()
 
+    def _populate_targets(self):
+        """按技能的「单名友方回复SP」范围填充「对象」下拉框。"""
+        prev = self.target_combo.currentData()
+        skill = self._find_skill()
+        scope = None
+        if skill is not None and skill.sp_recover and skill.sp_recover_scope:
+            scope = skill.sp_recover_scope
+        with self._suspended():
+            self.target_combo.clear()
+            if scope in ("one_other", "one_any"):
+                for slot in sorted(self.owner._active_slots()):
+                    if scope == "one_other" and slot == self.member_index:
+                        continue
+                    role = self.owner.team[slot].get("role") or ""
+                    self.target_combo.addItem(
+                        "角色%d %s" % (slot + 1, role), slot)
+                pos = self.target_combo.findData(prev)
+                if pos >= 0:
+                    self.target_combo.setCurrentIndex(pos)
+                self.target_combo.setEnabled(True)
+            else:
+                self.target_combo.addItem("—", None)
+                self.target_combo.setEnabled(False)
+
+    def get_sp_target(self):
+        """单名友方回复 SP 的目标队员下标（无则 None）。"""
+        return self.target_combo.currentData()
+
     def _all_skills(self):
         team = self.owner.team
         if not team:
             return []
         idx = min(max(self.member_index, 0), len(team) - 1)
         member = team[idx]
-        return self.data_source.skills(member.get("role", ""),
-                                       member.get("style", ""))
+        # 同角色各风格技能通用；SSR/SS 的第一个主动技能为专属
+        return self.data_source.available_skills(member.get("role", ""),
+                                                 member.get("style", ""))
 
     def _find_skill(self, name=None):
         if name is None:
@@ -451,6 +705,8 @@ class ActionRow(QFrame):
         self._populate_members()
         self._populate_skills()
         self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
         self._emit_changed()
 
     # ------------------------------------------------------------- signals
@@ -468,14 +724,35 @@ class ActionRow(QFrame):
         self.member_index = member
         self._populate_skills(preserve="")
         self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
         if self.turn is not None:
             self.turn.refresh_member_options(self)
+        self.member_edited.emit()
         self._emit_changed()
+
+    def set_member(self, member):
+        """程序化设置队员（用于前锋同步，不标记为手动编辑）。"""
+        if member == self.member_index:
+            return
+        with self._suspended():
+            self.member_index = member
+            pos = self.member_combo.findData(member)
+            if pos >= 0:
+                self.member_combo.setCurrentIndex(pos)
+            self._populate_skills(preserve=self._current_skill_name())
+            self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
+        if self.turn is not None:
+            self.turn.refresh_member_options(self)
 
     def _on_skill_changed(self, name):
         if self._loading:
             return
         self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
         self._emit_changed()
 
     def _apply_skill_data(self, name=None):
@@ -513,13 +790,80 @@ class ActionRow(QFrame):
             else self.earring_spin.value(),
         )
 
+    def _is_attack(self):
+        """该行动是否为攻击行为（技能带攻击/伤害 Hit）。"""
+        skill = self._find_skill()
+        return bool(skill is not None and skill.hits is not None)
+
+    def _od_up_uses_earring(self):
+        """技能的「OD条上升」是否按固定OD结算（吃 OD 耳环）。
+
+        攻击技能 -> 吃耳环；非攻击技能默认不吃，但标记 od_up_earring 的
+        例外（如 驱动增益）也吃。
+        """
+        skill = self._find_skill()
+        if skill is None:
+            return False
+        return (skill.hits is not None
+                or getattr(skill, "od_up_earring", False))
+
+    def get_od_up_flat(self):
+        """非攻击且不吃耳环的技能「OD条上升 X%」：直接增加超频条。"""
+        skill = self._find_skill()
+        if skill is None or skill.hits is not None:
+            return 0.0
+        if getattr(skill, "od_up_earring", False):
+            return 0.0
+        if getattr(skill, "od_up_on_break", False) and not self.is_break():
+            return 0.0
+        return getattr(skill, "od_up_fixed", 0.0) * 100.0
+
+    def _auto_fixed_od(self):
+        """该行动自动计入「固定OD」的部分（吃 OD 耳环）：
+
+        * 「击破敌人时超频条+X%」被动（勾选击破敌人且为攻击行为时）；
+        * 技能自带的「OD条上升 X%」效果（攻击技能，或标记吃耳环的例外，
+          如 驱动增益；若限定「以此技能击破敌人时」则需勾选击破敌人）。
+        """
+        total = 0.0
+        if self.owner is None:
+            return total
+        if self._is_attack() and self.is_break():
+            total += self.owner._member_break_od_fraction(self.member_index)
+        skill = self._find_skill()
+        if skill is not None and self._od_up_uses_earring():
+            if not getattr(skill, "od_up_on_break", False) or self.is_break():
+                total += getattr(skill, "od_up_fixed", 0.0)
+        return total
+
+    def _sync_fixed_od(self):
+        """把自动固定OD同步到「固定OD」输入框（不覆盖用户手填的值）。"""
+        frac = self._auto_fixed_od()
+        prev = getattr(self, "_auto_fixed_added", 0.0)
+        if abs(frac - prev) > 1e-9:
+            self.fixed_od_spin.setValue(self.fixed_od_spin.value() - prev + frac)
+            self._auto_fixed_added = frac
+
+    def _on_break_toggled(self, *args):
+        self._sync_fixed_od()
+        self._emit_changed()
+
     def set_result(self, contribution):
         self.result_label.setText("%.2f" % contribution)
 
-    def get_sp_cost(self):
-        """该次行动消耗的 SP；通常攻击为 0。"""
+    def get_sp_cost(self, downed=False):
+        """该次行动消耗的 SP；通常攻击为 0。
+
+        downed=True 表示敌人处于倒地/超倒地状态：带该条件的技能
+        （如 对称·启示 0(16)）改用条件消耗。
+        """
         skill = self._find_skill()
-        return skill.sp_cost if skill else 0
+        if not skill:
+            return 0
+        if (downed and skill.sp_cost_cond == "downed"
+                and skill.sp_cost_alt is not None):
+            return skill.sp_cost_alt
+        return skill.sp_cost
 
     def get_sp_recover(self):
         """该次行动回复的 SP：(回复量, 范围, 元素)。"""
@@ -532,12 +876,26 @@ class ActionRow(QFrame):
     def is_break(self):
         return self.break_check.isChecked()
 
+    def get_attack_element(self):
+        """本次行动的攻击元素：通常攻击固定为「无」；其余取技能攻击元素 → 角色风格元素 → 无。"""
+        skill = self._find_skill()
+        if skill is not None and skill.is_normal_attack:
+            return "无"
+        if skill and skill.element:
+            return skill.element
+        return self.owner._member_element(self.member_index) or "无"
+
     def get_break_skill_recover(self):
         """本次行动击破敌人时，技能自带的 SP 回复 (回复量, 范围)。"""
         skill = self._find_skill()
         if skill and skill.sp_break_recover and skill.sp_break_scope:
             return skill.sp_break_recover, skill.sp_break_scope
         return 0, None
+
+    def get_od_down_fixed(self):
+        """本次行动「OD条下降」的固定下降值（如 50）。"""
+        skill = self._find_skill()
+        return skill.od_down_fixed if skill else 0.0
 
     def set_sp_result(self, remaining, enough=True):
         """显示该次行动后的剩余 SP；不足时标红。"""
@@ -564,10 +922,13 @@ class ActionRow(QFrame):
             "skill": self._current_skill_name(),
             "base_hits": self.base_hits_spin.value(),
             "combo": self.combo_spin.value(),
-            "fixed_od": self.fixed_od_spin.value(),
+            # 只存「手动」固定OD；击破被动的部分读取时再自动加上
+            "fixed_od": (self.fixed_od_spin.value()
+                         - getattr(self, "_auto_fixed_added", 0.0)),
             "resonance_31x": self.resonance_spin.value(),
             "od_earring": self.earring_spin.value(),
             "break": self.break_check.isChecked(),
+            "sp_target": self.get_sp_target(),
         }
 
     def set_data(self, data):
@@ -593,6 +954,11 @@ class ActionRow(QFrame):
             if not self.is_normal_attack():
                 self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
             self.break_check.setChecked(bool(data.get("break", False)))
+            self._populate_targets()
+            tpos = self.target_combo.findData(data.get("sp_target"))
+            if tpos >= 0:
+                self.target_combo.setCurrentIndex(tpos)
+        self._sync_fixed_od()
 
 
 # ======================================================================
@@ -610,6 +976,8 @@ class TurnCard(QFrame):
         self.setObjectName("turnCard")
         self.owner = owner
         self.actions = []
+        self.manual_front = False      # 用户是否手动改过本回合的前锋队员
+        self.last_front_sig = None     # 上次同步的前锋签名（用于向上传播）
         self._loading = 0
         self._build_ui()
         self.add_action()
@@ -624,7 +992,7 @@ class TurnCard(QFrame):
         header.setSpacing(6)
 
         self.index_label = QLabel("第1回合")
-        self.index_label.setFixedWidth(96)
+        self.index_label.setFixedWidth(118)
         self.index_label.setAlignment(Qt.AlignCenter)
         header.addWidget(self.index_label)
 
@@ -643,18 +1011,44 @@ class TurnCard(QFrame):
         self.od_combo = QComboBox()
         self.od_combo.addItems(OD_OPTIONS)
         self.od_combo.setFixedWidth(112)
+        self.od_combo.setToolTip("该回合发动的 OD 等级；发动后 OD 槽 -等级×100")
         self.od_combo.currentTextChanged.connect(self._on_od_changed)
         header.addWidget(self.od_combo)
 
+        self.od_timing_combo = QComboBox()
+        self.od_timing_combo.addItems(OD_TIMING_OPTIONS)
+        self.od_timing_combo.setFixedWidth(84)
+        self.od_timing_combo.setToolTip(
+            "前置OD=当前回合直接发动；后置OD=当前回合结束马上发动（OD回合都是当前回合）")
+        self.od_timing_combo.currentTextChanged.connect(self._on_od_changed)
+        self.od_timing_combo.setEnabled(False)
+        header.addWidget(self.od_timing_combo)
+
         header.addStretch(1)
 
-        self.result_label = QLabel("本回合 OD：0.00")
+        self.start_od_label = QLabel("回合开始OD：0.00")
+        self.start_od_label.setFixedWidth(140)
+        self.start_od_label.setToolTip(
+            "该回合开始时的 OD 槽 = 上一回合结束OD + 回合开始被动 − 发动OD消耗")
+        self.start_od_label.setStyleSheet("color: #555555;")
+        header.addWidget(self.start_od_label)
+
+        self.result_label = QLabel("本回合OD：0.00")
         self.result_label.setStyleSheet("font-weight: bold;")
+        self.result_label.setToolTip(
+            "本回合行动产生的 OD（不含回合开始被动；回合开始被动计入「回合开始OD」）")
         header.addWidget(self.result_label)
 
         self.cumulative_label = QLabel("累计：0.00")
         self.cumulative_label.setFixedWidth(110)
         header.addWidget(self.cumulative_label)
+
+        self.current_od_label = QLabel("当前OD：0.00")
+        self.current_od_label.setFixedWidth(130)
+        self.current_od_label.setToolTip(
+            "行动结束后的 OD 槽：累计获得 − 已发动 OD 消耗")
+        self.current_od_label.setStyleSheet("font-weight: bold; color: #3355aa;")
+        header.addWidget(self.current_od_label)
 
         self.delete_button = QPushButton("删除回合")
         self.delete_button.setFixedWidth(80)
@@ -670,8 +1064,14 @@ class TurnCard(QFrame):
         self.actions_layout.setSpacing(2)
         root.addLayout(self.actions_layout)
 
-        # 本回合结束后全队的 SP（含后卫），便于观察未行动角色
-        self.team_sp_label = QLabel("队伍SP：-")
+        # 行动前 / 行动后的全队 SP（含后卫），便于观察未行动角色
+        self.team_sp_before_label = QLabel("队伍SP（行动前）：-")
+        self.team_sp_before_label.setWordWrap(True)
+        self.team_sp_before_label.setStyleSheet(
+            "color: #557799; font-size: 12px;")
+        root.addWidget(self.team_sp_before_label)
+
+        self.team_sp_label = QLabel("队伍SP（行动后）：-")
         self.team_sp_label.setWordWrap(True)
         self.team_sp_label.setStyleSheet("color: #3355aa; font-size: 12px;")
         root.addWidget(self.team_sp_label)
@@ -694,9 +1094,9 @@ class TurnCard(QFrame):
     def actor_members(self):
         """本回合行动的队员下标（按行动顺序，去重，最多 3 人）。
 
-        切换回合不行动；追加回合不影响前锋/SP，故均返回空。
+        追加回合不影响前锋/SP，故返回空。
         """
-        if self.turn_type() in ("切换", "追加回合"):
+        if self.turn_type() == "追加回合":
             return []
         result = []
         for action in self.actions:
@@ -735,7 +1135,7 @@ class TurnCard(QFrame):
     def ensure_action_count(self):
         """保证回合行动数符合要求。
 
-        普通/切换回合 ≥3 人时固定 3 人；追加回合可自由增删（1~3）。
+        通常回合 ≥3 人时固定 3 人；追加回合可自由增删（1~3）。
         """
         while len(self.actions) > self.max_actions():
             self._force_remove(self.actions[-1])
@@ -774,6 +1174,7 @@ class TurnCard(QFrame):
                            default_member=self._first_free_member())
         action.changed.connect(self._on_action_changed)
         action.delete_requested.connect(self._delete_action)
+        action.member_edited.connect(self._on_member_edited)
         self.actions.append(action)
         self.actions_layout.addWidget(action)
         if data is None:
@@ -803,6 +1204,18 @@ class TurnCard(QFrame):
     def _on_action_changed(self):
         self.changed.emit()
 
+    def _on_member_edited(self):
+        # 用户手动改了本回合的队员，则本回合不再自动跟随上一回合的前锋
+        self.manual_front = True
+
+    def set_action_members(self, members):
+        """按给定队员下标同步本回合各行动的队员（保持技能尽量不变）。"""
+        names = list(members)
+        for i, action in enumerate(self.actions):
+            if i < len(names):
+                action.set_member(names[i])
+        self.refresh_member_options()
+
     def _update_controls(self):
         self.add_action_button.setEnabled(len(self.actions) < self.max_actions())
         can_delete = len(self.actions) > self.min_actions()
@@ -810,22 +1223,25 @@ class TurnCard(QFrame):
             action.delete_button.setEnabled(can_delete)
 
     def _on_type_changed(self, text):
-        is_switch = (text == "切换")
+        # 追加回合不能发动 OD
+        no_od = (text == "追加回合")
         with self._suspended():
-            self.od_combo.setEnabled(not is_switch)
-            if is_switch:
+            self.od_combo.setEnabled(not no_od)
+            self.od_timing_combo.setEnabled(
+                not no_od and self.od_combo.currentText() != "无")
+            if no_od:
                 self.od_combo.setCurrentText("无")
-            for action in self.actions:
-                action.setEnabled(not is_switch)
         self._apply_style()
         if not self._loading:
-            self.refresh_member_options()   # 切换/追加回合的可选角色不同
+            self.refresh_member_options()   # 追加回合的可选角色不同
             self.ensure_action_count()
             self.owner._reindex()           # 追加回合不计入回合数
         self.changed.emit()
 
     def _on_od_changed(self, text):
+        self.od_timing_combo.setEnabled(self.od_combo.currentText() != "无")
         self._apply_style()
+        self.owner._reindex()   # 后置OD 沿用上一回合号
         self.changed.emit()
 
     def mousePressEvent(self, event):
@@ -843,37 +1259,61 @@ class TurnCard(QFrame):
             return int(od[2])
         return 0
 
-    def set_index(self, index, additional=False):
+    def od_timing(self):
+        return self.od_timing_combo.currentText()
+
+    def od_gauge_cost(self):
+        """本回合发动 OD 消耗的 OD 槽（等级×100）。"""
+        return self.od_level() * OD_GAUGE_PER_LEVEL
+
+    def set_index(self, index, additional=False, post_od=False):
         if additional:
             text = "追加回合" if index <= 0 else "第%d回合 追加" % index
-            self.index_label.setText(text)
+        elif post_od:
+            # 后置OD：OD 在上一个回合结束发动，故沿用上一个回合号
+            text = "第%d回合 后置OD" % max(index, 1)
         else:
-            self.index_label.setText("第%d回合" % index)
+            text = "第%d回合" % index
+        self.index_label.setText(text)
 
     def set_result(self, contribution, cumulative):
-        self.result_label.setText("本回合 OD：%.2f" % contribution)
+        self.result_label.setText("本回合OD：%.2f" % contribution)
         self.cumulative_label.setText("累计：%.2f" % cumulative)
 
-    def set_team_sp(self, entries):
-        """显示本回合结束时全队的 SP。
+    def set_current_od(self, value):
+        self.current_od_label.setText("当前OD：%.2f" % value)
 
-        entries: [(slot_index, role_name, sp, is_front), ...]
-        """
+    def set_start_od(self, value):
+        """记录并显示回合开始 OD 槽（回合开始被动结算之后；用于显示与条件判定）。"""
+        self._start_od = value
+        self.start_od_label.setText("回合开始OD：%.2f" % value)
+
+    def start_od(self):
+        return getattr(self, "_start_od", 0.0)
+
+    def _format_team_sp(self, entries, prefix):
         if not entries:
-            self.team_sp_label.setText("队伍SP：-")
-            return
+            return "%s：-" % prefix
         parts = []
         for slot, role, sp, is_front in entries:
             pos = "前" if is_front else "后"
             parts.append("角色%d(%s) %s:%s" % (slot + 1, pos, role, sp))
-        self.team_sp_label.setText("队伍SP　" + "　".join(parts))
+        return "%s　%s" % (prefix, "　".join(parts))
+
+    def set_team_sp(self, entries, before=None):
+        """显示全队 SP。
+
+        entries: 行动结束后 [(slot_index, role_name, sp, is_front), ...]
+        before:  行动前（回合开始回复/OD 结算后）的同结构列表
+        """
+        if before is not None:
+            self.team_sp_before_label.setText(
+                self._format_team_sp(before, "队伍SP（行动前）"))
+        self.team_sp_label.setText(
+            self._format_team_sp(entries, "队伍SP（行动后）"))
 
     def _apply_style(self):
         od = self.od_combo.currentText()
-        if self.turn_type() == "切换":
-            self.setStyleSheet(TURN_CARD_STYLE % {
-                "bg": "rgba(26, 26, 26, 0.9)", "accent": "#1a1a1a"})
-            return
         bg = OD_COLORS.get(od[:3], "#ffffff")
         accent = "#c0c0c0"
         for key, color in OD_COLORS.items():
@@ -886,15 +1326,22 @@ class TurnCard(QFrame):
         return {
             "type": self.turn_type(),
             "od": self.od_combo.currentText(),
+            "od_timing": self.od_timing(),
             "actions": [a.to_data() for a in self.actions],
         }
 
     def set_data(self, data):
         with self._suspended():
-            self.type_combo.setCurrentText(data.get("type", TURN_OPTIONS[0]))
+            turn_type = data.get("type", TURN_OPTIONS[0])
+            if turn_type not in TURN_OPTIONS:   # 兼容旧存档（如已移除的「切换」）
+                turn_type = TURN_OPTIONS[0]
+            self.type_combo.setCurrentText(turn_type)
             od = data.get("od", "无")
             if od in OD_OPTIONS:
                 self.od_combo.setCurrentText(od)
+            timing = data.get("od_timing", OD_TIMING_OPTIONS[0])
+            if timing in OD_TIMING_OPTIONS:
+                self.od_timing_combo.setCurrentText(timing)
             for action in list(self.actions):
                 self.actions_layout.removeWidget(action)
                 action.setParent(None)
@@ -904,6 +1351,7 @@ class TurnCard(QFrame):
                 action = ActionRow(self.owner, turn=self, data=action_data)
                 action.changed.connect(self._on_action_changed)
                 action.delete_requested.connect(self._delete_action)
+                action.member_edited.connect(self._on_member_edited)
                 self.actions.append(action)
                 self.actions_layout.addWidget(action)
         self._update_controls()
@@ -939,6 +1387,9 @@ class AxleODWindow(QFrame):
         self._team_updating = False
         self._build_ui()
         self._normalize_team()
+        # 用队伍行实际数据同步（含突破数/携带被动等）
+        self.team = [row.to_data() for row in self.team_rows]
+        self._refresh_role_choices()
         self.add_turn()
 
     def _default_team(self):
@@ -962,9 +1413,9 @@ class AxleODWindow(QFrame):
         root.addLayout(self._build_toolbar())
         root.addWidget(self._build_team_group())
         root.addWidget(self._build_battle_group())
+        root.addWidget(self._build_resist_group())
         root.addWidget(self._build_sp_group())
         root.addWidget(self._build_rows_area(), 1)
-        root.addWidget(self._build_footer())
 
     def _build_toolbar(self):
         bar = QHBoxLayout()
@@ -1002,7 +1453,8 @@ class AxleODWindow(QFrame):
             row.set_data(self.team[i])
             row.changed.connect(self._on_team_changed)
             self.team_rows.append(row)
-            layout.addWidget(row, i // 3, i % 3)
+            # 2 列 × 3 行，给「被动」选择按钮留出宽度
+            layout.addWidget(row, i // 2, i % 2)
         return group
 
     def _build_battle_group(self):
@@ -1019,11 +1471,6 @@ class AxleODWindow(QFrame):
         self.target_spin.setToolTip("目标数 / 敌人数量，参与 HIT OD 计算")
         self.target_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.target_spin)
-
-        self.resistance_check = QCheckBox("抗性（命中无效）")
-        self.resistance_check.setToolTip("勾选后 HIT OD 记 0")
-        self.resistance_check.stateChanged.connect(self.recalculate)
-        layout.addWidget(self.resistance_check)
 
         layout.addWidget(QLabel("其他OD增量"))
         self.other_od_spin = _make_double_spin(0.0, 100.0, 0.01, 3, 0.0)
@@ -1043,11 +1490,39 @@ class AxleODWindow(QFrame):
         self.total_label.setStyleSheet("font-weight: bold; font-size: 15px;")
         layout.addWidget(self.total_label)
 
+        self.net_od_label = QLabel("净OD：0.00")
+        self.net_od_label.setToolTip(
+            "净OD = 累计获得 − 发动 OD 消耗（OD1=100 / OD2=200 / OD3=300）")
+        layout.addWidget(self.net_od_label)
+
         self.percent_label = QLabel("实际OD：0.0000")
         layout.addWidget(self.percent_label)
 
         self.actual_hits_label = QLabel("实际Hit数：0.000")
         layout.addWidget(self.actual_hits_label)
+        return group
+
+    def _build_resist_group(self):
+        group = QGroupBox("敌人抗性（对应属性行动 HIT OD 记 0）")
+        layout = QHBoxLayout(group)
+        layout.setContentsMargins(10, 6, 10, 6)
+        layout.setSpacing(10)
+
+        self.resistance_check = QCheckBox("全部（命中无效）")
+        self.resistance_check.setToolTip("勾选后所有行动的 HIT OD 记 0")
+        self.resistance_check.stateChanged.connect(self.recalculate)
+        layout.addWidget(self.resistance_check)
+
+        layout.addWidget(QLabel("按属性："))
+        self.resist_element_checks = {}
+        for element in ELEMENTS:
+            cb = QCheckBox(element)
+            cb.setToolTip("敌人对「%s」属性抗性，该属性角色的行动 HIT OD 记 0" % element)
+            cb.stateChanged.connect(self.recalculate)
+            layout.addWidget(cb)
+            self.resist_element_checks[element] = cb
+
+        layout.addStretch(1)
         return group
 
     def _build_sp_group(self):
@@ -1068,9 +1543,10 @@ class AxleODWindow(QFrame):
         layout.addWidget(QLabel("前锋回复"))
         self.sp_regen_front_spin = QSpinBox()
         self.sp_regen_front_spin.setRange(0, 20)
-        self.sp_regen_front_spin.setValue(3)
+        self.sp_regen_front_spin.setValue(2)
         self.sp_regen_front_spin.setFixedWidth(56)
-        self.sp_regen_front_spin.setToolTip("每回合开始时前锋（角色1~3）回复的 SP")
+        self.sp_regen_front_spin.setToolTip(
+            "每回合开始时前锋的基础回复；风格被动的「闪光/佳音…」会额外叠加")
         self.sp_regen_front_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.sp_regen_front_spin)
 
@@ -1092,11 +1568,11 @@ class AxleODWindow(QFrame):
         self.sp_limit_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.sp_limit_spin)
 
-        layout.addStretch(1)
+        self.sp_limit_hint = QLabel("")
+        self.sp_limit_hint.setStyleSheet("color: #cc6600; font-size: 12px;")
+        layout.addWidget(self.sp_limit_hint)
 
-        note = QLabel("前锋 +3 / 后卫 +2；OD 额外 +5/+12/+20（首回合按队伍配置）")
-        note.setStyleSheet("color: #777777; font-size: 12px;")
-        layout.addWidget(note)
+        layout.addStretch(1)
         return group
 
     def _build_rows_area(self):
@@ -1111,26 +1587,6 @@ class AxleODWindow(QFrame):
         scroll.setWidget(self.turns_container)
         return scroll
 
-    def _build_footer(self):
-        label = QLabel(
-            "OD公式来自「等效破坏率与OD计算表」："
-            "耳环系数 = 1+(5+MIN(原始Hit,10)×10/9−10/9)/100×OD耳环；"
-            "HIT OD = (原始Hit+连击数) × ROUNDDOWN(2.5×总系数×敌方OD率,2) × 敌人数量 × (抗性?0:1)；"
-            "固定OD = ROUNDDOWN(固定OD×100×总系数,2) + ROUNDDOWN(31X共鸣×100×总系数,2)；"
-            "总系数 = 耳环系数 + 其他OD增量。通常攻击不享受 OD 耳环加成。\n"
-            "SP：第1回合按队伍配置顺序（前 3 人为前锋），其后以「上一回合行动的队员」为前锋；"
-            "回合开始前锋 +3、后卫 +2（上限默认 20）；"
-            "发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20；行动扣除技能 SP"
-            "（「剩余SP」列红色表示不足；技能自带的 SP 回复会自动结算；"
-            "勾选行动的「破」表示该行动击破敌人，会触发「击破时回复SP」的技能/被动）。"
-            "队伍≥3人时每回合固定 3 人行动；新增回合会自动沿用上一回合行动的队员；"
-            "追加回合不计回合数、不触发回合开始回复，但行动消耗与技能 SP 回复照常生效；"
-            "每个回合下方显示全队 SP（含未行动的后卫）。"
-        )
-        label.setWordWrap(True)
-        label.setStyleSheet("color: #777777; font-size: 12px;")
-        return label
-
     # ------------------------------------------------------------- team ops
     def _normalize_team(self):
         """后卫存在的必要条件是前锋有 3 人。"""
@@ -1141,6 +1597,16 @@ class AxleODWindow(QFrame):
                 row.set_role("无")
             row.set_slot_enabled(front_full)
 
+    def _refresh_role_choices(self):
+        """队伍角色不可重复：禁用其它位置已选的角色。"""
+        used = {}
+        for i, row in enumerate(self.team_rows):
+            role = row.role()
+            if role:
+                used.setdefault(role, []).append(i)
+        for i, row in enumerate(self.team_rows):
+            row.set_roles_enabled(used, i)
+
     def _on_team_changed(self):
         if self._team_updating:
             return
@@ -1150,13 +1616,14 @@ class AxleODWindow(QFrame):
             self.team = [row.to_data() for row in self.team_rows]
         finally:
             self._team_updating = False
+        self._refresh_role_choices()
         for turn in self.turns:
             turn.refresh_team()
         self.recalculate()
 
     # ------------------------------------------------------------- turn ops
     def _last_front_actors(self, exclude=None):
-        """最近一个有效回合的行动队员（跳过切换/追加回合）。"""
+        """最近一个有效回合的行动队员（跳过追加回合）。"""
         for turn in reversed(self.turns):
             if turn is exclude:
                 continue
@@ -1179,7 +1646,7 @@ class AxleODWindow(QFrame):
 
     def add_turn(self, data=None, turn_type=None):
         turn = TurnCard(self)
-        turn.changed.connect(self.recalculate)
+        turn.changed.connect(lambda t=turn: self._on_turn_changed(t))
         turn.delete_requested.connect(self._delete_turn)
         turn.turn_selected.connect(self._select_turn)
         self.turns.append(turn)
@@ -1206,6 +1673,7 @@ class AxleODWindow(QFrame):
             turn.refresh_member_options()
         if turn_type:
             turn.type_combo.setCurrentText(turn_type)
+        turn.last_front_sig = tuple(turn.actor_members())
         self._reindex()
         self._select_turn(turn)
         self.recalculate()
@@ -1214,6 +1682,26 @@ class AxleODWindow(QFrame):
     def add_additional_turn(self):
         """添加「追加回合」：不计回合数、不影响 SP。"""
         return self.add_turn(turn_type="追加回合")
+
+    def _on_turn_changed(self, turn):
+        """某回合变更时，若其前锋变化则同步到后面（未被手动编辑的）回合。"""
+        self._sync_following_turns(turn)
+        self.recalculate()
+
+    def _sync_following_turns(self, turn):
+        try:
+            idx = self.turns.index(turn)
+        except ValueError:
+            return
+        sig = tuple(turn.actor_members())
+        if not sig or sig == turn.last_front_sig:
+            return
+        turn.last_front_sig = sig
+        for nxt in self.turns[idx + 1:]:
+            if nxt.manual_front:
+                break
+            nxt.last_front_sig = sig
+            nxt.set_action_members(sig)
 
     def _delete_turn(self, turn):
         if turn not in self.turns:
@@ -1275,44 +1763,122 @@ class AxleODWindow(QFrame):
                 item.index_label.setStyleSheet("")
 
     def _reindex(self):
-        """重新编号：追加回合不计入回合数。"""
+        """重新编号：追加回合、以及后置OD 回合都不计入回合数。"""
         number = 0
         for turn in self.turns:
-            if turn.turn_type() == "追加回合":
+            is_additional = turn.turn_type() == "追加回合"
+            is_post_od = (not is_additional and turn.od_level() > 0
+                          and turn.od_timing() == "后置OD")
+            if is_additional:
                 turn.set_index(number, additional=True)
+            elif is_post_od:
+                turn.set_index(number, post_od=True)
             else:
                 number += 1
                 turn.set_index(number)
 
     # --------------------------------------------------------- calculation
-    def _battle_params(self):
+    def _battle_params(self, resistance=False):
         return ODBattle(
             target_count=self.target_spin.value(),
-            resistance=self.resistance_check.isChecked(),
+            resistance=resistance,
             other_od=self.other_od_spin.value(),
             enemy_od_rate=self.enemy_od_spin.value(),
         )
 
-    def recalculate(self):
-        battle = self._battle_params()
-        cumulative = 0.0
-        for turn in self.turns:
-            contribution = 0.0
-            if turn.turn_type() != "切换":
-                for action in turn.actions:
-                    value = calc_od(action.get_od_skill(), battle).total_od
-                    action.set_result(value)
-                    contribution += value
-            else:
-                for action in turn.actions:
-                    action.set_result(0.0)
-            cumulative += contribution
-            turn.set_result(contribution, cumulative)
+    def _resisted_elements(self):
+        return {el for el, cb in self.resist_element_checks.items()
+                if cb.isChecked()}
 
+    def recalculate(self):
+        blanket = self.resistance_check.isChecked()
+        resisted = self._resisted_elements()
+        cumulative = 0.0
+        running_od = 0.0   # 行动结束后的 OD 槽（累计获得 − 已发动消耗）
+        consumed = 0.0
+        prev_level = 0     # 上一次发动的 OD 等级（连续同等级视为同一次发动）
+        od_gain_used = set()   # 已触发「OD条上升」被动的队员（出击中1次）
+        start_front = self._initial_front()   # 回合开始时的前锋
+        for turn_idx, turn in enumerate(self.turns):
+            # 回合开始：风格被动「OD条上升」（如 V字回复）——
+            # 按触发时机/位置/阈值/是否出击中1次结算。
+            # OD 回合（发动 OD 的回合，含其加成回合）与追加回合不触发「回合开始时」效果。
+            starts_turn = (not turn.od_level() and turn.turn_type() != "追加回合")
+            turn_bonus = 0.0   # 回合开始时被动带来的 OD 增加
+            for slot in (self._active_slots() if starts_turn else []):
+                if slot in od_gain_used:
+                    continue
+                for mod in self._member_turn_start_od(slot):
+                    if mod.get("timing") == "battle" and turn_idx != 0:
+                        continue
+                    pos = mod.get("position")
+                    if pos == "front" and slot not in start_front:
+                        continue
+                    if pos == "back" and slot in start_front:
+                        continue
+                    threshold = mod.get("threshold")
+                    if threshold is not None and running_od >= threshold:
+                        continue
+                    turn_bonus += mod.get("amount", 0.0)
+                    if mod.get("once", True):
+                        od_gain_used.add(slot)
+                    break
+            # 发动 OD 消耗（同一次发动只扣一次）
+            level = turn.od_level()
+            cost = 0
+            if level > 0 and level != prev_level:
+                cost = level * OD_GAUGE_PER_LEVEL
+                consumed += cost
+            prev_level = level
+
+            # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗
+            # 「本回合OD」只统计本回合行动；因此 回合开始OD + 本回合OD = 当前OD
+            turn.set_start_od(running_od + turn_bonus - cost)
+            turn_actions = 0.0
+            for action in turn.actions:
+                element = action.get_attack_element()
+                resist = blanket or bool(element and element in resisted)
+                battle = self._battle_params(resist)
+                value = calc_od(action.get_od_skill(), battle).total_od
+                # 「OD条下降」：固定扣减（如 50% → −50）
+                value -= action.get_od_down_fixed()
+                # 非攻击技能的「OD条上升 X%」：直接增加超频条（不吃 OD 耳环）
+                value += action.get_od_up_flat()
+                action.set_result(value)
+                turn_actions += value
+
+            cumulative += turn_bonus + turn_actions
+            running_od += turn_bonus + turn_actions - cost
+            turn.set_result(turn_actions, cumulative)
+            turn.set_current_od(running_od)
+
+            # 回合结束：更新前锋（供下一回合「回合开始时」判定使用）
+            actors = turn.actor_members()
+            if actors:
+                merged = list(actors)
+                for m in start_front:
+                    if len(merged) >= 3:
+                        break
+                    if m not in merged:
+                        merged.append(m)
+                for m in self._active_slots():
+                    if len(merged) >= 3:
+                        break
+                    if m not in merged:
+                        merged.append(m)
+                start_front = merged[:3]
         self.total_label.setText("总OD：%.2f" % cumulative)
+        self.net_od_label.setText("净OD：%.2f（消耗 %.0f）" % (
+            cumulative - consumed, consumed))
         self.percent_label.setText("实际OD：%.4f" % (cumulative / 100.0))
         self.actual_hits_label.setText(
             "实际Hit数：%.3f" % (cumulative / 100.0 * 40.0))
+
+        limit = self._effective_sp_limit()
+        if limit != self.sp_limit_spin.value():
+            self.sp_limit_hint.setText("（自动 %d）" % limit)
+        else:
+            self.sp_limit_hint.setText("")
 
         self._recalc_sp()
 
@@ -1324,82 +1890,151 @@ class AxleODWindow(QFrame):
         """初始前锋：队伍中前 3 个已安排角色的位置。"""
         return self._active_slots()[:3]
 
+    def _effective_sp_limit(self):
+        """当前 SP 上限：设置值与该风格「SP上限」被动（如 30）取较大者。"""
+        limit = self.sp_limit_spin.value()
+        for slot in self._active_slots():
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            selected = self._selected_passives(slot)
+            for st in self.data_source.styles(role):
+                if st.name != style or not st.sp_limit_override:
+                    continue
+                if (st.boost_enabler is None or selected is None
+                        or st.boost_enabler in selected):
+                    limit = max(limit, st.sp_limit_override)
+        return limit
+
     def _recalc_sp(self):
         """模拟全队 SP。
 
-        * 第 1 回合开始时，前锋/后卫按队伍配置顺序（前 3 人为前锋）。
-        * 每回合开始按「上一回合结束时」的前锋/后卫回复 SP：
-          前锋 +3、后卫 +2。
-        * 回合结束后，本回合行动的队员成为新的前锋（沿用上一回合前锋补齐）。
+        * 回合开始时的前锋：第 1 回合 = 队伍配置前 3 人；之后 = 上一回合行动的队员。
+        * 回合开始按「回合开始时的前锋/后卫」回复：前锋 +3、后卫 +2。
+        * 回合中/结束时的前锋 = 本回合行动的队员；
+          技能/被动里的「前锋」回复范围以此（本回合行动队员）为准。
         * 行动扣费，发动 OD 额外回复。
         """
-        limit = self.sp_limit_spin.value()
+        limit = self._effective_sp_limit()
         front_regen = self.sp_regen_front_spin.value()
         back_regen = self.sp_regen_back_spin.value()
         count = max(len(self.team), 1)
         active = self._active_slots()
 
         sp = [self.sp_init_spin.value()] * count
-        # 第 1 回合开始时的前锋 = 队伍配置顺序的前 3 人
+        # front = 「回合开始时」的前锋。第 1 回合 = 队伍配置前 3 人
         front = self._initial_front()
         break_seen = False   # 是否已经发生过击破（用于「首次击破」类被动）
+        prev_od_level = 0    # 上一次发动的 OD 等级（同一次发动只给一次额外 SP）
+        sp_once_used = set()  # 已触发过「每次出击1次」类 SP 被动的队员
 
-        for turn in self.turns:
+        for turn_idx, turn in enumerate(self.turns):
             # 追加回合不计回合数：不触发「回合开始回复」与 OD 回复，
             # 但行动仍然消耗 SP、技能回复 SP 也照常生效。
             is_additional = turn.turn_type() == "追加回合"
-            front_set = set(front)
+            # 回合开始时的前锋（用于回合开始 +3/+2）
+            start_front = set(front)
+            # 本回合行动的队员 = 回合中/结束时的前锋（用于技能/被动「前锋」范围）
+            actors = turn.actor_members()
+            turn_front = set(actors) if actors else start_front
+            first_turn = (turn_idx == 0)
 
-            if not is_additional:
-                # 回合开始回复（前锋 +front，后卫 +back）
+            # 后置OD 属于上一回合：不触发回合开始回复与闪光
+            level = turn.od_level()
+            is_new_od = level > 0 and level != prev_od_level
+            is_post_od = (not is_additional and level > 0
+                          and turn.od_timing() == "后置OD")
+
+            if is_post_od:
+                # 仅结算 OD 的额外 SP（无回合开始回复、无闪光）；同一次发动只给一次
+                if is_new_od:
+                    self._apply_od_sp_bonus(turn, sp, active)
+            elif not is_additional:
+                start_od = turn.start_od()
+                # 回合开始回复：基础回复（前锋/后卫）+ 风格被动的前锋 SP（闪光等）
                 for i in active:
-                    regen = front_regen if i in front_set else back_regen
+                    regen = front_regen if i in start_front else back_regen
+                    if i in start_front:
+                        for mod in self._member_front_sp(i):
+                            if mod.get("battle_start") and not first_turn:
+                                continue
+                            low = mod.get("sp_below")
+                            if low is not None and sp[i] > low:
+                                continue
+                            ob = mod.get("od_below")
+                            if ob is not None and start_od >= ob:
+                                continue
+                            regen += mod.get("amount", 0)
                     if sp[i] < limit:
                         sp[i] = min(limit, sp[i] + regen)
 
-                # 发动 OD 的额外 SP
-                level = turn.od_level()
-                if 1 <= level < len(OD_SP_BONUS):
-                    bonus = OD_SP_BONUS[level]
-                    for i in active:
-                        sp[i] = min(99, sp[i] + bonus)
+                # 回合开始：「回合开始时/战斗开始时」回复友方 SP 的被动（如 与伙伴一起）
+                for i in active:
+                    for mod in self._member_turn_start_sp(i):
+                        if mod.get("battle_start") and not first_turn:
+                            continue
+                        pos = mod.get("position")
+                        if pos == "front" and i not in start_front:
+                            continue
+                        if pos == "back" and i in start_front:
+                            continue
+                        low = mod.get("sp_below")
+                        if low is not None and sp[i] > low:
+                            continue
+                        ob = mod.get("od_below")
+                        if ob is not None and start_od >= ob:
+                            continue
+                        if mod.get("downed") and not break_seen:
+                            continue
+                        if mod.get("once") and i in sp_once_used:
+                            continue
+                        self._apply_scope_recover(
+                            mod.get("amount", 0), mod.get("scope"),
+                            mod.get("element"), i, sp, active,
+                            start_front, limit)
+                        if mod.get("once"):
+                            sp_once_used.add(i)
+
+                # 前置OD：当前回合直接发动，回合开始给 OD 额外 SP（同一次发动只给一次）
+                if turn.od_timing() == "前置OD" and is_new_od:
+                    self._apply_od_sp_bonus(turn, sp, active)
+            prev_od_level = level
+
+            # 记录「行动前」全队 SP（回合开始回复 / 前置OD 之后）
+            pre_entries = [(i, self.team[i].get("role"), sp[i], i in start_front)
+                           for i in active]
 
             # 行动：扣除技能 SP，并结算技能的 SP 回复效果
-            if turn.turn_type() == "切换":
-                for action in turn.actions:
+            for action in turn.actions:
+                i = action.member_index
+                if i not in active:
                     action.set_sp_result(None)
-            else:
-                for action in turn.actions:
-                    i = action.member_index
-                    if i not in active:
-                        action.set_sp_result(None)
-                        continue
-                    cost = action.get_sp_cost()
-                    if cost >= 99:      # 消耗全部 SP
-                        cost = sp[i]
-                    enough = sp[i] >= cost
-                    if enough:
-                        sp[i] -= cost
-                        self._apply_sp_recover(action, i, sp, active,
-                                               front_set, limit)
-                        if action.is_break():
-                            self._apply_break_recover(
-                                action, i, sp, active, front_set, limit,
-                                not break_seen)
-                            break_seen = True
-                    action.set_sp_result(sp[i], enough)
+                    continue
+                cost = action.get_sp_cost(downed=break_seen)
+                if cost >= 99:      # 消耗全部 SP
+                    cost = sp[i]
+                else:
+                    # SP 消耗增减被动（同名只叠加一次）；
+                    # 「高阶增强」（红宝石香水）不作用于通常攻击与 SP 消耗为 0 的技能
+                    cost = max(0, cost + self._sp_cost_modifier(
+                        i, active, turn_front, cost, downed=break_seen))
+                enough = sp[i] >= cost
+                if enough:
+                    sp[i] -= cost
+                    self._apply_sp_recover(action, i, sp, active,
+                                           turn_front, limit)
+                    if action.is_break():
+                        self._apply_break_recover(
+                            action, i, sp, active, turn_front, limit,
+                            not break_seen)
+                        break_seen = True
+                action.set_sp_result(sp[i], enough)
 
-            # 记录本回合结束时全队 SP（含后卫）
-            entries = [(i, self.team[i].get("role"), sp[i], i in front_set)
+            # 记录本回合结束时全队 SP（含后卫）；前锋标注用回合中的前锋
+            entries = [(i, self.team[i].get("role"), sp[i], i in turn_front)
                        for i in active]
-            turn.set_team_sp(entries)
+            turn.set_team_sp(entries, before=pre_entries)
 
-            # 追加回合不改变前锋
-            if is_additional:
-                continue
-
-            # 回合结束：本回合行动的队员成为新的前锋
-            actors = turn.actor_members()
+            # 回合结束：本回合行动的队员成为新的前锋（供下一回合开始使用）
             if actors:
                 merged = list(actors)
                 for m in front:
@@ -1414,6 +2049,14 @@ class AxleODWindow(QFrame):
                         merged.append(m)
                 front = merged[:3]
 
+    def _apply_od_sp_bonus(self, turn, sp, active):
+        """发动 OD 给全队的额外 SP（OD1+5 / OD2+12 / OD3+20）。"""
+        level = turn.od_level()
+        if 1 <= level < len(OD_SP_BONUS):
+            bonus = OD_SP_BONUS[level]
+            for i in active:
+                sp[i] = min(99, sp[i] + bonus)
+
     def _member_element(self, slot):
         """队员所装备风格的元素属性。"""
         role = self.team[slot].get("role")
@@ -1423,53 +2066,165 @@ class AxleODWindow(QFrame):
                 return st.element
         return None
 
+    def _scope_targets(self, scope, element, actor, active, front_set):
+        """返回某作用范围影响到的队员下标列表。"""
+        if scope == "self":
+            return [actor]
+        if scope == "all":
+            # 全体友方：包含自身
+            return list(active)
+        if scope == "others":
+            # 全体其他友方：除自身外的所有友方
+            return [i for i in active if i != actor]
+        if scope == "front":
+            # 前锋：包含自身
+            return [i for i in active if i in front_set]
+        if scope == "front_others":
+            # 前锋其他友方：前锋中除自身外
+            return [i for i in active if i in front_set and i != actor]
+        if scope == "others_element":
+            # 全体其他{X}属性风格：除自身外该元素（含双属性）的友方
+            return [i for i in active
+                    if i != actor and element
+                    and element in (self._member_element(i) or "")]
+        if scope == "all_element":
+            # 全体{X}属性风格：含自身该元素（含双属性）的友方
+            return [i for i in active
+                    if element and element in (self._member_element(i) or "")]
+        return []
+
     def _apply_scope_recover(self, amount, scope, element, actor,
                              sp, active, front_set, limit):
         """按范围结算一次 SP 回复。"""
         if amount <= 0 or not scope:
             return
-        if scope == "self":
-            targets = [actor]
-        elif scope == "all":
-            # 全体友方：包含自身
-            targets = list(active)
-        elif scope == "others":
-            # 全体其他友方：除自身外的所有友方
-            targets = [i for i in active if i != actor]
-        elif scope == "front":
-            # 前锋：包含自身
-            targets = [i for i in active if i in front_set]
-        elif scope == "front_others":
-            # 前锋其他友方：前锋中除自身外
-            targets = [i for i in active if i in front_set and i != actor]
-        elif scope == "others_element":
-            # 全体其他{X}属性风格：除自身外该元素（含双属性）的友方
-            targets = [i for i in active
-                       if i != actor and element
-                       and element in (self._member_element(i) or "")]
-        elif scope == "all_element":
-            # 全体{X}属性风格：含自身该元素（含双属性）的友方
-            targets = [i for i in active
-                       if element and element in (self._member_element(i) or "")]
-        else:
-            return
-        for t in targets:
+        for t in self._scope_targets(scope, element, actor, active, front_set):
             if sp[t] < limit:
                 sp[t] = min(limit, sp[t] + amount)
+
+    def _member_lb(self, slot):
+        """队员风格突破数（0~4）。"""
+        try:
+            return int(self.team[slot].get("lb", 0) or 0)
+        except Exception:
+            return 0
+
+    def _member_front_sp(self, slot):
+        """风格被动里「回合开始时位于前锋则自身 SP+X」的合计（闪光等，满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.front_sp_passives if m.get("lb", 0) <= lb]
+        return []
+
+    def _selected_passives(self, slot):
+        """队员在队伍配置里携带的「（被动技能）」；None 表示全部。"""
+        selected = self.team[slot].get("passives")
+        return set(selected) if selected is not None else None
+
+    def _member_turn_start_od(self, slot):
+        """风格被动里「回合开始时增加 OD 槽」的项（如 V字回复，满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.turn_start_od if m.get("lb", 0) <= lb]
+        return []
+
+    def _member_turn_start_sp(self, slot):
+        """风格被动里「回合开始时回复友方 SP」的项（如 与伙伴一起，满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.turn_start_sp if m.get("lb", 0) <= lb]
+        return []
+
+    def _member_break_od(self, slot):
+        """风格被动里「击破敌人时增加 OD 槽」的项（满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.break_od if m.get("lb", 0) <= lb]
+        return []
+
+    def _member_break_od_fraction(self, slot):
+        """击破敌人时增加 OD 槽的被动，换算为「固定OD」小数（25% → 0.25）。"""
+        return sum(m.get("amount", 0.0)
+                   for m in self._member_break_od(slot)) / 100.0
+
+    def _member_sp_cost_mods(self, slot):
+        """队员所装备风格里影响 SP 消耗的被动（过滤未携带的）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        selected = self._selected_passives(slot)
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                mods = []
+                for mod in st.sp_cost_mods:
+                    if mod.get("lb", 0) > lb:
+                        continue
+                    req = mod.get("requires")
+                    if req and selected is not None and req not in selected:
+                        continue
+                    mods.append(mod)
+                return mods
+        return []
+
+    def _sp_cost_modifier(self, actor, active, front_set, base_cost=None,
+                          downed=False):
+        """作用于该队员的 SP 消耗增减合计（同名被动只叠加一次）。
+
+        base_cost 为该技能的原始 SP 消耗；「高阶增强」（红宝石香水）
+        只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
+        downed=True 表示敌人处于倒地/被击破状态（带该条件的被动生效）。
+        """
+        total = 0
+        applied = set()
+        for slot in active:
+            for mod in self._member_sp_cost_mods(slot):
+                name = mod.get("name")
+                if name in applied:
+                    continue
+                if base_cost == 0 and name == "高阶增强":
+                    continue
+                if mod.get("downed") and not downed:
+                    continue
+                if actor in self._scope_targets(mod.get("scope"),
+                                                mod.get("element"), slot,
+                                                active, front_set):
+                    total += mod.get("amount", 0)
+                    applied.add(name)
+        return total
 
     def _apply_sp_recover(self, action, actor, sp, active, front_set, limit):
         """结算技能自带的 SP 回复效果。"""
         amount, scope, element = action.get_sp_recover()
+        if scope in ("one_other", "one_any"):
+            # 单名友方：回复到行动里选择的「对象」
+            target = action.get_sp_target()
+            if (target is not None and 0 <= target < len(sp)
+                    and sp[target] < limit):
+                sp[target] = min(limit, sp[target] + amount)
+            return
         self._apply_scope_recover(amount, scope, element, actor,
                                   sp, active, front_set, limit)
 
     def _member_break_sp(self, slot):
-        """队员所装备风格里「击破敌人时回复SP」的被动。"""
+        """队员所装备风格里「击破敌人时回复SP」的被动（满足突破要求）。"""
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
         for st in self.data_source.styles(role):
             if st.name == style:
-                return st.break_sp
+                return [b for b in st.break_sp if b.get("lb", 0) <= lb]
         return []
 
     def _apply_break_recover(self, action, actor, sp, active, front_set,
@@ -1492,6 +2247,7 @@ class AxleODWindow(QFrame):
             "battle": {
                 "target_count": self.target_spin.value(),
                 "resistance": self.resistance_check.isChecked(),
+                "resist_elements": sorted(self._resisted_elements()),
                 "other_od": self.other_od_spin.value(),
                 "enemy_od_rate": self.enemy_od_spin.value(),
                 "sp_init": self.sp_init_spin.value(),
@@ -1519,6 +2275,9 @@ class AxleODWindow(QFrame):
         battle = data.get("battle", {}) or {}
         self.target_spin.setValue(int(battle.get("target_count", 1)))
         self.resistance_check.setChecked(bool(battle.get("resistance", False)))
+        resist = set(battle.get("resist_elements") or [])
+        for element, cb in self.resist_element_checks.items():
+            cb.setChecked(element in resist)
         self.other_od_spin.setValue(float(battle.get("other_od", 0)))
         self.enemy_od_spin.setValue(float(battle.get("enemy_od_rate", 1)))
         self.sp_init_spin.setValue(int(battle.get("sp_init", 4)))
@@ -1588,6 +2347,9 @@ class AxleODWindow(QFrame):
 
 
 def creat_axle_od_win():
+    # 使用说明输出到 工具/排轴/help.txt
+    write_help_file()
+
     if is_win_open(WINDOW_TITLE, MODULE_NAME):
         win_set_top(WINDOW_TITLE, MODULE_NAME)
         return "break"

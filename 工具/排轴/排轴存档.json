@@ -1,0 +1,218 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "柳美音",
+      "style": "夜晚的香气，蔷薇的韵律",
+      "passives": [
+        "红宝石香水（被动技能）"
+      ],
+      "lb": 4
+    },
+    {
+      "role": "大岛一千子",
+      "style": "指引的光辉",
+      "passives": [],
+      "lb": 4
+    },
+    {
+      "role": "朝仓可怜",
+      "style": "CODE:Virtual Killer",
+      "passives": [],
+      "lb": 4
+    },
+    {
+      "role": "大岛五十铃",
+      "style": "出浴后的朦胧天地",
+      "passives": [],
+      "lb": 4
+    },
+    {
+      "role": "茅森月歌",
+      "style": "The Feel of the Throne",
+      "passives": [],
+      "lb": 4
+    },
+    {
+      "role": "和泉由希",
+      "style": "随侍公主",
+      "passives": [
+        "遥拜之人（被动技能）"
+      ],
+      "lb": 4
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 5,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "光之路标",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 5,
+          "skill": "暗夜代码",
+          "base_hits": 6,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 4,
+          "skill": "月芒",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "暗夜的杀戮之刃",
+          "base_hits": 8,
+          "combo": 5,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.18,
+          "od_earring": 1.0,
+          "break": true,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "OD1/Bonus1",
+      "od_timing": "后置OD",
+      "actions": [
+        {
+          "member": 1,
+          "skill": "无限光晕",
+          "base_hits": 6,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 0,
+          "skill": "日常维护",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": 1
+        },
+        {
+          "member": 2,
+          "skill": "对称·启示",
+          "base_hits": 10,
+          "combo": 5,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 1,
+          "skill": "无限光晕",
+          "base_hits": 6,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 3,
+          "skill": "驱动增益",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "对称·启示",
+          "base_hits": 10,
+          "combo": 5,
+          "fixed_od": 0.0,
+          "resonance_31x": 0.0,
+          "od_earring": 1.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}
