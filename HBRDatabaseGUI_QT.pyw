@@ -314,6 +314,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
 
     tool_menu = add_top_menu_button(menu_bar, "🛠️工具", "🛠️工具", None)[0]
     menu_tool_calls = [
+        ("排轴OD计算", load_hbr_axle_od),
         ("图片转线稿工具2.0", load_LineArtGUI2_QT),
         ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
@@ -325,7 +326,6 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
         ("hbr-tool", load_hbr_tool),
         ("hbr-tool伤害计算", load_hbr_tool_old_damage_calculator),
         ("hbr-axletool", load_hbr_axletool),
-        ("排轴OD计算", load_hbr_axle_od),
         ("wiki.hbr-hd", load_wiki_hbr_hd),
         ("词条计算器（在线）", load_entry_calculator),
         ("o.hbr.quest（v5.10）", load_o_hbr_quest),
@@ -396,7 +396,7 @@ if __name__ == "__main__":
         )
 
         check_error_queue_qt(root)
-        # check_for_updates()
+        check_for_updates()
 
         root.show()
         

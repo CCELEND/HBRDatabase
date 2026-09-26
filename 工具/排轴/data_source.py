@@ -44,10 +44,92 @@ def _sp_condition_ok(desc):
     return not any(k in str(desc) for k in _SP_CONDITION_SKIP)
 
 
+def _team_of_target(target):
+    """「全体31E友方」→ '31E'；「全体友方」→ None。"""
+    m = re.search(r'全体([0-9A-Za-z]+)友方', str(target or ""))
+    return m.group(1) if m else None
+
+
+_GENERIC_TARGETS = {
+    "自身", "全体友方", "全体其他友方", "前锋", "前锋其他友方",
+    "一名友方", "一名其他友方", "其他友方",
+}
+
+
+def _names_of_target(target):
+    """把「丸山 丰后 四叶草」这类目标拆成角色名片段（通用范围返回空）。"""
+    text = str(target or "").strip()
+    if not text or text in _GENERIC_TARGETS:
+        return []
+    return [tok for tok in re.split(r'[\s、,，/]+', text) if tok]
+
+
+def _parse_master_skill(ms):
+    """解析角色的「大师技能」，返回影响 SP 消耗的项。
+
+    结构：[名称, 描述, 类型, ?, [[效果类型, 数值, ..., 目标], ...], 解放条件]
+    目前只取「降低/增加SP消耗」类效果；目标为「全体{X}友方」按队伍，
+    否则按列出的角色名片段匹配。
+    """
+    if not isinstance(ms, list) or len(ms) < 5:
+        return []
+    name = str(ms[0])
+    effects = ms[4] if isinstance(ms[4], list) else []
+    mods = []
+    for eff in effects:
+        if not isinstance(eff, list) or len(eff) < 2:
+            continue
+        etype = str(eff[0])
+        if "SP消耗" not in etype and "SP消费" not in etype:
+            continue
+        if any(k in etype for k in ("降低", "减少", "下降")):
+            sign = -1
+        elif any(k in etype for k in ("增加", "上升", "提高", "增")):
+            sign = 1
+        else:
+            continue
+        num = re.search(r'\d+', str(eff[1]))
+        if not num:
+            continue
+        target = eff[6] if len(eff) > 6 else None
+        team = _team_of_target(target)
+        mods.append({
+            "name": name,
+            "amount": sign * int(num.group()),
+            "scope": "team_all",
+            "team": team,
+            "names": [] if team else _names_of_target(target),
+        })
+    return mods
+
+
 def _sp_below(desc):
     """解析「SP不大于N」条件；无则返回 None。"""
     m = re.search(r'SP不大于(\d+)', str(desc))
     return int(m.group(1)) if m else None
+
+
+def _parse_master_skill_action(ms):
+    """主动释放的大师技能 -> SkillInfo（被动技能则返回 None）。"""
+    if not isinstance(ms, list) or len(ms) < 5:
+        return None
+    if str(ms[2]) == "被动技能":
+        return None
+    name = str(ms[0])
+    desc = str(ms[1])
+    effects = ms[4] if isinstance(ms[4], list) else []
+    skill = _extract_skill([[name, desc, None, None], effects])
+    # 「一名XX友方」的条件回复：对象属于该队伍时额外回复（如 灵能充能 对 31A）
+    for eff in effects:
+        if not (isinstance(eff, list) and eff and eff[0] == "回复SP"):
+            continue
+        target = str(eff[6]) if len(eff) > 6 else ""
+        m = re.match(r'一名([0-9A-Za-z]+)友方', target)
+        num = re.search(r'\d+', str(eff[1]) if len(eff) > 1 else "")
+        if m and num:
+            skill.sp_recover_extra = int(num.group())
+            skill.sp_recover_extra_team = m.group(1)
+    return skill
 
 
 def _apply_exclusive(styles):
@@ -147,7 +229,8 @@ class SkillInfo:
                  sp_break_recover=0, sp_break_scope=None, element=None,
                  od_down_fixed=0.0, is_exclusive=False, od_up_fixed=0.0,
                  sp_cost_alt=None, sp_cost_cond=None, od_up_on_break=False,
-                 od_up_earring=False):
+                 od_up_earring=False, sp_recover_extra=0,
+                 sp_recover_extra_team=None):
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.element = element                        # 攻击效果的元素属性
@@ -161,6 +244,9 @@ class SkillInfo:
         self.od_up_on_break = od_up_on_break
         # 非攻击技能的「OD条上升」是否也按固定OD结算（吃 OD 耳环）；如 驱动增益
         self.od_up_earring = od_up_earring
+        # 单名友方回复 SP 时，若对象属于该队伍则额外回复（如 灵能充能 对 31A +3）
+        self.sp_recover_extra = sp_recover_extra or 0
+        self.sp_recover_extra_team = sp_recover_extra_team
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -455,6 +541,10 @@ class HBRDataSource:
         self._roles = None          # [(team, role_name, role_path)]
         self._role_by_name = None   # {role_name: role_path}
         self._style_cache = {}      # {role_path: [StyleInfo]}
+        self._master_mods = None    # {role_name: [大师技能 SP 消耗项]}
+        self._master_name = {}      # {role_name: 大师技能名}
+        self._master_action = {}    # {role_name: 可主动释放的大师技能 SkillInfo}
+        self._role_team = {}        # {role_name: 队伍}
 
     def _teams_path(self):
         return os.path.join(self.base_dir, "角色", "teams.json")
@@ -478,6 +568,46 @@ class HBRDataSource:
 
     def role_names(self):
         return [role_name for _, role_name, _ in self.load_roles()]
+
+    def _load_master_skills(self):
+        """读取各角色 role.json 里的「大师技能」（SP 消耗相关）。"""
+        if self._master_mods is not None:
+            return
+        self._master_mods = {}
+        self._master_name = {}
+        self._master_action = {}
+        self._role_team = {}
+        for _, role_name, role_path in self.load_roles():
+            path = os.path.join(self.base_dir, role_path.lstrip("./"),
+                                "role.json")
+            data = _load_json(path)
+            if not data:
+                continue
+            self._role_team[role_name] = data.get("team") or ""
+            ms = data.get("master_skill")
+            if isinstance(ms, list) and ms:
+                self._master_name[role_name] = str(ms[0])
+            mods = _parse_master_skill(ms)
+            if mods:
+                self._master_mods[role_name] = mods
+            action = _parse_master_skill_action(ms)
+            if action and action.name:
+                self._master_action[role_name] = action
+
+    def master_sp_cost_mods(self, role_name):
+        """角色「大师技能」中影响 SP 消耗的项。"""
+        self._load_master_skills()
+        return self._master_mods.get(role_name, [])
+
+    def master_skill_name(self, role_name):
+        """角色的「大师技能」名（无则 None）。"""
+        self._load_master_skills()
+        return self._master_name.get(role_name)
+
+    def role_team(self, role_name):
+        """角色所属队伍（如 31E）。"""
+        self._load_master_skills()
+        return self._role_team.get(role_name, "")
 
     def role_path(self, role_name):
         if self._role_by_name is None:
@@ -679,6 +809,10 @@ class HBRDataSource:
                             if m:
                                 sp_limit_override = max(
                                     sp_limit_override or 0, int(m.group(1)))
+                # 大师技能也可作为被动携带（默认携带）
+                master_name = self.master_skill_name(role_name)
+                if master_name and master_name not in passive_options:
+                    passive_options.append(master_name)
 
                 # 解析影响 SP 消耗的效果（降低/增加 SP 消耗；含「高阶增强」）
                 sp_cost_mods = []
@@ -833,7 +967,16 @@ class HBRDataSource:
         # 所有角色共有的通用技能
         for skill in GENERIC_SKILLS:
             add(skill)
+        # 该角色可主动释放的大师技能
+        master_action = self.master_action_skill(role_name)
+        if master_action is not None:
+            add(master_action)
         return result
+
+    def master_action_skill(self, role_name):
+        """角色可主动释放的大师技能（无则 None）。"""
+        self._load_master_skills()
+        return self._master_action.get(role_name)
 
 
 _default_source = None

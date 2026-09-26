@@ -57,8 +57,10 @@ HELP_TEXT = """排轴OD计算 使用说明
 ========================================
 
 【排轴】
-- 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数；
-  角色不可重复（已选的角色在其它位置会置灰不可选）。
+- 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数、
+  31X共鸣、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
+  31X共鸣 / OD耳环 按角色设置（31X共鸣仅在勾选「击破敌人」的行动中生效；
+  OD耳环对该角色所有回合生效）。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
@@ -112,8 +114,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 后置OD 属上一回合：不触发回合开始回复与闪光，仅结算 OD 额外 SP（同一次发动只给一次）。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
-- 行动扣除技能 SP；被动对 SP 消耗的增减（同名只叠加一次）会自动结算；
-  「剩余SP」列红色表示不足。
+- 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
+  （同种效果只生效一次：降低取最大降幅、增加取最大增幅，两者相抵；
+  且 SP 消耗为 0 的技能不受任何增减影响）；「剩余SP」列红色负值表示不足（缺口，实际 SP 不变）。
 - 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
   它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
 - 部分技能带「N(M)」式条件消耗：当敌人处于**倒地/超倒地**状态（本场已发生击破）时，
@@ -121,6 +124,11 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 每回合下方显示两行全队 SP（含未行动的后卫）：
   「队伍SP（行动前）」（回合开始回复 / OD 结算之后、行动之前）与
   「队伍SP（行动后）」（本回合结算结束时）。
+- 「大师技能」作为可携带被动出现在队伍配置的「被动」菜单里（默认携带），
+  其中影响 SP 消耗的效果会结算（如 大岛一千子「彩凤连理」：全体31E友方 消耗SP-1；
+  丸山奏多「丸山部队！出发！」：指定几名角色 消耗SP-1）。按队伍/角色名匹配，假设已解放。
+- 可**主动释放**的大师技能（如 逢川惠「灵能充能」：单体友方 SP+3、对象为 31A 再 +3）
+  会作为该角色的可选技能出现（消耗按 0 计）。
 - SP 上限默认 20；若风格有「SP上限变为 N」则自动取较大者（界面显示「（自动 N）」）。
 - 需「状态/加护/领域/印/信念/士气/DP/EX 等」才能判定的 SP 被动暂不计入（避免多算）；
   可判定的条件会结算：「战斗开始时」类仅第 1 回合、「位于前锋/后卫」按回合开始时的前锋、
@@ -178,8 +186,7 @@ BREAK_W, SP_W, RESULT_W = 96, 62, 66
 DEL_W = 26
 ACTION_COLUMNS = [
     ("角色", MEMBER_W), ("行动", SKILL_W), ("对象", TARGET_W),
-    ("原始Hit", HIT_W), ("连击", COMBO_W),
-    ("固定OD", FIXED_W), ("31X共鸣", RES_W), ("OD耳环", EARRING_W),
+    ("原始Hit", HIT_W), ("连击", COMBO_W), ("固定OD", FIXED_W),
     ("击破敌人", BREAK_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
 ]
 
@@ -329,6 +336,24 @@ class TeamMemberRow(QFrame):
         self.lb_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.lb_spin)
 
+        res_label = QLabel("31X共鸣")
+        res_label.setFixedWidth(52)
+        layout.addWidget(res_label)
+        self.resonance_spin = _make_double_spin(0.0, 100.0, 0.01, 2, 0.0, 56)
+        self.resonance_spin.setToolTip(
+            "该角色的 31X 共鸣（仅在勾选「击破敌人」的行动中生效）")
+        self.resonance_spin.valueChanged.connect(self._emit_changed)
+        layout.addWidget(self.resonance_spin)
+
+        ear_label = QLabel("OD耳环")
+        ear_label.setFixedWidth(48)
+        layout.addWidget(ear_label)
+        self.earring_spin = _make_double_spin(0.0, 10.0, 1.0, 2, 1.0, 56)
+        self.earring_spin.setToolTip(
+            "该角色的 OD 耳环（对所有回合生效；通常攻击不享受）")
+        self.earring_spin.valueChanged.connect(self._emit_changed)
+        layout.addWidget(self.earring_spin)
+
         self._selected_passives = None   # None = 全部携带
 
     @contextmanager
@@ -470,7 +495,9 @@ class TeamMemberRow(QFrame):
     def to_data(self):
         return {"role": self.role(), "style": self.style(),
                 "passives": self.selected_passives(),
-                "lb": self.lb_spin.value()}
+                "lb": self.lb_spin.value(),
+                "resonance_31x": self.resonance_spin.value(),
+                "od_earring": self.earring_spin.value()}
 
     def set_data(self, data):
         with self._suspended():
@@ -480,6 +507,9 @@ class TeamMemberRow(QFrame):
                 self._selected_passives = None
             if "lb" in data:
                 self.lb_spin.setValue(int(data.get("lb") or 0))
+            self.resonance_spin.setValue(
+                float(data.get("resonance_31x", 0) or 0))
+            self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
             self._populate_styles(preserve=data.get("style", ""))
@@ -560,16 +590,6 @@ class ActionRow(QFrame):
         self.fixed_od_spin.setToolTip("固定OD")
         self.fixed_od_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.fixed_od_spin)
-
-        self.resonance_spin = _make_double_spin(0.0, 100.0, 0.01, 2, 0.0, RES_W)
-        self.resonance_spin.setToolTip("31X 共鸣")
-        self.resonance_spin.valueChanged.connect(self._emit_changed)
-        layout.addWidget(self.resonance_spin)
-
-        self.earring_spin = _make_double_spin(0.0, 10.0, 1.0, 2, 1.0, EARRING_W)
-        self.earring_spin.setToolTip("OD耳环（通常攻击不享受，自动为 0）")
-        self.earring_spin.valueChanged.connect(self._emit_changed)
-        layout.addWidget(self.earring_spin)
 
         self.break_check = QCheckBox("击破敌人")
         self.break_check.setFixedWidth(BREAK_W)
@@ -765,29 +785,31 @@ class ActionRow(QFrame):
             else:
                 # 无 Hit 信息的技能（非通常攻击）原始Hit 记 0
                 self.base_hits_spin.setValue(0)
-            if skill.is_normal_attack:
-                if self.earring_spin.isEnabled():
-                    self._earring_backup = self.earring_spin.value()
-                self.earring_spin.setValue(0)
-                self.earring_spin.setEnabled(False)
-            else:
-                self.earring_spin.setEnabled(True)
-                if self.earring_spin.value() == 0:
-                    self.earring_spin.setValue(self._earring_backup or 1.0)
 
     # ------------------------------------------------------------- helpers
     def is_normal_attack(self):
         skill = self._find_skill()
         return bool(skill and skill.is_normal_attack)
 
+    def _member_setting(self, key, default):
+        """该行动角色在「队伍配置」里的设置（如 31X共鸣 / OD耳环）。"""
+        team = self.owner.team if self.owner is not None else []
+        if not team:
+            return default
+        idx = min(max(self.member_index, 0), len(team) - 1)
+        return team[idx].get(key, default)
+
     def get_od_skill(self):
+        # 31X共鸣 / OD耳环 在队伍配置里按角色设置，作用于该角色的所有回合；
+        # 31X共鸣仅在「攻击击破敌人」（勾选击破敌人）时生效
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=self.combo_spin.value(),
             fixed_od=self.fixed_od_spin.value(),
-            resonance_31x=self.resonance_spin.value(),
+            resonance_31x=(float(self._member_setting("resonance_31x", 0.0) or 0)
+                           if self.is_break() else 0.0),
             od_earring=0.0 if self.is_normal_attack()
-            else self.earring_spin.value(),
+            else float(self._member_setting("od_earring", 1.0) or 0),
         )
 
     def _is_attack(self):
@@ -873,6 +895,14 @@ class ActionRow(QFrame):
                     skill.sp_recover_element)
         return 0, None, None
 
+    def get_sp_recover_extra(self):
+        """对象属于指定队伍时的额外回复 SP：(额外量, 队伍)。"""
+        skill = self._find_skill()
+        if skill is None:
+            return 0, None
+        return (getattr(skill, "sp_recover_extra", 0) or 0,
+                getattr(skill, "sp_recover_extra_team", None))
+
     def is_break(self):
         return self.break_check.isChecked()
 
@@ -914,7 +944,8 @@ class ActionRow(QFrame):
                 "background-color: #f5b5b5; color: #7a0000;"
                 "border-radius: 3px; font-weight: bold;")
         self.sp_label.setToolTip(
-            "该次行动后队员剩余 SP" if enough else "SP 不足，无法释放该技能")
+            "该次行动后队员剩余 SP" if enough
+            else "SP 不足：红色负数为缺口（还差多少），实际 SP 不变")
 
     def to_data(self):
         return {
@@ -925,8 +956,6 @@ class ActionRow(QFrame):
             # 只存「手动」固定OD；击破被动的部分读取时再自动加上
             "fixed_od": (self.fixed_od_spin.value()
                          - getattr(self, "_auto_fixed_added", 0.0)),
-            "resonance_31x": self.resonance_spin.value(),
-            "od_earring": self.earring_spin.value(),
             "break": self.break_check.isChecked(),
             "sp_target": self.get_sp_target(),
         }
@@ -950,9 +979,6 @@ class ActionRow(QFrame):
                 self.base_hits_spin.setValue(int(data.get("base_hits") or 0))
             self.combo_spin.setValue(int(data.get("combo", 0) or 0))
             self.fixed_od_spin.setValue(float(data.get("fixed_od", 0) or 0))
-            self.resonance_spin.setValue(float(data.get("resonance_31x", 0) or 0))
-            if not self.is_normal_attack():
-                self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
             self.break_check.setChecked(bool(data.get("break", False)))
             self._populate_targets()
             tpos = self.target_combo.findData(data.get("sp_target"))
@@ -1398,7 +1424,8 @@ class AxleODWindow(QFrame):
         for i in range(TEAM_SIZE):
             role = roles[i] if i < len(roles) else ""
             styles = self.data_source.styles_names(role) if role else []
-            team.append({"role": role, "style": styles[0] if styles else ""})
+            team.append({"role": role, "style": styles[0] if styles else "",
+                         "resonance_31x": 0.0, "od_earring": 1.0})
         return team
 
     # ------------------------------------------------------------------ UI
@@ -1453,8 +1480,8 @@ class AxleODWindow(QFrame):
             row.set_data(self.team[i])
             row.changed.connect(self._on_team_changed)
             self.team_rows.append(row)
-            # 2 列 × 3 行，给「被动」选择按钮留出宽度
-            layout.addWidget(row, i // 2, i % 2)
+            # 单列 6 行：每行含 31X共鸣 / OD耳环，宽度可控
+            layout.addWidget(row, i, 0)
         return group
 
     def _build_battle_group(self):
@@ -2027,7 +2054,10 @@ class AxleODWindow(QFrame):
                             action, i, sp, active, turn_front, limit,
                             not break_seen)
                         break_seen = True
-                action.set_sp_result(sp[i], enough)
+                    action.set_sp_result(sp[i], True)
+                else:
+                    # SP 不足：显示红色负值（还差多少），实际 SP 不变
+                    action.set_sp_result(sp[i] - cost, False)
 
             # 记录本回合结束时全队 SP（含后卫）；前锋标注用回合中的前锋
             entries = [(i, self.team[i].get("role"), sp[i], i in turn_front)
@@ -2178,31 +2208,77 @@ class AxleODWindow(QFrame):
                 return mods
         return []
 
+    def _member_master_mods(self, slot):
+        """队员「大师技能」中影响 SP 消耗的项（过滤未携带的被动）。"""
+        role = self.team[slot].get("role")
+        selected = self._selected_passives(slot)
+        mods = []
+        for mod in self.data_source.master_sp_cost_mods(role):
+            name = mod.get("name")
+            if selected is not None and name not in selected:
+                continue
+            mods.append(mod)
+        return mods
+
     def _sp_cost_modifier(self, actor, active, front_set, base_cost=None,
                           downed=False):
-        """作用于该队员的 SP 消耗增减合计（同名被动只叠加一次）。
+        """作用于该队员的 SP 消耗增减合计。
 
-        base_cost 为该技能的原始 SP 消耗；「高阶增强」（红宝石香水）
-        只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
+        同种效果只生效一次并取大值：所有「降低SP消耗」取降幅最大者、
+        所有「增加SP消耗」取增幅最大者，两者相抵。
+        base_cost 为该技能的原始 SP 消耗；SP 消耗为 0 的技能（通常攻击等）
+        不受任何 SP 消耗增减影响。
         downed=True 表示敌人处于倒地/被击破状态（带该条件的被动生效）。
         """
-        total = 0
-        applied = set()
+        if base_cost is not None and base_cost == 0:
+            return 0          # SP 消耗为 0 的技能不受增减影响
+
+        reductions = []   # 负值
+        increases = []    # 正值
+
+        def collect(amount):
+            if amount < 0:
+                reductions.append(amount)
+            elif amount > 0:
+                increases.append(amount)
+
         for slot in active:
             for mod in self._member_sp_cost_mods(slot):
-                name = mod.get("name")
-                if name in applied:
-                    continue
-                if base_cost == 0 and name == "高阶增强":
-                    continue
                 if mod.get("downed") and not downed:
                     continue
                 if actor in self._scope_targets(mod.get("scope"),
                                                 mod.get("element"), slot,
                                                 active, front_set):
-                    total += mod.get("amount", 0)
-                    applied.add(name)
+                    collect(mod.get("amount", 0))
+            # 「大师技能」：影响全体同队（如 彩凤连理：全体31E友方 SP消耗-1）
+            for mod in self._member_master_mods(slot):
+                team = mod.get("team")
+                names = mod.get("names") or []
+                if team:
+                    if not self._member_in_team(actor, team):
+                        continue
+                elif names:
+                    if not self._member_name_matches(actor, names):
+                        continue
+                else:
+                    continue          # 目标无法判定 -> 不生效
+                collect(mod.get("amount", 0))
+        total = 0
+        if reductions:
+            total += min(reductions)
+        if increases:
+            total += max(increases)
         return total
+
+    def _member_in_team(self, slot, team):
+        """队员所属队伍是否为 team（如 31E）。"""
+        role = self.team[slot].get("role")
+        return bool(role and self.data_source.role_team(role) == team)
+
+    def _member_name_matches(self, slot, names):
+        """队员角色名是否匹配给定的名字片段（如 丸山 / 四叶草）。"""
+        role = self.team[slot].get("role") or ""
+        return any(n and n in role for n in names)
 
     def _apply_sp_recover(self, action, actor, sp, active, front_set, limit):
         """结算技能自带的 SP 回复效果。"""
@@ -2210,8 +2286,12 @@ class AxleODWindow(QFrame):
         if scope in ("one_other", "one_any"):
             # 单名友方：回复到行动里选择的「对象」
             target = action.get_sp_target()
-            if (target is not None and 0 <= target < len(sp)
-                    and sp[target] < limit):
+            if target is None or not (0 <= target < len(sp)):
+                return
+            extra, team = action.get_sp_recover_extra()
+            if extra and team and self._member_in_team(target, team):
+                amount += extra
+            if sp[target] < limit:
                 sp[target] = min(limit, sp[target] + amount)
             return
         self._apply_scope_recover(amount, scope, element, actor,
