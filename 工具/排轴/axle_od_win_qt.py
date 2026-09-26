@@ -63,6 +63,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   OD耳环对该角色所有回合生效）。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
+  回合窗口关闭后，可用配置窗口顶部的「打开回合窗口」按钮重新打开。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
 - 「特殊回合」性质与追加回合一致（不计回合数/不触发回合开始/不能发动 OD），
@@ -1507,6 +1508,7 @@ class AxleODWindow(QFrame):
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(6)
 
+        root.addLayout(self._build_main_toolbar())
         root.addWidget(self._build_team_group())
         root.addWidget(self._build_battle_group())
         root.addWidget(self._build_resist_group())
@@ -1514,6 +1516,24 @@ class AxleODWindow(QFrame):
         root.addStretch(1)
         # 回合列表（含操作按钮）放到独立窗口，避免主窗口拥挤
         self.turns_panel = self._build_turns_panel()
+
+    def _build_main_toolbar(self):
+        bar = QHBoxLayout()
+        bar.setContentsMargins(8, 2, 0, 0)
+        bar.setSpacing(6)
+        button = QPushButton("打开回合窗口")
+        button.setMinimumWidth(110)
+        button.setToolTip("回合列表在独立窗口；关闭后可在此重新打开")
+        button.clicked.connect(self.open_turns_window)
+        bar.addWidget(button)
+        bar.addStretch(1)
+        return bar
+
+    def open_turns_window(self):
+        """打开/置顶回合窗口。"""
+        frame = _open_turns_window(self)
+        if frame is not None:
+            win_set_top(TURNS_TITLE, TURNS_MODULE)
 
     def _build_turns_panel(self):
         panel = QWidget()
@@ -2590,6 +2610,7 @@ def _open_turns_window(view):
     frame.grid_layout.addWidget(view.turns_panel, 0, 0)
     frame.grid_layout.setRowStretch(0, 1)
     frame.grid_layout.setColumnStretch(0, 1)
+    view.turns_panel.show()   # 面板曾被隐藏，重新加入后需显式显示
     view.turns_frame = frame
     win_open_manage(frame, TURNS_MODULE)
 
