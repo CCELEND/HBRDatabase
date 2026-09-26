@@ -212,11 +212,14 @@ def _merge_forms(a, b):
 
 
 def _load_json(path):
+    # 缺少某个稀有度文件属正常情况（部分角色没有该稀有度的风格），静默跳过
+    if not os.path.isfile(path):
+        return None
     try:
         with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
     except Exception as e:
-        logger.error("读取 %s 失败: %s", path, e)
+        logger.warning("读取 %s 失败: %s", path, e)
         return None
 
 
@@ -439,6 +442,19 @@ def _sp_recover_scope(target):
 
 
 def _extract_skill(group):
+    """从一个 ActiveSkills 条目解析技能；任何异常都不应中断整体加载。"""
+    try:
+        return _extract_skill_inner(group)
+    except Exception as e:
+        try:
+            name = str(group[0][0])
+        except Exception:
+            name = "?"
+        logger.warning("解析技能 %s 失败: %s", name, e)
+        return SkillInfo(name)
+
+
+def _extract_skill_inner(group):
     """从一个 ActiveSkills 条目中提取技能名、SP 消耗/回复与攻击信息。"""
     name = None
     hits = None
@@ -511,10 +527,15 @@ def _extract_skill(group):
             raw_value = str(effect[1])
             scope_info = _sp_recover_scope(
                 effect[6] if len(effect) > 6 else None)
+            amount = None
+            text = raw_value.strip()
             try:
-                amount = int(raw_value.strip())
+                amount = int(text)
             except Exception:
-                amount = None
+                # 「30 ~ 60%概率回复3SP」这类：取最后的「NSP」作为回复量
+                m = re.search(r'(\d+)\s*SP', text)
+                if m:
+                    amount = int(m.group(1))
             if amount is not None and amount > 0 and scope_info:
                 sp_recover = amount
                 sp_scope, sp_element = scope_info
