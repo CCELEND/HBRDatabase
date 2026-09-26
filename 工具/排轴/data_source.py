@@ -233,7 +233,7 @@ class SkillInfo:
                  od_down_fixed=0.0, is_exclusive=False, od_up_fixed=0.0,
                  sp_cost_alt=None, sp_cost_cond=None, od_up_on_break=False,
                  od_up_earring=False, sp_recover_extra=0,
-                 sp_recover_extra_team=None):
+                 sp_recover_extra_team=None, od_earring_exempt=False):
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.element = element                        # 攻击效果的元素属性
@@ -250,6 +250,8 @@ class SkillInfo:
         # 单名友方回复 SP 时，若对象属于该队伍则额外回复（如 灵能充能 对 31A +3）
         self.sp_recover_extra = sp_recover_extra or 0
         self.sp_recover_extra_team = sp_recover_extra_team
+        # 该攻击是否不吃 OD 耳环（如 魔界骑兵启动：此攻击不受友方BUFF影响）
+        self.od_earring_exempt = od_earring_exempt
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -507,6 +509,9 @@ def _extract_skill_inner(group):
         if len(effect) > 2 and effect[0] in ATTACK_ATTRS:
             if len(effect) > 1 and effect[1]:
                 attack_element = str(effect[1])
+            else:
+                # 未写元素时，用攻击类型（斩/突/打）作为属性标识
+                attack_element = str(effect[0])
             try:
                 hits = int(effect[2])
             except Exception:
@@ -559,6 +564,31 @@ def _extract_skill_inner(group):
                      od_down_fixed=od_down_fixed, od_up_fixed=od_up_fixed,
                      sp_cost_alt=sp_cost_alt, sp_cost_cond=sp_cost_cond,
                      od_up_on_break=od_up_on_break)
+
+
+def _passive_action_skill(passive):
+    """「被动技能」里带攻击效果的特殊条目（如 魔界骑兵启动）-> SkillInfo。
+
+    这类被动的第 4 项不是类型字符串而是一组效果，其中含攻击效果，
+    因此在行动选择阶段可作为技能使用；且「此攻击不受友方BUFF影响」，
+    所以不吃 OD 耳环。
+    """
+    try:
+        name = str(passive[0])
+        desc = str(passive[1])
+        effects = passive[3] if len(passive) > 3 else None
+    except Exception:
+        return None
+    if not isinstance(effects, list):
+        return None
+    has_attack = any(
+        isinstance(e, list) and len(e) > 2 and e[0] in ATTACK_ATTRS
+        for e in effects)
+    if not has_attack:
+        return None
+    skill = _extract_skill([[name, desc, None, None], effects])
+    skill.od_earring_exempt = True
+    return skill
 
 
 class HBRDataSource:
@@ -672,6 +702,14 @@ class HBRDataSource:
                                     None, True)]
                 for group in (style_data.get("ActiveSkills") or []):
                     skills.append(_extract_skill(group))
+                # 特殊被动里的攻击（如 魔界骑兵启动）也可作为行动使用
+                for passive in (style_data.get("PassiveSkills") or []):
+                    action = _passive_action_skill(passive)
+                    if action is None:
+                        continue
+                    if rarity in ("SSR", "SS"):
+                        action.is_exclusive = True   # 该风格专属
+                    skills.append(action)
                 style_id = None
                 if len(style_info) > 10 and isinstance(style_info[10], dict):
                     try:

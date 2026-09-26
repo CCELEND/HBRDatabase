@@ -65,12 +65,16 @@ HELP_TEXT = """排轴OD计算 使用说明
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
+- 「特殊回合」性质与追加回合一致（不计回合数/不触发回合开始/不能发动 OD），
+  但**角色不限前锋**，任意队员都可行动。
 - 选了 OD 的回合，类型会显示为「超频回合」（与通常回合等价，仅作标识）。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
 - 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
   已通用化的例外：第一个 SS 风格的专属技能（如 幻象泡影）、星火燎原+。
 - 「（被动技能）」在队伍配置里选择携带（默认全部），选中后全程（所有回合）生效。
 - 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
+- 特殊被动里的攻击（如 山胁·冯·伊瓦尔「魔界骑兵启动！」，斩属性 6 连击）也可作为行动使用，
+  且该攻击不吃 OD 耳环（不受友方 BUFF 影响）。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
 - 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
@@ -155,7 +159,9 @@ def write_help_file():
 
 TEAM_SIZE = 6
 MAX_ACTIONS_PER_TURN = 3
-TURN_OPTIONS = ["通常回合", "超频回合", "追加回合"]
+TURN_OPTIONS = ["通常回合", "超频回合", "追加回合", "特殊回合"]
+# 与追加回合性质一致（不计回合数、不触发回合开始、不能发动OD）的回合类型
+EXTRA_TURN_TYPES = ("追加回合", "特殊回合")
 
 # 与参考站点一致的 OD 选项
 # 敌人可抗性的属性
@@ -650,7 +656,7 @@ class ActionRow(QFrame):
         team = self.owner.team
         # 同一回合内每位队员只能行动一次
         used = self.turn.used_members(self) if self.turn else set()
-        # 追加回合只能选择上一个普通回合的前锋
+        # 追加回合只能选择上一个普通回合的前锋；特殊回合不限
         allowed = self.turn.available_member_slots() if self.turn \
             else list(range(len(team)))
         with self._suspended():
@@ -816,17 +822,25 @@ class ActionRow(QFrame):
         idx = min(max(self.member_index, 0), len(team) - 1)
         return team[idx].get(key, default)
 
+    def _od_earring_exempt(self):
+        """该技能是否不吃 OD 耳环（如 魔界骑兵启动：不受友方BUFF影响）。"""
+        skill = self._find_skill()
+        return bool(skill is not None
+                    and getattr(skill, "od_earring_exempt", False))
+
     def get_od_skill(self):
         # 31X共鸣 / OD耳环 在队伍配置里按角色设置，作用于该角色的所有回合；
         # 31X共鸣仅在「攻击击破敌人」（勾选击破敌人）时生效
+        earring = float(self._member_setting("od_earring", 1.0) or 0)
+        if self.is_normal_attack() or self._od_earring_exempt():
+            earring = 0.0
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=self.combo_spin.value(),
             fixed_od=self.fixed_od_spin.value(),
             resonance_31x=(float(self._member_setting("resonance_31x", 0.0) or 0)
                            if self.is_break() else 0.0),
-            od_earring=0.0 if self.is_normal_attack()
-            else float(self._member_setting("od_earring", 1.0) or 0),
+            od_earring=earring,
         )
 
     def _is_attack(self):
@@ -1137,9 +1151,9 @@ class TurnCard(QFrame):
     def actor_members(self):
         """本回合行动的队员下标（按行动顺序，去重，最多 3 人）。
 
-        追加回合不影响前锋/SP，故返回空。
+        追加回合/特殊回合不影响前锋/SP，故返回空。
         """
-        if self.turn_type() == "追加回合":
+        if self.turn_type() in EXTRA_TURN_TYPES:
             return []
         result = []
         for action in self.actions:
@@ -1165,13 +1179,13 @@ class TurnCard(QFrame):
 
     def min_actions(self):
         """本回合最少行动数。"""
-        if self.turn_type() == "追加回合":
-            return 1          # 追加回合可自由增删，至少保留 1 条
+        if self.turn_type() in EXTRA_TURN_TYPES:
+            return 1          # 追加/特殊回合可自由增删，至少保留 1 条
         return self.required_actions()
 
     def max_actions(self):
         """本回合最多行动数。"""
-        if self.turn_type() == "追加回合":
+        if self.turn_type() in EXTRA_TURN_TYPES:
             return MAX_ACTIONS_PER_TURN
         return self.required_actions()
 
@@ -1191,7 +1205,8 @@ class TurnCard(QFrame):
     def available_member_slots(self):
         """本回合可选的角色位置。
 
-        追加回合只能由「上一个普通回合的前锋」行动。
+        追加回合只能由「上一个普通回合的前锋」行动；
+        特殊回合性质与追加回合一致，但**角色不限前锋**。
         """
         if self.turn_type() == "追加回合":
             return self.owner.front_members_before(self)
@@ -1266,11 +1281,11 @@ class TurnCard(QFrame):
             action.delete_button.setEnabled(can_delete)
 
     def _sync_turn_type(self):
-        """选了 OD 则类型显示「超频回合」，无 OD 显示「通常回合」（追加回合不变）。"""
+        """选了 OD 则类型显示「超频回合」，无 OD 显示「通常回合」（追加/特殊回合不变）。"""
         if getattr(self, "_syncing_type", False):
             return
         text = self.type_combo.currentText()
-        if text == "追加回合":
+        if text in EXTRA_TURN_TYPES:
             return
         want = "超频回合" if self.od_level() > 0 else "通常回合"
         if text != want:
@@ -1282,8 +1297,8 @@ class TurnCard(QFrame):
                 self._syncing_type = False
 
     def _on_type_changed(self, text):
-        # 追加回合不能发动 OD
-        no_od = (text == "追加回合")
+        # 追加/特殊回合不能发动 OD
+        no_od = (text in EXTRA_TURN_TYPES)
         with self._suspended():
             self.od_combo.setEnabled(not no_od)
             self.od_timing_combo.setEnabled(
@@ -1329,7 +1344,9 @@ class TurnCard(QFrame):
 
     def set_index(self, index, additional=False, post_od=False):
         if additional:
-            text = "追加回合" if index <= 0 else "第%d回合 追加" % index
+            kind = self.turn_type() or "追加回合"
+            short = kind.replace("回合", "")
+            text = kind if index <= 0 else "第%d回合 %s" % (index, short)
         elif post_od:
             # 后置OD：OD 在上一个回合结束发动，故沿用上一个回合号
             text = "第%d回合 后置OD" % max(index, 1)
@@ -1506,6 +1523,7 @@ class AxleODWindow(QFrame):
         buttons = [
             ("＋添加回合", self.add_turn),
             ("＋追加回合", self.add_additional_turn),
+            ("＋特殊回合", self.add_special_turn),
             ("删除选中回合", self.remove_selected_turn),
             ("上移", lambda: self.move_selected_turn(-1)),
             ("下移", lambda: self.move_selected_turn(1)),
@@ -1773,6 +1791,10 @@ class AxleODWindow(QFrame):
         """添加「追加回合」：不计回合数、不影响 SP。"""
         return self.add_turn(turn_type="追加回合")
 
+    def add_special_turn(self):
+        """添加「特殊回合」：性质同追加回合，但角色不限前锋。"""
+        return self.add_turn(turn_type="特殊回合")
+
     def _on_turn_changed(self, turn):
         """某回合变更时，若其前锋变化则同步到后面（未被手动编辑的）回合。"""
         self._sync_following_turns(turn)
@@ -1863,7 +1885,7 @@ class AxleODWindow(QFrame):
         number = 0
         prev_level = 0
         for turn in self.turns:
-            is_additional = turn.turn_type() == "追加回合"
+            is_additional = turn.turn_type() in EXTRA_TURN_TYPES
             level = turn.od_level()
             if is_additional:
                 turn.set_index(number, additional=True)
@@ -1916,7 +1938,7 @@ class AxleODWindow(QFrame):
             # 只有「通常回合」，或「前置OD 且为本次发动的第一回合（如 OD3/Bonus1）」
             # 才有回合开始；后置OD 与后续的 Bonus 回合（Bonus2/3）、追加回合都不结算。
             is_post_od = (level > 0 and turn.od_timing() == "后置OD")
-            starts_turn = (turn.turn_type() != "追加回合"
+            starts_turn = (turn.turn_type() not in EXTRA_TURN_TYPES
                            and not is_post_od
                            and (level == 0 or is_new_activation))
             turn_bonus = 0.0   # 回合开始时被动带来的 OD 增加
@@ -2039,7 +2061,7 @@ class AxleODWindow(QFrame):
         for turn_idx, turn in enumerate(self.turns):
             # 追加回合不计回合数：不触发「回合开始回复」与 OD 回复，
             # 但行动仍然消耗 SP、技能回复 SP 也照常生效。
-            is_additional = turn.turn_type() == "追加回合"
+            is_additional = turn.turn_type() in EXTRA_TURN_TYPES
             # 回合开始时的前锋（用于回合开始 +3/+2）
             start_front = set(front)
             # 本回合行动的队员 = 回合中/结束时的前锋（用于技能/被动「前锋」范围）
