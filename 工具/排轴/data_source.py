@@ -30,6 +30,14 @@ GENERALIZED_SKILLS = {
     "星火燎原+",   # 茅森月歌
 }
 
+# 需要强制标记为「专属」的特殊技能（同风格可切换的另一种形态等，
+# 不在 skills[1] 位置，故 _apply_exclusive 不会自动标记）
+FORCED_EXCLUSIVE_SKILLS = {
+    "苍焰螺旋",     # 白河由依奈 · 月色真美（苍焰迷宫 的切换形态）
+    "芬布尔之冬",   # 朝仓可怜 · Twinkle Eclosion（血腥燃烧 的冰属性切换形态）
+    "指挥行动",     # 各风格自带「以指挥行动取代普通攻击」，仅该风格可用
+}
+
 # SP 类被动里，排轴无法判定的条件——描述中出现任一关键词即整条跳过（避免多算）。
 # 目前可判定的条件：位于前锋/后卫、回合开始时、战斗开始时、SP不大于N、超频条（未判定）。
 _SP_CONDITION_SKIP = (
@@ -142,12 +150,19 @@ def _apply_exclusive(styles):
     ss_styles = [s for s in styles if s.rarity == "SS" and s.style_id]
     first_ss = min(ss_styles, key=lambda s: s.style_id) if ss_styles else None
     for style in styles:
+        # 强制专属的特殊技能（如 指挥行动）
+        for skill in style.skills:
+            if skill.name in FORCED_EXCLUSIVE_SKILLS:
+                skill.is_exclusive = True
         if style.rarity not in ("SSR", "SS") or len(style.skills) < 2:
             continue
-        skill = style.skills[1]      # skills[0] 为通常攻击
-        skill.is_exclusive = True
-        if skill.name in GENERALIZED_SKILLS or style is first_ss:
-            skill.is_exclusive = False
+        first = style.skills[1]      # skills[0] 为通常攻击
+        generalized = (first.name in GENERALIZED_SKILLS or style is first_ss)
+        for skill in style.skills:
+            # 同一 ActiveSkills 条目下的可切换形态也一并标记
+            if skill is first or (first.source_group is not None
+                                  and skill.source_group == first.source_group):
+                skill.is_exclusive = not generalized
 
 
 def _dedupe(items):
@@ -237,6 +252,8 @@ class SkillInfo:
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.element = element                        # 攻击效果的元素属性
+        # 同一 ActiveSkills 条目的分组号（含可切换的多个技能形态）
+        self.source_group = None
         # 专属技能（SSR/SS 的第一个主动技能）：仅在装备该风格时可用
         self.is_exclusive = is_exclusive
         # 「OD条下降 X%」：该次行动 OD 固定减少 X（如 50% → 固定 −50）
@@ -494,10 +511,15 @@ def _extract_skill_inner(group):
         # 较小值为「敌人处于倒地/超倒地状态」时的消耗
         desc = str(group[0][1]) if len(group[0]) > 1 else ""
         nums = [int(n) for n in re.findall(r'\d+', str(raw_sp))]
-        if (len(nums) >= 2 and ("倒地" in desc or "倒下" in desc)
-                and min(nums) != sp_cost):
-            sp_cost_alt = min(nums)
-            sp_cost_cond = "downed"
+        if len(nums) >= 2 and min(nums) != sp_cost:
+            if "倒地" in desc or "倒下" in desc:
+                # 敌人处于倒地/超倒地状态时改用较小值
+                sp_cost_alt = min(nums)
+                sp_cost_cond = "downed"
+            elif "追加回合" in desc:
+                # 追加回合内 SP 消耗减半等（如 苍焰螺旋 7(14)）
+                sp_cost_alt = min(nums)
+                sp_cost_cond = "extra"
     except Exception:
         name = "?"
 
@@ -564,6 +586,38 @@ def _extract_skill_inner(group):
                      od_down_fixed=od_down_fixed, od_up_fixed=od_up_fixed,
                      sp_cost_alt=sp_cost_alt, sp_cost_cond=sp_cost_cond,
                      od_up_on_break=od_up_on_break)
+
+
+def _extract_skills(group):
+    """返回该 ActiveSkills 条目对应的技能列表。
+
+    数据里可切换的技能，第 5 项是 {条件或形态名: [效果下标..., 描述, SP消耗, 使用次数, 技能名]}。
+    其中「技能名」与基础技能名不同的，属于另一个可切换形态（如 苍焰迷宫 ↔ 苍焰螺旋），
+    因此额外生成一个技能；同名（只是条件不同：充能状态/追加回合内/首次使用…）的则忽略。
+    """
+    base = _extract_skill(group)
+    skills = [base]
+    variants = group[4] if len(group) > 4 and isinstance(group[4], dict) else None
+    if not variants:
+        return skills
+    effects = group[1] if len(group) > 1 and isinstance(group[1], list) else []
+    for key, spec in variants.items():
+        if not isinstance(spec, list) or not spec:
+            continue
+        strs = [str(x) for x in spec if isinstance(x, str)]
+        name = strs[-1] if strs else str(key)
+        if not name or name == base.name:
+            continue        # 与基础技能同名（仅条件不同），无需另列
+        idx = [x for x in spec if isinstance(x, int)]
+        sub_effects = [effects[i] for i in idx if 0 <= i < len(effects)]
+        if not sub_effects:
+            continue
+        desc = strs[0] if strs else name
+        sp_note = (strs[1] if len(strs) > 1 and strs[1] else base.sp_cost_note)
+        sub = _extract_skill([[name, desc, sp_note, None], sub_effects])
+        sub.source_group = base.source_group
+        skills.append(sub)
+    return skills
 
 
 def _passive_action_skill(passive):
@@ -700,8 +754,10 @@ class HBRDataSource:
                 # 通常攻击为所有风格共有，置于技能列表最前
                 skills = [SkillInfo(NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
                                     None, True)]
-                for group in (style_data.get("ActiveSkills") or []):
-                    skills.append(_extract_skill(group))
+                for gi, group in enumerate(style_data.get("ActiveSkills") or []):
+                    for sk in _extract_skills(group):
+                        sk.source_group = gi
+                        skills.append(sk)
                 # 特殊被动里的攻击（如 魔界骑兵启动）也可作为行动使用
                 for passive in (style_data.get("PassiveSkills") or []):
                     action = _passive_action_skill(passive)
@@ -816,15 +872,17 @@ class HBRDataSource:
                         continue
                     if ptype != "回复SP":
                         continue
-                    if ("回合开始时" not in pdesc
-                            and "战斗开始时" not in pdesc
-                            and "初战开始时" not in pdesc):
+                    # 「追加回合开始时」只在该回合开始时结算（如 战场之花）
+                    extra_only = "追加回合开始时" in pdesc
+                    if not extra_only and ("回合开始时" not in pdesc
+                                           and "战斗开始时" not in pdesc
+                                           and "初战开始时" not in pdesc):
                         continue
                     if str(ptarget) == "自身" and "位于前锋" in pdesc:
                         continue          # 已由 front_sp_passives 处理
                     # 敌人处于倒地/被击破状态的回合开始时条件（如 算法）
                     downed_cond = "被击破的敌人" in pdesc
-                    if not downed_cond and not _sp_condition_ok(pdesc):
+                    if not (downed_cond or extra_only) and not _sp_condition_ok(pdesc):
                         continue
                     if (not downed_cond
                             and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
@@ -850,6 +908,7 @@ class HBRDataSource:
                         "od_below": (lambda m: int(m.group(1)) if m else None)(
                             re.search(r'超频条不足(\d+)%', pdesc)),
                         "downed": downed_cond,
+                        "extra": extra_only,
                         "once": "1次" in pdesc,
                         "lb": _passive_lb(passive),
                     })
@@ -885,7 +944,7 @@ class HBRDataSource:
                 added = set()
 
                 def add_cost_mod(mod_name, amount, target, requires=None, lb=0,
-                                 downed=False):
+                                 downed=False, extra=False):
                     if not amount:
                         return
                     scope_info = _sp_recover_scope(target)
@@ -903,6 +962,7 @@ class HBRDataSource:
                         "requires": requires,   # 需携带的「（被动技能）」名
                         "lb": lb,               # 需要的突破数
                         "downed": downed,       # 需敌人处于倒地/被击破状态
+                        "extra": extra,         # 需处于追加回合（或特殊回合）
                     })
 
                 for passive in (style_data.get("PassiveSkills") or []):
@@ -919,7 +979,9 @@ class HBRDataSource:
                     # 敌人处于倒地/被击破状态的条件（如 最佳位置）
                     downed_cond = ("倒地" in pdesc or "倒下" in pdesc
                                    or "被击破的敌人" in pdesc)
-                    if not downed_cond and not _sp_condition_ok(pdesc):
+                    # 追加回合内的 SP 消耗增减（如 优美的剑技：追加回合中 自身消耗SP-2）
+                    extra_cond = "追加回合" in pdesc
+                    if not (downed_cond or extra_cond) and not _sp_condition_ok(pdesc):
                         continue
                     if any(k in ptype for k in ("降低", "减少", "下降")):
                         sign = -1
@@ -931,7 +993,7 @@ class HBRDataSource:
                     if num:
                         add_cost_mod(pname, sign * int(num.group()), ptarget,
                                      lb=_passive_lb(passive),
-                                     downed=downed_cond)
+                                     downed=downed_cond, extra=extra_cond)
 
                 # 主动技能条目里也可能带效果（如「高阶增强」：SP消耗量增加N）
                 for group in (style_data.get("ActiveSkills") or []):

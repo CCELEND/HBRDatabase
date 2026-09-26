@@ -75,6 +75,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
 - 特殊被动里的攻击（如 山胁·冯·伊瓦尔「魔界骑兵启动！」，斩属性 6 连击）也可作为行动使用，
   且该攻击不吃 OD 耳环（不受友方 BUFF 影响）。
+- 技能数据里的「切换形态」会被自动展开（如 白河由依奈「月色真美」的 苍焰迷宫 / 苍焰螺旋、
+  朝仓可怜「Twinkle Eclosion」的 血腥燃烧 / 芬布尔之冬 与 红尖晶石 / 堇青石），
+  同一条目下的形态共享该条目的专属标记；「指挥行动」只属于其所在风格。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
 - 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
@@ -122,7 +125,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 回合开始：基础回复（前锋/后卫）+ 风格被动的前锋SP（闪光/佳音/机敏/俊敏…，需满足突破数）；
   以及「回合开始时回复友方SP」的被动（如 与伙伴一起【朝仓可怜专属】：除自身外全体友方 SP+1）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
-  后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）。
+  后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
+  「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
 - 同一回合内 SP 的结算顺序：**非攻击技能先于攻击技能**（同类按行动行顺序）。
@@ -131,8 +135,10 @@ HELP_TEXT = """排轴OD计算 使用说明
   且 SP 消耗为 0 的技能不受任何增减影响）；「剩余SP」列红色负值表示不足（缺口，实际 SP 不变）。
 - 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
   它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
-- 部分技能带「N(M)」式条件消耗：当敌人处于**倒地/超倒地**状态（本场已发生击破）时，
-  改用较小值（如 对称·启示 0(16)：未倒地消耗 16、击破敌人后消耗 0）。
+- 部分技能带「N(M)」式条件消耗，满足条件时改用较小值：
+  「倒地/超倒地」（如 对称·启示 0(16)）、「追加回合内」（如 苍焰螺旋 7(14)：通常 14、追加回合 7）。
+- 「追加回合内」的 SP 消耗增减被动也只在追加回合/特殊回合生效
+  （如 优美的剑技：追加回合中 自身消耗SP-2）。
 - 每回合下方显示两行全队 SP（含未行动的后卫）：
   「队伍SP（行动前）」（回合开始回复 / OD 结算之后、行动之前）与
   「队伍SP（行动后）」（本回合结算结束时）。
@@ -904,18 +910,22 @@ class ActionRow(QFrame):
     def set_result(self, contribution):
         self.result_label.setText("%.2f" % contribution)
 
-    def get_sp_cost(self, downed=False):
+    def get_sp_cost(self, downed=False, extra=False):
         """该次行动消耗的 SP；通常攻击为 0。
 
         downed=True 表示敌人处于倒地/超倒地状态：带该条件的技能
         （如 对称·启示 0(16)）改用条件消耗。
+        extra=True 表示处于追加回合/特殊回合：带该条件的技能
+        （如 苍焰螺旋 7(14)）改用条件消耗。
         """
         skill = self._find_skill()
         if not skill:
             return 0
-        if (downed and skill.sp_cost_cond == "downed"
-                and skill.sp_cost_alt is not None):
-            return skill.sp_cost_alt
+        if skill.sp_cost_alt is not None:
+            if skill.sp_cost_cond == "downed" and downed:
+                return skill.sp_cost_alt
+            if skill.sp_cost_cond == "extra" and extra:
+                return skill.sp_cost_alt
         return skill.sp_cost
 
     def get_sp_recover(self):
@@ -2107,6 +2117,8 @@ class AxleODWindow(QFrame):
                     # 回合开始：「回合开始时/战斗开始时」回复友方 SP 的被动（如 与伙伴一起）
                     for i in active:
                         for mod in self._member_turn_start_sp(i):
+                            if mod.get("extra"):
+                                continue    # 「追加回合开始时」类在另外的分支处理
                             if mod.get("battle_start") and not first_turn:
                                 continue
                             pos = mod.get("position")
@@ -2134,6 +2146,21 @@ class AxleODWindow(QFrame):
                 # 前置OD：当前回合直接发动，回合开始给 OD 额外 SP（同一次发动只给一次）
                 if turn.od_timing() == "前置OD" and is_new_od:
                     self._apply_od_sp_bonus(turn, sp, active)
+            elif is_additional:
+                # 追加/特殊回合开始时：「追加回合开始时」类被动
+                # （如 战场之花：追加回合开始时 自身SP+5，每次出击仅1次）
+                for i in active:
+                    for mod in self._member_turn_start_sp(i):
+                        if not mod.get("extra"):
+                            continue
+                        if mod.get("once") and i in sp_once_used:
+                            continue
+                        self._apply_scope_recover(
+                            mod.get("amount", 0), mod.get("scope"),
+                            mod.get("element"), i, sp, active,
+                            start_front, limit)
+                        if mod.get("once"):
+                            sp_once_used.add(i)
             prev_od_level = level
 
             # 记录「行动前」全队 SP（回合开始回复 / 前置OD 之后）
@@ -2142,6 +2169,7 @@ class AxleODWindow(QFrame):
 
             # 行动：扣除技能 SP，并结算技能的 SP 回复效果。
             # 结算顺序：非攻击技能先于攻击技能（同类按行动行顺序）。
+            is_extra_turn = turn.turn_type() in EXTRA_TURN_TYPES
             action_order = sorted(
                 turn.actions, key=lambda a: 1 if a._is_attack() else 0)
             for action in action_order:
@@ -2149,14 +2177,16 @@ class AxleODWindow(QFrame):
                 if i not in active:
                     action.set_sp_result(None)
                     continue
-                cost = action.get_sp_cost(downed=break_seen)
+                cost = action.get_sp_cost(downed=break_seen,
+                                          extra=is_extra_turn)
                 if cost >= 99:      # 消耗全部 SP
                     cost = sp[i]
                 else:
                     # SP 消耗增减被动（同名只叠加一次）；
                     # 「高阶增强」（红宝石香水）不作用于通常攻击与 SP 消耗为 0 的技能
                     cost = max(0, cost + self._sp_cost_modifier(
-                        i, active, turn_front, cost, downed=break_seen))
+                        i, active, turn_front, cost, downed=break_seen,
+                        extra=is_extra_turn))
                 enough = sp[i] >= cost
                 if enough:
                     sp[i] -= cost
@@ -2334,7 +2364,7 @@ class AxleODWindow(QFrame):
         return mods
 
     def _sp_cost_modifier(self, actor, active, front_set, base_cost=None,
-                          downed=False):
+                          downed=False, extra=False):
         """作用于该队员的 SP 消耗增减合计。
 
         同种效果只生效一次并取大值：所有「降低SP消耗」取降幅最大者、
@@ -2342,6 +2372,7 @@ class AxleODWindow(QFrame):
         base_cost 为该技能的原始 SP 消耗；SP 消耗为 0 的技能（通常攻击等）
         不受任何 SP 消耗增减影响。
         downed=True 表示敌人处于倒地/被击破状态（带该条件的被动生效）。
+        extra=True 表示处于追加回合/特殊回合（带「追加回合」条件的被动生效）。
         """
         if base_cost is not None and base_cost == 0:
             return 0          # SP 消耗为 0 的技能不受增减影响
@@ -2358,6 +2389,8 @@ class AxleODWindow(QFrame):
         for slot in active:
             for mod in self._member_sp_cost_mods(slot):
                 if mod.get("downed") and not downed:
+                    continue
+                if mod.get("extra") and not extra:
                     continue
                 if actor in self._scope_targets(mod.get("scope"),
                                                 mod.get("element"), slot,
