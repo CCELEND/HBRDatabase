@@ -1411,7 +1411,12 @@ class AxleODWindow(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.data_source = get_data_source()
-        self.team = self._default_team()
+        try:
+            self.team = self._default_team()
+        except Exception as e:
+            logger.warning("初始化默认队伍失败: %s", e)
+            self.team = [{"role": "", "style": "", "resonance_31x": 0.0,
+                          "od_earring": 1.0} for _ in range(TEAM_SIZE)]
         self.turns = []
         self.team_rows = []
         self.selected_turn = None

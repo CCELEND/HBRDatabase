@@ -386,6 +386,16 @@ def _parse_number(text):
     return float(token) if "." in token else int(token)
 
 
+def _to_int(text):
+    """尽量转成 int，失败返回 None（绝不抛异常）。"""
+    try:
+        if str(text).strip().isdigit():
+            return int(str(text).strip())
+    except Exception:
+        pass
+    return None
+
+
 def _parse_sp_cost(raw):
     """解析 SP 消耗，返回 (消耗值, 展示文本)。
 
@@ -527,13 +537,10 @@ def _extract_skill_inner(group):
             raw_value = str(effect[1])
             scope_info = _sp_recover_scope(
                 effect[6] if len(effect) > 6 else None)
-            amount = None
-            text = raw_value.strip()
-            try:
-                amount = int(text)
-            except Exception:
+            amount = _to_int(raw_value)
+            if amount is None:
                 # 「30 ~ 60%概率回复3SP」这类：取最后的「NSP」作为回复量
-                m = re.search(r'(\d+)\s*SP', text)
+                m = re.search(r'(\d+)\s*SP', raw_value)
                 if m:
                     amount = int(m.group(1))
             if amount is not None and amount > 0 and scope_info:
@@ -944,7 +951,11 @@ class HBRDataSource:
         return styles
 
     def styles_names(self, role_name):
-        return [style.name for style in self.styles(role_name)]
+        try:
+            return [style.name for style in self.styles(role_name)]
+        except Exception as e:
+            logger.warning("读取 %s 的风格失败: %s", role_name, e)
+            return []
 
     def skills(self, role_name, style_name):
         for style in self.styles(role_name):
