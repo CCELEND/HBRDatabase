@@ -294,6 +294,7 @@ class TeamMemberRow(QFrame):
         self.slot = slot
         self.data_source = data_source
         self._loading = 0
+        self._block_role_signal = False
         self._build_ui()
         self._populate_styles()
 
@@ -373,7 +374,7 @@ class TeamMemberRow(QFrame):
             self._loading -= 1
 
     def _on_role_changed(self, role):
-        if self._loading:
+        if self._loading or self._block_role_signal:
             return
         self._selected_passives = None   # 换角色后默认携带全部被动
         self._populate_styles(preserve="")
@@ -383,16 +384,23 @@ class TeamMemberRow(QFrame):
         """队伍角色不可重复：禁用其它位置已选的角色。
 
         used: {role_name: [slot_index, ...]}
+        注意：切换项的可选状态会触发 currentTextChanged，这里临时屏蔽，
+        避免误触发「换角色 → 重置风格」。
         """
         model = self.role_combo.model()
-        for j in range(self.role_combo.count()):
-            role = self.role_combo.itemText(j)
-            if not role or role == "无":
-                continue
-            taken = any(idx != my_index for idx in used.get(role, []))
-            item = model.item(j)
-            if item is not None:
-                item.setEnabled(not taken)
+        prev = self._block_role_signal
+        self._block_role_signal = True
+        try:
+            for j in range(self.role_combo.count()):
+                role = self.role_combo.itemText(j)
+                if not role or role == "无":
+                    continue
+                taken = any(idx != my_index for idx in used.get(role, []))
+                item = model.item(j)
+                if item is not None:
+                    item.setEnabled(not taken)
+        finally:
+            self._block_role_signal = prev
 
     def _on_style_changed(self, style):
         if self._loading:

@@ -140,7 +140,7 @@
       ]
     },
     {
-      "type": "通常回合",
+      "type": "超频回合",
       "od": "OD1/Bonus1",
       "od_timing": "后置OD",
       "actions": [
