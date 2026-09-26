@@ -109,7 +109,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   共用同一个回合号。
 - 发动消耗 OD 槽 = 等级×100（OD1=100 / OD2=200 / OD3=300）；
   同一次发动只扣一次（连续相同 OD 等级的回合，如 OD2 / OD2/Bonus1 / OD2/Bonus2 视为同一次）。
-- 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗）、
+- 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗，上限 300）、
   「本回合OD」（仅本回合行动产生的 OD）、「当前OD」= 回合开始OD + 本回合OD；
   汇总的「净OD」即最后一个回合的当前OD。
 
@@ -165,6 +165,7 @@ ELEMENTS = ["火", "冰", "雷", "光", "暗", "无"]
 OD_TIMING_OPTIONS = ["前置OD", "后置OD"]
 # 每级 OD 消耗的 OD 槽
 OD_GAUGE_PER_LEVEL = 100
+OD_GAUGE_MAX = 300   # OD 槽上限（OD3）
 
 # OD 最高 3 级
 OD_OPTIONS = [
@@ -1938,9 +1939,9 @@ class AxleODWindow(QFrame):
                         od_gain_used.add(slot)
                     break
 
-            # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗
+            # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗（上限 300）
             # 「本回合OD」只统计本回合行动；因此 回合开始OD + 本回合OD = 当前OD
-            turn.set_start_od(running_od + turn_bonus - cost)
+            turn.set_start_od(min(running_od + turn_bonus - cost, OD_GAUGE_MAX))
             turn_actions = 0.0
             for action in turn.actions:
                 element = action.get_attack_element()
@@ -1956,6 +1957,7 @@ class AxleODWindow(QFrame):
 
             cumulative += turn_bonus + turn_actions
             running_od += turn_bonus + turn_actions - cost
+            running_od = min(running_od, OD_GAUGE_MAX)   # OD 槽上限 300
             turn.set_result(turn_actions, cumulative)
             turn.set_current_od(running_od)
 
