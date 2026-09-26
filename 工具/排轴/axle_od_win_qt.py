@@ -121,6 +121,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
+- 同一回合内 SP 的结算顺序：**非攻击技能先于攻击技能**（同类按行动行顺序）。
 - 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
   （同种效果只生效一次：降低取最大降幅、增加取最大增幅，两者相抵；
   且 SP 消耗为 0 的技能不受任何增减影响）；「剩余SP」列红色负值表示不足（缺口，实际 SP 不变）。
@@ -2107,8 +2108,11 @@ class AxleODWindow(QFrame):
             pre_entries = [(i, self.team[i].get("role"), sp[i], i in start_front)
                            for i in active]
 
-            # 行动：扣除技能 SP，并结算技能的 SP 回复效果
-            for action in turn.actions:
+            # 行动：扣除技能 SP，并结算技能的 SP 回复效果。
+            # 结算顺序：非攻击技能先于攻击技能（同类按行动行顺序）。
+            action_order = sorted(
+                turn.actions, key=lambda a: 1 if a._is_attack() else 0)
+            for action in action_order:
                 i = action.member_index
                 if i not in active:
                     action.set_sp_result(None)
