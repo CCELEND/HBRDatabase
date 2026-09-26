@@ -61,6 +61,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   31X共鸣、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
   31X共鸣 / OD耳环 按角色设置（31X共鸣仅在勾选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
+- 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
+  回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
@@ -1392,8 +1394,11 @@ class TurnCard(QFrame):
 
     def destroy(self):
         for action in list(self.actions):
-            action.setParent(None)
-            action.deleteLater()
+            try:
+                action.setParent(None)
+                action.deleteLater()
+            except RuntimeError:
+                pass          # C++ 对象可能已随窗口销毁
         self.actions = []
 
 
@@ -1437,15 +1442,28 @@ class AxleODWindow(QFrame):
         root.setContentsMargins(8, 8, 8, 8)
         root.setSpacing(6)
 
-        root.addLayout(self._build_toolbar())
         root.addWidget(self._build_team_group())
         root.addWidget(self._build_battle_group())
         root.addWidget(self._build_resist_group())
         root.addWidget(self._build_sp_group())
-        root.addWidget(self._build_rows_area(), 1)
+        root.addStretch(1)
+        # 回合列表（含操作按钮）放到独立窗口，避免主窗口拥挤
+        self.turns_panel = self._build_turns_panel()
+
+    def _build_turns_panel(self):
+        panel = QWidget()
+        panel.setStyleSheet(COMBO_QSS)
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(6)
+        layout.addLayout(self._build_toolbar())
+        self.rows_area = self._build_rows_area()
+        layout.addWidget(self.rows_area, 1)
+        return panel
 
     def _build_toolbar(self):
         bar = QHBoxLayout()
+        bar.setContentsMargins(8, 2, 0, 0)
         bar.setSpacing(6)
         buttons = [
             ("＋添加回合", self.add_turn),
@@ -1486,8 +1504,11 @@ class AxleODWindow(QFrame):
 
     def _build_battle_group(self):
         group = QGroupBox("全局战斗设置（OD计算）")
-        layout = QHBoxLayout(group)
-        layout.setContentsMargins(10, 6, 10, 6)
+        outer = QVBoxLayout(group)
+        outer.setContentsMargins(10, 6, 10, 6)
+        outer.setSpacing(4)
+
+        layout = QHBoxLayout()
         layout.setSpacing(10)
 
         layout.addWidget(QLabel("敌人数量"))
@@ -1510,23 +1531,27 @@ class AxleODWindow(QFrame):
         self.enemy_od_spin.setToolTip("敌方 OD 率倍率（默认 1.0）")
         self.enemy_od_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.enemy_od_spin)
-
         layout.addStretch(1)
+        outer.addLayout(layout)
 
+        summary = QHBoxLayout()
+        summary.setSpacing(18)
         self.total_label = QLabel("总OD：0.00")
         self.total_label.setStyleSheet("font-weight: bold; font-size: 15px;")
-        layout.addWidget(self.total_label)
+        summary.addWidget(self.total_label)
 
         self.net_od_label = QLabel("净OD：0.00")
         self.net_od_label.setToolTip(
             "净OD = 累计获得 − 发动 OD 消耗（OD1=100 / OD2=200 / OD3=300）")
-        layout.addWidget(self.net_od_label)
+        summary.addWidget(self.net_od_label)
 
         self.percent_label = QLabel("实际OD：0.0000")
-        layout.addWidget(self.percent_label)
+        summary.addWidget(self.percent_label)
 
         self.actual_hits_label = QLabel("实际Hit数：0.000")
-        layout.addWidget(self.actual_hits_label)
+        summary.addWidget(self.actual_hits_label)
+        summary.addStretch(1)
+        outer.addLayout(summary)
         return group
 
     def _build_resist_group(self):
@@ -2420,21 +2445,73 @@ class AxleODWindow(QFrame):
     # -------------------------------------------------------------- close
     def destroy(self):
         for turn in list(self.turns):
-            turn.destroy()
-            turn.setParent(None)
-            turn.deleteLater()
+            try:
+                turn.destroy()
+                turn.setParent(None)
+                turn.deleteLater()
+            except RuntimeError:
+                pass          # C++ 对象可能已随回合窗口销毁
         self.turns = []
 
 
+TURNS_TITLE = WINDOW_TITLE + "-回合"
+TURNS_MODULE = MODULE_NAME + "_TURNS"
+_active_view = None   # 当前打开的排轴窗口（用于重新打开回合窗口）
+
+
+def _open_turns_window(view):
+    """把回合列表放到独立窗口，避免主窗口拥挤。"""
+    frame = getattr(view, "turns_frame", None)
+    if frame is not None:
+        return frame
+    frame = creat_Toplevel(TURNS_TITLE, 1180, 760, 380, 155)
+    set_window_icon(frame, "./工具/help.png")
+    frame.grid_layout.addWidget(view.turns_panel, 0, 0)
+    frame.grid_layout.setRowStretch(0, 1)
+    frame.grid_layout.setColumnStretch(0, 1)
+    view.turns_frame = frame
+    win_open_manage(frame, TURNS_MODULE)
+
+    def on_close(self, event):
+        if getattr(view, "_turns_closing", False):
+            event.accept()
+            return
+        view._turns_closing = True
+        try:
+            view.turns_frame = None
+            # 保留回合面板（不随窗口销毁），以便之后再次打开
+            panel = view.turns_panel
+            panel.setParent(None)
+            panel.hide()
+            win_close_manage(frame, TURNS_MODULE, None)
+        finally:
+            view._turns_closing = False
+        event.accept()
+
+    frame.closeEvent = types.MethodType(on_close, frame)
+    return frame
+
+
+def _close_turns_window(view):
+    frame = getattr(view, "turns_frame", None)
+    if frame is not None:
+        view.turns_frame = None
+        win_close_manage(frame, TURNS_MODULE, None)
+
+
 def creat_axle_od_win():
+    global _active_view
     # 使用说明输出到 工具/排轴/help.txt
     write_help_file()
 
     if is_win_open(WINDOW_TITLE, MODULE_NAME):
         win_set_top(WINDOW_TITLE, MODULE_NAME)
+        if _active_view is not None:
+            _open_turns_window(_active_view)
+            win_set_top(TURNS_TITLE, TURNS_MODULE)
         return "break"
 
-    win_frame = creat_Toplevel(WINDOW_TITLE, 1200, 820, 160, 60)
+    win_frame = creat_Toplevel(WINDOW_TITLE, 780, 400, 120, 60)
     set_window_icon(win_frame, "./工具/help.png")
 
     view = AxleODWindow(win_frame.centralWidget())
@@ -2442,9 +2519,14 @@ def creat_axle_od_win():
     win_frame.grid_layout.setRowStretch(0, 1)
     win_frame.grid_layout.setColumnStretch(0, 1)
 
+    _active_view = view
     win_open_manage(win_frame, MODULE_NAME)
+    _open_turns_window(view)
 
     def on_close(self, event):
+        global _active_view
+        _active_view = None
+        _close_turns_window(view)
         win_close_manage(win_frame, MODULE_NAME, view)
         event.accept()
 
