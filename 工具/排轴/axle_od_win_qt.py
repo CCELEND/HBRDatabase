@@ -65,6 +65,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
+- 选了 OD 的回合，类型会显示为「超频回合」（与通常回合等价，仅作标识）。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
 - 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
   已通用化的例外：第一个 SS 风格的专属技能（如 幻象泡影）、星火燎原+。
@@ -88,7 +89,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 风格被动「OD条上升」（如 V字回复）：「回合开始时」每回合结算、「战斗开始时」仅第 1 回合；
   按「位于前锋/后卫」判定位置；「超频条不足N%」为触发阈值；「出击中1次」整场只触发一次；
   均为「直接增加超频条」，收益为固定值（不吃 OD 耳环加成）；也需满足突破数。
-  「回合开始时」类在 **OD 回合（含其加成回合）与追加回合**中不结算。
+  「回合开始时」类只结算于：**通常回合**；或「**前置OD 且为本次发动的第一回合**」（如 OD3/Bonus1）。
+  后置OD、后续 Bonus 回合（Bonus2/3）与追加回合都不结算。
 - 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：勾选行动的「击破敌人」**且该行动是攻击**时，
   自动同步到该行动的**固定OD**输入框（X% → X/100，如 25% → 0.250），
   因此会吃到 OD 耳环加成；取消勾选会自动移除（手填值保留）。
@@ -103,6 +105,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 【OD 发动与回合数】
 - 前置OD：当前回合直接发动；后置OD：当前回合结束马上发动（两者 OD 回合都是当前回合）。
 - 后置OD 的回合沿用上一个回合号（显示「第N回合 后置OD」），不计入回合数。
+- 同一次 OD 发动的多个「超频回合」（连续相同等级，如 OD3 / OD3/Bonus1 / OD3/Bonus2）
+  共用同一个回合号。
 - 发动消耗 OD 槽 = 等级×100（OD1=100 / OD2=200 / OD3=300）；
   同一次发动只扣一次（连续相同 OD 等级的回合，如 OD2 / OD2/Bonus1 / OD2/Bonus2 视为同一次）。
 - 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗）、
@@ -113,7 +117,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 第 1 回合前锋 = 队伍配置前 3 人；之后 = 上一回合行动的队员。
 - 回合开始：基础回复（前锋/后卫）+ 风格被动的前锋SP（闪光/佳音/机敏/俊敏…，需满足突破数）；
   以及「回合开始时回复友方SP」的被动（如 与伙伴一起【朝仓可怜专属】：除自身外全体友方 SP+1）。
-- 后置OD 属上一回合：不触发回合开始回复与闪光，仅结算 OD 额外 SP（同一次发动只给一次）。
+- 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
+  后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
 - 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
@@ -149,7 +154,7 @@ def write_help_file():
 
 TEAM_SIZE = 6
 MAX_ACTIONS_PER_TURN = 3
-TURN_OPTIONS = ["通常回合", "追加回合"]
+TURN_OPTIONS = ["通常回合", "超频回合", "追加回合"]
 
 # 与参考站点一致的 OD 选项
 # 敌人可抗性的属性
@@ -1250,6 +1255,22 @@ class TurnCard(QFrame):
         for action in self.actions:
             action.delete_button.setEnabled(can_delete)
 
+    def _sync_turn_type(self):
+        """选了 OD 则类型显示「超频回合」，无 OD 显示「通常回合」（追加回合不变）。"""
+        if getattr(self, "_syncing_type", False):
+            return
+        text = self.type_combo.currentText()
+        if text == "追加回合":
+            return
+        want = "超频回合" if self.od_level() > 0 else "通常回合"
+        if text != want:
+            self._syncing_type = True
+            try:
+                with self._suspended():
+                    self.type_combo.setCurrentText(want)
+            finally:
+                self._syncing_type = False
+
     def _on_type_changed(self, text):
         # 追加回合不能发动 OD
         no_od = (text == "追加回合")
@@ -1259,6 +1280,7 @@ class TurnCard(QFrame):
                 not no_od and self.od_combo.currentText() != "无")
             if no_od:
                 self.od_combo.setCurrentText("无")
+        self._sync_turn_type()
         self._apply_style()
         if not self._loading:
             self.refresh_member_options()   # 追加回合的可选角色不同
@@ -1268,6 +1290,7 @@ class TurnCard(QFrame):
 
     def _on_od_changed(self, text):
         self.od_timing_combo.setEnabled(self.od_combo.currentText() != "无")
+        self._sync_turn_type()
         self._apply_style()
         self.owner._reindex()   # 后置OD 沿用上一回合号
         self.changed.emit()
@@ -1820,19 +1843,31 @@ class AxleODWindow(QFrame):
                 item.index_label.setStyleSheet("")
 
     def _reindex(self):
-        """重新编号：追加回合、以及后置OD 回合都不计入回合数。"""
+        """重新编号。
+
+        * 追加回合不计入回合数；
+        * 同一次 OD 发动的多个「超频回合」（连续相同等级，如
+          OD3 / OD3/Bonus1 / OD3/Bonus2）共用同一个回合号；
+        * 后置OD 在上一个回合结束发动，故沿用上一个回合号。
+        """
         number = 0
+        prev_level = 0
         for turn in self.turns:
             is_additional = turn.turn_type() == "追加回合"
-            is_post_od = (not is_additional and turn.od_level() > 0
-                          and turn.od_timing() == "后置OD")
+            level = turn.od_level()
             if is_additional:
                 turn.set_index(number, additional=True)
+                continue
+            is_post_od = (level > 0 and turn.od_timing() == "后置OD")
+            if level > 0 and level == prev_level:
+                # 同一次 OD 发动的后续超频回合：沿用同一个回合号
+                turn.set_index(number, post_od=is_post_od)
             elif is_post_od:
                 turn.set_index(number, post_od=True)
             else:
                 number += 1
                 turn.set_index(number)
+            prev_level = level
 
     # --------------------------------------------------------- calculation
     def _battle_params(self, resistance=False):
@@ -1857,10 +1892,23 @@ class AxleODWindow(QFrame):
         od_gain_used = set()   # 已触发「OD条上升」被动的队员（出击中1次）
         start_front = self._initial_front()   # 回合开始时的前锋
         for turn_idx, turn in enumerate(self.turns):
+            # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
+            level = turn.od_level()
+            is_new_activation = level > 0 and level != prev_level
+            if is_new_activation:
+                cost = level * OD_GAUGE_PER_LEVEL
+                consumed += cost
+            else:
+                cost = 0
+            prev_level = level
             # 回合开始：风格被动「OD条上升」（如 V字回复）——
             # 按触发时机/位置/阈值/是否出击中1次结算。
-            # OD 回合（发动 OD 的回合，含其加成回合）与追加回合不触发「回合开始时」效果。
-            starts_turn = (not turn.od_level() and turn.turn_type() != "追加回合")
+            # 只有「通常回合」，或「前置OD 且为本次发动的第一回合（如 OD3/Bonus1）」
+            # 才有回合开始；后置OD 与后续的 Bonus 回合（Bonus2/3）、追加回合都不结算。
+            is_post_od = (level > 0 and turn.od_timing() == "后置OD")
+            starts_turn = (turn.turn_type() != "追加回合"
+                           and not is_post_od
+                           and (level == 0 or is_new_activation))
             turn_bonus = 0.0   # 回合开始时被动带来的 OD 增加
             for slot in (self._active_slots() if starts_turn else []):
                 if slot in od_gain_used:
@@ -1880,13 +1928,6 @@ class AxleODWindow(QFrame):
                     if mod.get("once", True):
                         od_gain_used.add(slot)
                     break
-            # 发动 OD 消耗（同一次发动只扣一次）
-            level = turn.od_level()
-            cost = 0
-            if level > 0 and level != prev_level:
-                cost = level * OD_GAUGE_PER_LEVEL
-                consumed += cost
-            prev_level = level
 
             # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗
             # 「本回合OD」只统计本回合行动；因此 回合开始OD + 本回合OD = 当前OD
@@ -2006,13 +2047,39 @@ class AxleODWindow(QFrame):
                 if is_new_od:
                     self._apply_od_sp_bonus(turn, sp, active)
             elif not is_additional:
-                start_od = turn.start_od()
-                # 回合开始回复：基础回复（前锋/后卫）+ 风格被动的前锋 SP（闪光等）
-                for i in active:
-                    regen = front_regen if i in start_front else back_regen
-                    if i in start_front:
-                        for mod in self._member_front_sp(i):
+                # 「回合开始」的结算条件与 OD 增加被动一致：
+                # 通常回合，或「前置OD 且为本次发动的第一回合」；
+                # 后续 Bonus 回合（Bonus2/3）不再有回合开始。
+                starts_turn = (level == 0
+                               or (is_new_od and turn.od_timing() == "前置OD"))
+                if starts_turn:
+                    start_od = turn.start_od()
+                    # 回合开始回复：基础回复（前锋/后卫）+ 风格被动的前锋 SP（闪光等）
+                    for i in active:
+                        regen = front_regen if i in start_front else back_regen
+                        if i in start_front:
+                            for mod in self._member_front_sp(i):
+                                if mod.get("battle_start") and not first_turn:
+                                    continue
+                                low = mod.get("sp_below")
+                                if low is not None and sp[i] > low:
+                                    continue
+                                ob = mod.get("od_below")
+                                if ob is not None and start_od >= ob:
+                                    continue
+                                regen += mod.get("amount", 0)
+                        if sp[i] < limit:
+                            sp[i] = min(limit, sp[i] + regen)
+
+                    # 回合开始：「回合开始时/战斗开始时」回复友方 SP 的被动（如 与伙伴一起）
+                    for i in active:
+                        for mod in self._member_turn_start_sp(i):
                             if mod.get("battle_start") and not first_turn:
+                                continue
+                            pos = mod.get("position")
+                            if pos == "front" and i not in start_front:
+                                continue
+                            if pos == "back" and i in start_front:
                                 continue
                             low = mod.get("sp_below")
                             if low is not None and sp[i] > low:
@@ -2020,36 +2087,16 @@ class AxleODWindow(QFrame):
                             ob = mod.get("od_below")
                             if ob is not None and start_od >= ob:
                                 continue
-                            regen += mod.get("amount", 0)
-                    if sp[i] < limit:
-                        sp[i] = min(limit, sp[i] + regen)
-
-                # 回合开始：「回合开始时/战斗开始时」回复友方 SP 的被动（如 与伙伴一起）
-                for i in active:
-                    for mod in self._member_turn_start_sp(i):
-                        if mod.get("battle_start") and not first_turn:
-                            continue
-                        pos = mod.get("position")
-                        if pos == "front" and i not in start_front:
-                            continue
-                        if pos == "back" and i in start_front:
-                            continue
-                        low = mod.get("sp_below")
-                        if low is not None and sp[i] > low:
-                            continue
-                        ob = mod.get("od_below")
-                        if ob is not None and start_od >= ob:
-                            continue
-                        if mod.get("downed") and not break_seen:
-                            continue
-                        if mod.get("once") and i in sp_once_used:
-                            continue
-                        self._apply_scope_recover(
-                            mod.get("amount", 0), mod.get("scope"),
-                            mod.get("element"), i, sp, active,
-                            start_front, limit)
-                        if mod.get("once"):
-                            sp_once_used.add(i)
+                            if mod.get("downed") and not break_seen:
+                                continue
+                            if mod.get("once") and i in sp_once_used:
+                                continue
+                            self._apply_scope_recover(
+                                mod.get("amount", 0), mod.get("scope"),
+                                mod.get("element"), i, sp, active,
+                                start_front, limit)
+                            if mod.get("once"):
+                                sp_once_used.add(i)
 
                 # 前置OD：当前回合直接发动，回合开始给 OD 额外 SP（同一次发动只给一次）
                 if turn.od_timing() == "前置OD" and is_new_od:
