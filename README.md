@@ -43,6 +43,12 @@
 ### 工具
 
 > 包含词条获取和伤害分计算、风格图鉴获取、伤害模拟等
+
+#### 排轴OD计算
+OD、SP排轴工具，支持OD、SP、被动、大师技能自动获取计算
+>目前已经实现超越量表、印记等，如有 BUG 请与我联系
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/axle_od_win_show1.png)
+
 #### 图片转线稿工具2.0
 >优化图像处理算法，相较于图片转线稿工具基于 Canny 边缘检测，图片转线稿工具2.0则基于最小值滤波和线性减淡
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show1.png)
