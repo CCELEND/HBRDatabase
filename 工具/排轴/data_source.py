@@ -259,7 +259,8 @@ class SkillInfo:
                  sp_cost_alt=None, sp_cost_cond=None, od_up_on_break=False,
                  od_up_earring=False, sp_recover_extra=0,
                  sp_recover_extra_team=None, od_earring_exempt=False,
-                 sp_cost_sigil_element=None, sp_cost_sigil_min=None):
+                 sp_cost_sigil_element=None, sp_cost_sigil_min=None,
+                 target_scope=None):
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.element = element                        # 攻击效果的元素属性
@@ -293,6 +294,8 @@ class SkillInfo:
         # cond == "sigil" 时：需「X之印等级为 N 或以上」（如 火之印≥4 时 SP消耗减半）
         self.sp_cost_sigil_element = sp_cost_sigil_element
         self.sp_cost_sigil_min = sp_cost_sigil_min
+        # 攻击范围（效果最后一项，如「单体」「全体」）；非攻击技能为 None
+        self.target_scope = target_scope
         self.sp_recover = sp_recover or 0             # 回复 SP 量
         # 回复范围：self/all/others/front/front_others/others_element/all_element
         self.sp_recover_scope = sp_recover_scope
@@ -543,6 +546,7 @@ def _extract_skill_inner(group):
     sp_cost_cond = None
     sp_cost_sigil_element = None
     sp_cost_sigil_min = None
+    target_scope = None
     od_up_on_break = False
     try:
         name = group[0][0]
@@ -591,6 +595,10 @@ def _extract_skill_inner(group):
             if len(effect) > 8:
                 value = _parse_number(effect[8])
                 destructive = float(value) if value is not None else None
+            # 攻击范围：效果里最后一项（「单体」「全体」…）
+            tail = [x for x in effect if isinstance(x, str)]
+            if tail and ("单体" in tail[-1] or "全体" in tail[-1]):
+                target_scope = tail[-1]
             continue
         # OD 条下降（数据写作「OD条下降」）：固定下降值，如 50% → 固定 −50
         if (isinstance(effect[0], str) and effect[0].startswith("OD")
@@ -637,7 +645,8 @@ def _extract_skill_inner(group):
                      sp_cost_alt=sp_cost_alt, sp_cost_cond=sp_cost_cond,
                      od_up_on_break=od_up_on_break,
                      sp_cost_sigil_element=sp_cost_sigil_element,
-                     sp_cost_sigil_min=sp_cost_sigil_min)
+                     sp_cost_sigil_min=sp_cost_sigil_min,
+                     target_scope=target_scope)
 
 
 def _extract_skills(group):

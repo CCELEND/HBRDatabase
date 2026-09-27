@@ -94,7 +94,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 
 【OD 公式】来自「等效破坏率与OD计算表」
 - 耳环系数 = 1 + (5 + MIN(原始Hit,10)×10/9 − 10/9)/100 × OD耳环
-- HIT OD = (原始Hit + 连击数) × ROUNDDOWN(2.5×总系数×敌方OD率, 2) × 敌人数量 × (抗性?0:1)
+- HIT OD = (原始Hit + 连击数) × ROUNDDOWN(2.5×总系数×敌方OD率, 2) × 目标数 × (抗性?0:1)
+  目标数：**全体攻击** = 敌人数量；**单体攻击（含通常攻击）恒为 1**。
 - 固定OD = ROUNDDOWN(固定OD×100×总系数, 2) + ROUNDDOWN(31X共鸣×100×总系数, 2)
 - 总系数 = 耳环系数 + 其他OD增量
 - 通常攻击不享受 OD 耳环加成、**不计连击**；通常攻击视为「无属性」。
@@ -1026,6 +1027,23 @@ class ActionRow(QFrame):
             od_earring=earring,
         )
 
+    def is_all_target(self):
+        """该技能是否为「全体」攻击（攻击范围含「全体」）。"""
+        skill = self._find_skill()
+        return bool(skill is not None and skill.target_scope
+                    and "全体" in skill.target_scope)
+
+    def get_target_count(self):
+        """该次行动的有效目标数：**全体攻击**按「敌人数量」，**单体攻击**恒为 1。
+
+        通常攻击等单体技能不会因为场上有多个敌人而多算 OD。
+        """
+        if self.owner is None:
+            return 1
+        if self.is_all_target():
+            return self.owner.target_spin.value()
+        return 1
+
     def _is_attack(self):
         """该行动是否为攻击行为（技能带攻击/伤害 Hit）。"""
         skill = self._find_skill()
@@ -1794,7 +1812,7 @@ class AxleODWindow(QFrame):
         self.target_spin.setRange(1, 10)
         self.target_spin.setValue(1)
         self.target_spin.setFixedWidth(60)
-        self.target_spin.setToolTip("目标数 / 敌人数量，参与 HIT OD 计算")
+        self.target_spin.setToolTip("目标数 / 敌人数量：仅全体攻击按此计算，单体攻击恒为 1")
         self.target_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.target_spin)
 
@@ -2124,9 +2142,10 @@ class AxleODWindow(QFrame):
             prev_level = level
 
     # --------------------------------------------------------- calculation
-    def _battle_params(self, resistance=False):
+    def _battle_params(self, resistance=False, target_count=None):
         return ODBattle(
-            target_count=self.target_spin.value(),
+            target_count=(self.target_spin.value() if target_count is None
+                          else target_count),
             resistance=resistance,
             other_od=self.other_od_spin.value(),
             enemy_od_rate=self.enemy_od_spin.value(),
@@ -2205,7 +2224,8 @@ class AxleODWindow(QFrame):
             for action in turn.actions:
                 element = action.get_attack_element()
                 resist = blanket or bool(element and element in resisted)
-                battle = self._battle_params(resist)
+                # 目标数：全体攻击按「敌人数量」，单体攻击恒为 1
+                battle = self._battle_params(resist, action.get_target_count())
                 value = calc_od(action.get_od_skill(), battle).total_od
                 # 「OD条下降」：固定扣减（如 50% → −50）
                 value -= action.get_od_down_fixed()
@@ -2215,10 +2235,10 @@ class AxleODWindow(QFrame):
                 turn_actions += value
 
             # 「追击」（由 SP 侧算出）：按固定OD参数（原始Hit=追击Hit、连击0）计入本回合OD。
-            # 实测：追击（含替换后的「猫咪喷射打靶」）均**不吃 OD 耳环**。
+            # 实测：追击（含替换后的「猫咪喷射打靶」）均**不吃 OD 耳环**；追击均为单体 → 目标数 1。
             for hits, elem, slot, _switch in turn.follow_up_od():
                 resist = blanket or bool(elem and elem in resisted)
-                battle = self._battle_params(resist)
+                battle = self._battle_params(resist, 1)
                 od_skill = ODSkill(base_hits=hits, combo_count=0.0, fixed_od=0.0,
                                    resonance_31x=0.0, od_earring=0.0)
                 turn_actions += calc_od(od_skill, battle).total_od
