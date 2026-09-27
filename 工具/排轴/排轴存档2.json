@@ -1,0 +1,172 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "瑞原蓝娜",
+      "style": "冲锋！突刺！金枪鱼！",
+      "passives": [],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    },
+    {
+      "role": "茅森月歌",
+      "style": "黎明的感性之魂",
+      "passives": [
+        "交织而成的记忆"
+      ],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    },
+    {
+      "role": "朝仓可怜",
+      "style": "秘密特工·摧毁",
+      "passives": [],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    },
+    {
+      "role": "大岛四叶草",
+      "style": "悠然摇曳温泉之乐",
+      "passives": [
+        "温泉通行木牌（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_31x": 0.0,
+      "od_earring": 1.0
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "豪迈！海盗加农炮",
+          "base_hits": 5,
+          "combo": 10,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "闪电脉冲",
+          "base_hits": 2,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "狂野投掷",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "豪迈！海盗加农炮",
+          "base_hits": 5,
+          "combo": 10,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "炽热冲击",
+          "base_hits": 2,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "狂野投掷",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}

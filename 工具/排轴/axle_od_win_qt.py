@@ -76,8 +76,13 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
 - 特殊被动里的攻击（如 山胁·冯·伊瓦尔「魔界骑兵启动！」，斩属性 6 连击）也可作为行动使用，
   且该攻击不吃 OD 耳环（不受友方 BUFF 影响）。
+- 「追击」（如 大岛四叶草「悠然摇曳温泉之乐」）：该风格位于**后卫**时，友方每使用一次
+  **SP 消耗≤8 的攻击行动**就触发一次追击（1 Hit，计入本回合 OD；**不吃 OD 耳环**）。
+  装备「温泉通行木牌（被动技能）」且自身 **SP≥10** 时，该回合**首次**追击变为
+  「猫咪喷射打靶」（整回合仅1次，消耗 SP10）；追击（含猫咪喷射打靶）**均不吃 OD 耳环**；
+  「嫩绿摇曳」使每次追击给前锋 SP+2。
 - 技能数据里的「切换形态」会被自动展开（如 白河由依奈「月色真美」的 苍焰迷宫 / 苍焰螺旋、
-  朝仓可怜「Twinkle Eclosion」的 血腥燃烧 / 芬布尔之冬 与 红尖晶石 / 堇青石），
+  朝仓可怜「Twinkle Eclosion」的 血腥燃烧 / 芬布尔之舞 与 红尖晶石 / 堇青石），
   同一条目下的形态共享该条目的专属标记；「指挥行动」只属于其所在风格。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
@@ -1377,6 +1382,13 @@ class TurnCard(QFrame):
         self._start_od = value
         self.start_od_label.setText("回合开始OD：%.2f" % value)
 
+    def set_follow_up_od(self, entries):
+        """记录本回合的追击信息：[(原始Hit, 元素, 队员下标, 是否吃OD耳环), ...]。"""
+        self._follow_up_od = list(entries or [])
+
+    def follow_up_od(self):
+        return list(getattr(self, "_follow_up_od", []))
+
     def start_od(self):
         return getattr(self, "_start_od", 0.0)
 
@@ -1945,6 +1957,9 @@ class AxleODWindow(QFrame):
                 if cb.isChecked()}
 
     def recalculate(self):
+        # 先结算一次 SP：「追击」及其 SP 消耗/回复会影响 OD，需要先算出来
+        self._recalc_sp()
+
         blanket = self.resistance_check.isChecked()
         resisted = self._resisted_elements()
         cumulative = 0.0
@@ -2006,6 +2021,15 @@ class AxleODWindow(QFrame):
                 value += action.get_od_up_flat()
                 action.set_result(value)
                 turn_actions += value
+
+            # 「追击」（由 SP 侧算出）：按固定OD参数（原始Hit=追击Hit、连击0）计入本回合OD。
+            # 实测：追击（含替换后的「猫咪喷射打靶」）均**不吃 OD 耳环**。
+            for hits, elem, slot, _switch in turn.follow_up_od():
+                resist = blanket or bool(elem and elem in resisted)
+                battle = self._battle_params(resist)
+                od_skill = ODSkill(base_hits=hits, combo_count=0.0, fixed_od=0.0,
+                                   resonance_31x=0.0, od_earring=0.0)
+                turn_actions += calc_od(od_skill, battle).total_od
 
             cumulative += turn_bonus + turn_actions
             running_od += turn_bonus + turn_actions - cost
@@ -2222,6 +2246,47 @@ class AxleODWindow(QFrame):
                     # SP 不足：显示红色负值（还差多少），实际 SP 不变
                     action.set_sp_result(sp[i] - cost, False)
 
+            # 「追击」：友方使用 SP≤N 的攻击行动时触发（如 温泉巡游）。
+            # 追击不计入行动、只在后卫发动；装备 温泉通行木牌 时首变为 猫咪喷射打靶（整回合1次）。
+            follow_entries = []
+            for m_slot in active:
+                fu = self._member_follow_up(m_slot)
+                if fu is None or m_slot in start_front:
+                    continue
+                threshold = fu.get("sp_below", 8)
+                quals = []
+                for a in action_order:
+                    if not a._is_attack():
+                        continue
+                    c = a.get_sp_cost(downed=break_seen, extra=is_extra_turn)
+                    if 0 < c <= threshold:
+                        quals.append(a)
+                if not quals:
+                    continue
+                switch = self._member_follow_up_switch(m_slot)
+                used_switch = False
+                for _a in quals:
+                    hits = fu.get("hits") or 1
+                    elem = fu.get("element")
+                    is_switch = False
+                    if (switch is not None and not used_switch
+                            and sp[m_slot] >= switch["skill"].sp_cost):
+                        sk = switch["skill"]
+                        hits = sk.hits or 1
+                        elem = sk.element
+                        sp[m_slot] -= sk.sp_cost
+                        used_switch = True
+                        is_switch = True
+                    # 追击本体（温泉巡游）不吃 OD 耳环；替换后的「猫咪喷射打靶」是实际技能，吃耳环
+                    follow_entries.append((hits, elem, m_slot, is_switch))
+                    # 发动追击时的 SP 回复（如 嫩绿摇曳：前锋SP+2）
+                    for mod in self._member_follow_up_sp(m_slot):
+                        self._apply_scope_recover(
+                            mod.get("amount", 0), mod.get("scope"),
+                            mod.get("element"), m_slot, sp, active,
+                            turn_front, limit)
+            turn.set_follow_up_od(follow_entries)
+
             # 记录本回合结束时全队 SP（含后卫）；前锋标注用回合中的前锋
             entries = [(i, self.team[i].get("role"), sp[i], i in turn_front)
                        for i in active]
@@ -2336,6 +2401,45 @@ class AxleODWindow(QFrame):
             if st.name == style:
                 return [m for m in st.turn_start_sp if m.get("lb", 0) <= lb]
         return []
+
+    def _member_follow_up(self, slot):
+        """风格被动的「追击」定义（如 温泉巡游），满足突破要求则返回。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                fu = st.follow_up
+                if fu and fu.get("lb", 0) <= lb:
+                    return fu
+                return None
+        return None
+
+    def _member_follow_up_sp(self, slot):
+        """风格被动里「发动追击时回复友方 SP」的项（如 嫩绿摇曳）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.follow_up_sp if m.get("lb", 0) <= lb]
+        return []
+
+    def _member_follow_up_switch(self, slot):
+        """追击替换（如 温泉通行木牌 → 猫咪喷射打靶）；未携带该被动则 None。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        selected = self._selected_passives(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                sw = st.follow_up_switch
+                if not sw:
+                    return None
+                req = sw.get("requires")
+                if selected is not None and req not in selected:
+                    return None
+                return sw
+        return None
 
     def _member_break_od(self, slot):
         """风格被动里「击破敌人时增加 OD 槽」的项（满足突破要求）。"""

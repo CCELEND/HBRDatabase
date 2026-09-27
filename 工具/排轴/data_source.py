@@ -34,9 +34,19 @@ GENERALIZED_SKILLS = {
 # 不在 skills[1] 位置，故 _apply_exclusive 不会自动标记）
 FORCED_EXCLUSIVE_SKILLS = {
     "苍焰螺旋",     # 白河由依奈 · 月色真美（苍焰迷宫 的切换形态）
-    "芬布尔之冬",   # 朝仓可怜 · Twinkle Eclosion（血腥燃烧 的冰属性切换形态）
+    "芬布尔之舞",   # 朝仓可怜 · Twinkle Eclosion（血腥燃烧 的冰属性切换形态）
     "指挥行动",     # 各风格自带「以指挥行动取代普通攻击」，仅该风格可用
 }
+
+# 本地数据里个别技能名与游戏内文本不一致（不动 角色/*.json，仅在解析时修正显示名）
+_SKILL_NAME_ALIASES = {
+    "芬布尔之冬": "芬布尔之舞",   # 朝仓可怜「Twinkle Eclosion」冰属性切换形态
+}
+
+
+def _fix_skill_name(name):
+    """修正本地数据里的个别技能名笔误（返回游戏内的正确名称）。"""
+    return _SKILL_NAME_ALIASES.get(name, name)
 
 # SP 类被动里，排轴无法判定的条件——描述中出现任一关键词即整条跳过（避免多算）。
 # 目前可判定的条件：位于前锋/后卫、回合开始时、战斗开始时、SP不大于N、超频条（未判定）。
@@ -254,6 +264,7 @@ class SkillInfo:
         self.element = element                        # 攻击效果的元素属性
         # 同一 ActiveSkills 条目的分组号（含可切换的多个技能形态）
         self.source_group = None
+        self.desc = ""                                # 技能描述
         # 专属技能（SSR/SS 的第一个主动技能）：仅在装备该风格时可用
         self.is_exclusive = is_exclusive
         # 「OD条下降 X%」：该次行动 OD 固定减少 X（如 50% → 固定 −50）
@@ -369,6 +380,14 @@ class StyleInfo:
         self.passive_options = passive_options or []
         # 「高阶增幅状态」的启用被动名（无则为 None）
         self.boost_enabler = boost_enabler
+        # 「追击」类被动（如 温泉巡游）：友方用 SP≤N 的攻击行动时触发
+        # {"name","hits","element","sp_below","lb"}；无则 None
+        self.follow_up = None
+        # 发动追击时的 SP 回复（如 嫩绿摇曳：自身发动追击时 前锋SP+2）
+        self.follow_up_sp = []
+        # 追击替换（如 温泉通行木牌：追击变为【猫咪喷射打靶】）
+        # {"requires": 被动名, "skill": SkillInfo}
+        self.follow_up_switch = None
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -473,14 +492,20 @@ def _sp_recover_scope(target):
 def _extract_skill(group):
     """从一个 ActiveSkills 条目解析技能；任何异常都不应中断整体加载。"""
     try:
-        return _extract_skill_inner(group)
+        skill = _extract_skill_inner(group)
     except Exception as e:
         try:
             name = str(group[0][0])
         except Exception:
             name = "?"
         logger.warning("解析技能 %s 失败: %s", name, e)
-        return SkillInfo(name)
+        skill = SkillInfo(name)
+    try:
+        skill.desc = str(group[0][1])
+    except Exception:
+        pass
+    skill.name = _fix_skill_name(skill.name)
+    return skill
 
 
 def _extract_skill_inner(group):
@@ -635,6 +660,8 @@ def _passive_action_skill(passive):
         return None
     if not isinstance(effects, list):
         return None
+    if "追击" in str(passive[1]):
+        return None          # 追击类被动按「追击」机制单独处理，不作为行动技能
     has_attack = any(
         isinstance(e, list) and len(e) > 2 and e[0] in ATTACK_ATTRS
         for e in effects)
@@ -643,6 +670,92 @@ def _passive_action_skill(passive):
     skill = _extract_skill([[name, desc, None, None], effects])
     skill.od_earring_exempt = True
     return skill
+
+
+def _passive_lb(passive):
+    """被动的突破要求（第 3 项）。"""
+    try:
+        return int(str(passive[2]).strip() or 0)
+    except Exception:
+        return 0
+
+
+def _parse_follow_up(style_data, skills):
+    """解析「追击」相关被动，返回 (follow_up, follow_up_sp, follow_up_switch)。
+
+    * 温泉巡游（效果列表型）：友方用 SP≤N 的攻击时触发自身追击；
+    * 嫩绿摇曳 等：发动追击时给某范围回复 SP；
+    * 温泉通行木牌（被动技能）：追击变为【猫咪喷射打靶】。
+    """
+    follow_up = None
+    follow_up_sp = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = passive[3] if len(passive) > 3 else ""
+            pvalue = passive[4] if len(passive) > 4 else None
+            ptarget = passive[7] if len(passive) > 7 else None
+        except Exception:
+            continue
+        if "追击" not in pdesc:
+            continue
+        if isinstance(ptype, list) and follow_up is None:
+            skill = _extract_skill([[pname, pdesc, None, None], ptype])
+            # 追击本体是「效果列表」里的攻击：直接取 Hit 数/元素
+            hits = skill.hits
+            elem = skill.element
+            for e in ptype:
+                if not (isinstance(e, list) and len(e) > 2):
+                    continue
+                if str(e[2]).isdigit():
+                    hits = int(e[2])
+                    elem = str(e[1]) if len(e) > 1 and e[1] else str(e[0])
+                    break
+            m = re.search(r'SP不大于(\d+)', pdesc)
+            follow_up = {
+                "name": pname,
+                "hits": hits,
+                "element": elem,
+                "sp_below": int(m.group(1)) if m else 8,
+                "lb": _passive_lb(passive),
+            }
+            continue
+        if str(ptype) == "回复SP":
+            scope_info = _sp_recover_scope(ptarget)
+            num = re.search(r'\d+', str(pvalue))
+            if scope_info and num:
+                follow_up_sp.append({
+                    "amount": int(num.group()),
+                    "scope": scope_info[0],
+                    "element": scope_info[1],
+                    "lb": _passive_lb(passive),
+                })
+
+    # 替换：带「攻击切换」效果的（被动技能）条目，其描述里【】内为替换后的技能名
+    requires = None
+    target_name = None
+    for group in (style_data.get("ActiveSkills") or []):
+        try:
+            gname = str(group[0][0])
+            gdesc = str(group[0][1])
+            effects = group[1] if len(group) > 1 else []
+        except Exception:
+            continue
+        if not any(isinstance(e, list) and e and str(e[0]) == "攻击切换"
+                   for e in (effects or [])):
+            continue
+        requires = gname
+        m = re.search(r'【(.+?)】', gdesc)
+        if m:
+            target_name = m.group(1)
+    follow_up_switch = None
+    if requires and target_name:
+        for sk in skills:
+            if sk.name == target_name:
+                follow_up_switch = {"requires": requires, "skill": sk}
+                break
+    return follow_up, follow_up_sp, follow_up_switch
 
 
 class HBRDataSource:
@@ -1044,6 +1157,11 @@ class HBRDataSource:
                                         boost_enabler, front_sp_passives,
                                         turn_start_od, turn_start_sp,
                                         style_label, break_od))
+                # 「追击」相关（温泉巡游 / 嫩绿摇曳 / 温泉通行木牌）
+                fu, fu_sp, fu_sw = _parse_follow_up(style_data, skills)
+                styles[-1].follow_up = fu
+                styles[-1].follow_up_sp = fu_sp
+                styles[-1].follow_up_switch = fu_sw
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
