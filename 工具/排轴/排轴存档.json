@@ -1,0 +1,154 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "室伏理沙",
+      "style": "今夜，于摇曳花影之下",
+      "passives": [
+        "活力绽放"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "爱心爆破+",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}

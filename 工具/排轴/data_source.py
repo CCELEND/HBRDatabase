@@ -173,6 +173,10 @@ def _apply_exclusive(styles):
             if skill is first or (first.source_group is not None
                                   and skill.source_group == first.source_group):
                 skill.is_exclusive = not generalized
+                skill.is_ex_skill = True
+            # 「+」进化版（如 光茫一闪+）同样属于该风格的 EX 技能
+            elif skill.name.endswith("+") and skill.name[:-1] == first.name:
+                skill.is_ex_skill = True
 
 
 def _dedupe(items):
@@ -282,6 +286,8 @@ class SkillInfo:
         self.sp_recover_extra_team = sp_recover_extra_team
         # 该攻击是否不吃 OD 耳环（如 魔界骑兵启动：此攻击不受友方BUFF影响）
         self.od_earring_exempt = od_earring_exempt
+        # 是否为「EX技能」（SS/SSR 风格的第一个主动技能及其进化版；含被通用化的）
+        self.is_ex_skill = False
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -411,6 +417,12 @@ class StyleInfo:
         # 「X之律动」（超越条，如 冰之律动）：
         # {"name","element","initial_per_style","per_action","threshold","od_bonus","once","lb"}
         self.rhythm = None
+        # 「自身使用EX技能后 …」的回复 SP 被动（如 注入活力）：
+        # [{name, amount, scope, element, lb}, ...]
+        self.ex_sp = []
+        # 「自身使用EX技能后 超频条+X%」的项（如 追加支援 / 千里眼）：
+        # [{name, amount(百分点), lb, requires}, ...]
+        self.ex_od = []
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -510,6 +522,32 @@ def _sp_recover_scope(target):
         if element:
             return ("all_element", element)
     return None
+
+
+def _parse_master_ex_sp(ms):
+    """大师技能里「自身使用EX技能后 回复SP」的项。
+
+    如 桐生美也「开辟希望的一箭」：自身使用EX技能后 全体友方SP+2。
+    返回 [{"amount", "scope", "element"}, ...]。
+    """
+    if not isinstance(ms, list) or len(ms) < 5:
+        return []
+    desc = str(ms[1]) if len(ms) > 1 else ""
+    effects = ms[4]
+    if "EX技能" not in desc or not isinstance(effects, list):
+        return []
+    result = []
+    for effect in effects:
+        if not (isinstance(effect, list) and effect
+                and str(effect[0]) == "回复SP"):
+            continue
+        num = re.search(r'\d+', str(effect[1]) if len(effect) > 1 else "")
+        scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+        if num and scope_info:
+            result.append({"amount": int(num.group()),
+                           "scope": scope_info[0],
+                           "element": scope_info[1]})
+    return result
 
 
 def _extract_skill(group):
@@ -862,6 +900,78 @@ def _parse_sigil(style_data):
     return None
 
 
+def _parse_ex_od(style_data):
+    """解析「自身使用EX技能后 超频条+X%」的项（如 追加支援 / 千里眼）。
+
+    返回 [{"name","amount","lb","requires"}, ...]（amount 为百分点，如 10 → +10 OD）。
+    """
+    result = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            pvalue = passive[4] if len(passive) > 4 else None
+        except Exception:
+            continue
+        if "EX技能" not in pdesc or "超频条" not in pdesc:
+            continue
+        m = re.search(r'(\d+(?:\.\d+)?)', str(pvalue))
+        if not m:
+            m = re.search(r'超频条\+(\d+(?:\.\d+)?)%', pdesc)
+        if not m:
+            continue
+        result.append({"name": pname, "amount": float(m.group(1)),
+                       "lb": _passive_lb(passive), "requires": None})
+    # 「（被动技能）」条目里也有（如 千里眼）
+    for group in (style_data.get("ActiveSkills") or []):
+        try:
+            gname = str(group[0][0])
+            gdesc = str(group[0][1])
+        except Exception:
+            continue
+        if "（被动技能）" not in gname and "(被动技能)" not in gname:
+            continue
+        if "EX技能" not in gdesc or "超频条" not in gdesc:
+            continue
+        m = re.search(r'超频条\+(\d+(?:\.\d+)?)%', gdesc)
+        if not m:
+            continue
+        result.append({"name": gname, "amount": float(m.group(1)),
+                       "lb": 0, "requires": gname})
+    return result
+
+
+def _parse_ex_sp(style_data):
+    """解析「自身使用EX技能后 …」的回复 SP 被动（如 注入活力：全体友方SP+2）。
+
+    返回 [{"name","amount","scope","element","lb"}, ...]。
+    """
+    result = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            pvalue = passive[4] if len(passive) > 4 else None
+            ptarget = passive[7] if len(passive) > 7 else None
+        except Exception:
+            continue
+        if ptype != "回复SP" or "EX技能" not in pdesc:
+            continue
+        num = re.search(r'\d+', str(pvalue))
+        scope_info = _sp_recover_scope(ptarget)
+        if not num or not scope_info:
+            continue
+        result.append({
+            "name": pname,
+            "amount": int(num.group()),
+            "scope": scope_info[0],
+            "element": scope_info[1],
+            "lb": _passive_lb(passive),
+        })
+    return result
+
+
 def _parse_rhythm(style_data):
     """解析「X之律动」被动（如 冰之律动）。
 
@@ -943,6 +1053,7 @@ class HBRDataSource:
         self._master_mods = None    # {role_name: [大师技能 SP 消耗项]}
         self._master_name = {}      # {role_name: 大师技能名}
         self._master_action = {}    # {role_name: 可主动释放的大师技能 SkillInfo}
+        self._master_ex_sp = {}     # {role_name: [EX技能后回复SP项]}
         self._role_team = {}        # {role_name: 队伍}
         self._resonance_pool = None  # {名称: 共鸣天赋}
 
@@ -993,6 +1104,14 @@ class HBRDataSource:
             action = _parse_master_skill_action(ms)
             if action and action.name:
                 self._master_action[role_name] = action
+            ex_sp = _parse_master_ex_sp(ms)
+            if ex_sp:
+                self._master_ex_sp[role_name] = ex_sp
+
+    def master_ex_sp(self, role_name):
+        """角色「大师技能」里「自身使用EX技能后 回复SP」的项。"""
+        self._load_master_skills()
+        return self._master_ex_sp.get(role_name, [])
 
     def master_sp_cost_mods(self, role_name):
         """角色「大师技能」中影响 SP 消耗的项。"""
@@ -1359,6 +1478,10 @@ class HBRDataSource:
                                      else None)
                 # 「X之律动」（超越条）
                 styles[-1].rhythm = _parse_rhythm(style_data)
+                # 「自身使用EX技能后 …」的回复 SP 被动
+                styles[-1].ex_sp = _parse_ex_sp(style_data)
+                # 「自身使用EX技能后 超频条+X%」的项
+                styles[-1].ex_od = _parse_ex_od(style_data)
                 # 「共鸣天赋」（如 神圣恩典）
                 res = style_data.get("resonance")
                 if isinstance(res, dict) and res.get("name"):

@@ -160,6 +160,12 @@ HELP_TEXT = """排轴OD计算 使用说明
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
   「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
+- 「自身使用EX技能后 …」类效果（如 注入活力：全体友方SP+2、桐生美也大师技能
+  「开辟希望的一箭」；追加支援 / 千里眼：超频条+10%）：在该队员使用 **EX技能** 后结算。
+  **EX技能** = SS/SSR 风格的第一个主动技能（及其「+」进化版）；被通用化的
+  （如 光茫一闪 / 光茫一闪+、星火燎原+）同样算 EX 技能。
+  回复SP 类按作用范围回复；「超频条+X%」类：EX 技能是**攻击技能**时**吃 OD 耳环**
+  （按固定OD结算），非攻击时**直接加 X 点**超频条。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
 - 同一回合内 SP 的结算顺序：**非攻击技能先于攻击技能**（同类按行动行顺序）。
 - 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
@@ -1089,6 +1095,11 @@ class ActionRow(QFrame):
             od_earring=earring,
         )
 
+    def get_skill_is_ex(self):
+        """该次行动使用的技能是否为「EX技能」。"""
+        skill = self._find_skill()
+        return bool(skill is not None and getattr(skill, "is_ex_skill", False))
+
     def is_all_target(self):
         """该技能是否为「全体」攻击（攻击范围含「全体」）。"""
         skill = self._find_skill()
@@ -1124,15 +1135,24 @@ class ActionRow(QFrame):
                 or getattr(skill, "od_up_earring", False))
 
     def get_od_up_flat(self):
-        """非攻击且不吃耳环的技能「OD条上升 X%」：直接增加超频条。"""
+        """不吃耳环的「OD条上升 X%」：**直接**增加超频条。
+
+        * 「自身使用EX技能后 超频条+X%」类（如 追加支援 / 千里眼）：EX 技能为**非攻击**时直接加；
+        * 非攻击且不吃耳环的技能自带的「OD条上升 X%」。
+        （攻击技能的同类效果吃 OD 耳环，走「固定OD」。）
+        """
+        total = 0.0
+        if (self.owner is not None and self.get_skill_is_ex()
+                and not self._od_up_uses_earring()):
+            total += self.owner._member_ex_od_fraction(self.member_index) * 100.0
         skill = self._find_skill()
         if skill is None or skill.hits is not None:
-            return 0.0
+            return total
         if getattr(skill, "od_up_earring", False):
-            return 0.0
+            return total
         if getattr(skill, "od_up_on_break", False) and not self.is_break():
-            return 0.0
-        return getattr(skill, "od_up_fixed", 0.0) * 100.0
+            return total
+        return total + getattr(skill, "od_up_fixed", 0.0) * 100.0
 
     def _auto_fixed_od(self):
         """该行动自动计入「固定OD」的部分（吃 OD 耳环）：
@@ -1146,6 +1166,9 @@ class ActionRow(QFrame):
             return total
         if self._is_attack() and self.is_break():
             total += self.owner._member_break_od_fraction(self.member_index)
+        # 「自身使用EX技能后 超频条+X%」：EX 技能为**攻击技能**时吃 OD 耳环（按固定OD结算）
+        if self.get_skill_is_ex() and self._od_up_uses_earring():
+            total += self.owner._member_ex_od_fraction(self.member_index)
         skill = self._find_skill()
         if skill is not None and self._od_up_uses_earring():
             if not getattr(skill, "od_up_on_break", False) or self.is_break():
@@ -2601,6 +2624,13 @@ class AxleODWindow(QFrame):
                             action, i, sp, active, turn_front, limit,
                             not break_seen)
                         break_seen = True
+                    # 「自身使用EX技能后」回复SP（如 注入活力 / 开辟希望的一箭）
+                    if action.get_skill_is_ex():
+                        for mod in self._member_ex_sp(i):
+                            self._apply_scope_recover(
+                                mod.get("amount", 0), mod.get("scope"),
+                                mod.get("element"), i, sp, active,
+                                turn_front, limit)
                     action.set_sp_result(sp[i], True)
                 else:
                     # SP 不足：显示红色负值（还差多少），实际 SP 不变
@@ -2842,6 +2872,50 @@ class AxleODWindow(QFrame):
             if st.name == style:
                 return [m for m in st.turn_start_od if m.get("lb", 0) <= lb]
         return []
+
+    def _member_ex_sp(self, slot):
+        """该队员「自身使用EX技能后 回复SP」的项（风格被动 + 大师技能）。
+
+        如 注入活力（31D 六宇亚 的 SS 被动）、桐生美也大师技能 开辟希望的一箭。
+        """
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        mods = []
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                mods.extend(m for m in st.ex_sp if m.get("lb", 0) <= lb)
+                break
+        # 大师技能（默认可携带，未取消时生效）
+        selected = self._selected_passives(slot)
+        name = self.data_source.master_skill_name(role)
+        if name and (selected is None or name in selected):
+            mods.extend(self.data_source.master_ex_sp(role))
+        return mods
+
+    def _member_ex_od(self, slot):
+        """该队员「自身使用EX技能后 超频条+X%」的项（过滤未携带的「（被动技能）」）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        selected = self._selected_passives(slot)
+        mods = []
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                for mod in st.ex_od:
+                    if mod.get("lb", 0) > lb:
+                        continue
+                    req = mod.get("requires")
+                    if req and selected is not None and req not in selected:
+                        continue
+                    mods.append(mod)
+                break
+        return mods
+
+    def _member_ex_od_fraction(self, slot):
+        """使用 EX 技能时增加 OD 槽的被动，换算为「固定OD」小数（10% → 0.10）。"""
+        return sum(m.get("amount", 0.0)
+                   for m in self._member_ex_od(slot)) / 100.0
 
     def _member_turn_start_sp(self, slot):
         """风格被动里「回合开始时回复友方 SP」的项（如 与伙伴一起，满足突破要求）。"""
