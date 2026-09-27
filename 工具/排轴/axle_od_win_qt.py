@@ -66,6 +66,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
   回合窗口关闭后，可用配置窗口顶部的「打开回合窗口」按钮重新打开。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
+  **队伍为空时没有行动**（行动列表为空，也不再出现 点数援助/驱动增益 等通用技能），
+  且**不能添加回合**（「添加回合 / 追加回合 / 特殊回合」按钮禁用）。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
 - 「特殊回合」性质与追加回合一致（不计回合数/不触发回合开始/不能发动 OD），
   但**角色不限前锋**，任意队员都可行动。
@@ -1451,20 +1453,24 @@ class TurnCard(QFrame):
         self._update_controls()
 
     def required_actions(self):
-        """本回合应有的行动数：队伍 ≥3 人时为 3，否则为队伍人数。"""
+        """本回合应有的行动数：队伍 ≥3 人时为 3，否则为队伍人数（空队伍为 0）。"""
         active = len(self.owner._active_slots())
         if active <= 0:
-            return 1
+            return 0
         return min(MAX_ACTIONS_PER_TURN, active)
 
     def min_actions(self):
         """本回合最少行动数。"""
+        if not self.owner._active_slots():
+            return 0          # 队伍为空时没有行动
         if self.turn_type() in EXTRA_TURN_TYPES:
             return 1          # 追加/特殊回合可自由增删，至少保留 1 条
         return self.required_actions()
 
     def max_actions(self):
         """本回合最多行动数。"""
+        if not self.owner._active_slots():
+            return 0          # 队伍为空时没有行动
         if self.turn_type() in EXTRA_TURN_TYPES:
             return MAX_ACTIONS_PER_TURN
         return self.required_actions()
@@ -1506,7 +1512,9 @@ class TurnCard(QFrame):
                 action._populate_members()
 
     def add_action(self, data=None):
-        if len(self.actions) >= MAX_ACTIONS_PER_TURN:
+        if not self.owner._active_slots():
+            return None       # 队伍为空时没有行动
+        if len(self.actions) >= self.max_actions():
             return None
         action = ActionRow(self.owner, turn=self, data=data,
                            default_member=self._first_free_member())
@@ -1768,6 +1776,7 @@ class AxleODWindow(QFrame):
         # 用队伍行实际数据同步（含突破数/携带被动等）
         self.team = [row.to_data() for row in self.team_rows]
         self._refresh_role_choices()
+        self._update_turn_buttons()
         self.add_turn()
 
     def _default_team(self):
@@ -1843,11 +1852,15 @@ class AxleODWindow(QFrame):
             ("保存", self.save_axle),
             ("读取", self.load_axle),
         ]
+        add_buttons = []
         for text, callback in buttons:
             button = QPushButton(text)
             button.setMinimumWidth(92)
             button.clicked.connect(callback)
             bar.addWidget(button)
+            add_buttons.append(button)
+        # 前三个是「添加回合」类：空队伍时禁用
+        self.add_turn_buttons = add_buttons[:3]
         bar.addStretch(1)
         tip = QLabel("提示：队伍≥3人时每回合固定 3 人行动；点击回合选中")
         tip.setStyleSheet("color: #666666;")
@@ -2027,6 +2040,12 @@ class AxleODWindow(QFrame):
         for i, row in enumerate(self.team_rows):
             row.set_roles_enabled(used, i)
 
+    def _update_turn_buttons(self):
+        """空队伍不能添加任何回合。"""
+        ok = bool(self._active_slots())
+        for button in getattr(self, "add_turn_buttons", []):
+            button.setEnabled(ok)
+
     def _refresh_commander_choices(self):
         """指挥者只能编入一名：职业为「指挥者」的最靠前一名为指挥者，其它位置禁用指挥者风格。"""
         commander = None
@@ -2048,6 +2067,7 @@ class AxleODWindow(QFrame):
         finally:
             self._team_updating = False
         self._refresh_role_choices()
+        self._update_turn_buttons()
         for turn in self.turns:
             turn.refresh_team()
         self.recalculate()
@@ -2076,6 +2096,8 @@ class AxleODWindow(QFrame):
         return self._initial_front()
 
     def add_turn(self, data=None, turn_type=None):
+        if not self._active_slots():
+            return None       # 空队伍不能添加回合
         turn = TurnCard(self)
         turn.changed.connect(lambda t=turn: self._on_turn_changed(t))
         turn.delete_requested.connect(self._delete_turn)

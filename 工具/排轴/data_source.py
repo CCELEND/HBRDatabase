@@ -1430,6 +1430,8 @@ class HBRDataSource:
         commander=False 时表示该队员不是「指挥者」：此时不能用「指挥行动」，
         而是恢复「通常攻击」（一个队伍只能有一个指挥者）。
         """
+        if not role_name:
+            return []          # 未安排角色：没有可用技能
         styles = self.styles(role_name)
         result = []
         seen = set()
