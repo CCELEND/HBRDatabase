@@ -73,9 +73,18 @@ def click_style_element(driver, style_id, limit_break_level):
     
     try:
         style_element = driver.find_element(By.ID, brochure_id)
-        # 模拟点击 limit_break_level+1 次
+        # 图鉴网页只监听 pointerdown/pointerup。直接点击会被右侧固定栏遮挡，
+        # 而 HTMLElement.click() 不会触发网页的指针事件处理器。
         for _ in range(limit_break_level + 1):
-            style_element.click()
+            driver.execute_script("""
+                const element = arguments[0];
+                const options = {
+                    bubbles: true, cancelable: true, pointerId: 1,
+                    pointerType: 'mouse', button: 0, clientX: 0, clientY: 0
+                };
+                element.dispatchEvent(new PointerEvent('pointerdown', options));
+                element.dispatchEvent(new PointerEvent('pointerup', options));
+            """, style_element)
         # logger.info(f"[+] Successfully clicked style ID: {style_id} ({brochure_id})")
         return True
     except NoSuchElementException:
@@ -287,10 +296,14 @@ def get_brochure(driver: webdriver.Chrome, style_infos: dict):
     # 网页缩略到50%
     web_abbreviation(driver, 50)
 
-    # 点击图鉴
-    # click_brochure(driver, style_infos)
-    click_brochure_multithread(driver, style_infos, max_workers=4)
-    # click_brochure_by_chunk(driver, style_infos, thread_count=8)
+    # 同一个 WebDriver 不能由多个线程同时滚动和点击页面。
+    failed_style_ids = []
+    for style_id, info in style_infos.items():
+        if not click_style_element(driver, style_id, int(info["limit_break_level"])):
+            failed_style_ids.append(style_id)
+    if failed_style_ids:
+        logger.warning("图鉴中未能设置的风格 ID: %s", ", ".join(failed_style_ids))
+        print("[!] 图鉴中未能设置的风格 ID: " + ", ".join(failed_style_ids))
 
     # 下载图鉴
     download_brochure(driver)
