@@ -399,6 +399,10 @@ class StyleInfo:
         # 等级6 时「回合开始时若位于前锋则自身SP上升N」。
         # {"name","element","amount","front_only","level","lb"}；无则 None
         self.sigil = None
+        # 「共鸣天赋」（如 神圣恩典）：{"name","type","levels":{0..4: 文本}}；无则 None
+        self.resonance = None
+        # 所属队伍（如 31D），取自 style_info
+        self.team = None
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -844,6 +848,27 @@ def _parse_sigil(style_data):
     return None
 
 
+def resonance_od_effect(text):
+    """从「共鸣天赋」某一等级的文本里解析 OD 相关效果。
+
+    返回 {"kind": "turn_start"/"break", "amount": float, "position": "front"/None}
+    或 None（非 OD 相关）。
+    """
+    text = str(text or "")
+    if "超频条" not in text:
+        return None
+    m = re.search(r'超频条\+(\d+(?:\.\d+)?)%', text)
+    if not m:
+        return None
+    amount = float(m.group(1))
+    if "击破" in text or "破盾" in text:
+        return {"kind": "break", "amount": amount, "position": None}
+    if "回合开始时" in text:
+        return {"kind": "turn_start", "amount": amount,
+                "position": "front" if "位于前锋" in text else None}
+    return None
+
+
 class HBRDataSource:
     """本地角色资料读取器（带缓存）。"""
 
@@ -856,6 +881,7 @@ class HBRDataSource:
         self._master_name = {}      # {role_name: 大师技能名}
         self._master_action = {}    # {role_name: 可主动释放的大师技能 SkillInfo}
         self._role_team = {}        # {role_name: 队伍}
+        self._resonance_pool = None  # {名称: 共鸣天赋}
 
     def _teams_path(self):
         return os.path.join(self.base_dir, "角色", "teams.json")
@@ -1260,6 +1286,19 @@ class HBRDataSource:
                     for sk in skills)
                 # 「X之印记」（雷之印 / 冰之印…）
                 styles[-1].sigil = _parse_sigil(style_data)
+                # 所属队伍（如 31D）
+                styles[-1].team = (str(style_info[1])
+                                   if len(style_info) > 1 and style_info[1]
+                                   else None)
+                # 「共鸣天赋」（如 神圣恩典）
+                res = style_data.get("resonance")
+                if isinstance(res, dict) and res.get("name"):
+                    styles[-1].resonance = {
+                        "name": str(res.get("name")),
+                        "type": list(res.get("type") or []),
+                        "levels": {str(k): str(res.get(str(k)) or "")
+                                   for k in range(5)},
+                    }
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
@@ -1278,6 +1317,42 @@ class HBRDataSource:
             if style.name == style_name:
                 return style.skills
         return []
+
+    def resonance_pool(self):
+        """全部「共鸣天赋」（按名称去重），供队伍配置里更换：{名称: 定义}。
+
+        定义里额外带：
+          * "owners"：拥有该天赋的风格元素集合（未知元素不计）；
+          * "element"：只有一个所属元素时为其元素，否则 None（不限属性）；
+          * "team"：所属队伍（如 31D），多个时取 None。
+        """
+        if self._resonance_pool is not None:
+            return self._resonance_pool
+        pool = {}
+        owners = {}
+        teams = {}
+        for role in self.role_names():
+            for st in self.styles(role):
+                res = getattr(st, "resonance", None)
+                if not res or not res.get("name"):
+                    continue
+                name = res["name"]
+                if name not in pool:
+                    pool[name] = dict(res)
+                    owners[name] = set()
+                    teams[name] = set()
+                # 元素未知的风格视为「无」属性（无 是一个独立属性）
+                owners[name].add(st.element or "无")
+                if getattr(st, "team", None):
+                    teams[name].add(st.team)
+        for name, elements in owners.items():
+            pool[name]["owners"] = sorted(elements)
+            pool[name]["element"] = (next(iter(elements))
+                                     if len(elements) == 1 else None)
+            pool[name]["team"] = (next(iter(teams[name]))
+                                  if len(teams[name]) == 1 else None)
+        self._resonance_pool = pool
+        return pool
 
     def available_skills(self, role_name, style_name):
         """该角色当前可用的技能列表。

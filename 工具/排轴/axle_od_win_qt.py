@@ -13,7 +13,7 @@
 界面：
     * 队伍配置：6 个位置，各选择角色与风格。
     * 排轴：每个回合最多 3 次行动，每次行动选择队员、技能，并配置
-      该次行动的 OD 参数（原始Hit数 / 连击数 / 固定OD / 31X共鸣 / OD耳环）。
+      该次行动的 OD 参数（原始Hit数 / 连击数 / 固定OD / 31X共鸣(=共鸣天赋) / OD耳环）。
     * 全局战斗设置：敌人数量、抗性、其他OD增量、敌方OD率。
     * 按公式实时计算每个回合的 OD 与累计总 OD。
     * SP：参考 https://www.hbr-tool.com/#/simulator 模拟每名队员的 SP。
@@ -42,7 +42,8 @@ from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_to
 
 from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
 from 工具.排轴.data_source import (
-    get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS)
+    get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
+    resonance_od_effect)
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -58,8 +59,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 
 【排轴】
 - 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数、
-  31X共鸣、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
-  31X共鸣 / OD耳环 按角色设置（31X共鸣仅在勾选「击破敌人」的行动中生效；
+  共鸣天赋（含等级）、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
+  共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在勾选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
@@ -96,7 +97,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 - HIT OD = (原始Hit + 连击数) × ROUNDDOWN(2.5×总系数×敌方OD率, 2) × 敌人数量 × (抗性?0:1)
 - 固定OD = ROUNDDOWN(固定OD×100×总系数, 2) + ROUNDDOWN(31X共鸣×100×总系数, 2)
 - 总系数 = 耳环系数 + 其他OD增量
-- 通常攻击不享受 OD 耳环加成；通常攻击视为「无属性」。
+- 通常攻击不享受 OD 耳环加成、**不计连击**；通常攻击视为「无属性」。
 - 抗性可按属性勾选（含「无」）：行动的攻击元素（技能元素 → 角色风格元素 → 无）被抗性时，
   该次 HIT OD 记 0。
 - 「OD条下降 X%」为该次行动 OD 的固定扣减（如 50% → −50，可为负）。
@@ -138,6 +139,13 @@ HELP_TEXT = """排轴OD计算 使用说明
   依赖印记等级的效果也按等级结算：如 冰岚之进击（冰之印≥6 → 全体友方 SP+5，出击中限1次）、
   猛火进击（火之印≥6 → 全体友方 SP+5，出击中限1次）、
   暮色中升腾绽放的幻影（火之印≥4 → SP消耗减半 16→8）。
+- 「共鸣天赋」（相当于角色的装备，也就是队伍配置里的这一项，对应计算表的 **B19 31X共鸣**）：
+  **只有 SSR 风格才能配置**；每个位置可选（默认 = 风格自带、或无），**等级可自由选择（0~4）**。
+  列表里标明**所属队伍**（如 神圣恩典（31D·冰））。
+  **只有与风格属性（火/冰/雷/光/暗/无）相同的天赋才能选**（被多属性风格共用的团队天赋不限属性）。
+  「**无**」是独立属性：无属性风格只能配无属性天赋，其它属性风格也不能配无属性天赋。
+  排轴只结算与 OD 相关的效果：如 神圣恩典（回合开始时位于前锋 → 超频条 +5/6/7/8/10%，计入回合开始OD）、
+  Excelsior!（自身攻击击破敌人时 超频条 +12/14/16/18/20%，勾选击破敌人时作为 B19 计入该次行动）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
   「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算。
@@ -311,6 +319,19 @@ def _build_action_header():
 # ======================================================================
 # 队伍成员
 # ======================================================================
+def _talent_element_ok(need, element):
+    """共鸣天赋的属性是否与风格属性相符。
+
+    「无」是一个独立属性：无属性风格只能配无属性天赋，其它属性风格也不能配无属性天赋。
+    need 为 None 表示该天赋被多属性风格共用（不限属性）。
+    """
+    if need is None:
+        return True
+    if need == "无":
+        return element is None
+    return element is not None and need in element
+
+
 class TeamMemberRow(QFrame):
     """队伍中的一个位置：角色 + 风格。"""
 
@@ -324,6 +345,7 @@ class TeamMemberRow(QFrame):
         self._block_role_signal = False
         self._build_ui()
         self._populate_styles()
+        self._populate_talents()
 
     def _build_ui(self):
         layout = QHBoxLayout(self)
@@ -347,6 +369,9 @@ class TeamMemberRow(QFrame):
         self.style_combo.currentTextChanged.connect(self._on_style_changed)
         self.style_combo.currentTextChanged.connect(
             lambda text: self.style_combo.setToolTip(text))
+        self.style_combo.currentTextChanged.connect(
+            lambda *a: (self._refresh_talent_enabled(),
+                        self._update_talent_tip()))
         layout.addWidget(self.style_combo)
 
         # 「（被动技能）」选择：配置时携带，之后所有回合都生效
@@ -372,14 +397,21 @@ class TeamMemberRow(QFrame):
         self.lb_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.lb_spin)
 
-        res_label = QLabel("31X共鸣")
-        res_label.setFixedWidth(52)
+        # 「共鸣天赋」（相当于装备）：默认使用风格自带的；等级可自由选择（0~4）
+        res_label = QLabel("共鸣天赋")
+        res_label.setFixedWidth(56)
         layout.addWidget(res_label)
-        self.resonance_spin = _make_double_spin(0.0, 100.0, 0.01, 2, 0.0, 56)
-        self.resonance_spin.setToolTip(
-            "该角色的 31X 共鸣（仅在勾选「击破敌人」的行动中生效）")
-        self.resonance_spin.valueChanged.connect(self._emit_changed)
-        layout.addWidget(self.resonance_spin)
+        self.talent_combo = QComboBox()
+        self.talent_combo.setFixedWidth(170)
+        self.talent_combo.currentIndexChanged.connect(self._on_talent_changed)
+        layout.addWidget(self.talent_combo)
+        self.talent_lb = QSpinBox()
+        self.talent_lb.setRange(0, 4)
+        self.talent_lb.setValue(4)
+        self.talent_lb.setFixedWidth(46)
+        self.talent_lb.setToolTip("共鸣天赋等级（0~4，可自由选择）")
+        self.talent_lb.valueChanged.connect(self._on_talent_changed)
+        layout.addWidget(self.talent_lb)
 
         ear_label = QLabel("OD耳环")
         ear_label.setFixedWidth(48)
@@ -391,6 +423,127 @@ class TeamMemberRow(QFrame):
         layout.addWidget(self.earring_spin)
 
         self._selected_passives = None   # None = 全部携带
+
+    def _on_talent_changed(self, *args):
+        self._update_talent_tip()
+        self._emit_changed()
+
+    def _populate_talents(self):
+        """填充「共鸣天赋」下拉：（默认）= 风格自带、无、以及全部天赋（标明所属队伍）。"""
+        prev = self.talent_combo.currentData() if self.talent_combo.count() else None
+        pool = self.data_source.resonance_pool()
+        with self._suspended():
+            self.talent_combo.clear()
+            self.talent_combo.addItem("（默认）", None)
+            self.talent_combo.addItem("无", "")
+            for name in sorted(pool.keys()):
+                entry = pool[name]
+                tags = "·".join(t for t in (entry.get("team"),
+                                            entry.get("element")) if t)
+                text = "%s（%s）" % (name, tags) if tags else name
+                self.talent_combo.addItem(text, name)
+                self.talent_combo.setItemData(
+                    self.talent_combo.count() - 1,
+                    "所属队伍：%s\n属性：%s" % (entry.get("team") or "—",
+                                                entry.get("element") or "不限"),
+                    Qt.ToolTipRole)
+            pos = self.talent_combo.findData(prev)
+            self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
+        self._refresh_talent_enabled()
+        self._update_talent_tip()
+
+    def _style_element(self):
+        """当前风格的元素属性（火/冰/雷/光/暗/无…）。"""
+        role = self.role()
+        style = self.style()
+        if not role:
+            return None
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return st.element
+        return None
+
+    def _style_rarity(self):
+        """当前风格的稀有度（SSR/SS/S/A）。"""
+        role = self.role()
+        style = self.style()
+        if not role:
+            return None
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return st.rarity
+        return None
+
+    def _refresh_talent_enabled(self):
+        """只有 SSR 风格才能配置共鸣天赋；且天赋属性需与风格相同。"""
+        if self.talent_combo.count() == 0:
+            return
+        is_ssr = (self._style_rarity() == "SSR")
+        self.talent_combo.setEnabled(is_ssr)
+        self.talent_lb.setEnabled(is_ssr)
+        element = self._style_element()
+        pool = self.data_source.resonance_pool()
+        model = self.talent_combo.model()
+        for i in range(self.talent_combo.count()):
+            name = self.talent_combo.itemData(i)
+            item = model.item(i)
+            if item is None:
+                continue
+            if name is None or name == "":
+                item.setEnabled(is_ssr)
+                continue
+            need = (pool.get(name) or {}).get("element")
+            item.setEnabled(is_ssr and _talent_element_ok(need, element))
+        # 当前选择不合法时回到「（默认）」
+        cur = model.item(self.talent_combo.currentIndex())
+        if cur is not None and not cur.isEnabled():
+            self.talent_combo.setCurrentIndex(0)
+
+    def talent(self):
+        """所选共鸣天赋名：None = 用风格自带的；"" = 不装备。"""
+        if self.talent_combo.count() == 0:
+            return None
+        return self.talent_combo.currentData()
+
+    def talent_level(self):
+        """所选共鸣天赋等级（0~4，可自由选择）。"""
+        return self.talent_lb.value()
+
+    def _update_talent_tip(self):
+        """提示里显示所选共鸣天赋在当前等级下的效果。"""
+        name = self.talent()
+        level = self.talent_level()
+        pool = self.data_source.resonance_pool()
+        if name is None:      # （默认）：取风格自带
+            res = self._own_resonance()
+        elif name == "":
+            res = None
+        else:
+            res = pool.get(name)
+        if not res:
+            self.talent_combo.setToolTip(
+                "共鸣天赋（相当于装备）：只有 SSR 风格才能配置；等级可自由选择（0~4）"
+                if self._style_rarity() != "SSR" else
+                "共鸣天赋（相当于装备）；等级可自由选择（0~4）")
+            return
+        entry = pool.get(res.get("name")) or {}
+        text = res.get("levels", {}).get(str(level), "")
+        self.talent_combo.setToolTip(
+            "共鸣天赋：%s（%s）\n所属队伍：%s\n属性：%s\nLv%d：%s" % (
+                res.get("name", name), name if name else "（默认）",
+                entry.get("team") or "—",
+                entry.get("element") or "不限", level, text))
+
+    def _own_resonance(self):
+        """当前风格的共鸣天赋（无则 None）。"""
+        role = self.role()
+        style = self.style()
+        if not role:
+            return None
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return getattr(st, "resonance", None)
+        return None
 
     @contextmanager
     def _suspended(self):
@@ -539,7 +692,8 @@ class TeamMemberRow(QFrame):
         return {"role": self.role(), "style": self.style(),
                 "passives": self.selected_passives(),
                 "lb": self.lb_spin.value(),
-                "resonance_31x": self.resonance_spin.value(),
+                "resonance_talent": self.talent(),
+                "resonance_level": self.talent_level(),
                 "od_earring": self.earring_spin.value()}
 
     def set_data(self, data):
@@ -550,9 +704,8 @@ class TeamMemberRow(QFrame):
                 self._selected_passives = None
             if "lb" in data:
                 self.lb_spin.setValue(int(data.get("lb") or 0))
-            self.resonance_spin.setValue(
-                float(data.get("resonance_31x", 0) or 0))
             self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
+            self.talent_lb.setValue(int(data.get("resonance_level", 4) or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
             self._populate_styles(preserve=data.get("style", ""))
@@ -560,7 +713,13 @@ class TeamMemberRow(QFrame):
             pos = self.style_combo.findData(style) if style else -1
             if pos >= 0:
                 self.style_combo.setCurrentIndex(pos)
+            # 共鸣天赋：None = （默认）；"" = 无；否则为天赋名
+            tal = data.get("resonance_talent", None)
+            tpos = self.talent_combo.findData(tal)
+            self.talent_combo.setCurrentIndex(tpos if tpos >= 0 else 0)
             self._populate_passives()
+        self._refresh_talent_enabled()
+        self._update_talent_tip()
 
 
 # ======================================================================
@@ -828,6 +987,8 @@ class ActionRow(QFrame):
             else:
                 # 无 Hit 信息的技能（非通常攻击）原始Hit 记 0
                 self.base_hits_spin.setValue(0)
+            # 通常攻击不计连击：禁用「连击」输入框
+            self.combo_spin.setEnabled(not bool(skill.is_normal_attack))
 
     # ------------------------------------------------------------- helpers
     def is_normal_attack(self):
@@ -835,7 +996,7 @@ class ActionRow(QFrame):
         return bool(skill and skill.is_normal_attack)
 
     def _member_setting(self, key, default):
-        """该行动角色在「队伍配置」里的设置（如 31X共鸣 / OD耳环）。"""
+        """该行动角色在「队伍配置」里的设置（如 共鸣天赋 / OD耳环）。"""
         team = self.owner.team if self.owner is not None else []
         if not team:
             return default
@@ -849,16 +1010,19 @@ class ActionRow(QFrame):
                     and getattr(skill, "od_earring_exempt", False))
 
     def get_od_skill(self):
-        # 31X共鸣 / OD耳环 在队伍配置里按角色设置，作用于该角色的所有回合；
-        # 31X共鸣仅在「攻击击破敌人」（勾选击破敌人）时生效
+        # 共鸣天赋（B19 31X共鸣）与 OD耳环 在队伍配置里按角色设置；
+        # 共鸣天赋的「击破敌人时 超频条+N%」仅在勾选击破敌人时生效
         earring = float(self._member_setting("od_earring", 1.0) or 0)
-        if self.is_normal_attack() or self._od_earring_exempt():
+        is_normal = self.is_normal_attack()
+        if is_normal or self._od_earring_exempt():
             earring = 0.0
+        # 通常攻击不计连击
+        combo = 0.0 if is_normal else float(self.combo_spin.value())
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
-            combo_count=self.combo_spin.value(),
+            combo_count=combo,
             fixed_od=self.fixed_od_spin.value(),
-            resonance_31x=(float(self._member_setting("resonance_31x", 0.0) or 0)
+            resonance_31x=(self.owner._member_resonance_break(self.member_index)
                            if self.is_break() else 0.0),
             od_earring=earring,
         )
@@ -1503,7 +1667,8 @@ class AxleODWindow(QFrame):
             self.team = self._default_team()
         except Exception as e:
             logger.warning("初始化默认队伍失败: %s", e)
-            self.team = [{"role": "", "style": "", "resonance_31x": 0.0,
+            self.team = [{"role": "", "style": "", "resonance_talent": None,
+                          "resonance_level": 4,
                           "od_earring": 1.0} for _ in range(TEAM_SIZE)]
         self.turns = []
         self.team_rows = []
@@ -1523,7 +1688,8 @@ class AxleODWindow(QFrame):
             role = roles[i] if i < len(roles) else ""
             styles = self.data_source.styles_names(role) if role else []
             team.append({"role": role, "style": styles[0] if styles else "",
-                         "resonance_31x": 0.0, "od_earring": 1.0})
+                         "resonance_talent": None, "resonance_level": 4,
+                         "od_earring": 1.0})
         return team
 
     # ------------------------------------------------------------------ UI
@@ -1611,7 +1777,7 @@ class AxleODWindow(QFrame):
             row.set_data(self.team[i])
             row.changed.connect(self._on_team_changed)
             self.team_rows.append(row)
-            # 单列 6 行：每行含 31X共鸣 / OD耳环，宽度可控
+            # 单列 6 行：每行含 共鸣天赋 / OD耳环，宽度可控
             layout.addWidget(row, i, 0)
         return group
 
@@ -2020,6 +2186,18 @@ class AxleODWindow(QFrame):
                     if mod.get("once", True):
                         od_gain_used.add(slot)
                     break
+
+            # 「共鸣天赋」的回合开始 OD（如 神圣恩典：位于前锋 则超频条+N%），
+            # 每回合都生效（与「出击中1次」的被动无关）
+            if starts_turn:
+                for slot in self._active_slots():
+                    res_od = self._member_resonance_od(slot)
+                    if res_od is None:
+                        continue
+                    if (res_od.get("position") == "front"
+                            and slot not in start_front):
+                        continue
+                    turn_bonus += res_od.get("amount", 0.0)
 
             # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗（上限 300）
             # 「本回合OD」只统计本回合行动；因此 回合开始OD + 本回合OD = 当前OD
@@ -2528,6 +2706,59 @@ class AxleODWindow(QFrame):
             if st.name == style:
                 return [m for m in st.break_od if m.get("lb", 0) <= lb]
         return []
+
+    def _member_resonance_break(self, slot):
+        """共鸣天赋里「击破敌人时 超频条+N%」的项，换算为 B19 的 31X共鸣小数。"""
+        res = self._member_resonance(slot)
+        if not res:
+            return 0.0
+        eff = resonance_od_effect(res.get("text"))
+        if eff and eff.get("kind") == "break":
+            return eff.get("amount", 0.0) / 100.0
+        return 0.0
+
+    def _member_resonance(self, slot):
+        """该队员当前生效的「共鸣天赋」（含等级）。
+
+        只有 **SSR** 风格才能配置；选择「（默认）」时用风格自带的，否则用所选天赋。
+        返回 {"name","type","levels","level","text"} 或 None。
+        """
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        style_info = None
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                style_info = st
+                break
+        if style_info is None or style_info.rarity != "SSR":
+            return None          # 只有 SSR 风格才能配置共鸣天赋
+        choice = self.team[slot].get("resonance_talent", None)
+        if choice == "":
+            return None
+        res = self.data_source.resonance_pool().get(choice) if choice else None
+        if res is not None and not _talent_element_ok(res.get("element"),
+                                                     style_info.element):
+            return None          # 属性不符，不能配置
+        if res is None:
+            res = getattr(style_info, "resonance", None)
+        if not res:
+            return None
+        level = int(self.team[slot].get("resonance_level", 4) or 0)
+        level = max(0, min(4, level))
+        levels = dict(res.get("levels") or {})
+        return {"name": res.get("name"), "type": list(res.get("type") or []),
+                "levels": levels, "level": level,
+                "text": levels.get(str(level), "")}
+
+    def _member_resonance_od(self, slot):
+        """共鸣天赋里「回合开始时位于前锋 则超频条+N%」的项（无则 None）。"""
+        res = self._member_resonance(slot)
+        if not res:
+            return None
+        eff = resonance_od_effect(res.get("text"))
+        if eff and eff.get("kind") == "turn_start":
+            return eff
+        return None
 
     def _member_break_od_fraction(self, slot):
         """击破敌人时增加 OD 槽的被动，换算为「固定OD」小数（25% → 0.25）。"""

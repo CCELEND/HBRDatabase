@@ -8,7 +8,8 @@
         "红宝石香水（被动技能）"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -18,7 +19,8 @@
         "彩凤连理"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -26,7 +28,8 @@
       "style": "CODE:Virtual Killer",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.18,
+      "resonance_talent": "Excelsior!",
+      "resonance_level": 3,
       "od_earring": 1.0
     },
     {
@@ -34,7 +37,8 @@
       "style": "出浴后的朦胧天地",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -44,7 +48,8 @@
         "交织而成的记忆"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -55,7 +60,8 @@
         "BeatDown();"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     }
   ],

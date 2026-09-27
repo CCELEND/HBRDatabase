@@ -6,7 +6,8 @@
       "style": "冲锋！突刺！金枪鱼！",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -16,7 +17,8 @@
         "交织而成的记忆"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -24,7 +26,8 @@
       "style": "秘密特工·摧毁",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -34,7 +37,8 @@
         "温泉通行木牌（被动技能）"
       ],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -42,7 +46,8 @@
       "style": "",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     },
     {
@@ -50,7 +55,8 @@
       "style": "",
       "passives": [],
       "lb": 4,
-      "resonance_31x": 0.0,
+      "resonance_talent": null,
+      "resonance_level": 4,
       "od_earring": 1.0
     }
   ],
