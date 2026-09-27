@@ -1322,8 +1322,8 @@ class HBRDataSource:
         """全部「共鸣天赋」（按名称去重），供队伍配置里更换：{名称: 定义}。
 
         定义里额外带：
-          * "owners"：拥有该天赋的风格元素集合（未知元素不计）；
-          * "element"：只有一个所属元素时为其元素，否则 None（不限属性）；
+          * "owners"：**可装备该天赋的属性**（拥有该天赋的风格元素；未知元素记为「无」）。
+            没有「不限属性」这种说法——SSR 只能装备与自身属性相同的共鸣天赋。
           * "team"：所属队伍（如 31D），多个时取 None。
         """
         if self._resonance_pool is not None:
@@ -1347,8 +1347,6 @@ class HBRDataSource:
                     teams[name].add(st.team)
         for name, elements in owners.items():
             pool[name]["owners"] = sorted(elements)
-            pool[name]["element"] = (next(iter(elements))
-                                     if len(elements) == 1 else None)
             pool[name]["team"] = (next(iter(teams[name]))
                                   if len(teams[name]) == 1 else None)
         self._resonance_pool = pool

@@ -142,8 +142,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 「共鸣天赋」（相当于角色的装备，也就是队伍配置里的这一项，对应计算表的 **B19 31X共鸣**）：
   **只有 SSR 风格才能配置**；每个位置可选（默认 = 风格自带、或无），**等级可自由选择（0~4）**。
   列表里标明**所属队伍**（如 神圣恩典（31D·冰））。
-  **只有与风格属性（火/冰/雷/光/暗/无）相同的天赋才能选**（被多属性风格共用的团队天赋不限属性）。
-  「**无**」是独立属性：无属性风格只能配无属性天赋，其它属性风格也不能配无属性天赋。
+  **只有与风格属性（火/冰/雷/光/暗/无）相同的天赋才能选**（没有「不限属性」——
+  团队天赋也按其所属风格的属性判定；「无」是独立属性）。
   排轴只结算与 OD 相关的效果：如 神圣恩典（回合开始时位于前锋 → 超频条 +5/6/7/8/10%，计入回合开始OD）、
   Excelsior!（自身攻击击破敌人时 超频条 +12/14/16/18/20%，勾选击破敌人时作为 B19 计入该次行动）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
@@ -319,17 +319,19 @@ def _build_action_header():
 # ======================================================================
 # 队伍成员
 # ======================================================================
-def _talent_element_ok(need, element):
-    """共鸣天赋的属性是否与风格属性相符。
+def _talent_element_ok(allowed, element):
+    """共鸣天赋的属性是否与风格属性相符（**没有**「不限属性」这种说法）。
 
-    「无」是一个独立属性：无属性风格只能配无属性天赋，其它属性风格也不能配无属性天赋。
-    need 为 None 表示该天赋被多属性风格共用（不限属性）。
+    allowed 为该天赋**可装备的属性集合**（即拥有该天赋的风格元素；「无」是独立属性）；
+    风格属性 element 为 None 时视为「无」；双属性风格（如「冰雷」）任一属性相同即可。
     """
-    if need is None:
+    if not allowed:
+        return False
+    if not element:
+        return "无" in allowed
+    if element in allowed:
         return True
-    if need == "无":
-        return element is None
-    return element is not None and need in element
+    return any(ch in allowed for ch in element)
 
 
 class TeamMemberRow(QFrame):
@@ -438,14 +440,14 @@ class TeamMemberRow(QFrame):
             self.talent_combo.addItem("无", "")
             for name in sorted(pool.keys()):
                 entry = pool[name]
-                tags = "·".join(t for t in (entry.get("team"),
-                                            entry.get("element")) if t)
+                attrs = "/".join(entry.get("owners") or [])
+                tags = "·".join(t for t in (entry.get("team"), attrs) if t)
                 text = "%s（%s）" % (name, tags) if tags else name
                 self.talent_combo.addItem(text, name)
                 self.talent_combo.setItemData(
                     self.talent_combo.count() - 1,
                     "所属队伍：%s\n属性：%s" % (entry.get("team") or "—",
-                                                entry.get("element") or "不限"),
+                                                attrs or "—"),
                     Qt.ToolTipRole)
             pos = self.talent_combo.findData(prev)
             self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
@@ -492,8 +494,8 @@ class TeamMemberRow(QFrame):
             if name is None or name == "":
                 item.setEnabled(is_ssr)
                 continue
-            need = (pool.get(name) or {}).get("element")
-            item.setEnabled(is_ssr and _talent_element_ok(need, element))
+            allowed = (pool.get(name) or {}).get("owners") or []
+            item.setEnabled(is_ssr and _talent_element_ok(allowed, element))
         # 当前选择不合法时回到「（默认）」
         cur = model.item(self.talent_combo.currentIndex())
         if cur is not None and not cur.isEnabled():
@@ -532,7 +534,7 @@ class TeamMemberRow(QFrame):
             "共鸣天赋：%s（%s）\n所属队伍：%s\n属性：%s\nLv%d：%s" % (
                 res.get("name", name), name if name else "（默认）",
                 entry.get("team") or "—",
-                entry.get("element") or "不限", level, text))
+                "/".join(entry.get("owners") or []) or "—", level, text))
 
     def _own_resonance(self):
         """当前风格的共鸣天赋（无则 None）。"""
@@ -2736,7 +2738,7 @@ class AxleODWindow(QFrame):
         if choice == "":
             return None
         res = self.data_source.resonance_pool().get(choice) if choice else None
-        if res is not None and not _talent_element_ok(res.get("element"),
+        if res is not None and not _talent_element_ok(res.get("owners") or [],
                                                      style_info.element):
             return None          # 属性不符，不能配置
         if res is None:
