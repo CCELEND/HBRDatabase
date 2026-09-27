@@ -258,7 +258,8 @@ class SkillInfo:
                  od_down_fixed=0.0, is_exclusive=False, od_up_fixed=0.0,
                  sp_cost_alt=None, sp_cost_cond=None, od_up_on_break=False,
                  od_up_earring=False, sp_recover_extra=0,
-                 sp_recover_extra_team=None, od_earring_exempt=False):
+                 sp_recover_extra_team=None, od_earring_exempt=False,
+                 sp_cost_sigil_element=None, sp_cost_sigil_min=None):
         self.name = name
         self.hits = hits                              # 技能原始Hit数，攻击技能才有
         self.element = element                        # 攻击效果的元素属性
@@ -285,9 +286,13 @@ class SkillInfo:
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
         self.sp_cost_note = sp_cost_note              # SP 原始写法（用于展示）
         # 有条件的 SP 消耗（如「存在处于倒地/超倒地状态的敌人时 SP消耗为0」）：
-        # sp_cost_alt 为满足条件时的消耗，sp_cost_cond 为条件类型（目前仅 "downed"）
+        # sp_cost_alt 为满足条件时的消耗，sp_cost_cond 为条件类型
+        # （"downed" / "extra" / "sigil"）
         self.sp_cost_alt = sp_cost_alt
         self.sp_cost_cond = sp_cost_cond
+        # cond == "sigil" 时：需「X之印等级为 N 或以上」（如 火之印≥4 时 SP消耗减半）
+        self.sp_cost_sigil_element = sp_cost_sigil_element
+        self.sp_cost_sigil_min = sp_cost_sigil_min
         self.sp_recover = sp_recover or 0             # 回复 SP 量
         # 回复范围：self/all/others/front/front_others/others_element/all_element
         self.sp_recover_scope = sp_recover_scope
@@ -390,6 +395,10 @@ class StyleInfo:
         self.follow_up_switch = None
         # 该风格是否用「指挥行动」取代普通攻击（此时不能使用通常攻击）
         self.no_normal_attack = False
+        # 「X之印记」（如 雷之印 / 冰之印）：按初战开始时同属性风格数量决定等级，
+        # 等级6 时「回合开始时若位于前锋则自身SP上升N」。
+        # {"name","element","amount","front_only","level","lb"}；无则 None
+        self.sigil = None
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -528,6 +537,8 @@ def _extract_skill_inner(group):
     desc = ""
     sp_cost_alt = None
     sp_cost_cond = None
+    sp_cost_sigil_element = None
+    sp_cost_sigil_min = None
     od_up_on_break = False
     try:
         name = group[0][0]
@@ -547,6 +558,14 @@ def _extract_skill_inner(group):
                 # 追加回合内 SP 消耗减半等（如 苍焰螺旋 7(14)）
                 sp_cost_alt = min(nums)
                 sp_cost_cond = "extra"
+            elif "SP消耗" in desc:
+                # 「X之印等级为 N 或以上时 SP消耗减半」（如 暮色中升腾绽放的幻影）
+                m = re.search(r'(\S)之印等级为(\d+)或以上', desc)
+                if m:
+                    sp_cost_alt = min(nums)
+                    sp_cost_cond = "sigil"
+                    sp_cost_sigil_element = m.group(1)
+                    sp_cost_sigil_min = int(m.group(2))
     except Exception:
         name = "?"
 
@@ -612,7 +631,9 @@ def _extract_skill_inner(group):
                      sp_break_recover, sp_break_scope, element=attack_element,
                      od_down_fixed=od_down_fixed, od_up_fixed=od_up_fixed,
                      sp_cost_alt=sp_cost_alt, sp_cost_cond=sp_cost_cond,
-                     od_up_on_break=od_up_on_break)
+                     od_up_on_break=od_up_on_break,
+                     sp_cost_sigil_element=sp_cost_sigil_element,
+                     sp_cost_sigil_min=sp_cost_sigil_min)
 
 
 def _extract_skills(group):
@@ -758,6 +779,69 @@ def _parse_follow_up(style_data, skills):
                 follow_up_switch = {"requires": requires, "skill": sk}
                 break
     return follow_up, follow_up_sp, follow_up_switch
+
+
+def _parse_sigil(style_data):
+    """解析「X之印」被动（如 雷之印 / 冰之印 / 火之印）。
+
+    等级由「初战开始时」同属性风格的数量决定；等级 6 的效果为
+    「回合开始时若位于前锋则自身 SP 上升 N」。
+    印记有两种来源：
+      * PassiveSkills 里 type 为「X之印记」的（常驻生效）；
+      * ActiveSkills 里的「X之印（被动技能）」条目（需在队伍配置里携带）。
+    返回 {"name","element","amount","front_only","level","lb"[,"requires"]} 或 None。
+    """
+    # 1) PassiveSkills 里的「X之印记」（常驻）
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            pvalue = str(passive[4]) if len(passive) > 4 else ""
+        except Exception:
+            continue
+        if not ptype.endswith("之印记"):
+            continue
+        element = ptype[:-3]
+        m = re.search(r'等级6[：:]([^\n]*)', pvalue)
+        amount = 1
+        front_only = True
+        if m:
+            seg = m.group(1)
+            num = re.search(r'SP上升(\d+)', seg)
+            amount = int(num.group(1)) if num else 1
+            front_only = "位于前锋" in seg
+        return {
+            "name": pname,
+            "element": element,
+            "amount": amount,
+            "front_only": front_only,
+            "level": 6,
+            "lb": _passive_lb(passive),
+        }
+    # 2) ActiveSkills 里的「X之印（被动技能）」（需携带）
+    for group in (style_data.get("ActiveSkills") or []):
+        try:
+            gname = str(group[0][0])
+            gdesc = str(group[0][1])
+        except Exception:
+            continue
+        if "（被动技能）" not in gname and "(被动技能)" not in gname:
+            continue
+        if "之印" not in gdesc:
+            continue
+        m = re.search(r'赋予(\S)属性风格', gdesc)
+        if not m:
+            continue
+        return {
+            "name": gname,
+            "element": m.group(1),
+            "amount": 1,
+            "front_only": True,
+            "level": 6,
+            "lb": 0,
+            "requires": gname,
+        }
+    return None
 
 
 class HBRDataSource:
@@ -997,11 +1081,14 @@ class HBRDataSource:
                         continue          # 已由 front_sp_passives 处理
                     # 敌人处于倒地/被击破状态的回合开始时条件（如 算法）
                     downed_cond = "被击破的敌人" in pdesc
-                    if not (downed_cond or extra_only) and not _sp_condition_ok(pdesc):
-                        continue
-                    if (not downed_cond
-                            and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
-                        continue
+                    # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
+                    sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
+                    if sig is None:
+                        if not (downed_cond or extra_only) and not _sp_condition_ok(pdesc):
+                            continue
+                        if (not downed_cond
+                                and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
+                            continue
                     num = re.search(r'\d+', str(pvalue))
                     scope_info = _sp_recover_scope(ptarget)
                     if not num or not scope_info:
@@ -1025,6 +1112,8 @@ class HBRDataSource:
                         "downed": downed_cond,
                         "extra": extra_only,
                         "once": "1次" in pdesc,
+                        "sigil_element": sig.group(1) if sig else None,
+                        "sigil_min_level": int(sig.group(2)) if sig else None,
                         "lb": _passive_lb(passive),
                     })
                 # 检测「高阶增幅状态」的启用被动（如 红宝石香水（被动技能））；
@@ -1169,6 +1258,8 @@ class HBRDataSource:
                     sk.name == "指挥行动" or "取代普通攻击" in (sk.desc or "")
                     or "取代通常攻击" in (sk.desc or "")
                     for sk in skills)
+                # 「X之印记」（雷之印 / 冰之印…）
+                styles[-1].sigil = _parse_sigil(style_data)
 
         _apply_exclusive(styles)
         _share_style_forms(styles)

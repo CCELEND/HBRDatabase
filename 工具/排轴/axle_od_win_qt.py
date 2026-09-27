@@ -131,6 +131,13 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 第 1 回合前锋 = 队伍配置前 3 人；之后 = 上一回合行动的队员。
 - 回合开始：基础回复（前锋/后卫）+ 风格被动的前锋SP（闪光/佳音/机敏/俊敏…，需满足突破数）；
   以及「回合开始时回复友方SP」的被动（如 与伙伴一起【朝仓可怜专属】：除自身外全体友方 SP+1）。
+- 「X之印」（雷之印/冰之印/火之印…）：等级 = **初战开始时同属性风格的数量**，
+  满 6 级时该属性风格位于前锋者在回合开始时**自身 SP+1**。
+  印记来源有两种：被动里常驻的（如 白虎「兽之心暖」的 雷之印、苍井绘里香「传承·Legacy」的 冰之印），
+  以及「（被动技能）」条目（如 桐生美也「海风的邀约」的 夏日晴空：需在队伍配置里携带）。
+  依赖印记等级的效果也按等级结算：如 冰岚之进击（冰之印≥6 → 全体友方 SP+5，出击中限1次）、
+  猛火进击（火之印≥6 → 全体友方 SP+5，出击中限1次）、
+  暮色中升腾绽放的幻影（火之印≥4 → SP消耗减半 16→8）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
   「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算。
@@ -917,13 +924,15 @@ class ActionRow(QFrame):
     def set_result(self, contribution):
         self.result_label.setText("%.2f" % contribution)
 
-    def get_sp_cost(self, downed=False, extra=False):
+    def get_sp_cost(self, downed=False, extra=False, sigil_levels=None):
         """该次行动消耗的 SP；通常攻击为 0。
 
         downed=True 表示敌人处于倒地/超倒地状态：带该条件的技能
         （如 对称·启示 0(16)）改用条件消耗。
         extra=True 表示处于追加回合/特殊回合：带该条件的技能
         （如 苍焰螺旋 7(14)）改用条件消耗。
+        sigil_levels 为当前各「X之印」等级 {元素: 等级}：带该条件的技能
+        （如 暮色中升腾绽放的幻影：火之印≥4 时 SP消耗减半）改用条件消耗。
         """
         skill = self._find_skill()
         if not skill:
@@ -933,6 +942,11 @@ class ActionRow(QFrame):
                 return skill.sp_cost_alt
             if skill.sp_cost_cond == "extra" and extra:
                 return skill.sp_cost_alt
+            if skill.sp_cost_cond == "sigil":
+                element = getattr(skill, "sp_cost_sigil_element", None)
+                need = getattr(skill, "sp_cost_sigil_min", None) or 0
+                if element is not None and (sigil_levels or {}).get(element, 0) >= need:
+                    return skill.sp_cost_alt
         return skill.sp_cost
 
     def get_sp_recover(self):
@@ -2105,6 +2119,8 @@ class AxleODWindow(QFrame):
         back_regen = self.sp_regen_back_spin.value()
         count = max(len(self.team), 1)
         active = self._active_slots()
+        # 各「X之印」等级（用于「X之印等级≥N」类的 SP 消耗/回复条件）
+        sigil_levels = self._team_sigil_levels()
 
         sp = [self.sp_init_spin.value()] * count
         # front = 「回合开始时」的前锋。第 1 回合 = 队伍配置前 3 人
@@ -2156,6 +2172,8 @@ class AxleODWindow(QFrame):
                                 if ob is not None and start_od >= ob:
                                     continue
                                 regen += mod.get("amount", 0)
+                            # 「X之印」等级6：回合开始时若位于前锋则自身 SP+N
+                            regen += self._member_sigil_bonus(i)
                         if sp[i] < limit:
                             sp[i] = min(limit, sp[i] + regen)
 
@@ -2166,6 +2184,11 @@ class AxleODWindow(QFrame):
                                 continue    # 「追加回合开始时」类在另外的分支处理
                             if mod.get("battle_start") and not first_turn:
                                 continue
+                            # 「若回合开始时 X之印 等级为 N 或以上」（如 冰岚之进击）
+                            sig_el = mod.get("sigil_element")
+                            if sig_el is not None:
+                                if self._sigil_level(sig_el) < (mod.get("sigil_min_level") or 0):
+                                    continue
                             pos = mod.get("position")
                             if pos == "front" and i not in start_front:
                                 continue
@@ -2223,7 +2246,8 @@ class AxleODWindow(QFrame):
                     action.set_sp_result(None)
                     continue
                 cost = action.get_sp_cost(downed=break_seen,
-                                          extra=is_extra_turn)
+                                          extra=is_extra_turn,
+                                          sigil_levels=sigil_levels)
                 if cost >= 99:      # 消耗全部 SP
                     cost = sp[i]
                 else:
@@ -2259,7 +2283,8 @@ class AxleODWindow(QFrame):
                 for a in action_order:
                     if not a._is_attack():
                         continue
-                    c = a.get_sp_cost(downed=break_seen, extra=is_extra_turn)
+                    c = a.get_sp_cost(downed=break_seen, extra=is_extra_turn,
+                                      sigil_levels=sigil_levels)
                     if 0 < c <= threshold:
                         quals.append(a)
                 if not quals:
@@ -2377,6 +2402,58 @@ class AxleODWindow(QFrame):
             if st.name == style:
                 return [m for m in st.front_sp_passives if m.get("lb", 0) <= lb]
         return []
+
+    def _member_element(self, slot):
+        """队员所装备风格的元素属性（火/冰/雷/光/暗/无…）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return st.element
+        return None
+
+    def _passive_carried(self, slot, name):
+        """该队员是否携带指定的「（被动技能）」条目（None 表示默认全选）。"""
+        selected = self._selected_passives(slot)
+        return selected is None or name in selected
+
+    def _team_sigils(self):
+        """队伍里存在的「X之印」：{元素: sigil 定义}。"""
+        found = {}
+        for slot in self._active_slots():
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            lb = self._member_lb(slot)
+            for st in self.data_source.styles(role):
+                if st.name == style:
+                    sig = getattr(st, "sigil", None)
+                    if sig and sig.get("lb", 0) <= lb:
+                        req = sig.get("requires")
+                        if req is None or self._passive_carried(slot, req):
+                            found.setdefault(sig.get("element"), sig)
+                    break
+        return found
+
+    def _sigil_level(self, element):
+        """「X之印」等级 = 初战开始时同属性风格的数量（队伍里存在该印记时才有效）。"""
+        if element is None or element not in self._team_sigils():
+            return 0
+        return sum(1 for slot in self._active_slots()
+                   if self._member_element(slot) == element)
+
+    def _team_sigil_levels(self):
+        """当前队伍各「X之印」的等级：{元素: 等级}。"""
+        return {el: self._sigil_level(el) for el in self._team_sigils()}
+
+    def _member_sigil_bonus(self, slot):
+        """该队员因「X之印」等级6 获得的回合开始自身 SP（需位于前锋，0 表示不触发）。"""
+        element = self._member_element(slot)
+        sig = self._team_sigils().get(element)
+        if not sig:
+            return 0
+        if self._sigil_level(element) < sig.get("level", 6):
+            return 0
+        return int(sig.get("amount", 0) or 0)
 
     def _selected_passives(self, slot):
         """队员在队伍配置里携带的「（被动技能）」；None 表示全部。"""
