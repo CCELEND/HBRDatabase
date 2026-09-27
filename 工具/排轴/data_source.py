@@ -388,6 +388,8 @@ class StyleInfo:
         # 追击替换（如 温泉通行木牌：追击变为【猫咪喷射打靶】）
         # {"requires": 被动名, "skill": SkillInfo}
         self.follow_up_switch = None
+        # 该风格是否用「指挥行动」取代普通攻击（此时不能使用通常攻击）
+        self.no_normal_attack = False
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -1162,6 +1164,11 @@ class HBRDataSource:
                 styles[-1].follow_up = fu
                 styles[-1].follow_up_sp = fu_sp
                 styles[-1].follow_up_switch = fu_sw
+                # 「指挥行动」取代普通攻击：该风格不能使用通常攻击
+                styles[-1].no_normal_attack = any(
+                    sk.name == "指挥行动" or "取代普通攻击" in (sk.desc or "")
+                    or "取代通常攻击" in (sk.desc or "")
+                    for sk in skills)
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
@@ -1190,23 +1197,25 @@ class HBRDataSource:
         styles = self.styles(role_name)
         result = []
         seen = set()
+        # 「指挥行动」取代普通攻击的风格：不能使用通常攻击
+        equipped = next((s for s in styles if s.name == style_name), None)
+        block_normal = bool(equipped is not None
+                            and getattr(equipped, "no_normal_attack", False))
 
         def add(skill):
             # 「（被动技能）」属于被动，不作为可选行动技能
             if "（被动技能）" in skill.name or "(被动技能)" in skill.name:
+                return
+            if block_normal and skill.is_normal_attack:
                 return
             if skill.name not in seen:
                 seen.add(skill.name)
                 result.append(skill)
 
         # 装备风格的技能（含其专属），排在最前
-        equipped = None
-        for style in styles:
-            if style.name == style_name:
-                equipped = style
-                for skill in style.skills:
-                    add(skill)
-                break
+        if equipped is not None:
+            for skill in equipped.skills:
+                add(skill)
         # 其它风格：只加入非专属技能
         for style in styles:
             if style is equipped:
