@@ -406,6 +406,11 @@ class StyleInfo:
         self.resonance = None
         # 所属队伍（如 31D），取自 style_info
         self.team = None
+        # 职业（如 攻击者/破盾者/指挥者…），取自 style_info[7]
+        self.career = None
+        # 「X之律动」（超越条，如 冰之律动）：
+        # {"name","element","initial_per_style","per_action","threshold","od_bonus","once","lb"}
+        self.rhythm = None
 
     def display_name(self):
         """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
@@ -857,6 +862,55 @@ def _parse_sigil(style_data):
     return None
 
 
+def _parse_rhythm(style_data):
+    """解析「X之律动」被动（如 冰之律动）。
+
+    战斗开始时获得超越条（X）；每有 1 名 X 属性风格，初始条 +15%（出击中限1次）；
+    X 属性风格行动后条 +4%；达到 100% 时 X 属性风格进入【超越状态】，
+    并触发「OD条上升 100%（出击中限1次）」。
+    返回 {"name","element","initial_per_style","per_action","threshold",
+          "od_bonus","once","lb"} 或 None。
+    """
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            peffects = passive[3] if len(passive) > 3 else None
+        except Exception:
+            continue
+        if "律动" not in pname or not isinstance(peffects, list):
+            continue
+        m = re.search(r'超越条（(\S+?)）', pdesc)
+        if not m:
+            continue
+        element = m.group(1)
+        init = re.search(r'每有\s*1\s*名.*?\+(\d+(?:\.\d+)?)%', pdesc)
+        per = re.search(r'行动后会提升(\d+(?:\.\d+)?)%', pdesc)
+        th = re.search(r'达到(\d+(?:\.\d+)?)%', pdesc)
+        od_bonus = 0.0
+        once = False
+        for effect in peffects:
+            if (isinstance(effect, list) and effect
+                    and str(effect[0]).startswith("OD")
+                    and "上升" in str(effect[0]) and len(effect) > 1):
+                mm = re.search(r'(\d+(?:\.\d+)?)', str(effect[1]))
+                if mm:
+                    od_bonus = float(mm.group(1))
+                    once = "1次" in str(effect[1])
+                break
+        return {
+            "name": pname,
+            "element": element,
+            "initial_per_style": float(init.group(1)) if init else 15.0,
+            "per_action": float(per.group(1)) if per else 4.0,
+            "threshold": float(th.group(1)) if th else 100.0,
+            "od_bonus": od_bonus,
+            "once": once,
+            "lb": _passive_lb(passive),
+        }
+    return None
+
+
 def resonance_od_effect(text):
     """从「共鸣天赋」某一等级的文本里解析 OD 相关效果。
 
@@ -1299,6 +1353,12 @@ class HBRDataSource:
                 styles[-1].team = (str(style_info[1])
                                    if len(style_info) > 1 and style_info[1]
                                    else None)
+                # 职业（如 指挥者）
+                styles[-1].career = (str(style_info[7])
+                                     if len(style_info) > 7 and style_info[7]
+                                     else None)
+                # 「X之律动」（超越条）
+                styles[-1].rhythm = _parse_rhythm(style_data)
                 # 「共鸣天赋」（如 神圣恩典）
                 res = style_data.get("resonance")
                 if isinstance(res, dict) and res.get("name"):
@@ -1361,25 +1421,33 @@ class HBRDataSource:
         self._resonance_pool = pool
         return pool
 
-    def available_skills(self, role_name, style_name):
+    def available_skills(self, role_name, style_name, commander=True):
         """该角色当前可用的技能列表。
 
         同角色各风格的技能通用；但 SSR/SS 的第一个主动技能为其专属，
         仅在装备该风格时可用。
+
+        commander=False 时表示该队员不是「指挥者」：此时不能用「指挥行动」，
+        而是恢复「通常攻击」（一个队伍只能有一个指挥者）。
         """
         styles = self.styles(role_name)
         result = []
         seen = set()
-        # 「指挥行动」取代普通攻击的风格：不能使用通常攻击
+        # 「指挥行动」取代普通攻击的风格：只有「指挥者」才不能使用通常攻击
         equipped = next((s for s in styles if s.name == style_name), None)
+        has_command = bool(equipped is not None and any(
+            sk.name == "指挥行动" for sk in equipped.skills))
         block_normal = bool(equipped is not None
-                            and getattr(equipped, "no_normal_attack", False))
+                            and getattr(equipped, "no_normal_attack", False)
+                            and commander)
 
         def add(skill):
             # 「（被动技能）」属于被动，不作为可选行动技能
             if "（被动技能）" in skill.name or "(被动技能)" in skill.name:
                 return
             if block_normal and skill.is_normal_attack:
+                return
+            if has_command and not commander and skill.name == "指挥行动":
                 return
             if skill.name not in seen:
                 seen.add(skill.name)

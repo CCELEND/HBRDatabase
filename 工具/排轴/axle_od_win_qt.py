@@ -86,6 +86,9 @@ HELP_TEXT = """排轴OD计算 使用说明
   朝仓可怜「Twinkle Eclosion」的 血腥燃烧 / 芬布尔之舞 与 红尖晶石 / 堇青石），
   同一条目下的形态共享该条目的专属标记；「指挥行动」只属于其所在风格，
   且带「指挥行动」的风格**不能使用通常攻击**（行动列表里不再出现通常攻击）。
+  「指挥者」是一个**职业**（风格数据里的 职业 字段，如 茅森月歌「Glorious Blades」）。
+  「指挥行动」是该职业**专属**的；**一个队伍只能编入一名指挥者**——
+  其它位置的「指挥者」职业风格会被**禁用（不可选）**。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
 - 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
@@ -96,6 +99,10 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 耳环系数 = 1 + (5 + MIN(原始Hit,10)×10/9 − 10/9)/100 × OD耳环
 - HIT OD = (原始Hit + 连击数) × ROUNDDOWN(2.5×总系数×敌方OD率, 2) × 目标数 × (抗性?0:1)
   目标数：**全体攻击** = 敌人数量；**单体攻击（含通常攻击）恒为 1**。
+- 「X之律动」（超越条，如 茅森月歌「Glorious Blades」的 冰之律动）：战斗开始时超越条 = **15% × 该属性风格数**
+  （出击中限1次）；**该属性风格每行动一次 +4%**（任何行动都算，含指挥行动）；
+  达到 **100%** 时触发「OD条上升 100%」（出击中限1次，直接计入当前OD）。
+  回合卡片上「超越条(X)：N」显示的是**本回合行动结束后**的值。
 - 固定OD = ROUNDDOWN(固定OD×100×总系数, 2) + ROUNDDOWN(31X共鸣×100×总系数, 2)
 - 总系数 = 耳环系数 + 其他OD增量
 - 通常攻击不享受 OD 耳环加成、**不计连击**；通常攻击视为「无属性」。
@@ -320,6 +327,13 @@ def _build_action_header():
 # ======================================================================
 # 队伍成员
 # ======================================================================
+def _element_matches(style_element, element):
+    """风格属性是否属于指定属性（双属性如「冰雷」任一命中即可；未知属性视为「无」）。"""
+    if not style_element:
+        return element == "无"
+    return element in style_element
+
+
 def _talent_element_ok(allowed, element):
     """共鸣天赋的属性是否与风格属性相符（**没有**「不限属性」这种说法）。
 
@@ -504,6 +518,50 @@ class TeamMemberRow(QFrame):
         if self.talent_combo.count() == 0:
             return None
         return self.talent_combo.currentData()
+
+    def _style_career_at(self, index):
+        """风格下拉第 index 项对应风格的职业。"""
+        name = self.style_combo.itemData(index)
+        for st in self.data_source.styles(self.role()):
+            if st.name == name:
+                return getattr(st, "career", None)
+        return None
+
+    def set_commanders_enabled(self, is_commander):
+        """指挥者只能编入一名：非指挥者的位置禁用「指挥者」职业的风格。
+
+        （「指挥行动」专属且只有指挥者能用，故一个队伍不能编入两名指挥者。）
+        """
+        model = self.style_combo.model()
+        for j in range(self.style_combo.count()):
+            item = model.item(j)
+            if item is None:
+                continue
+            career = self._style_career_at(j)
+            item.setEnabled(not (career == "指挥者" and not is_commander))
+        if is_commander:
+            return
+        # 当前选中的风格若被禁用，回到第一个可用风格
+        cur = model.item(self.style_combo.currentIndex())
+        if cur is not None and not cur.isEnabled():
+            for j in range(self.style_combo.count()):
+                item = model.item(j)
+                if item is not None and item.isEnabled():
+                    self.style_combo.setCurrentIndex(j)
+                    break
+
+    def commander(self):
+        """该队员所装备风格的职业是否为「指挥者」。"""
+        return self._style_career() == "指挥者"
+
+    def _style_career(self):
+        """当前风格的职业（如 指挥者）。"""
+        role = self.role()
+        style = self.style()
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return getattr(st, "career", None)
+        return None
 
     def talent_level(self):
         """所选共鸣天赋等级（0~4，可自由选择）。"""
@@ -911,8 +969,10 @@ class ActionRow(QFrame):
         idx = min(max(self.member_index, 0), len(team) - 1)
         member = team[idx]
         # 同角色各风格技能通用；SSR/SS 的第一个主动技能为专属
-        return self.data_source.available_skills(member.get("role", ""),
-                                                 member.get("style", ""))
+        # 「指挥行动」：一个队伍只能有一个指挥者，非指挥者恢复通常攻击
+        return self.data_source.available_skills(
+            member.get("role", ""), member.get("style", ""),
+            commander=self.owner.is_commander(idx))
 
     def _find_skill(self, name=None):
         if name is None:
@@ -1295,6 +1355,14 @@ class TurnCard(QFrame):
 
         header.addStretch(1)
 
+        self.rhythm_label = QLabel("超越条：—")
+        self.rhythm_label.setToolTip(
+            "超越条（X之律动）：战斗开始时 = 15%×该属性风格数；该属性风格行动后 +4%；\n"
+            "达到 100% 时触发「OD条上升 100%」（出击中限1次，计入当前OD）。\n"
+            "显示的是本回合行动结束后的值")
+        self.rhythm_label.setStyleSheet("color: #7a5c00;")
+        header.addWidget(self.rhythm_label)
+
         self.start_od_label = QLabel("回合开始OD：0.00")
         self.start_od_label.setFixedWidth(140)
         self.start_od_label.setToolTip(
@@ -1572,6 +1640,10 @@ class TurnCard(QFrame):
 
     def set_current_od(self, value):
         self.current_od_label.setText("当前OD：%.2f" % value)
+
+    def set_rhythm(self, text):
+        """显示超越条（本回合行动结束后的值）。"""
+        self.rhythm_label.setText(text if text else "超越条：—")
 
     def set_start_od(self, value):
         """记录并显示回合开始 OD 槽（回合开始被动结算之后；用于显示与条件判定）。"""
@@ -1955,12 +2027,23 @@ class AxleODWindow(QFrame):
         for i, row in enumerate(self.team_rows):
             row.set_roles_enabled(used, i)
 
+    def _refresh_commander_choices(self):
+        """指挥者只能编入一名：职业为「指挥者」的最靠前一名为指挥者，其它位置禁用指挥者风格。"""
+        commander = None
+        for slot, row in enumerate(self.team_rows):
+            if row.role() and row.commander():
+                commander = slot
+                break
+        for slot, row in enumerate(self.team_rows):
+            row.set_commanders_enabled(slot == commander)
+
     def _on_team_changed(self):
         if self._team_updating:
             return
         self._team_updating = True
         try:
             self._normalize_team()
+            self._refresh_commander_choices()
             self.team = [row.to_data() for row in self.team_rows]
         finally:
             self._team_updating = False
@@ -2167,6 +2250,16 @@ class AxleODWindow(QFrame):
         prev_level = 0     # 上一次发动的 OD 等级（连续同等级视为同一次发动）
         od_gain_used = set()   # 已触发「OD条上升」被动的队员（出击中1次）
         start_front = self._initial_front()   # 回合开始时的前锋
+        # 「X之律动」（超越条）：战斗开始时 = 15% × 该属性风格数（出击中限1次）；
+        # 该属性风格行动后 +4%；达到 100% 时触发「OD条上升 100%」（出击中限1次）
+        rhythm_state = {}
+        for element, rhythm in self._team_rhythms().items():
+            rhythm_state[element] = {
+                "def": rhythm,
+                "value": rhythm.get("initial_per_style", 15.0)
+                * len(self._rhythm_members(element)),
+                "triggered": False,
+            }
         for turn_idx, turn in enumerate(self.turns):
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
             level = turn.od_level()
@@ -2242,6 +2335,29 @@ class AxleODWindow(QFrame):
                 od_skill = ODSkill(base_hits=hits, combo_count=0.0, fixed_od=0.0,
                                    resonance_31x=0.0, od_earring=0.0)
                 turn_actions += calc_od(od_skill, battle).total_od
+
+            # 「X之律动」（超越条）：本回合该属性风格每行动一次 +4%；满 100% 触发 OD +100
+            if rhythm_state:
+                for element, state in rhythm_state.items():
+                    rhythm = state["def"]
+                    acted = sum(
+                        1 for action in turn.actions
+                        if action.member_index is not None
+                        and _element_matches(
+                            self._member_element(action.member_index), element))
+                    state["value"] = min(
+                        rhythm.get("threshold", 100.0),
+                        state["value"] + rhythm.get("per_action", 4.0) * acted)
+                    if (not state["triggered"]
+                            and state["value"] >= rhythm.get("threshold", 100.0)
+                            and rhythm.get("od_bonus")):
+                        turn_actions += rhythm["od_bonus"]
+                        state["triggered"] = True
+                turn.set_rhythm(" ".join(
+                    "超越条(%s)：%.0f" % (el, st["value"])
+                    for el, st in rhythm_state.items()))
+            else:
+                turn.set_rhythm("")
 
             cumulative += turn_bonus + turn_actions
             running_od += turn_bonus + turn_actions - cost
@@ -2547,6 +2663,26 @@ class AxleODWindow(QFrame):
                 return st.element
         return None
 
+    def _style_has_command(self, slot):
+        """该队员所装备风格的职业是否为「指挥者」。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return getattr(st, "career", None) == "指挥者"
+        return False
+
+    def _commander_slot(self):
+        """队伍唯一的指挥者：职业为「指挥者」的最靠前的一名队员。"""
+        for slot in self._active_slots():
+            if self._style_has_command(slot):
+                return slot
+        return None
+
+    def is_commander(self, slot):
+        """该队员是否为队伍唯一的指挥者（职业为「指挥者」的最靠前者）。"""
+        return self._commander_slot() == slot
+
     def _scope_targets(self, scope, element, actor, active, front_set):
         """返回某作用范围影响到的队员下标列表。"""
         if scope == "self":
@@ -2600,19 +2736,37 @@ class AxleODWindow(QFrame):
                 return [m for m in st.front_sp_passives if m.get("lb", 0) <= lb]
         return []
 
-    def _member_element(self, slot):
-        """队员所装备风格的元素属性（火/冰/雷/光/暗/无…）。"""
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return st.element
-        return None
-
     def _passive_carried(self, slot, name):
         """该队员是否携带指定的「（被动技能）」条目（None 表示默认全选）。"""
         selected = self._selected_passives(slot)
         return selected is None or name in selected
+
+    def _member_rhythm(self, slot):
+        """该队员风格的「X之律动」（超越条）定义（满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                r = getattr(st, "rhythm", None)
+                if r and r.get("lb", 0) <= lb:
+                    return r
+                return None
+        return None
+
+    def _team_rhythms(self):
+        """队伍里存在的「X之律动」：{元素: 定义}。"""
+        found = {}
+        for slot in self._active_slots():
+            r = self._member_rhythm(slot)
+            if r and r.get("element") not in found:
+                found[r["element"]] = r
+        return found
+
+    def _rhythm_members(self, element):
+        """队伍里属于该元素的队员下标（双属性任一命中）。"""
+        return [slot for slot in self._active_slots()
+                if _element_matches(self._member_element(slot), element)]
 
     def _team_sigils(self):
         """队伍里存在的「X之印」：{元素: sigil 定义}。"""
