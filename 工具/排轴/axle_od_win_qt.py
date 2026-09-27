@@ -355,7 +355,7 @@ class TeamMemberRow(QFrame):
         layout.setSpacing(4)
 
         label = QLabel("角色%d" % self.slot)
-        label.setFixedWidth(42)
+        # 不设固定宽度：按文字自然宽度显示，避免被截断
         layout.addWidget(label)
 
         self.role_combo = QComboBox()
@@ -389,7 +389,6 @@ class TeamMemberRow(QFrame):
         layout.addWidget(self.passive_button)
 
         lb_label = QLabel("突破")
-        lb_label.setFixedWidth(30)
         layout.addWidget(lb_label)
         self.lb_spin = QSpinBox()
         self.lb_spin.setRange(0, 4)
@@ -401,7 +400,6 @@ class TeamMemberRow(QFrame):
 
         # 「共鸣天赋」（相当于装备）：默认使用风格自带的；等级可自由选择（0~4）
         res_label = QLabel("共鸣天赋")
-        res_label.setFixedWidth(56)
         layout.addWidget(res_label)
         self.talent_combo = QComboBox()
         self.talent_combo.setFixedWidth(170)
@@ -416,7 +414,6 @@ class TeamMemberRow(QFrame):
         layout.addWidget(self.talent_lb)
 
         ear_label = QLabel("OD耳环")
-        ear_label.setFixedWidth(48)
         layout.addWidget(ear_label)
         self.earring_spin = _make_double_spin(0.0, 10.0, 1.0, 2, 1.0, 56)
         self.earring_spin.setToolTip(
