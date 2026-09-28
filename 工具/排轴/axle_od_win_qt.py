@@ -67,10 +67,14 @@ HELP_TEXT = """排轴OD计算 使用说明
   回合窗口关闭后，可用配置窗口顶部的「打开回合窗口」按钮重新打开。
 - 队伍≥3人时每回合固定 3 人行动；同一回合内队员不重复。
   **队伍为空时没有行动**（行动列表为空，也不再出现 点数援助/驱动增益 等通用技能），
-  且**不能添加回合**（「添加回合 / 追加回合 / 特殊回合」按钮禁用）。
+  且**不能添加回合**（「添加回合 / 追加回合 / 特殊回合 / 占位回合」按钮禁用）。
 - 追加回合不计回合数、不触发回合开始回复，也不能发动 OD。
 - 「特殊回合」性质与追加回合一致（不计回合数/不触发回合开始/不能发动 OD），
   但**角色不限前锋**，任意队员都可行动。
+- 「占位回合」同样不计回合数、不能发动 OD、角色不限前锋，且：
+  **不算己方回合**（不消耗连击 buff 的「己方回合」，见下）、
+  **不触发任何被动**（回合开始回复、OD条上升、击破回复、印记/律动/共鸣、SP消耗被动、追击、EX 被动等一律不生效）、
+  **所有技能不消耗 SP**（技能自身的 OD/连击等效果照常结算）。
 - 选了 OD 的回合，类型会显示为「超频回合」（与通常回合等价，仅作标识）。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
 - 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
@@ -123,7 +127,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   每次攻击都会生效并被消耗；带「**[单独发动]**」的主动层会**独占**（该次攻击只生效它一个）。
   未生效的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
   「己方回合」的消耗规则：**通常回合 / 超频回合（OD回合）所有队员各 −1**；
-  **追加 / 特殊回合只有当回合出手的队员 −1**（额外回合只算出手那个人的）。
+  **追加 / 特殊回合只有当回合出手的队员 −1**（额外回合只算出手那个人的）；
+  **占位回合不属于任何己方回合，完全不消耗**。
   因此同一个 buff 对不同队员，其「3 己方回合」可能落在不同的回合上。
 - 「**SP0或以上即可使用**」的技能（如 李映夏「第七击·无中生有」）：SP 不足时也能使用，
   消耗照扣、SP 会变成负数。
@@ -134,7 +139,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   按「位于前锋/后卫」判定位置；「超频条不足N%」为触发阈值；「出击中1次」整场只触发一次；
   均为「直接增加超频条」，收益为固定值（不吃 OD 耳环加成）；也需满足突破数。
   「回合开始时」类只结算于：**通常回合**；或「**前置OD 且为本次发动的第一回合**」（如 OD3/Bonus1）。
-  后置OD、后续 Bonus 回合（Bonus2/3）与追加回合都不结算。
+  后置OD、后续 Bonus 回合（Bonus2/3）与追加/特殊/占位回合都不结算。
 - 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：勾选行动的「击破敌人」**且该行动是攻击**时，
   自动同步到该行动的**固定OD**输入框（X% → X/100，如 25% → 0.250），
   因此会吃到 OD 耳环加成；取消勾选会自动移除（手填值保留）。
@@ -149,7 +154,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 前置OD：当前回合直接发动；后置OD：当前回合结束马上发动（两者 OD 回合都是当前回合）。
 - 后置OD 的回合沿用上一个回合号（显示「第N回合 后置OD」），不计入回合数。
 - 同一次 OD 发动的多个「超频回合」（连续相同等级，如 OD3 / OD3/Bonus1 / OD3/Bonus2）
-  共用同一个回合号；**中间隔着追加/特殊回合也算同一次发动**（只扣一次 OD 槽）。
+  共用同一个回合号；**中间隔着追加/特殊/占位回合也算同一次发动**（只扣一次 OD 槽）。
 - 发动消耗 OD 槽 = 等级×100（OD1=100 / OD2=200 / OD3=300）；
   同一次发动只扣一次（连续相同 OD 等级的回合，如 OD2 / OD2/Bonus1 / OD2/Bonus2 视为同一次）。
 - 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗，上限 300）、
@@ -176,7 +181,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   Excelsior!（自身攻击击破敌人时 超频条 +12/14/16/18/20%，勾选击破敌人时作为 B19 计入该次行动）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
-  「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算。
+  「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算
+  （占位回合不触发任何被动）。
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 「分享」类被动（如 东城司「哀情挽歌」的 分享 / 惹人怜爱）：**友方的主动技能使自身 SP 提升时**，
   额外给全体友方 / 自身 **SP+N**（可突破上限，最高到 SP30）。
@@ -223,9 +229,15 @@ def write_help_file():
 
 TEAM_SIZE = 6
 MAX_ACTIONS_PER_TURN = 3
-TURN_OPTIONS = ["通常回合", "超频回合", "追加回合", "特殊回合"]
-# 与追加回合性质一致（不计回合数、不触发回合开始、不能发动OD）的回合类型
+TURN_OPTIONS = ["通常回合", "超频回合", "追加回合", "特殊回合", "占位回合"]
+# 额外回合（带「追加回合」条件的技能/被动在此生效）：
+# 不计回合数、不触发回合开始、不能发动 OD
 EXTRA_TURN_TYPES = ("追加回合", "特殊回合")
+# 占位回合：不计回合数、不能发动 OD；且**不算己方回合**、**不触发任何被动**、
+# 技能**不消耗 SP**（技能自身的 OD/连击等效果照常结算）
+PLACEHOLDER_TURN_TYPES = ("占位回合",)
+# 以上两类统称「不计回合数、不能发动 OD」的回合
+UNTIMED_TURN_TYPES = EXTRA_TURN_TYPES + PLACEHOLDER_TURN_TYPES
 
 # 与参考站点一致的 OD 选项
 # 敌人可抗性的属性
@@ -1531,9 +1543,9 @@ class TurnCard(QFrame):
     def actor_members(self):
         """本回合行动的队员下标（按行动顺序，去重，最多 3 人）。
 
-        追加回合/特殊回合不影响前锋/SP，故返回空。
+        追加回合/特殊回合/占位回合不影响前锋/SP，故返回空。
         """
-        if self.turn_type() in EXTRA_TURN_TYPES:
+        if self.turn_type() in UNTIMED_TURN_TYPES:
             return []
         result = []
         for action in self.actions:
@@ -1561,15 +1573,15 @@ class TurnCard(QFrame):
         """本回合最少行动数。"""
         if not self.owner._active_slots():
             return 0          # 队伍为空时没有行动
-        if self.turn_type() in EXTRA_TURN_TYPES:
-            return 1          # 追加/特殊回合可自由增删，至少保留 1 条
+        if self.turn_type() in UNTIMED_TURN_TYPES:
+            return 1          # 追加/特殊/占位回合可自由增删，至少保留 1 条
         return self.required_actions()
 
     def max_actions(self):
         """本回合最多行动数。"""
         if not self.owner._active_slots():
             return 0          # 队伍为空时没有行动
-        if self.turn_type() in EXTRA_TURN_TYPES:
+        if self.turn_type() in UNTIMED_TURN_TYPES:
             return MAX_ACTIONS_PER_TURN
         return self.required_actions()
 
@@ -1590,7 +1602,7 @@ class TurnCard(QFrame):
         """本回合可选的角色位置。
 
         追加回合只能由「上一个普通回合的前锋」行动；
-        特殊回合性质与追加回合一致，但**角色不限前锋**。
+        特殊回合/占位回合性质与追加回合一致，但**角色不限前锋**。
         """
         if self.turn_type() == "追加回合":
             return self.owner.front_members_before(self)
@@ -1667,11 +1679,11 @@ class TurnCard(QFrame):
             action.delete_button.setEnabled(can_delete)
 
     def _sync_turn_type(self):
-        """选了 OD 则类型显示「超频回合」，无 OD 显示「通常回合」（追加/特殊回合不变）。"""
+        """选了 OD 则类型显示「超频回合」，无 OD 显示「通常回合」（追加/特殊/占位回合不变）。"""
         if getattr(self, "_syncing_type", False):
             return
         text = self.type_combo.currentText()
-        if text in EXTRA_TURN_TYPES:
+        if text in UNTIMED_TURN_TYPES:
             return
         want = "超频回合" if self.od_level() > 0 else "通常回合"
         if text != want:
@@ -1683,8 +1695,8 @@ class TurnCard(QFrame):
                 self._syncing_type = False
 
     def _on_type_changed(self, text):
-        # 追加/特殊回合不能发动 OD
-        no_od = (text in EXTRA_TURN_TYPES)
+        # 追加/特殊/占位回合不能发动 OD
+        no_od = (text in UNTIMED_TURN_TYPES)
         with self._suspended():
             self.od_combo.setEnabled(not no_od)
             self.od_timing_combo.setEnabled(
@@ -1943,6 +1955,7 @@ class AxleODWindow(QFrame):
             ("＋添加回合", self.add_turn),
             ("＋追加回合", self.add_additional_turn),
             ("＋特殊回合", self.add_special_turn),
+            ("＋占位回合", self.add_placeholder_turn),
             ("删除选中回合", self.remove_selected_turn),
             ("上移", lambda: self.move_selected_turn(-1)),
             ("下移", lambda: self.move_selected_turn(1)),
@@ -1957,8 +1970,8 @@ class AxleODWindow(QFrame):
             button.clicked.connect(callback)
             bar.addWidget(button)
             add_buttons.append(button)
-        # 前三个是「添加回合」类：空队伍时禁用
-        self.add_turn_buttons = add_buttons[:3]
+        # 前四个是「添加回合」类：空队伍时禁用
+        self.add_turn_buttons = add_buttons[:4]
         bar.addStretch(1)
         tip = QLabel("提示：队伍≥3人时每回合固定 3 人行动；点击回合选中")
         tip.setStyleSheet("color: #666666;")
@@ -2242,6 +2255,10 @@ class AxleODWindow(QFrame):
         """添加「特殊回合」：性质同追加回合，但角色不限前锋。"""
         return self.add_turn(turn_type="特殊回合")
 
+    def add_placeholder_turn(self):
+        """添加「占位回合」：不计回合数、不算己方回合、不触发任何被动、技能不消耗 SP。"""
+        return self.add_turn(turn_type="占位回合")
+
     def _on_turn_changed(self, turn):
         """某回合变更时，若其前锋变化则同步到后面（未被手动编辑的）回合。"""
         self._sync_following_turns(turn)
@@ -2332,7 +2349,7 @@ class AxleODWindow(QFrame):
         number = 0
         prev_level = 0
         for turn in self.turns:
-            is_additional = turn.turn_type() in EXTRA_TURN_TYPES
+            is_additional = turn.turn_type() in UNTIMED_TURN_TYPES
             level = turn.od_level()
             if is_additional:
                 turn.set_index(number, additional=True)
@@ -2469,7 +2486,10 @@ class AxleODWindow(QFrame):
             #    - 通常回合 / 超频回合：**所有队员**各 −1（真正的己方回合）
             #    - 追加 / 特殊回合：只有**当回合出手的队员**−1
             #      （额外回合只属于出手的那个人，如释放者本人）
-            if turn.turn_type() in EXTRA_TURN_TYPES:
+            #    - 占位回合：**不属于任何己方回合**，不消耗
+            if turn.turn_type() in PLACEHOLDER_TURN_TYPES:
+                tick_slots = set()
+            elif turn.turn_type() in EXTRA_TURN_TYPES:
                 tick_slots = set(actors)
             else:
                 tick_slots = set(combo_buffs)
@@ -2478,10 +2498,12 @@ class AxleODWindow(QFrame):
                     if e["left"] > 0 and e.get("kind") != "use":
                         e["left"] -= 1
         for turn_idx, turn in enumerate(self.turns):
+            # 占位回合：不触发任何被动
+            self._passives_off = turn.turn_type() in PLACEHOLDER_TURN_TYPES
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
-            # 追加/特殊回合没有 OD，不参与「同一次发动」的判定，
+            # 追加/特殊/占位回合没有 OD，不参与「同一次发动」的判定，
             # 因此「OD2/Bonus1 → 追加回合 → OD2/Bonus2」仍属同一次发动。
-            is_extra = turn.turn_type() in EXTRA_TURN_TYPES
+            is_extra = turn.turn_type() in UNTIMED_TURN_TYPES
             level = turn.od_level()
             if is_extra:
                 is_new_activation = False
@@ -2497,9 +2519,9 @@ class AxleODWindow(QFrame):
             # 回合开始：风格被动「OD条上升」（如 V字回复）——
             # 按触发时机/位置/阈值/是否出击中1次结算。
             # 只有「通常回合」，或「前置OD 且为本次发动的第一回合（如 OD3/Bonus1）」
-            # 才有回合开始；后置OD 与后续的 Bonus 回合（Bonus2/3）、追加回合都不结算。
+            # 才有回合开始；后置OD 与后续的 Bonus 回合（Bonus2/3）、追加/占位回合都不结算。
             is_post_od = (level > 0 and turn.od_timing() == "后置OD")
-            starts_turn = (turn.turn_type() not in EXTRA_TURN_TYPES
+            starts_turn = (turn.turn_type() not in UNTIMED_TURN_TYPES
                            and not is_post_od
                            and (level == 0 or is_new_activation))
             turn_bonus = 0.0   # 回合开始时被动带来的 OD 增加
@@ -2561,22 +2583,24 @@ class AxleODWindow(QFrame):
                 turn_actions += calc_od(od_skill, battle).total_od
 
             # 「X之律动」（超越条）：本回合该属性风格每行动一次 +4%；满 100% 触发 OD +100
+            # （占位回合不触发任何被动，律动也不推进）
             if rhythm_state:
-                for element, state in rhythm_state.items():
-                    rhythm = state["def"]
-                    acted = sum(
-                        1 for action in turn.actions
-                        if action.member_index is not None
-                        and _element_matches(
-                            self._member_element(action.member_index), element))
-                    state["value"] = min(
-                        rhythm.get("threshold", 100.0),
-                        state["value"] + rhythm.get("per_action", 4.0) * acted)
-                    if (not state["triggered"]
-                            and state["value"] >= rhythm.get("threshold", 100.0)
-                            and rhythm.get("od_bonus")):
-                        turn_actions += rhythm["od_bonus"]
-                        state["triggered"] = True
+                if not self._passives_off:
+                    for element, state in rhythm_state.items():
+                        rhythm = state["def"]
+                        acted = sum(
+                            1 for action in turn.actions
+                            if action.member_index is not None
+                            and _element_matches(
+                                self._member_element(action.member_index), element))
+                        state["value"] = min(
+                            rhythm.get("threshold", 100.0),
+                            state["value"] + rhythm.get("per_action", 4.0) * acted)
+                        if (not state["triggered"]
+                                and state["value"] >= rhythm.get("threshold", 100.0)
+                                and rhythm.get("od_bonus")):
+                            turn_actions += rhythm["od_bonus"]
+                            state["triggered"] = True
                 turn.set_rhythm(" ".join(
                     "超越条(%s)：%.0f" % (el, st["value"])
                     for el, st in rhythm_state.items()))
@@ -2604,6 +2628,7 @@ class AxleODWindow(QFrame):
                     if m not in merged:
                         merged.append(m)
                 start_front = merged[:3]
+        self._passives_off = False
         self.total_label.setText("总OD：%.2f" % cumulative)
         self.net_od_label.setText("净OD：%.2f（消耗 %.0f）" % (
             cumulative - consumed, consumed))
@@ -2667,9 +2692,12 @@ class AxleODWindow(QFrame):
         sp_once_used = set()  # 已触发过「每次出击1次」类 SP 被动的队员
 
         for turn_idx, turn in enumerate(self.turns):
-            # 追加回合不计回合数：不触发「回合开始回复」与 OD 回复，
+            # 追加/特殊回合不计回合数：不触发「回合开始回复」与 OD 回复，
             # 但行动仍然消耗 SP、技能回复 SP 也照常生效。
-            is_additional = turn.turn_type() in EXTRA_TURN_TYPES
+            is_additional = turn.turn_type() in UNTIMED_TURN_TYPES
+            # 占位回合：不算己方回合、不触发任何被动、技能不消耗 SP
+            is_placeholder = turn.turn_type() in PLACEHOLDER_TURN_TYPES
+            self._passives_off = is_placeholder
             # 回合开始时的前锋（用于回合开始 +3/+2）
             start_front = set(front)
             # 本回合行动的队员 = 回合中/结束时的前锋（用于技能/被动「前锋」范围）
@@ -2687,6 +2715,9 @@ class AxleODWindow(QFrame):
                 # 仅结算 OD 的额外 SP（无回合开始回复、无闪光）；同一次发动只给一次
                 if is_new_od:
                     self._apply_od_sp_bonus(turn, sp, active)
+            elif is_placeholder:
+                # 占位回合：不触发任何回合开始结算（也没有基础回复）
+                pass
             elif not is_additional:
                 # 「回合开始」的结算条件与 OD 增加被动一致：
                 # 通常回合，或「前置OD 且为本次发动的第一回合」；
@@ -2788,7 +2819,9 @@ class AxleODWindow(QFrame):
                 cost = action.get_sp_cost(downed=break_seen,
                                           extra=is_extra_turn,
                                           sigil_levels=sigil_levels)
-                if cost >= 99:      # 消耗全部 SP
+                if is_placeholder:
+                    cost = 0          # 占位回合：所有技能不消耗 SP
+                elif cost >= 99:      # 消耗全部 SP
                     cost = sp[i]
                 else:
                     # SP 消耗增减被动（同名只叠加一次）；
@@ -2892,6 +2925,8 @@ class AxleODWindow(QFrame):
                         merged.append(m)
                 front = merged[:3]
 
+        self._passives_off = False
+
     def _apply_od_sp_bonus(self, turn, sp, active):
         """发动 OD 给全队的额外 SP（OD1+5 / OD2+12 / OD3+20）。"""
         level = turn.od_level()
@@ -2974,6 +3009,8 @@ class AxleODWindow(QFrame):
 
     def _member_front_sp(self, slot):
         """风格被动里「回合开始时位于前锋则自身 SP+X」的合计（闪光等，满足突破要求）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -2989,6 +3026,8 @@ class AxleODWindow(QFrame):
 
     def _member_rhythm(self, slot):
         """该队员风格的「X之律动」（超越条）定义（满足突破要求）。"""
+        if getattr(self, "_passives_off", False):
+            return None        # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3044,6 +3083,8 @@ class AxleODWindow(QFrame):
 
     def _member_sigil_bonus(self, slot):
         """该队员因「X之印」等级6 获得的回合开始自身 SP（需位于前锋，0 表示不触发）。"""
+        if getattr(self, "_passives_off", False):
+            return 0           # 占位回合：不触发任何被动
         element = self._member_element(slot)
         sig = self._team_sigils().get(element)
         if not sig:
@@ -3063,6 +3104,8 @@ class AxleODWindow(QFrame):
         「（被动技能）」条目（带 requires）按**角色**通用：任一风格解锁后，
         该角色所有风格携带它都生效。
         """
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3087,6 +3130,8 @@ class AxleODWindow(QFrame):
 
         如 注入活力（31D 六宇亚 的 SS 被动）、桐生美也大师技能 开辟希望的一箭。
         """
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3108,6 +3153,8 @@ class AxleODWindow(QFrame):
         「（被动技能）」条目（如 千里眼）按**角色**通用：任一风格解锁后，
         该角色所有风格携带它都生效。
         """
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3134,6 +3181,8 @@ class AxleODWindow(QFrame):
 
     def _member_passive_combo(self, slot):
         """该队员风格被动里的「连击数上升」项（满足突破要求）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3144,6 +3193,8 @@ class AxleODWindow(QFrame):
 
     def _member_share_sp(self, slot):
         """该队员「友方主动技能使自身SP提升时 额外使全体SP+N」的项（如 东城司「分享」）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3154,6 +3205,8 @@ class AxleODWindow(QFrame):
 
     def _member_turn_start_sp(self, slot):
         """风格被动里「回合开始时回复友方 SP」的项（如 与伙伴一起，满足突破要求）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3164,6 +3217,8 @@ class AxleODWindow(QFrame):
 
     def _member_follow_up(self, slot):
         """风格被动的「追击」定义（如 温泉巡游），满足突破要求则返回。"""
+        if getattr(self, "_passives_off", False):
+            return None        # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3177,6 +3232,8 @@ class AxleODWindow(QFrame):
 
     def _member_follow_up_sp(self, slot):
         """风格被动里「发动追击时回复友方 SP」的项（如 嫩绿摇曳）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3187,6 +3244,8 @@ class AxleODWindow(QFrame):
 
     def _member_follow_up_switch(self, slot):
         """追击替换（如 温泉通行木牌 → 猫咪喷射打靶）；未携带该被动则 None。"""
+        if getattr(self, "_passives_off", False):
+            return None        # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         selected = self._selected_passives(slot)
@@ -3203,6 +3262,8 @@ class AxleODWindow(QFrame):
 
     def _member_break_od(self, slot):
         """风格被动里「击破敌人时增加 OD 槽」的项（满足突破要求）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
@@ -3227,6 +3288,8 @@ class AxleODWindow(QFrame):
         只有 **SSR** 风格才能配置；选择「（默认）」时用风格自带的，否则用所选天赋。
         返回 {"name","type","levels","level","text"} 或 None。
         """
+        if getattr(self, "_passives_off", False):
+            return None        # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         style_info = None
@@ -3271,6 +3334,8 @@ class AxleODWindow(QFrame):
 
     def _member_sp_cost_mods(self, slot):
         """队员所装备风格里影响 SP 消耗的被动（过滤未携带的）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         selected = self._selected_passives(slot)
@@ -3290,6 +3355,8 @@ class AxleODWindow(QFrame):
 
     def _member_master_mods(self, slot):
         """队员「大师技能」中影响 SP 消耗的项（过滤未携带的被动）。"""
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         selected = self._selected_passives(slot)
         mods = []
@@ -3313,6 +3380,8 @@ class AxleODWindow(QFrame):
         """
         if base_cost is not None and base_cost == 0:
             return 0          # SP 消耗为 0 的技能不受增减影响
+        if getattr(self, "_passives_off", False):
+            return 0          # 占位回合：不触发任何被动
 
         reductions = []   # 负值
         increases = []    # 正值
@@ -3385,6 +3454,8 @@ class AxleODWindow(QFrame):
 
         另外包含「大师技能」里的同类效果（如 小笠原「友缘之剑」：击破时 全体友方SP+1）。
         """
+        if getattr(self, "_passives_off", False):
+            return []          # 占位回合：不触发任何被动
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
