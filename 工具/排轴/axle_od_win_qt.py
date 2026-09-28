@@ -119,8 +119,9 @@ HELP_TEXT = """排轴OD计算 使用说明
   标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
   目标是**单名友方**的（如 茅森月歌「月芒」、李映夏「第七击·无中生有」）：
   在行动行的「**对象**」下拉里选择受益的友方，该 buff 只加到他/她身上。
-  一次攻击技能里连击**最多生效 2 层**（例：3 层各 +5 → 只生效 +10），
-  余下的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
+  一次攻击技能里**主动**给的连击层**最多生效 2 层**；被动给的层（如 梅雨）**不占名额**、
+  每次攻击都会生效并被消耗；带「**[单独发动]**」的主动层会**独占**（该次攻击只生效它一个）。
+  未生效的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
 - 「**SP0或以上即可使用**」的技能（如 李映夏「第七击·无中生有」）：SP 不足时也能使用，
   消耗照扣、SP 会变成负数。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
@@ -2446,6 +2447,7 @@ class AxleODWindow(QFrame):
                         "left": buff["duration"],
                         "kind": buff.get("kind", "turn"),
                         "source": buff.get("source"),
+                        "solo": bool(buff.get("solo")),
                     })
             # 3) 连击框显示全部可用层之和；一次攻击技能**最多生效 2 层**，
             #    其余层留到下一次攻击技能；「按次数」的层生效时消耗 1 次
@@ -2454,7 +2456,13 @@ class AxleODWindow(QFrame):
                 active = [e for e in entries if e["left"] > 0]
                 action.set_auto_combo(sum(e["amount"] for e in active))
                 if action.is_combo_eligible():
-                    applied = active[:2]
+                    # 被动给的层不占「2 层」名额；主动层最多生效 2 层，
+                    # 「[单独发动]」的主动层独占（其它主动层不生效），其余层留到下次攻击
+                    passive = [e for e in active if e.get("passive")]
+                    actives = [e for e in active if not e.get("passive")]
+                    solo = [e for e in actives if e.get("solo")]
+                    chosen = solo[:1] if solo else actives[:2]
+                    applied = passive + chosen
                     action.set_effective_combo(
                         sum(e["amount"] for e in applied))
                     for e in applied:
