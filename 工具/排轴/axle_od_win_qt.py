@@ -117,6 +117,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   带「**[单独发动]**」的这类效果**不会叠加**：重复发动只刷新持续回合数（连击值不变）。
   被动里的同类效果（如 山胁「梅雨」：战斗开始时位于前锋 自身连击+5（1次））同样自动计入；
   标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
+  目标是**单名友方**的（如 茅森月歌「月芒」、李映夏「第七击·无中生有」）：
+  在行动行的「**对象**」下拉里选择受益的友方，该 buff 只加到他/她身上。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
   例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
   到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
@@ -958,12 +960,15 @@ class ActionRow(QFrame):
         return data if data else self.skill_combo.currentText()
 
     def _populate_targets(self):
-        """按技能的「单名友方回复SP」范围填充「对象」下拉框。"""
+        """按技能的「单名友方」范围填充「对象」下拉框（回复SP / 连击数上升）。"""
         prev = self.target_combo.currentData()
         skill = self._find_skill()
         scope = None
         if skill is not None and skill.sp_recover and skill.sp_recover_scope:
             scope = skill.sp_recover_scope
+        buff = getattr(skill, "combo_buff", None) if skill is not None else None
+        if scope is None and buff and buff.get("scope") in ("one_other", "one_any"):
+            scope = buff["scope"]
         with self._suspended():
             self.target_combo.clear()
             if scope in ("one_other", "one_any"):
@@ -2401,9 +2406,18 @@ class AxleODWindow(QFrame):
                 buff = action.get_combo_buff()
                 if not buff or not buff.get("amount") or not buff.get("duration"):
                     continue
-                for target in self._scope_targets(
-                        buff.get("scope"), buff.get("element"),
-                        action.member_index, self._active_slots(), turn_front):
+                scope = buff.get("scope")
+                if scope in ("one_any", "one_other"):
+                    # 单名友方：取行动里的「对象」
+                    tgt = action.get_sp_target()
+                    targets = ([tgt] if tgt is not None else [])
+                    if scope == "one_other" and tgt == action.member_index:
+                        targets = []
+                else:
+                    targets = self._scope_targets(
+                        scope, buff.get("element"),
+                        action.member_index, self._active_slots(), turn_front)
+                for target in targets:
                     entries = combo_buffs.setdefault(target, [])
                     if buff.get("solo"):
                         # 「[单独发动]」：重复发动不叠加，只刷新回合数
