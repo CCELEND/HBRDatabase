@@ -138,10 +138,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：勾选行动的「击破敌人」**且该行动是攻击**时，
   自动同步到该行动的**固定OD**输入框（X% → X/100，如 25% → 0.250），
   因此会吃到 OD 耳环加成；取消勾选会自动移除（手填值保留）。
-- 技能的「OD条上升 X%」效果：**攻击技能**（带伤害 Hit，如 无限光晕）→ 自动同步到**固定OD**
-  （吃 OD 耳环加成）；**非攻击技能**（如 威严号令）→ 作为**直接增加超频条 +X**，不吃耳环。
+- 技能的「OD条上升 X%」效果：**一律按「固定OD」结算（吃 OD 耳环加成）**，
+  包括**非攻击技能**（如 驱动增益 / 连结未来的苍之意志）。
   若限定「以此技能击破敌人时」（如 原子火焰 / 哀伤的雪花莲），则仅在勾选击破敌人时计入。
-  例外：**驱动增益**虽非攻击技能，但实测也会吃 OD 耳环，故同按固定OD结算。
   换其它技能时会自动移除。
 - 概率类被动（如福运 70%）按必定触发计算；
   无法判定的条件（干劲/领域/解除BUFF/EX/SP提升等）不计入。
@@ -1204,36 +1203,28 @@ class ActionRow(QFrame):
         return bool(skill is not None and skill.hits is not None)
 
     def _od_up_uses_earring(self):
-        """技能的「OD条上升」是否按固定OD结算（吃 OD 耳环）。
+        """该技能是否为「攻击技能」（用于 EX 技能触发的超频条是否吃 OD 耳环）。
 
-        攻击技能 -> 吃耳环；非攻击技能默认不吃，但标记 od_up_earring 的
-        例外（如 驱动增益）也吃。
+        注：技能自带的「OD条上升 X%」**一律吃 OD 耳环**（含非攻击技能，如 驱动增益 /
+        连结未来的苍之意志）；只有「自身使用EX技能后 超频条+X%」这种被动，
+        在 EX 技能为**非攻击**时才直接加。
         """
         skill = self._find_skill()
         if skill is None:
             return False
-        return (skill.hits is not None
-                or getattr(skill, "od_up_earring", False))
+        return skill.hits is not None
 
     def get_od_up_flat(self):
-        """不吃耳环的「OD条上升 X%」：**直接**增加超频条。
+        """不吃耳环、**直接**增加超频条的部分。
 
-        * 「自身使用EX技能后 超频条+X%」类（如 追加支援 / 千里眼）：EX 技能为**非攻击**时直接加；
-        * 非攻击且不吃耳环的技能自带的「OD条上升 X%」。
-        （攻击技能的同类效果吃 OD 耳环，走「固定OD」。）
+        只有「自身使用EX技能后 超频条+X%」在 EX 技能为**非攻击**时直接加；
+        技能自带的「OD条上升」一律走「固定OD」（吃 OD 耳环）。
         """
         total = 0.0
         if (self.owner is not None and self.get_skill_is_ex()
                 and not self._od_up_uses_earring()):
             total += self.owner._member_ex_od_fraction(self.member_index) * 100.0
-        skill = self._find_skill()
-        if skill is None or skill.hits is not None:
-            return total
-        if getattr(skill, "od_up_earring", False):
-            return total
-        if getattr(skill, "od_up_on_break", False) and not self.is_break():
-            return total
-        return total + getattr(skill, "od_up_fixed", 0.0) * 100.0
+        return total
 
     def _auto_fixed_od(self):
         """该行动自动计入「固定OD」的部分（吃 OD 耳环）：
@@ -1251,7 +1242,9 @@ class ActionRow(QFrame):
         if self.get_skill_is_ex() and self._od_up_uses_earring():
             total += self.owner._member_ex_od_fraction(self.member_index)
         skill = self._find_skill()
-        if skill is not None and self._od_up_uses_earring():
+        # 技能自带的「OD条上升 X%」**一律**按固定OD结算（吃 OD 耳环），
+        # 包括非攻击技能（驱动增益 / 连结未来的苍之意志 等）。
+        if skill is not None:
             if not getattr(skill, "od_up_on_break", False) or self.is_break():
                 total += getattr(skill, "od_up_fixed", 0.0)
         return total
