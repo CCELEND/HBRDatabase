@@ -2759,7 +2759,10 @@ class AxleODWindow(QFrame):
                             start_front, limit)
                         if mod.get("once"):
                             sp_once_used.add(i)
-            prev_od_level = level
+            # 追加/特殊回合没有 OD，不参与「同一次发动」的判定
+            # （中间隔着追加回合时 OD2/Bonus1 与 OD2/Bonus2 仍只给一次额外 SP）
+            if not is_additional:
+                prev_od_level = level
 
             # 记录「行动前」全队 SP（回合开始回复 / 前置OD 之后）
             pre_entries = [(i, self.team[i].get("role"), sp[i], i in start_front)
