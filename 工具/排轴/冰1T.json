@@ -34,7 +34,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "od_earring": 1.0
+      "od_earring": 0.0
     },
     {
       "role": "国见玉",
@@ -45,7 +45,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "od_earring": 1.0
+      "od_earring": 0.0
     },
     {
       "role": "立华奏",
@@ -54,7 +54,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "od_earring": 1.0
+      "od_earring": 0.0
     },
     {
       "role": "小笠原绯雨",
@@ -65,7 +65,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "od_earring": 1.0
+      "od_earring": 0.0
     }
   ],
   "battle": {
