@@ -112,7 +112,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   **连击只对「攻击技能（非通常攻击）」生效**：非攻击技能（无 Hit，如 增益/回复）也不计连击
   （连击输入框不禁用，只是不参与计算）。
 - 「连击数上升」buff（如 苍井绘里香「传承·Legacy」的 连结未来的苍之意志：
-  提升冰属性风格连击数 3 己方回合）会**自动计入**受影响队员行动的连击数。
+  提升冰属性风格连击数 3 己方回合）会**自动计入**受影响队员行动的连击数，
+  **连击框里直接显示「手动＋自动」的合计值**（手动部分另存，读档不会重复叠加）。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
   例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
   到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
@@ -858,9 +859,12 @@ class ActionRow(QFrame):
         self.combo_spin.setRange(0, 999)
         self.combo_spin.setFixedWidth(COMBO_W)
         self.combo_spin.setAlignment(Qt.AlignCenter)
-        self.combo_spin.setToolTip("连击数")
+        self.combo_spin.setToolTip("连击数（只对攻击技能、且非通常攻击生效）")
+        self.combo_spin.valueChanged.connect(self._on_combo_changed)
         self.combo_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.combo_spin)
+        self._manual_combo = 0.0    # 用户手动设置的连击
+        self._auto_combo = 0.0      # 「连击数上升」buff 自动提供的连击
 
         self.fixed_od_spin = _make_double_spin(0.0, 100.0, 0.05, 3, 0.0, FIXED_W)
         self.fixed_od_spin.setToolTip("固定OD")
@@ -1095,8 +1099,8 @@ class ActionRow(QFrame):
         is_attack = bool(skill is not None and skill.hits is not None)
         combo = 0.0
         if is_attack and not is_normal:
-            # 手动连击 + 「连击数上升」buff 自动连击
-            combo = float(self.combo_spin.value()) + self.get_auto_combo()
+            # 连击框已显示「手动 + 自动（连击数上升 buff）」
+            combo = float(self.combo_spin.value())
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=combo,
@@ -1116,13 +1120,26 @@ class ActionRow(QFrame):
         skill = self._find_skill()
         return getattr(skill, "combo_buff", None) if skill is not None else None
 
+    def _on_combo_changed(self, value):
+        """用户手动编辑连击：视为「总连击」，手动部分 = 总 − 自动。"""
+        if getattr(self, "_setting_combo", False) or self._loading:
+            return
+        self._manual_combo = max(0.0, float(value) - self.get_auto_combo())
+
     def set_auto_combo(self, value):
-        """记录本回合自动获得的连击（来自「连击数上升」buff）。"""
+        """记录本回合自动获得的连击（来自「连击数上升」buff）并显示在连击框。"""
         self._auto_combo = float(value or 0.0)
+        self._setting_combo = True
+        try:
+            self.combo_spin.setValue(int(round(
+                max(0.0, getattr(self, "_manual_combo", 0.0)
+                    + self._auto_combo))))
+        finally:
+            self._setting_combo = False
         if self._auto_combo > 0:
             self.combo_spin.setToolTip(
                 "连击数：手动 %d ＋ 自动（连击数上升 buff）%g"
-                % (self.combo_spin.value(), self._auto_combo))
+                % (getattr(self, "_manual_combo", 0), self._auto_combo))
         else:
             self.combo_spin.setToolTip("连击数（只对攻击技能、且非通常攻击生效）")
 
@@ -1309,7 +1326,7 @@ class ActionRow(QFrame):
             "member": self.member_index,
             "skill": self._current_skill_name(),
             "base_hits": self.base_hits_spin.value(),
-            "combo": self.combo_spin.value(),
+            "combo": int(max(0, round(getattr(self, "_manual_combo", 0.0)))),
             # 只存「手动」固定OD；击破被动的部分读取时再自动加上
             "fixed_od": (self.fixed_od_spin.value()
                          - getattr(self, "_auto_fixed_added", 0.0)),
@@ -1334,7 +1351,8 @@ class ActionRow(QFrame):
             # 技能自动带出的 Hit 数重置为 0
             if "base_hits" in data:
                 self.base_hits_spin.setValue(int(data.get("base_hits") or 0))
-            self.combo_spin.setValue(int(data.get("combo", 0) or 0))
+            self._manual_combo = float(data.get("combo", 0) or 0)
+            self.combo_spin.setValue(int(self._manual_combo))
             self.fixed_od_spin.setValue(float(data.get("fixed_od", 0) or 0))
             self.break_check.setChecked(bool(data.get("break", False)))
             self._populate_targets()
