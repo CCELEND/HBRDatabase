@@ -294,6 +294,8 @@ class SkillInfo:
         # 被动里的「连击数上升」项（如 山胁「梅雨」）：
         # [{"name","amount","count","kind","position","timing","target","lb"}, ...]
         self.passive_combo = []
+        # 「SP0或以上即可使用」：即使 SP 不足也能使用（SP 会变成负数）
+        self.allow_negative_sp = False
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -564,9 +566,23 @@ def _parse_combo_buff(group):
     返回 {"amount","duration","timing","scope","element"} 或 None。
     """
     effects = group[1] if len(group) > 1 and isinstance(group[1], list) else []
-    for effect in effects:
+    # 「歌姬/非歌姬」这类形态：默认取「非X」对应的那一条效果
+    preferred = None
+    variants = group[4] if len(group) > 4 and isinstance(group[4], dict) else None
+    if variants:
+        for key, spec in variants.items():
+            if not str(key).startswith("非") or not isinstance(spec, list):
+                continue
+            for item in spec:
+                if isinstance(item, int):
+                    preferred = item
+                    break
+            break
+    for idx, effect in enumerate(effects):
         if not (isinstance(effect, list) and effect
                 and "连击数上升" in str(effect[0])):
+            continue
+        if preferred is not None and idx != preferred:
             continue
         m = re.search(r'(\d+)', str(effect[1]) if len(effect) > 1 else "")
         amount = int(m.group(1)) if m else 0
@@ -657,6 +673,8 @@ def _extract_skill(group):
     skill.name = _fix_skill_name(skill.name)
     if skill.combo_buff is not None:
         skill.combo_buff["source"] = skill.name
+    skill.allow_negative_sp = ("SP0或以上" in skill.desc
+                               or "SP0 或以上" in skill.desc)
     return skill
 
 

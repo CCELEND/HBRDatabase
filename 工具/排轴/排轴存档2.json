@@ -1,0 +1,143 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "山胁·冯·伊瓦尔",
+      "style": "Daydream Believer",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "茅森月歌",
+      "style": "月华歌姬",
+      "passives": [
+        "交织而成的记忆",
+        "怪物般的球威（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "李映夏",
+      "style": "吾若不勇，与无将同",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "月芒",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": 0
+        },
+        {
+          "member": 2,
+          "skill": "第七计 无中生有",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": 0
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "冰霜斩击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}

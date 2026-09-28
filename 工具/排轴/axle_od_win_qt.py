@@ -119,6 +119,10 @@ HELP_TEXT = """排轴OD计算 使用说明
   标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
   目标是**单名友方**的（如 茅森月歌「月芒」、李映夏「第七击·无中生有」）：
   在行动行的「**对象**」下拉里选择受益的友方，该 buff 只加到他/她身上。
+  一次攻击技能里连击**最多生效 2 层**（例：3 层各 +5 → 只生效 +10），
+  余下的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
+- 「**SP0或以上即可使用**」的技能（如 李映夏「第七击·无中生有」）：SP 不足时也能使用，
+  消耗照扣、SP 会变成负数。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
   例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
   到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
@@ -1107,8 +1111,9 @@ class ActionRow(QFrame):
         is_attack = bool(skill is not None and skill.hits is not None)
         combo = 0.0
         if is_attack and not is_normal:
-            # 连击框已显示「手动 + 自动（连击数上升 buff）」
-            combo = float(self.combo_spin.value())
+            # 手动连击 + 本次实际生效的连击（buff 最多 2 层）
+            combo = (getattr(self, "_manual_combo", 0.0)
+                     + self.get_effective_combo())
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=combo,
@@ -1128,6 +1133,19 @@ class ActionRow(QFrame):
         skill = self._find_skill()
         return bool(skill is not None and skill.hits is not None
                     and not skill.is_normal_attack)
+
+    def allows_negative_sp(self):
+        """该技能是否「SP0或以上即可使用」（SP 不足也能使用，会变负）。"""
+        skill = self._find_skill()
+        return bool(skill is not None
+                    and getattr(skill, "allow_negative_sp", False))
+
+    def set_effective_combo(self, value):
+        """记录本次攻击技能实际生效的连击（最多 2 层）。"""
+        self._effective_combo = float(value or 0.0)
+
+    def get_effective_combo(self):
+        return float(getattr(self, "_effective_combo", 0.0) or 0.0)
 
     def get_combo_buff(self):
         """该技能是否附带「连击数上升」buff（如 连结未来的苍之意志）。"""
@@ -2429,16 +2447,21 @@ class AxleODWindow(QFrame):
                         "kind": buff.get("kind", "turn"),
                         "source": buff.get("source"),
                     })
-            # 3) 各行动的自动连击 = 当前生效 buff 之和；
-            #    「按次数」的 buff 每释放一次攻击技能消耗 1 次
+            # 3) 连击框显示全部可用层之和；一次攻击技能**最多生效 2 层**，
+            #    其余层留到下一次攻击技能；「按次数」的层生效时消耗 1 次
             for action in turn.actions:
                 entries = combo_buffs.get(action.member_index, [])
-                action.set_auto_combo(sum(e["amount"] for e in entries
-                                          if e["left"] > 0))
+                active = [e for e in entries if e["left"] > 0]
+                action.set_auto_combo(sum(e["amount"] for e in active))
                 if action.is_combo_eligible():
-                    for e in entries:
-                        if e["left"] > 0 and e.get("kind") == "use":
+                    applied = active[:2]
+                    action.set_effective_combo(
+                        sum(e["amount"] for e in applied))
+                    for e in applied:
+                        if e.get("kind") == "use":
                             e["left"] -= 1
+                else:
+                    action.set_effective_combo(0.0)
             # 4) 「己方回合」计数：本回合行动过的队员，按回合消耗的 buff −1
             for slot in actors:
                 for e in combo_buffs.get(slot, []):
@@ -2754,6 +2777,8 @@ class AxleODWindow(QFrame):
                         i, active, turn_front, cost, downed=break_seen,
                         extra=is_extra_turn))
                 enough = sp[i] >= cost
+                if not enough and action.allows_negative_sp():
+                    enough = True     # 「SP0或以上即可使用」：SP 可为负
                 if enough:
                     sp[i] -= cost
                     self._apply_sp_recover(action, i, sp, active,
