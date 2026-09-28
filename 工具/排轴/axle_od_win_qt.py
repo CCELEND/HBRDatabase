@@ -150,7 +150,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 前置OD：当前回合直接发动；后置OD：当前回合结束马上发动（两者 OD 回合都是当前回合）。
 - 后置OD 的回合沿用上一个回合号（显示「第N回合 后置OD」），不计入回合数。
 - 同一次 OD 发动的多个「超频回合」（连续相同等级，如 OD3 / OD3/Bonus1 / OD3/Bonus2）
-  共用同一个回合号。
+  共用同一个回合号；**中间隔着追加/特殊回合也算同一次发动**（只扣一次 OD 槽）。
 - 发动消耗 OD 槽 = 等级×100（OD1=100 / OD2=200 / OD3=300）；
   同一次发动只扣一次（连续相同 OD 等级的回合，如 OD2 / OD2/Bonus1 / OD2/Bonus2 视为同一次）。
 - 每回合显示：「回合开始OD」（= 上一回合结束OD + 回合开始被动 − 发动OD消耗，上限 300）、
@@ -2479,14 +2479,21 @@ class AxleODWindow(QFrame):
                         e["left"] -= 1
         for turn_idx, turn in enumerate(self.turns):
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
+            # 追加/特殊回合没有 OD，不参与「同一次发动」的判定，
+            # 因此「OD2/Bonus1 → 追加回合 → OD2/Bonus2」仍属同一次发动。
+            is_extra = turn.turn_type() in EXTRA_TURN_TYPES
             level = turn.od_level()
-            is_new_activation = level > 0 and level != prev_level
-            if is_new_activation:
-                cost = level * OD_GAUGE_PER_LEVEL
-                consumed += cost
-            else:
+            if is_extra:
+                is_new_activation = False
                 cost = 0
-            prev_level = level
+            else:
+                is_new_activation = level > 0 and level != prev_level
+                if is_new_activation:
+                    cost = level * OD_GAUGE_PER_LEVEL
+                    consumed += cost
+                else:
+                    cost = 0
+                prev_level = level
             # 回合开始：风格被动「OD条上升」（如 V字回复）——
             # 按触发时机/位置/阈值/是否出击中1次结算。
             # 只有「通常回合」，或「前置OD 且为本次发动的第一回合（如 OD3/Bonus1）」
@@ -3371,14 +3378,23 @@ class AxleODWindow(QFrame):
                                   sp, active, front_set, limit)
 
     def _member_break_sp(self, slot):
-        """队员所装备风格里「击破敌人时回复SP」的被动（满足突破要求）。"""
+        """队员所装备风格里「击破敌人时回复SP」的被动（满足突破要求）。
+
+        另外包含「大师技能」里的同类效果（如 小笠原「友缘之剑」：击破时 全体友方SP+1）。
+        """
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
+        mods = []
         for st in self.data_source.styles(role):
             if st.name == style:
-                return [b for b in st.break_sp if b.get("lb", 0) <= lb]
-        return []
+                mods = [b for b in st.break_sp if b.get("lb", 0) <= lb]
+                break
+        selected = self._selected_passives(slot)
+        name = self.data_source.master_skill_name(role)
+        if name and (selected is None or name in selected):
+            mods = mods + list(self.data_source.master_break_sp(role))
+        return mods
 
     def _apply_break_recover(self, action, actor, sp, active, front_set,
                              limit, is_first_break):

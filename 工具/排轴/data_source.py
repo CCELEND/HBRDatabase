@@ -535,6 +535,33 @@ def _sp_recover_scope(target):
     return None
 
 
+def _parse_master_break_sp(ms):
+    """大师技能里「自身攻击击破敌人时 回复SP」的项。
+
+    如 小笠原绯雨「友缘之剑」：自身攻击击破敌人时 全体友方SP+1。
+    返回 [{"amount","scope","element","first_only"}, ...]。
+    """
+    if not isinstance(ms, list) or len(ms) < 5:
+        return []
+    desc = str(ms[1]) if len(ms) > 1 else ""
+    effects = ms[4]
+    if "击破" not in desc or not isinstance(effects, list):
+        return []
+    result = []
+    for effect in effects:
+        if not (isinstance(effect, list) and effect
+                and str(effect[0]) == "回复SP"):
+            continue
+        num = re.search(r'\d+', str(effect[1]) if len(effect) > 1 else "")
+        scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+        if num and scope_info:
+            result.append({"amount": int(num.group()),
+                           "scope": scope_info[0],
+                           "element": scope_info[1],
+                           "first_only": "首次" in desc})
+    return result
+
+
 def _parse_master_ex_sp(ms):
     """大师技能里「自身使用EX技能后 回复SP」的项。
 
@@ -1201,6 +1228,7 @@ class HBRDataSource:
         self._master_name = {}      # {role_name: 大师技能名}
         self._master_action = {}    # {role_name: 可主动释放的大师技能 SkillInfo}
         self._master_ex_sp = {}     # {role_name: [EX技能后回复SP项]}
+        self._master_break_sp = {}  # {role_name: [击破敌人时回复SP项]}
         self._role_team = {}        # {role_name: 队伍}
         self._resonance_pool = None  # {名称: 共鸣天赋}
 
@@ -1254,6 +1282,14 @@ class HBRDataSource:
             ex_sp = _parse_master_ex_sp(ms)
             if ex_sp:
                 self._master_ex_sp[role_name] = ex_sp
+            break_sp = _parse_master_break_sp(ms)
+            if break_sp:
+                self._master_break_sp[role_name] = break_sp
+
+    def master_break_sp(self, role_name):
+        """角色「大师技能」里「自身攻击击破敌人时 回复SP」的项。"""
+        self._load_master_skills()
+        return self._master_break_sp.get(role_name, [])
 
     def master_ex_sp(self, role_name):
         """角色「大师技能」里「自身使用EX技能后 回复SP」的项。"""

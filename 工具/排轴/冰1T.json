@@ -121,8 +121,8 @@
       "actions": [
         {
           "member": 0,
-          "skill": "通常攻击",
-          "base_hits": 3,
+          "skill": "连结未来的苍之意志",
+          "base_hits": 0,
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
@@ -130,7 +130,75 @@
         },
         {
           "member": 1,
-          "skill": "通常攻击",
+          "skill": "生命无常+",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "点数援助",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "超频回合",
+      "od": "OD2/Bonus1",
+      "od_timing": "后置OD",
+      "actions": [
+        {
+          "member": 3,
+          "skill": "秘技！灵符龙卷风",
+          "base_hits": 5,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 5,
+          "skill": "放学后的小小刺激",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": true,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "先导的领袖魅力",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "追加回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 3,
+          "skill": "秘技！灵符龙卷风",
+          "base_hits": 5,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 5,
+          "skill": "放学后的小小刺激",
           "base_hits": 3,
           "combo": 0,
           "fixed_od": 0.0,
@@ -141,6 +209,74 @@
           "member": 2,
           "skill": "胜利之弧",
           "base_hits": 10,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "超频回合",
+      "od": "OD2/Bonus2",
+      "od_timing": "后置OD",
+      "actions": [
+        {
+          "member": 1,
+          "skill": "幻影时刻",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 4,
+          "skill": "天堂心跳",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "先导的领袖魅力",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "追加回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 1,
+          "skill": "泪雨",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 4,
+          "skill": "垂直打击",
+          "base_hits": 6,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "指挥行动",
+          "base_hits": 0,
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
