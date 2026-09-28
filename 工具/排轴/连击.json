@@ -138,6 +138,74 @@
           "sp_target": null
         }
       ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "冰霜斩击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "致命的微笑",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
     }
   ]
 }
