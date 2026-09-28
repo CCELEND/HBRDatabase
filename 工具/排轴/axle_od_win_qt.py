@@ -109,6 +109,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 固定OD = ROUNDDOWN(固定OD×100×总系数, 2) + ROUNDDOWN(31X共鸣×100×总系数, 2)
 - 总系数 = 耳环系数 + 其他OD增量
 - 通常攻击不享受 OD 耳环加成、**不计连击**；通常攻击视为「无属性」。
+  **连击只对「攻击技能（非通常攻击）」生效**：非攻击技能（无 Hit，如 增益/回复）也不计连击
+  （连击输入框不禁用，只是不参与计算）。
 - 抗性可按属性勾选（含「无」）：行动的攻击元素（技能元素 → 角色风格元素 → 无）被抗性时，
   该次 HIT OD 记 0。
 - 「OD条下降 X%」为该次行动 OD 的固定扣减（如 50% → −50，可为负）。
@@ -1056,8 +1058,6 @@ class ActionRow(QFrame):
             else:
                 # 无 Hit 信息的技能（非通常攻击）原始Hit 记 0
                 self.base_hits_spin.setValue(0)
-            # 通常攻击不计连击：禁用「连击」输入框
-            self.combo_spin.setEnabled(not bool(skill.is_normal_attack))
 
     # ------------------------------------------------------------- helpers
     def is_normal_attack(self):
@@ -1085,8 +1085,11 @@ class ActionRow(QFrame):
         is_normal = self.is_normal_attack()
         if is_normal or self._od_earring_exempt():
             earring = 0.0
-        # 通常攻击不计连击
-        combo = 0.0 if is_normal else float(self.combo_spin.value())
+        # 连击只对「攻击技能（非通常攻击）」生效：通常攻击与非攻击技能都不计连击
+        skill = self._find_skill()
+        is_attack = bool(skill is not None and skill.hits is not None)
+        combo = (float(self.combo_spin.value())
+                 if (is_attack and not is_normal) else 0.0)
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=combo,
