@@ -288,6 +288,9 @@ class SkillInfo:
         self.od_earring_exempt = od_earring_exempt
         # 是否为「EX技能」（SS/SSR 风格的第一个主动技能及其进化版；含被通用化的）
         self.is_ex_skill = False
+        # 「连击数上升」buff（如 连结未来的苍之意志）：
+        # {"amount","duration","timing","scope","element"}；无则 None
+        self.combo_buff = None
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -550,6 +553,33 @@ def _parse_master_ex_sp(ms):
     return result
 
 
+def _parse_combo_buff(group):
+    """解析技能里的「连击数上升」效果（如 连结未来的苍之意志）。
+
+    效果形如 ["连击数上升（特大）", "3", null, null, "3", "己方回合", "全体冰属性风格"]
+    → amount=3、duration=3、scope/element 取自目标。
+    返回 {"amount","duration","timing","scope","element"} 或 None。
+    """
+    effects = group[1] if len(group) > 1 and isinstance(group[1], list) else []
+    for effect in effects:
+        if not (isinstance(effect, list) and effect
+                and "连击数上升" in str(effect[0])):
+            continue
+        m = re.search(r'(\d+)', str(effect[1]) if len(effect) > 1 else "")
+        amount = int(m.group(1)) if m else 0
+        m2 = re.search(r'(\d+)', str(effect[4]) if len(effect) > 4 else "")
+        duration = int(m2.group(1)) if m2 else 0
+        scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+        return {
+            "amount": amount,
+            "duration": duration,
+            "timing": (str(effect[5]) if len(effect) > 5 and effect[5] else None),
+            "scope": scope_info[0] if scope_info else "self",
+            "element": scope_info[1] if scope_info else None,
+        }
+    return None
+
+
 def _extract_skill(group):
     """从一个 ActiveSkills 条目解析技能；任何异常都不应中断整体加载。"""
     try:
@@ -563,6 +593,10 @@ def _extract_skill(group):
         skill = SkillInfo(name)
     try:
         skill.desc = str(group[0][1])
+    except Exception:
+        pass
+    try:
+        skill.combo_buff = _parse_combo_buff(group)
     except Exception:
         pass
     skill.name = _fix_skill_name(skill.name)

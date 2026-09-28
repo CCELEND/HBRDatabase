@@ -111,6 +111,11 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 通常攻击不享受 OD 耳环加成、**不计连击**；通常攻击视为「无属性」。
   **连击只对「攻击技能（非通常攻击）」生效**：非攻击技能（无 Hit，如 增益/回复）也不计连击
   （连击输入框不禁用，只是不参与计算）。
+- 「连击数上升」buff（如 苍井绘里香「传承·Legacy」的 连结未来的苍之意志：
+  提升冰属性风格连击数 3 己方回合）会**自动计入**受影响队员行动的连击数。
+  「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
+  例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
+  到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
 - 抗性可按属性勾选（含「无」）：行动的攻击元素（技能元素 → 角色风格元素 → 无）被抗性时，
   该次 HIT OD 记 0。
 - 「OD条下降 X%」为该次行动 OD 的固定扣减（如 50% → −50，可为负）。
@@ -1088,8 +1093,10 @@ class ActionRow(QFrame):
         # 连击只对「攻击技能（非通常攻击）」生效：通常攻击与非攻击技能都不计连击
         skill = self._find_skill()
         is_attack = bool(skill is not None and skill.hits is not None)
-        combo = (float(self.combo_spin.value())
-                 if (is_attack and not is_normal) else 0.0)
+        combo = 0.0
+        if is_attack and not is_normal:
+            # 手动连击 + 「连击数上升」buff 自动连击
+            combo = float(self.combo_spin.value()) + self.get_auto_combo()
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=combo,
@@ -1103,6 +1110,24 @@ class ActionRow(QFrame):
         """该次行动使用的技能是否为「EX技能」。"""
         skill = self._find_skill()
         return bool(skill is not None and getattr(skill, "is_ex_skill", False))
+
+    def get_combo_buff(self):
+        """该技能是否附带「连击数上升」buff（如 连结未来的苍之意志）。"""
+        skill = self._find_skill()
+        return getattr(skill, "combo_buff", None) if skill is not None else None
+
+    def set_auto_combo(self, value):
+        """记录本回合自动获得的连击（来自「连击数上升」buff）。"""
+        self._auto_combo = float(value or 0.0)
+        if self._auto_combo > 0:
+            self.combo_spin.setToolTip(
+                "连击数：手动 %d ＋ 自动（连击数上升 buff）%g"
+                % (self.combo_spin.value(), self._auto_combo))
+        else:
+            self.combo_spin.setToolTip("连击数（只对攻击技能、且非通常攻击生效）")
+
+    def get_auto_combo(self):
+        return float(getattr(self, "_auto_combo", 0.0) or 0.0)
 
     def is_all_target(self):
         """该技能是否为「全体」攻击（攻击范围含「全体」）。"""
@@ -2313,6 +2338,34 @@ class AxleODWindow(QFrame):
                 * len(self._rhythm_members(element)),
                 "triggered": False,
             }
+        # 「连击数上升」buff（如 连结未来的苍之意志）：按目标自己的「己方回合」数结算，
+        # 含追加/特殊回合（行动过就算一个己方回合）
+        combo_buffs = {}   # {slot: [{"amount", "remaining"}]}
+        for turn in self.turns:
+            # 本回合行动过的队员（追加/特殊回合也算「己方回合」）
+            actors = [a.member_index for a in turn.actions
+                      if a.member_index is not None]
+            turn_front = set(actors) or start_front
+            # 1) 本回合使用的「连击数上升」技能：当回合即生效
+            for action in turn.actions:
+                buff = action.get_combo_buff()
+                if not buff or not buff.get("amount") or not buff.get("duration"):
+                    continue
+                for target in self._scope_targets(
+                        buff.get("scope"), buff.get("element"),
+                        action.member_index, self._active_slots(), turn_front):
+                    combo_buffs.setdefault(target, []).append(
+                        {"amount": buff["amount"],
+                         "remaining": buff["duration"]})
+            # 2) 本回合各行动的自动连击 = 当前生效 buff 之和
+            for action in turn.actions:
+                action.set_auto_combo(sum(
+                    b["amount"] for b in combo_buffs.get(action.member_index, [])
+                    if b["remaining"] > 0))
+            # 3) 「己方回合」计数：本回合行动过的队员，其 buff 剩余 −1
+            for slot in actors:
+                for b in combo_buffs.get(slot, []):
+                    b["remaining"] -= 1
         for turn_idx, turn in enumerate(self.turns):
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
             level = turn.od_level()
