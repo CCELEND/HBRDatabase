@@ -5,7 +5,8 @@
       "role": "柳美音",
       "style": "夜晚的香气，蔷薇的韵律",
       "passives": [
-        "红宝石香水（被动技能）"
+        "红宝石香水（被动技能）",
+        "柳眉倒竖"
       ],
       "lb": 4,
       "resonance_talent": null,
@@ -16,7 +17,8 @@
       "role": "大岛一千子",
       "style": "指引的光辉",
       "passives": [
-        "彩凤连理"
+        "彩凤连理",
+        "晨间的必做事项（被动技能）"
       ],
       "lb": 4,
       "resonance_talent": null,
@@ -35,7 +37,9 @@
     {
       "role": "大岛五十铃",
       "style": "出浴后的朦胧天地",
-      "passives": [],
+      "passives": [
+        "打开你的心扉吧"
+      ],
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
@@ -45,7 +49,8 @@
       "role": "茅森月歌",
       "style": "月华歌姬",
       "passives": [
-        "交织而成的记忆"
+        "交织而成的记忆",
+        "怪物般的球威（被动技能）"
       ],
       "lb": 4,
       "resonance_talent": null,
@@ -132,13 +137,13 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
-          "sp_target": null
+          "sp_target": 2
         },
         {
           "member": 2,
           "skill": "暗夜的杀戮之刃",
           "base_hits": 8,
-          "combo": 5,
+          "combo": 0,
           "fixed_od": 0.0,
           "break": true,
           "sp_target": null
@@ -172,7 +177,7 @@
           "member": 2,
           "skill": "对称·启示",
           "base_hits": 10,
-          "combo": 5,
+          "combo": 0,
           "fixed_od": 0.0,
           "break": false,
           "sp_target": null
@@ -206,7 +211,7 @@
           "member": 2,
           "skill": "对称·启示",
           "base_hits": 10,
-          "combo": 5,
+          "combo": 0,
           "fixed_od": 0.0,
           "break": false,
           "sp_target": null
