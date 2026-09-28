@@ -122,11 +122,11 @@ HELP_TEXT = """排轴OD计算 使用说明
   一次攻击技能里**主动**给的连击层**最多生效 2 层**；被动给的层（如 梅雨）**不占名额**、
   每次攻击都会生效并被消耗；带「**[单独发动]**」的主动层会**独占**（该次攻击只生效它一个）。
   未生效的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
+  「己方回合」的消耗规则：**通常回合 / 超频回合（OD回合）所有队员各 −1**；
+  **追加 / 特殊回合只有当回合出手的队员 −1**（额外回合只算出手那个人的）。
+  因此同一个 buff 对不同队员，其「3 己方回合」可能落在不同的回合上。
 - 「**SP0或以上即可使用**」的技能（如 李映夏「第七击·无中生有」）：SP 不足时也能使用，
   消耗照扣、SP 会变成负数。
-  「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
-  例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
-  到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
 - 抗性可按属性勾选（含「无」）：行动的攻击元素（技能元素 → 角色风格元素 → 无）被抗性时，
   该次 HIT OD 记 0。
 - 「OD条下降 X%」为该次行动 OD 的固定扣减（如 50% → −50，可为负）。
@@ -2384,8 +2384,8 @@ class AxleODWindow(QFrame):
                 * len(self._rhythm_members(element)),
                 "triggered": False,
             }
-        # 「连击数上升」buff（如 连结未来的苍之意志）：按目标自己的「己方回合」数结算，
-        # 含追加/特殊回合（行动过就算一个己方回合）
+        # 「连击数上升」buff（如 连结未来的苍之意志）：「己方回合」数消耗——
+        # 通常/超频回合**所有队员**各 −1；追加/特殊回合只有**当回合出手的队员** −1
         combo_buffs = {}   # {slot: [{"amount","left","kind","source"}]}
         initial_front = self._initial_front()
         for turn_idx, turn in enumerate(self.turns):
@@ -2465,8 +2465,15 @@ class AxleODWindow(QFrame):
                             e["left"] -= 1
                 else:
                     action.set_effective_combo(0.0)
-            # 4) 「己方回合」计数：本回合行动过的队员，按回合消耗的 buff −1
-            for slot in actors:
+            # 4) 「己方回合」计数：
+            #    - 通常回合 / 超频回合：**所有队员**各 −1（真正的己方回合）
+            #    - 追加 / 特殊回合：只有**当回合出手的队员**−1
+            #      （额外回合只属于出手的那个人，如释放者本人）
+            if turn.turn_type() in EXTRA_TURN_TYPES:
+                tick_slots = set(actors)
+            else:
+                tick_slots = set(combo_buffs)
+            for slot in tick_slots:
                 for e in combo_buffs.get(slot, []):
                     if e["left"] > 0 and e.get("kind") != "use":
                         e["left"] -= 1
