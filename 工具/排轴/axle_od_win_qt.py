@@ -60,6 +60,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 【排轴】
 - 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数、
   共鸣天赋（含等级）、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
+  **默认队伍是空队伍**（角色/风格都为空），首次编入角色时会自动建立第 1 回合。
   共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在勾选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
@@ -1890,15 +1891,10 @@ class AxleODWindow(QFrame):
         self.add_turn()
 
     def _default_team(self):
-        roles = self.data_source.role_names()
-        team = []
-        for i in range(TEAM_SIZE):
-            role = roles[i] if i < len(roles) else ""
-            styles = self.data_source.styles_names(role) if role else []
-            team.append({"role": role, "style": styles[0] if styles else "",
-                         "resonance_talent": None, "resonance_level": 4,
-                         "od_earring": 1.0})
-        return team
+        """默认队伍为**空队伍**（角色/风格都为空，由用户自行编入）。"""
+        return [{"role": "", "style": "", "resonance_talent": None,
+                 "resonance_level": 4, "od_earring": 1.0}
+                for _ in range(TEAM_SIZE)]
 
     # ------------------------------------------------------------------ UI
     def _build_ui(self):
@@ -1973,9 +1969,6 @@ class AxleODWindow(QFrame):
         # 前四个是「添加回合」类：空队伍时禁用
         self.add_turn_buttons = add_buttons[:4]
         bar.addStretch(1)
-        tip = QLabel("提示：队伍≥3人时每回合固定 3 人行动；点击回合选中")
-        tip.setStyleSheet("color: #666666;")
-        bar.addWidget(tip)
         return bar
 
     def _build_team_group(self):
@@ -2183,6 +2176,9 @@ class AxleODWindow(QFrame):
             self._team_updating = False
         self._refresh_role_choices()
         self._update_turn_buttons()
+        # 默认是空队伍，因此开始时没有回合；首次编入角色后自动建一个回合
+        if not self.turns and self._active_slots():
+            self.add_turn()
         for turn in self.turns:
             turn.refresh_team()
         self.recalculate()
@@ -3602,7 +3598,7 @@ def _open_turns_window(view):
     frame = getattr(view, "turns_frame", None)
     if frame is not None:
         return frame
-    frame = creat_Toplevel(TURNS_TITLE, 1180, 760, 380, 155)
+    frame = creat_Toplevel(TURNS_TITLE, 1280, 760, 380, 155)
     set_window_icon(frame, "./工具/help.png")
     frame.grid_layout.addWidget(view.turns_panel, 0, 0)
     frame.grid_layout.setRowStretch(0, 1)

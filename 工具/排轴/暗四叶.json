@@ -4,7 +4,9 @@
     {
       "role": "瑞原蓝娜",
       "style": "冲锋！突刺！金枪鱼！",
-      "passives": [],
+      "passives": [
+        "水光摇曳（被动技能）"
+      ],
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
@@ -14,7 +16,8 @@
       "role": "茅森月歌",
       "style": "黎明的感性之魂",
       "passives": [
-        "交织而成的记忆"
+        "交织而成的记忆",
+        "怪物般的球威（被动技能）"
       ],
       "lb": 4,
       "resonance_talent": null,
@@ -81,7 +84,7 @@
           "member": 0,
           "skill": "豪迈！海盗加农炮",
           "base_hits": 5,
-          "combo": 10,
+          "combo": 0,
           "fixed_od": 0.0,
           "break": false,
           "sp_target": null
@@ -115,7 +118,7 @@
           "member": 0,
           "skill": "豪迈！海盗加农炮",
           "base_hits": 5,
-          "combo": 10,
+          "combo": 0,
           "fixed_od": 0.0,
           "break": false,
           "sp_target": null
