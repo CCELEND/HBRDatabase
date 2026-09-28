@@ -114,6 +114,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 「连击数上升」buff（如 苍井绘里香「传承·Legacy」的 连结未来的苍之意志：
   提升冰属性风格连击数 3 己方回合）会**自动计入**受影响队员行动的连击数，
   **连击框里直接显示「手动＋自动」的合计值**（手动部分另存，读档不会重复叠加）。
+  带「**[单独发动]**」的这类效果**不会叠加**：重复发动只刷新持续回合数（连击值不变）。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
   例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
   到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
@@ -2372,9 +2373,16 @@ class AxleODWindow(QFrame):
                 for target in self._scope_targets(
                         buff.get("scope"), buff.get("element"),
                         action.member_index, self._active_slots(), turn_front):
-                    combo_buffs.setdefault(target, []).append(
-                        {"amount": buff["amount"],
-                         "remaining": buff["duration"]})
+                    entries = combo_buffs.setdefault(target, [])
+                    if buff.get("solo"):
+                        # 「[单独发动]」：重复发动不叠加，只刷新回合数
+                        entries[:] = [e for e in entries
+                                      if e.get("source") != buff.get("source")]
+                    entries.append({
+                        "amount": buff["amount"],
+                        "remaining": buff["duration"],
+                        "source": buff.get("source"),
+                    })
             # 2) 本回合各行动的自动连击 = 当前生效 buff 之和
             for action in turn.actions:
                 action.set_auto_combo(sum(

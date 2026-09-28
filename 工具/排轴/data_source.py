@@ -576,6 +576,7 @@ def _parse_combo_buff(group):
             "timing": (str(effect[5]) if len(effect) > 5 and effect[5] else None),
             "scope": scope_info[0] if scope_info else "self",
             "element": scope_info[1] if scope_info else None,
+            "solo": False,     # 由 _extract_skill 按描述里的「[单独发动]」补充
         }
     return None
 
@@ -597,9 +598,15 @@ def _extract_skill(group):
         pass
     try:
         skill.combo_buff = _parse_combo_buff(group)
+        if skill.combo_buff is not None:
+            # 「[单独发动]」类：重复发动不叠加，只刷新回合数
+            skill.combo_buff["solo"] = ("[单独发动]" in skill.desc
+                                        or "【单独发动】" in skill.desc)
     except Exception:
         pass
     skill.name = _fix_skill_name(skill.name)
+    if skill.combo_buff is not None:
+        skill.combo_buff["source"] = skill.name
     return skill
 
 
