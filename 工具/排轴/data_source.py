@@ -1265,6 +1265,39 @@ class HBRDataSource:
                         "once": ("1次" in pdesc) or timing == "battle",
                         "lb": _passive_lb(passive),
                     })
+                # 「（被动技能）」条目里的「战斗/回合开始时 超频条+X%」
+                # （如 东城司「微风」的 背阴处的小憩：战斗开始时位于前锋 超频条+10%，仅首回合）
+                for group in (style_data.get("ActiveSkills") or []):
+                    try:
+                        gname = str(group[0][0])
+                        gdesc = str(group[0][1])
+                    except Exception:
+                        continue
+                    if ("（被动技能）" not in gname
+                            and "(被动技能)" not in gname):
+                        continue
+                    if "超频条" not in gdesc:
+                        continue
+                    gm = re.search(r'超频条\+(\d+(?:\.\d+)?)%', gdesc)
+                    if not gm:
+                        continue
+                    position = None
+                    if "位于前锋" in gdesc:
+                        position = "front"
+                    elif "位于后卫" in gdesc:
+                        position = "back"
+                    timing = ("battle" if ("战斗开始时" in gdesc
+                                           or "初战开始时" in gdesc) else "turn")
+                    turn_start_od.append({
+                        "name": gname,
+                        "amount": float(gm.group(1)),
+                        "threshold": None,
+                        "position": position,
+                        "timing": timing,
+                        "once": ("1次" in gdesc) or timing == "battle",
+                        "lb": 0,
+                        "requires": gname,
+                    })
                 # 「回合开始时 / 战斗开始时」回复友方 SP 的被动（如 与伙伴一起）：
                 # 「位于前锋 + 自身」类归入 front_sp_passives，其余按作用范围结算。
                 turn_start_sp = []

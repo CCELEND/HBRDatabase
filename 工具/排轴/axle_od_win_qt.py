@@ -2872,9 +2872,18 @@ class AxleODWindow(QFrame):
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
+        selected = self._selected_passives(slot)
         for st in self.data_source.styles(role):
             if st.name == style:
-                return [m for m in st.turn_start_od if m.get("lb", 0) <= lb]
+                mods = []
+                for m in st.turn_start_od:
+                    if m.get("lb", 0) > lb:
+                        continue
+                    req = m.get("requires")
+                    if req and selected is not None and req not in selected:
+                        continue
+                    mods.append(m)
+                return mods
         return []
 
     def _member_ex_sp(self, slot):
