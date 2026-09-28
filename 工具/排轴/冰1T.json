@@ -1,0 +1,152 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "苍井绘里香",
+      "style": "传承·Legacy",
+      "passives": [
+        "战吼（被动技能）",
+        "私人课程（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": "神圣恩典",
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "东城司",
+      "style": "哀情挽歌",
+      "passives": [
+        "背阴处的小憩（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "茅森月歌",
+      "style": "Glorious Blades",
+      "passives": [
+        "交织而成的记忆",
+        "怪物般的球威（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "国见玉",
+      "style": "欢迎参加♪梦魇游行",
+      "passives": [
+        "大贴特贴吧！（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "立华奏",
+      "style": "翱翔天际之剑",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "小笠原绯雨",
+      "style": "夏暮色榴石",
+      "passives": [
+        "友缘之剑"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "心动滑行",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "驱动增益",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "先导的领袖魅力",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    },
+    {
+      "type": "追加回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "胜利之弧",
+          "base_hits": 10,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}

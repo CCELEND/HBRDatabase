@@ -296,6 +296,9 @@ class SkillInfo:
         self.passive_combo = []
         # 「SP0或以上即可使用」：即使 SP 不足也能使用（SP 会变成负数）
         self.allow_negative_sp = False
+        # 「友方主动技能使自身SP提升时 额外使全体SP+N（可突破上限至SP30）」
+        # 如 东城司「分享」：[{"name","amount","scope","element","limit","lb"}]
+        self.share_sp = []
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -600,6 +603,41 @@ def _parse_combo_buff(group):
             "solo": False,     # 由 _extract_skill 按描述里的「[单独发动]」补充
         }
     return None
+
+
+def _parse_share_sp(style_data):
+    """「友方主动技能使自身SP提升时 额外使全体SP+N」被动（如 东城司「分享」）。
+
+    返回 [{"name","amount","scope","element","limit","lb"}, ...]。
+    """
+    result = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            pvalue = passive[4] if len(passive) > 4 else None
+            ptarget = passive[7] if len(passive) > 7 else None
+        except Exception:
+            continue
+        if ptype != "回复SP":
+            continue
+        if "使自身的SP提升" not in pdesc and "自身的SP提升时" not in pdesc:
+            continue
+        num = re.search(r'\d+', str(pvalue))
+        scope_info = _sp_recover_scope(ptarget)
+        if not num or not scope_info:
+            continue
+        lm = re.search(r'上限至SP(\d+)', pdesc)
+        result.append({
+            "name": pname,
+            "amount": int(num.group()),
+            "scope": scope_info[0],
+            "element": scope_info[1],
+            "limit": int(lm.group(1)) if lm else None,
+            "lb": _passive_lb(passive),
+        })
+    return result
 
 
 def _parse_passive_combo(style_data):
@@ -1626,6 +1664,8 @@ class HBRDataSource:
                 styles[-1].ex_od = _parse_ex_od(style_data)
                 # 被动里的「连击数上升」项（如 梅雨）
                 styles[-1].passive_combo = _parse_passive_combo(style_data)
+                # 「分享」类：友方主动技能使自身SP提升时 额外全体SP+N
+                styles[-1].share_sp = _parse_share_sp(style_data)
                 # 「共鸣天赋」（如 神圣恩典）
                 res = style_data.get("resonance")
                 if isinstance(res, dict) and res.get("name"):
