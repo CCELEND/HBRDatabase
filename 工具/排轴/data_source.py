@@ -1527,6 +1527,10 @@ class HBRDataSource:
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
+        # 「（被动技能）」条目按**角色**通用：任一风格解锁后，该角色所有风格都能携带
+        all_options = _dedupe([opt for st in styles for opt in st.passive_options])
+        for st in styles:
+            st.passive_options = list(all_options)
         self._style_cache[role_path] = styles
         return styles
 

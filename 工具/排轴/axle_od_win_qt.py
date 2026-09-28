@@ -75,7 +75,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
 - 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
   已通用化的例外：第一个 SS 风格的专属技能（如 幻象泡影）、星火燎原+。
-- 「（被动技能）」在队伍配置里选择携带（默认全部），选中后全程（所有回合）生效。
+- 「（被动技能）」在队伍配置里选择携带（默认全部），选中后全程（所有回合）生效；
+  这些条目按**角色通用**（任一风格解锁后，该角色所有风格都能携带并生效）。
 - 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
 - 特殊被动里的攻击（如 山胁·冯·伊瓦尔「魔界骑兵启动！」，斩属性 6 连击）也可作为行动使用，
   且该攻击不吃 OD 耳环（不受友方 BUFF 影响）。
@@ -2868,23 +2869,29 @@ class AxleODWindow(QFrame):
         return set(selected) if selected is not None else None
 
     def _member_turn_start_od(self, slot):
-        """风格被动里「回合开始时增加 OD 槽」的项（如 V字回复，满足突破要求）。"""
+        """风格被动里「回合开始时增加 OD 槽」的项（满足突破要求）。
+
+        「（被动技能）」条目（带 requires）按**角色**通用：任一风格解锁后，
+        该角色所有风格携带它都生效。
+        """
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
         selected = self._selected_passives(slot)
+        mods = []
         for st in self.data_source.styles(role):
-            if st.name == style:
-                mods = []
-                for m in st.turn_start_od:
-                    if m.get("lb", 0) > lb:
+            equipped = (st.name == style)
+            for m in st.turn_start_od:
+                if m.get("lb", 0) > lb:
+                    continue
+                req = m.get("requires")
+                if req is not None:
+                    if selected is not None and req not in selected:
                         continue
-                    req = m.get("requires")
-                    if req and selected is not None and req not in selected:
-                        continue
-                    mods.append(m)
-                return mods
-        return []
+                elif not equipped:
+                    continue
+                mods.append(m)
+        return mods
 
     def _member_ex_sp(self, slot):
         """该队员「自身使用EX技能后 回复SP」的项（风格被动 + 大师技能）。
@@ -2907,22 +2914,28 @@ class AxleODWindow(QFrame):
         return mods
 
     def _member_ex_od(self, slot):
-        """该队员「自身使用EX技能后 超频条+X%」的项（过滤未携带的「（被动技能）」）。"""
+        """该队员「自身使用EX技能后 超频条+X%」的项。
+
+        「（被动技能）」条目（如 千里眼）按**角色**通用：任一风格解锁后，
+        该角色所有风格携带它都生效。
+        """
         role = self.team[slot].get("role")
         style = self.team[slot].get("style")
         lb = self._member_lb(slot)
         selected = self._selected_passives(slot)
         mods = []
         for st in self.data_source.styles(role):
-            if st.name == style:
-                for mod in st.ex_od:
-                    if mod.get("lb", 0) > lb:
+            equipped = (st.name == style)
+            for mod in st.ex_od:
+                if mod.get("lb", 0) > lb:
+                    continue
+                req = mod.get("requires")
+                if req is not None:
+                    if selected is not None and req not in selected:
                         continue
-                    req = mod.get("requires")
-                    if req and selected is not None and req not in selected:
-                        continue
-                    mods.append(mod)
-                break
+                elif not equipped:
+                    continue
+                mods.append(mod)
         return mods
 
     def _member_ex_od_fraction(self, slot):
