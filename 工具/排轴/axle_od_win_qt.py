@@ -115,6 +115,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   提升冰属性风格连击数 3 己方回合）会**自动计入**受影响队员行动的连击数，
   **连击框里直接显示「手动＋自动」的合计值**（手动部分另存，读档不会重复叠加）。
   带「**[单独发动]**」的这类效果**不会叠加**：重复发动只刷新持续回合数（连击值不变）。
+  被动里的同类效果（如 山胁「梅雨」：战斗开始时位于前锋 自身连击+5（1次））同样自动计入；
+  标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
   「己方回合」按**该队员自己行动过的回合**计（含追加/特殊回合）——
   例如第1回合发动后，第1回合、第1回合的追加回合、第2回合都还有；
   到第3回合，在追加回合里行动过的人已用满 3 个己方回合而失效，其他人仍保留。
@@ -1115,6 +1117,12 @@ class ActionRow(QFrame):
         """该次行动使用的技能是否为「EX技能」。"""
         skill = self._find_skill()
         return bool(skill is not None and getattr(skill, "is_ex_skill", False))
+
+    def is_combo_eligible(self):
+        """是否属于「连击生效」的行动：攻击技能且非通常攻击。"""
+        skill = self._find_skill()
+        return bool(skill is not None and skill.hits is not None
+                    and not skill.is_normal_attack)
 
     def get_combo_buff(self):
         """该技能是否附带「连击数上升」buff（如 连结未来的苍之意志）。"""
@@ -2359,13 +2367,36 @@ class AxleODWindow(QFrame):
             }
         # 「连击数上升」buff（如 连结未来的苍之意志）：按目标自己的「己方回合」数结算，
         # 含追加/特殊回合（行动过就算一个己方回合）
-        combo_buffs = {}   # {slot: [{"amount", "remaining"}]}
-        for turn in self.turns:
+        combo_buffs = {}   # {slot: [{"amount","left","kind","source"}]}
+        initial_front = self._initial_front()
+        for turn_idx, turn in enumerate(self.turns):
             # 本回合行动过的队员（追加/特殊回合也算「己方回合」）
             actors = [a.member_index for a in turn.actions
                       if a.member_index is not None]
             turn_front = set(actors) or start_front
-            # 1) 本回合使用的「连击数上升」技能：当回合即生效
+            # 1) 被动类连击（如 山胁「梅雨」：战斗开始时位于前锋 连击+5（1次））
+            for slot in self._active_slots():
+                for mod in self._member_passive_combo(slot):
+                    if mod.get("timing") == "battle" and turn_idx != 0:
+                        continue
+                    pos = mod.get("position")
+                    if pos == "front" and slot not in initial_front:
+                        continue
+                    if pos == "back" and slot in initial_front:
+                        continue
+                    entries = combo_buffs.setdefault(slot, [])
+                    if mod.get("timing") == "battle" and any(
+                            e.get("source") == mod.get("name")
+                            and e.get("passive") for e in entries):
+                        continue          # 出击中仅1次
+                    entries.append({
+                        "amount": mod.get("amount", 0),
+                        "left": mod.get("count", 0),
+                        "kind": mod.get("kind", "turn"),
+                        "source": mod.get("name"),
+                        "passive": True,
+                    })
+            # 2) 本回合使用的「连击数上升」技能：当回合即生效
             for action in turn.actions:
                 buff = action.get_combo_buff()
                 if not buff or not buff.get("amount") or not buff.get("duration"):
@@ -2380,18 +2411,25 @@ class AxleODWindow(QFrame):
                                       if e.get("source") != buff.get("source")]
                     entries.append({
                         "amount": buff["amount"],
-                        "remaining": buff["duration"],
+                        "left": buff["duration"],
+                        "kind": buff.get("kind", "turn"),
                         "source": buff.get("source"),
                     })
-            # 2) 本回合各行动的自动连击 = 当前生效 buff 之和
+            # 3) 各行动的自动连击 = 当前生效 buff 之和；
+            #    「按次数」的 buff 每释放一次攻击技能消耗 1 次
             for action in turn.actions:
-                action.set_auto_combo(sum(
-                    b["amount"] for b in combo_buffs.get(action.member_index, [])
-                    if b["remaining"] > 0))
-            # 3) 「己方回合」计数：本回合行动过的队员，其 buff 剩余 −1
+                entries = combo_buffs.get(action.member_index, [])
+                action.set_auto_combo(sum(e["amount"] for e in entries
+                                          if e["left"] > 0))
+                if action.is_combo_eligible():
+                    for e in entries:
+                        if e["left"] > 0 and e.get("kind") == "use":
+                            e["left"] -= 1
+            # 4) 「己方回合」计数：本回合行动过的队员，按回合消耗的 buff −1
             for slot in actors:
-                for b in combo_buffs.get(slot, []):
-                    b["remaining"] -= 1
+                for e in combo_buffs.get(slot, []):
+                    if e["left"] > 0 and e.get("kind") != "use":
+                        e["left"] -= 1
         for turn_idx, turn in enumerate(self.turns):
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
             level = turn.od_level()
@@ -3024,6 +3062,16 @@ class AxleODWindow(QFrame):
         """使用 EX 技能时增加 OD 槽的被动，换算为「固定OD」小数（10% → 0.10）。"""
         return sum(m.get("amount", 0.0)
                    for m in self._member_ex_od(slot)) / 100.0
+
+    def _member_passive_combo(self, slot):
+        """该队员风格被动里的「连击数上升」项（满足突破要求）。"""
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        lb = self._member_lb(slot)
+        for st in self.data_source.styles(role):
+            if st.name == style:
+                return [m for m in st.passive_combo if m.get("lb", 0) <= lb]
+        return []
 
     def _member_turn_start_sp(self, slot):
         """风格被动里「回合开始时回复友方 SP」的项（如 与伙伴一起，满足突破要求）。"""

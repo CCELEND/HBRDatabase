@@ -289,8 +289,11 @@ class SkillInfo:
         # 是否为「EX技能」（SS/SSR 风格的第一个主动技能及其进化版；含被通用化的）
         self.is_ex_skill = False
         # 「连击数上升」buff（如 连结未来的苍之意志）：
-        # {"amount","duration","timing","scope","element"}；无则 None
+        # {"amount","duration","kind","timing","scope","element"}；无则 None
         self.combo_buff = None
+        # 被动里的「连击数上升」项（如 山胁「梅雨」）：
+        # [{"name","amount","count","kind","position","timing","target","lb"}, ...]
+        self.passive_combo = []
         self.destructive_multiplier = destructive_multiplier  # 破坏倍率
         self.is_normal_attack = is_normal_attack      # 是否通常攻击
         self.sp_cost = sp_cost or 0                   # 消耗 SP（用于计算）
@@ -570,15 +573,62 @@ def _parse_combo_buff(group):
         m2 = re.search(r'(\d+)', str(effect[4]) if len(effect) > 4 else "")
         duration = int(m2.group(1)) if m2 else 0
         scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+        unit = str(effect[5]) if len(effect) > 5 and effect[5] else ""
         return {
             "amount": amount,
             "duration": duration,
-            "timing": (str(effect[5]) if len(effect) > 5 and effect[5] else None),
+            "kind": "use" if "次" in unit else "turn",   # 「次」= 按次数消耗
+            "timing": (unit or None),
             "scope": scope_info[0] if scope_info else "self",
             "element": scope_info[1] if scope_info else None,
             "solo": False,     # 由 _extract_skill 按描述里的「[单独发动]」补充
         }
     return None
+
+
+def _parse_passive_combo(style_data):
+    """解析被动里的「连击数上升」项。
+
+    如 山胁「梅雨」：若战斗开始时位于前锋 则自身的连击数（少量伤害）+5（1次）
+    → amount=5、count=1、kind="use"（每释放一次攻击技能消耗一次）。
+    返回 [{"name","amount","count","kind","position","timing","target","lb"}, ...]。
+    """
+    result = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            pvalue = passive[4] if len(passive) > 4 else None
+            pcount = passive[5] if len(passive) > 5 else None
+            punit = str(passive[6]) if len(passive) > 6 else ""
+            ptarget = str(passive[7]) if len(passive) > 7 else None
+        except Exception:
+            continue
+        if not ptype.startswith("连击数上升"):
+            continue
+        m = re.search(r'(\d+)', str(pvalue))
+        amount = int(m.group(1)) if m else 0
+        m2 = re.search(r'(\d+)', str(pcount))
+        count = int(m2.group(1)) if m2 else 0
+        position = None
+        if "位于前锋" in pdesc:
+            position = "front"
+        elif "位于后卫" in pdesc:
+            position = "back"
+        timing = ("battle" if ("战斗开始时" in pdesc
+                               or "初战开始时" in pdesc) else "turn")
+        result.append({
+            "name": pname,
+            "amount": amount,
+            "count": count,
+            "kind": "use" if "次" in punit else "turn",
+            "position": position,
+            "timing": timing,
+            "target": ptarget,
+            "lb": _passive_lb(passive),
+        })
+    return result
 
 
 def _extract_skill(group):
@@ -1556,6 +1606,8 @@ class HBRDataSource:
                 styles[-1].ex_sp = _parse_ex_sp(style_data)
                 # 「自身使用EX技能后 超频条+X%」的项
                 styles[-1].ex_od = _parse_ex_od(style_data)
+                # 被动里的「连击数上升」项（如 梅雨）
+                styles[-1].passive_combo = _parse_passive_combo(style_data)
                 # 「共鸣天赋」（如 神圣恩典）
                 res = style_data.get("resonance")
                 if isinstance(res, dict) and res.get("name"):
