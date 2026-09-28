@@ -90,7 +90,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   且带「指挥行动」的风格**不能使用通常攻击**（行动列表里不再出现通常攻击）。
   「指挥者」是一个**职业**（风格数据里的 职业 字段，如 茅森月歌「Glorious Blades」）。
   「指挥行动」是该职业**专属**的；**一个队伍只能编入一名指挥者**——
-  其它位置的「指挥者」职业风格会被**禁用（不可选）**。
+  尚未有指挥者时各位置都可选，选中一名后**其它位置的「指挥者」职业风格会被禁用（不可选）**。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
 - 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
@@ -2070,14 +2070,18 @@ class AxleODWindow(QFrame):
             button.setEnabled(ok)
 
     def _refresh_commander_choices(self):
-        """指挥者只能编入一名：职业为「指挥者」的最靠前一名为指挥者，其它位置禁用指挥者风格。"""
+        """指挥者只能编入一名：职业为「指挥者」的最靠前一名为指挥者，其它位置禁用指挥者风格。
+
+        还没有任何指挥者时（commander is None）**所有位置都可选**，
+        这样才选得进第一个指挥者；选中后其它位置的指挥者风格才会被禁用。
+        """
         commander = None
         for slot, row in enumerate(self.team_rows):
             if row.role() and row.commander():
                 commander = slot
                 break
         for slot, row in enumerate(self.team_rows):
-            row.set_commanders_enabled(slot == commander)
+            row.set_commanders_enabled(commander is None or slot == commander)
 
     def _on_team_changed(self):
         if self._team_updating:
