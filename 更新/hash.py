@@ -66,6 +66,14 @@ def calculate_file_hash_block(filepath, key):
             sha256_hash.update(chunk)
     return key, sha256_hash.hexdigest()
 
+# 哈希/修复时跳过整棵子树：这些目录是机器本地或版本控制内容，
+# 不属于分发包，哈希它们既慢（venv 约 1.3 万个文件）又会被上传给服务器。
+HASH_SKIP_DIRS = frozenset({
+    "venv", ".venv", ".git", ".vs", ".vscode", "__pycache__",
+    "node_modules", "chrome_user_data",
+})
+
+
 def calculate_file_hashes(directory):
     file_hashes = {}
     skip_items = ["__pycache__", ".mp3", ".flac", 
@@ -75,6 +83,8 @@ def calculate_file_hashes(directory):
     # 遍历目录，收集所有需要计算哈希的文件路径
     file_tasks = []
     for root, dirs, files in os.walk(directory):
+        # 剪枝：不进入 venv/.git/.vs 等目录
+        dirs[:] = [d for d in dirs if d not in HASH_SKIP_DIRS]
         for filename in files:
             filepath = os.path.join(root, filename)
             # 使用相对路径作为键，格式为 "./目录名/子目录/文件名"

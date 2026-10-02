@@ -211,6 +211,14 @@ def webp_to_ico(size=(80, 66)):
             iconimage.save(tempiconpath, format='ICO', sizes=[(size[0], size[1])])
 
 
+# 启动清理时跳过的目录：这些是机器本地/版本控制内容，不含需要清理的资源，
+# 却占了大头（venv 约 1.3 万个文件），遍历它们会白白拖慢启动。
+CLEANUP_SKIP_DIRS = frozenset({
+    "venv", ".venv", "env", ".git", ".vs", ".vscode", "__pycache__",
+    "node_modules", "chrome_user_data", "build", "dist", ".idea",
+})
+
+
 def delete_files_if_alternative_exists(
     directory: str,
     target_suffix: str,
@@ -227,24 +235,27 @@ def delete_files_if_alternative_exists(
         logger.warning(f"目录 {directory} 不存在或不是有效目录，跳过删除操作")
         return
 
-    # 转换为Path对象
-    dir_path = pathlib.Path(directory)
-
-    # 遍历目标后缀的所有文件
-    for target_file in dir_path.rglob(f'*{target_suffix}'):
-        # 构建替代文件路径
-        alternative_file = target_file.with_suffix(alternative_suffix)
-        
-        if alternative_file.exists():
+    # 用 os.walk + 剪枝遍历（比 Path.rglob 快得多，且跳过 venv/.git 等）
+    target_suffix_lower = target_suffix.lower()
+    for root, dirs, files in os.walk(directory):
+        dirs[:] = [d for d in dirs if d not in CLEANUP_SKIP_DIRS]
+        for filename in files:
+            if not filename.lower().endswith(target_suffix_lower):
+                continue
+            target_path = os.path.join(root, filename)
+            # 构建替代文件路径（替换最后一个后缀）
+            alternative_path = target_path[:-len(target_suffix)] + alternative_suffix
+            if not os.path.exists(alternative_path):
+                continue
             try:
-                target_file.unlink()
-                logger.info(f"成功删除文件: {target_file}")
+                os.remove(target_path)
+                logger.info(f"成功删除文件: {target_path}")
             except PermissionError:
-                error_msg = f"没有权限删除 {target_file}"
+                error_msg = f"没有权限删除 {target_path}"
                 logger.error(error_msg)
                 messagebox.showerror("错误", error_msg)
             except Exception as e:
-                error_msg = f"删除 {target_file} 时出错: {e}"
+                error_msg = f"删除 {target_path} 时出错: {e}"
                 logger.error(error_msg)
                 messagebox.showerror("错误", error_msg)
 
@@ -413,13 +424,10 @@ def get_list_not_isinstance_index(a: list) -> int | None:
         if not isinstance(item, (int, float)):
             return index
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
-import psutil
 def kill_chrome_using_profile(user_data_dir: str):
     """终止占用指定 --user-data-dir 的残留 Chrome 进程，避免 profile 被锁"""
+    # 延迟导入：selenium / psutil 仅在真正需要启动 Chrome 时才加载
+    import psutil
     if not user_data_dir:
         return
     target = os.path.normcase(os.path.normpath(user_data_dir))
@@ -449,7 +457,11 @@ def kill_chrome_using_profile(user_data_dir: str):
                 except OSError:
                     pass
 
-def init_chrome_driver(chrome_options: webdriver.ChromeOptions) -> webdriver.Chrome | None:
+def init_chrome_driver(chrome_options: "webdriver.ChromeOptions") -> "webdriver.Chrome | None":
+    # 延迟导入：selenium / webdriver_manager 仅在真正需要启动 Chrome 时才加载
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from webdriver_manager.chrome import ChromeDriverManager
 
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")

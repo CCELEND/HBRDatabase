@@ -66,69 +66,109 @@ TOOL_BUTTON_STYLE = """
 """
 
 from 日志.error_queue_proc_qt import check_error_queue_qt
-from 更新.check_proc_qt import check_for_updates
 
-from 持有物.饰品.jewelrys_win_qt import show_jewelrys_type
-from 持有物.奖杯勋章.trophy_medals_win_qt import show_trophy_medals
-from 持有物.道具.props_win_qt import show_props
-from 持有物.主线道具.main_props_win_qt import show_main_props
-from 持有物.饰品材料.jewelry_materials_win_qt import show_jewelry_materials
-from 持有物.成长素材.growth_materials_win_qt import show_growth_materials
-from 持有物.活动奖章.medals_win_qt import show_medals
-from 持有物.强化素材.strengthen_materials_win_qt import show_strengthen_materials
-from 持有物.入场券.tickets_win_qt import show_tickets
-from 持有物.货币.currencys_win_qt import show_currencys
-from 持有物.增幅器.amplifiers_win_qt import show_amplifiers
-from 持有物.扭蛋材料.capsuletoys_win_qt import show_capsuletoys
-from 持有物.芯片.chips_win_qt import show_chips
-from 持有物.碎片.fragments_win_qt import show_fragments
+# ---------------------------------------------------------------------------
+# 延迟导入：菜单里的工具模块（pandas / selenium / pygame / openpyxl 等）只在
+# **真正点击**时才 import，避免每次启动都付出上秒级的导入开销。
+# ---------------------------------------------------------------------------
+import importlib
 
-from 战斗系统.共鸣天赋.gmtf_win_qt import creat_gmtf_win
-from 战斗系统.基础.jc_win_qt import creat_jc_win
-from 战斗系统.OD.od_win_qt import creat_od_win
-from 战斗系统.乘区.cq_win_qt import creat_cq_win
-from 战斗系统.职业.careers_win_qt import show_career
-from 战斗系统.武器.weapons_win_qt import show_weapon
-from 战斗系统.属性.attributes_win_qt import show_attribute
-from 战斗系统.状态.status_win_qt import show_statu
 
-from 敌人.主线.zx_win_qt import show_zx_enemys
-from 敌人.时钟塔.szt_win_qt import show_szt_enemys
-from 敌人.光球BOSS.gqboss_win_qt import show_gqboss_enemys
-from 敌人.时之修炼场.szxlc_win_qt import show_szxlc_enemys
-from 敌人.棱镜战.ljz_win_qt import show_ljz_enemys
-from 敌人.宝石棱镜战.bsljz_win_qt import show_bsljz_enemys
-from 敌人.异时层.ysc_win_qt import show_ysc_enemys
-from 敌人.高分挑战.gftz_win_qt import show_gftz_enemys
-from 敌人.恒星战.hxz_win_qt import show_hxz_enemys
-from 敌人.遭遇战.zyz_win_qt import show_zyz_enemys
+def lazy_call(module_path, attr):
+    """返回一个函数：调用时才 import module_path 并取 attr 执行。"""
+    def _call(*args, **kwargs):
+        mod = importlib.import_module(module_path)
+        return getattr(mod, attr)(*args, **kwargs)
+    return _call
 
-from 搜索.search_win_qt import creat_search_win
-from 角色.team_win_qt import creat_team_win
-from 更新.http_update_processing_qt import http_update_data
-from 音乐.music_win_qt import creat_music_win
 
-from 工具.GetEntriesGUILocal.seed_tools.Load_qt import load_seed_tools
-from 工具.GetEntriesGUILocal.get_entries_win_qt import creat_ct_win
-from 工具.DamageScoreCal.damage_score_cal_win_qt import creat_dsc_win
-from 工具.DamageScoreCal.damage_score_cal_win_v2_qt import creat_dsc_win_v2
-from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
-from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
-from 工具.AFSGTools.Load import load_AFSGTools
-from 工具.hbr_tool.Load import load_hbr_tool
-from 工具.hbr_tool_old_damage_calculator.Load import load_hbr_tool_old_damage_calculator
-from 工具.hbr_axletool.Load import load_hbr_axletool
-from 工具.排轴.Load import load_hbr_axle_od
-from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
-from 工具.词条计算器.Load import load_entry_calculator
-from 工具.o_hbr_quest.Load import load_o_hbr_quest
-from 工具.hbr_quest.Load import load_hbr_quest
-from 工具.game8_hbr.Load import load_game8_hbr
-from 工具.gamekee_hbr.Load import load_gamekee_hbr
-from 工具.入队培训手册.Load import load_game_bilibili_com
-from 工具.LineArt.LineArtGUI2_QT import load_LineArtGUI2_QT
+# 下面这些名字与原「模块级 import」完全一致，只是改为**点击时才导入**。
 
-from 关于.about_win_qt import creat_about_win
+# ---- 持有物 ----
+show_main_props = lazy_call("持有物.主线道具.main_props_win_qt", "show_main_props")
+show_props = lazy_call("持有物.道具.props_win_qt", "show_props")
+show_jewelrys_type = lazy_call("持有物.饰品.jewelrys_win_qt", "show_jewelrys_type")
+show_jewelry_materials = lazy_call(
+    "持有物.饰品材料.jewelry_materials_win_qt", "show_jewelry_materials")
+show_medals = lazy_call("持有物.活动奖章.medals_win_qt", "show_medals")
+show_trophy_medals = lazy_call(
+    "持有物.奖杯勋章.trophy_medals_win_qt", "show_trophy_medals")
+show_growth_materials = lazy_call(
+    "持有物.成长素材.growth_materials_win_qt", "show_growth_materials")
+show_strengthen_materials = lazy_call(
+    "持有物.强化素材.strengthen_materials_win_qt", "show_strengthen_materials")
+show_amplifiers = lazy_call("持有物.增幅器.amplifiers_win_qt", "show_amplifiers")
+show_chips = lazy_call("持有物.芯片.chips_win_qt", "show_chips")
+show_tickets = lazy_call("持有物.入场券.tickets_win_qt", "show_tickets")
+show_capsuletoys = lazy_call("持有物.扭蛋材料.capsuletoys_win_qt",
+                             "show_capsuletoys")
+show_fragments = lazy_call("持有物.碎片.fragments_win_qt", "show_fragments")
+show_currencys = lazy_call("持有物.货币.currencys_win_qt", "show_currencys")
+
+# ---- 战斗系统 ----
+creat_gmtf_win = lazy_call("战斗系统.共鸣天赋.gmtf_win_qt", "creat_gmtf_win")
+creat_jc_win = lazy_call("战斗系统.基础.jc_win_qt", "creat_jc_win")
+creat_od_win = lazy_call("战斗系统.OD.od_win_qt", "creat_od_win")
+creat_cq_win = lazy_call("战斗系统.乘区.cq_win_qt", "creat_cq_win")
+show_career = lazy_call("战斗系统.职业.careers_win_qt", "show_career")
+show_weapon = lazy_call("战斗系统.武器.weapons_win_qt", "show_weapon")
+show_attribute = lazy_call("战斗系统.属性.attributes_win_qt", "show_attribute")
+show_statu = lazy_call("战斗系统.状态.status_win_qt", "show_statu")
+
+# ---- 敌人 ----
+show_szt_enemys = lazy_call("敌人.时钟塔.szt_win_qt", "show_szt_enemys")
+show_zx_enemys = lazy_call("敌人.主线.zx_win_qt", "show_zx_enemys")
+show_gqboss_enemys = lazy_call("敌人.光球BOSS.gqboss_win_qt",
+                               "show_gqboss_enemys")
+show_szxlc_enemys = lazy_call("敌人.时之修炼场.szxlc_win_qt",
+                              "show_szxlc_enemys")
+show_ljz_enemys = lazy_call("敌人.棱镜战.ljz_win_qt", "show_ljz_enemys")
+show_bsljz_enemys = lazy_call("敌人.宝石棱镜战.bsljz_win_qt",
+                              "show_bsljz_enemys")
+show_hxz_enemys = lazy_call("敌人.恒星战.hxz_win_qt", "show_hxz_enemys")
+show_gftz_enemys = lazy_call("敌人.高分挑战.gftz_win_qt", "show_gftz_enemys")
+show_ysc_enemys = lazy_call("敌人.异时层.ysc_win_qt", "show_ysc_enemys")
+show_zyz_enemys = lazy_call("敌人.遭遇战.zyz_win_qt", "show_zyz_enemys")
+
+# ---- 搜索 / 角色 / 更新 / 音乐 / 关于 ----
+creat_search_win = lazy_call("搜索.search_win_qt", "creat_search_win")
+creat_team_win = lazy_call("角色.team_win_qt", "creat_team_win")
+http_update_data = lazy_call("更新.http_update_processing_qt", "http_update_data")
+creat_music_win = lazy_call("音乐.music_win_qt", "creat_music_win")
+creat_about_win = lazy_call("关于.about_win_qt", "creat_about_win")
+check_for_updates = lazy_call("更新.check_proc_qt", "check_for_updates")
+
+# ---- 工具 ----
+load_seed_tools = lazy_call("工具.GetEntriesGUILocal.seed_tools.Load_qt",
+                            "load_seed_tools")
+creat_ct_win = lazy_call("工具.GetEntriesGUILocal.get_entries_win_qt",
+                         "creat_ct_win")
+creat_dsc_win = lazy_call("工具.DamageScoreCal.damage_score_cal_win_qt",
+                          "creat_dsc_win")
+creat_dsc_win_v2 = lazy_call("工具.DamageScoreCal.damage_score_cal_win_v2_qt",
+                             "creat_dsc_win_v2")
+get_hbr_brochure = lazy_call("工具.HBRbrochure.HBRbrochure",
+                             "get_hbr_brochure")
+load_AFSGTools = lazy_call("工具.AFSGTools.Load", "load_AFSGTools")
+load_hbr_damage_simulation = lazy_call("工具.HBR伤害模拟.Load",
+                                       "load_hbr_damage_simulation")
+load_hbr_tool = lazy_call("工具.hbr_tool.Load", "load_hbr_tool")
+load_hbr_tool_old_damage_calculator = lazy_call(
+    "工具.hbr_tool_old_damage_calculator.Load",
+    "load_hbr_tool_old_damage_calculator")
+load_hbr_axletool = lazy_call("工具.hbr_axletool.Load", "load_hbr_axletool")
+load_hbr_axle_od = lazy_call("工具.排轴.Load", "load_hbr_axle_od")
+load_wiki_hbr_hd = lazy_call("工具.wiki_hbr_hd.Load", "load_wiki_hbr_hd")
+load_entry_calculator = lazy_call("工具.词条计算器.Load",
+                                  "load_entry_calculator")
+load_o_hbr_quest = lazy_call("工具.o_hbr_quest.Load", "load_o_hbr_quest")
+load_hbr_quest = lazy_call("工具.hbr_quest.Load", "load_hbr_quest")
+load_game8_hbr = lazy_call("工具.game8_hbr.Load", "load_game8_hbr")
+load_gamekee_hbr = lazy_call("工具.gamekee_hbr.Load", "load_gamekee_hbr")
+load_game_bilibili_com = lazy_call("工具.入队培训手册.Load",
+                                   "load_game_bilibili_com")
+load_LineArtGUI2_QT = lazy_call("工具.LineArt.LineArtGUI2_QT",
+                                "load_LineArtGUI2_QT")
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)

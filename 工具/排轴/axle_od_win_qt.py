@@ -1882,6 +1882,8 @@ class AxleODWindow(QFrame):
         self.team_rows = []
         self.selected_turn = None
         self._team_updating = False
+        self._recalc_suspend = 0    # 批量修改时挂起重算
+        self._recalc_pending = False
         self._build_ui()
         self._normalize_team()
         # 用队伍行实际数据同步（含突破数/携带被动等）
@@ -2174,14 +2176,16 @@ class AxleODWindow(QFrame):
             self.team = [row.to_data() for row in self.team_rows]
         finally:
             self._team_updating = False
-        self._refresh_role_choices()
-        self._update_turn_buttons()
-        # 默认是空队伍，因此开始时没有回合；首次编入角色后自动建一个回合
-        if not self.turns and self._active_slots():
-            self.add_turn()
-        for turn in self.turns:
-            turn.refresh_team()
-        self.recalculate()
+        # 队伍批量同步（刷新所有回合/行动行）期间挂起重算，最后统一算一次
+        with self._suspend_recalc():
+            self._refresh_role_choices()
+            self._update_turn_buttons()
+            # 默认是空队伍，因此开始时没有回合；首次编入角色后自动建一个回合
+            if not self.turns and self._active_slots():
+                self.add_turn()
+            for turn in self.turns:
+                turn.refresh_team()
+            self.recalculate()
 
     # ------------------------------------------------------------- turn ops
     def _last_front_actors(self, exclude=None):
@@ -2375,7 +2379,28 @@ class AxleODWindow(QFrame):
         return {el for el, cb in self.resist_element_checks.items()
                 if cb.isChecked()}
 
+    @contextmanager
+    def _suspend_recalc(self):
+        """批量修改（读档 / 队伍批量同步）期间挂起重算，结束后只算一次。
+
+        否则读一次档会触发几十次全量重算（实测 49 次 × ~13ms）。
+        """
+        self._recalc_suspend += 1
+        try:
+            yield
+        finally:
+            self._recalc_suspend -= 1
+            if self._recalc_suspend <= 0:
+                self._recalc_suspend = 0
+                if self._recalc_pending:
+                    self._recalc_pending = False
+                    self.recalculate()
+
     def recalculate(self):
+        # 批量修改期间只登记待重算，避免反复全量计算
+        if self._recalc_suspend:
+            self._recalc_pending = True
+            return
         # 先结算一次 SP：「追击」及其 SP 消耗/回复会影响 OD，需要先算出来
         self._recalc_sp()
 
@@ -3501,47 +3526,50 @@ class AxleODWindow(QFrame):
         if not isinstance(data, dict):
             return False
 
-        team = data.get("team") or []
-        self._team_updating = True
-        try:
-            for i, row in enumerate(self.team_rows):
-                if i < len(team):
-                    row.set_data(team[i])
-        finally:
-            self._team_updating = False
-        self._on_team_changed()
+        # 读档涉及大量控件赋值/建回合，先挂起重算，最后统一算一次
+        with self._suspend_recalc():
+            team = data.get("team") or []
+            self._team_updating = True
+            try:
+                for i, row in enumerate(self.team_rows):
+                    if i < len(team):
+                        row.set_data(team[i])
+            finally:
+                self._team_updating = False
+            self._on_team_changed()
 
-        battle = data.get("battle", {}) or {}
-        self.target_spin.setValue(int(battle.get("target_count", 1)))
-        self.resistance_check.setChecked(bool(battle.get("resistance", False)))
-        resist = set(battle.get("resist_elements") or [])
-        for element, cb in self.resist_element_checks.items():
-            cb.setChecked(element in resist)
-        self.other_od_spin.setValue(float(battle.get("other_od", 0)))
-        self.enemy_od_spin.setValue(float(battle.get("enemy_od_rate", 1)))
-        self.sp_init_spin.setValue(int(battle.get("sp_init", 4)))
-        self.sp_regen_front_spin.setValue(
-            int(battle.get("sp_regen_front", battle.get("sp_regen", 3))))
-        self.sp_regen_back_spin.setValue(
-            int(battle.get("sp_regen_back", battle.get("sp_regen", 2))))
-        self.sp_limit_spin.setValue(int(battle.get("sp_limit", 20)))
+            battle = data.get("battle", {}) or {}
+            self.target_spin.setValue(int(battle.get("target_count", 1)))
+            self.resistance_check.setChecked(
+                bool(battle.get("resistance", False)))
+            resist = set(battle.get("resist_elements") or [])
+            for element, cb in self.resist_element_checks.items():
+                cb.setChecked(element in resist)
+            self.other_od_spin.setValue(float(battle.get("other_od", 0)))
+            self.enemy_od_spin.setValue(float(battle.get("enemy_od_rate", 1)))
+            self.sp_init_spin.setValue(int(battle.get("sp_init", 4)))
+            self.sp_regen_front_spin.setValue(
+                int(battle.get("sp_regen_front", battle.get("sp_regen", 3))))
+            self.sp_regen_back_spin.setValue(
+                int(battle.get("sp_regen_back", battle.get("sp_regen", 2))))
+            self.sp_limit_spin.setValue(int(battle.get("sp_limit", 20)))
 
-        turns = data.get("turns", [])
-        if not turns:
-            return False
+            turns = data.get("turns", [])
+            if not turns:
+                return False
 
-        for turn in list(self.turns):
-            self.turns_layout.removeWidget(turn)
-            turn.destroy()
-            turn.setParent(None)
-            turn.deleteLater()
-        self.turns = []
-        self.selected_turn = None
-        for turn_data in turns:
-            self.add_turn(turn_data)
-        self._reindex()
-        self.recalculate()
-        return True
+            for turn in list(self.turns):
+                self.turns_layout.removeWidget(turn)
+                turn.destroy()
+                turn.setParent(None)
+                turn.deleteLater()
+            self.turns = []
+            self.selected_turn = None
+            for turn_data in turns:
+                self.add_turn(turn_data)
+            self._reindex()
+            self.recalculate()
+            return True
 
     def save_axle(self):
         if not self.turns:
