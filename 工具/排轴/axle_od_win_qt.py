@@ -198,6 +198,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
   （同种效果只生效一次：降低取最大降幅、增加取最大增幅，两者相抵；
   且 SP 消耗为 0 的技能不受任何增减影响）；「剩余SP」列红色负值表示不足（缺口，实际 SP 不变）。
+- 「**剩余SP**」列 = **行动前SP − 本次消耗**，**不含任何 SP 回复**：
+  技能自身的回复、以及被动/天赋（共鸣）/大师技能触发的回复都**不计入**该列
+  （它们只影响之后的回合与「队伍SP（行动后）」）。
 - 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
   它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
 - 部分技能带「N(M)」式条件消耗，满足条件时改用较小值：
@@ -905,7 +908,7 @@ class ActionRow(QFrame):
         self.sp_label = QLabel("-")
         self.sp_label.setFixedWidth(SP_W)
         self.sp_label.setAlignment(Qt.AlignCenter)
-        self.sp_label.setToolTip("该次行动后队员的剩余 SP")
+        self.sp_label.setToolTip("该次行动的剩余 SP＝行动前SP − 本次消耗（不含任何 SP 回复）")
         self.sp_label.setStyleSheet(
             "background-color: #eef3ff; border-radius: 3px;")
         layout.addWidget(self.sp_label)
@@ -1343,7 +1346,7 @@ class ActionRow(QFrame):
         return skill.od_down_fixed if skill else 0.0
 
     def set_sp_result(self, remaining, enough=True):
-        """显示该次行动后的剩余 SP；不足时标红。"""
+        """显示「剩余 SP」= 行动前SP − 本次消耗（不含任何 SP 回复）；不足时标红。"""
         if remaining is None:
             self.sp_label.setText("-")
             self.sp_label.setStyleSheet(
@@ -1359,7 +1362,7 @@ class ActionRow(QFrame):
                 "background-color: #f5b5b5; color: #7a0000;"
                 "border-radius: 3px; font-weight: bold;")
         self.sp_label.setToolTip(
-            "该次行动后队员剩余 SP" if enough
+            "剩余SP＝行动前SP − 本次消耗（不含任何 SP 回复）" if enough
             else "SP 不足：红色负数为缺口（还差多少），实际 SP 不变")
 
     def to_data(self):
@@ -2855,6 +2858,9 @@ class AxleODWindow(QFrame):
                     enough = True     # 「SP0或以上即可使用」：SP 可为负
                 if enough:
                     sp[i] -= cost
+                    # 「剩余SP」= 行动前SP − 本次消耗（**不含任何回复**：
+                    # 技能自身回复、被动/天赋/大师技能触发的回复都不计入）
+                    remaining_after_cost = sp[i]
                     before_share = list(sp)
                     self._apply_sp_recover(action, i, sp, active,
                                            turn_front, limit)
@@ -2879,7 +2885,7 @@ class AxleODWindow(QFrame):
                                 mod.get("amount", 0), mod.get("scope"),
                                 mod.get("element"), i, sp, active,
                                 turn_front, limit)
-                    action.set_sp_result(sp[i], True)
+                    action.set_sp_result(remaining_after_cost, True)
                 else:
                     # SP 不足：显示红色负值（还差多少），实际 SP 不变
                     action.set_sp_result(sp[i] - cost, False)
