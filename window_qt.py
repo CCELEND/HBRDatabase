@@ -1,6 +1,4 @@
 import os
-import numpy as np
-import cv2
 from PIL import Image
 
 from PyQt5.QtWidgets import (
@@ -11,6 +9,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
+
+# numpy / cv2 只在「按路径加载图片到图像查看器」时用到，
+# 改成函数内延迟导入，启动时不再加载这两个大库。
 
 
 MONO_FONT = QFont("Monospace", 10, QFont.Bold)
@@ -429,6 +430,8 @@ class ImageViewer(QGraphicsView):
         self._zoom_factor = self.transform().m11()
 
     def set_image_from_path(self, file_path: str):
+        import cv2
+        import numpy as np
         if not os.path.exists(file_path):
             return False
         np_arr = np.fromfile(file_path, dtype=np.uint8)
@@ -438,7 +441,8 @@ class ImageViewer(QGraphicsView):
         self.set_image_from_array(np_array)
         return True
 
-    def set_image_from_array(self, np_array: np.ndarray):
+    def set_image_from_array(self, np_array):
+        import cv2
         if np_array.ndim == 2:
             h, w = np_array.shape
             qimg = QImage(np_array.data, w, h, w, QImage.Format_Grayscale8)
