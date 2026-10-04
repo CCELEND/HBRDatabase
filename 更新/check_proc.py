@@ -4,6 +4,7 @@ from tkinter import messagebox
 import threading
 
 from 更新.http_client import send_hashes_to_server
+from 更新.server_config import server_url as get_server_url
 from tools import sort_dict_by_key, get_os_info
 
 from 日志.advanced_logger import AdvancedLogger
@@ -11,8 +12,8 @@ logger = AdvancedLogger.get_logger(__name__)
 
 def check_for_updates_proc():
     current_file_hashes = calculate_file_hashes("./")
-    # server_url = "http://127.0.0.1:65433"
-    server_url = "http://47.96.235.36:65433"
+    # 地址与 https 配置见 更新/server_config.py（可用环境变量覆盖）
+    server_url = get_server_url()
     sys = get_os_info()
     response = None
     try:

@@ -3,6 +3,7 @@ from hash import calculate_file_hashes
 from tkinter import messagebox
 
 from http_client import send_hashes_to_server, download_files_from_server
+from server_config import server_url as get_server_url
 import http_client
 from tools import get_os_info
 from 日志.advanced_logger import AdvancedLogger
@@ -14,8 +15,8 @@ def http_update_data():
         return
         
     current_file_hashes = calculate_file_hashes("./")
-    # server_url = "http://127.0.0.1:65433"
-    server_url = "http://47.96.235.36:65433"
+    # 地址与 https 配置见 更新/server_config.py（可用环境变量覆盖）
+    server_url = get_server_url()
     sys = get_os_info()
     response = None
     try:

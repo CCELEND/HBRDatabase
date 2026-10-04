@@ -10,6 +10,7 @@ from urllib.parse import quote
 from window import set_window_icon, creat_window
 from tools import creat_directory, sort_dict_by_key
 from 修复.hash import save_hashes_to_json
+from 更新.server_config import requests_kwargs as _tls_kwargs
 
 from 日志.advanced_logger import AdvancedLogger
 
@@ -20,7 +21,8 @@ is_updating = False
 def send_hashes_to_server(server_url, client_file_hashes, oper="repair", sys="windows"):
     headers = {'Content-Type': 'application/json'}
     payload = {"ver": "PyQT5", "oper": oper, "sys": sys, "hashes": client_file_hashes}
-    response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
+    response = requests.post(server_url, data=json.dumps(payload), headers=headers,
+                             timeout=5, **_tls_kwargs())
     return response.json()
 
 def create_progress_window():
@@ -92,7 +94,7 @@ def download_single_file(file_name, i, total_files, server_url,
 def perform_download(file_name, url, file_index, total_files, 
                      progress, percent_var, progress_window):
     # 执行文件下载
-    with requests.get(url, stream=True) as response:
+    with requests.get(url, stream=True, **_tls_kwargs()) as response:
         response.raise_for_status()
         
         # 检查是否是错误响应

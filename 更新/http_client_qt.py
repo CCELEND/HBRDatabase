@@ -9,6 +9,7 @@ from PyQt5.QtGui import QIcon
 
 from tools import creat_directory, confirm_restart_qt, sort_dict_by_key
 from 更新.hash import save_hashes_to_json
+from 更新.server_config import requests_kwargs as _tls_kwargs
 from 日志.advanced_logger import AdvancedLogger
 
 logger = AdvancedLogger.get_logger(__name__)
@@ -51,7 +52,8 @@ class DownloadThread(QThread):
 
                 encoded_name = quote(file_name)
                 url = f"{self.server_url}/download/{encoded_name}"
-                with requests.get(url, stream=True, timeout=30) as response:
+                with requests.get(url, stream=True, timeout=30,
+                                  **_tls_kwargs()) as response:
                     response.raise_for_status()
                     if response.status_code != 200:
                         err_info = response.json()
@@ -155,7 +157,8 @@ class UpdateProgressDialog(QDialog):
 def send_hashes_to_server(server_url, client_file_hashes, oper="update", sys="windows"):
     headers = {'Content-Type': 'application/json'}
     payload = {"ver": "PyQT5", "oper": oper, "sys": sys, "hashes": client_file_hashes}
-    response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
+    response = requests.post(server_url, data=json.dumps(payload), headers=headers,
+                             timeout=5, **_tls_kwargs())
     return response.json()
 
 

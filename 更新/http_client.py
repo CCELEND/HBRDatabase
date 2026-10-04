@@ -10,6 +10,7 @@ from urllib.parse import quote
 from window import set_window_icon
 from tools import creat_directory, confirm_restart, sort_dict_by_key
 from 更新.hash import save_hashes_to_json
+from server_config import requests_kwargs as _tls_kwargs
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -20,7 +21,8 @@ is_updating = False
 def send_hashes_to_server(server_url, client_file_hashes, oper="update", sys="windows"):
     headers = {'Content-Type': 'application/json'}
     payload = {"ver": "tkinter", "oper": oper, "sys": sys, "hashes": client_file_hashes}
-    response = requests.post(server_url, data=json.dumps(payload), headers=headers, timeout=5)
+    response = requests.post(server_url, data=json.dumps(payload), headers=headers,
+                             timeout=5, **_tls_kwargs())
     return response.json()
 
 def download_files_with_progress(files_to_download, server_url):
@@ -81,7 +83,7 @@ def download_files_with_progress(files_to_download, server_url):
                 url = f"{server_url}/download/{encoded_name}"
                 
                 # 流式下载
-                with requests.get(url, stream=True) as response:
+                with requests.get(url, stream=True, **_tls_kwargs()) as response:
                     response.raise_for_status()
                     
                     # 检查是否是错误响应

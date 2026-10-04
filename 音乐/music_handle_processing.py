@@ -9,10 +9,12 @@ from canvas_events import get_photo, create_canvas_with_image
 import music_player
 from window import win_set_top
 
+from 更新.server_config import music_url, requests_kwargs as _tls_kwargs
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-server_url = "http://47.96.235.36:65431"
+# 地址与 https 配置见 更新/server_config.py（可用环境变量覆盖）
+server_url = music_url()
 
 def download_music_files_from_server(file_path_album, music_win_name):
     file_path_all = "./音乐/下载/" + file_path_album
@@ -21,7 +23,8 @@ def download_music_files_from_server(file_path_album, music_win_name):
     # 编码特殊字符
     encoded_name = quote(file_path_album)
     # 服务器响应
-    response = requests.get(f"{server_url}/music_download/{encoded_name}")
+    response = requests.get(f"{server_url}/music_download/{encoded_name}",
+                            **_tls_kwargs())
 
     if response.content.startswith(b'{"error"'):
         err_info = response.content.decode('utf-8')

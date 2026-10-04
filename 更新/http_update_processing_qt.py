@@ -1,5 +1,6 @@
 from 更新.hash import calculate_file_hashes
 from 更新.http_client_qt import send_hashes_to_server, download_files_from_server
+from 更新.server_config import server_url as get_server_url
 import 更新.http_client_qt as http_client_qt
 from PyQt5.QtWidgets import QMessageBox
 from 日志.advanced_logger import AdvancedLogger
@@ -12,7 +13,7 @@ def http_update_data(parent_widget):
         return
 
     current_file_hashes = calculate_file_hashes("./")
-    server_url = "http://47.96.235.36:65433"
+    server_url = get_server_url()
     sys = get_os_info()
     response = None
     try:

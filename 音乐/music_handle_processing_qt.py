@@ -11,10 +11,12 @@ from canvas_events_qt import get_pixmap
 import music_player_qt
 from window_qt import win_set_top
 
+from 更新.server_config import music_url, requests_kwargs as _tls_kwargs
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
-server_url = "http://47.96.235.36:65431"
+# 地址与 https 配置见 更新/server_config.py（可用环境变量覆盖）
+server_url = music_url()
 
 
 def download_music_files_from_server(file_path_album, music_win_name):
@@ -23,7 +25,8 @@ def download_music_files_from_server(file_path_album, music_win_name):
 
     encoded_name = quote(file_path_album)
     try:
-        response = requests.get(f"{server_url}/music_download/{encoded_name}", timeout=10)
+        response = requests.get(f"{server_url}/music_download/{encoded_name}",
+                                timeout=10, **_tls_kwargs())
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error(f"文件 '{file_path_album}' 下载失败：{str(e)}")
