@@ -291,6 +291,9 @@ class SkillInfo:
         # 「连击数上升」buff（如 连结未来的苍之意志）：
         # {"amount","duration","kind","timing","scope","element"}；无则 None
         self.combo_buff = None
+        # 技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护）：
+        # [{"state","duration","scope","element"}, ...]
+        self.state_grants = []
         # 被动里的「连击数上升」项（如 山胁「梅雨」）：
         # [{"name","amount","count","kind","position","timing","target","lb"}, ...]
         self.passive_combo = []
@@ -588,48 +591,133 @@ def _parse_master_ex_sp(ms):
     return result
 
 
-def _parse_combo_buff(group):
-    """解析技能里的「连击数上升」效果（如 连结未来的苍之意志）。
+def _combo_buff_from_effect(effect):
+    """把一条「连击数上升」效果转成 buff 字典（不含 solo/source）。
 
     效果形如 ["连击数上升（特大）", "3", null, null, "3", "己方回合", "全体冰属性风格"]
     → amount=3、duration=3、scope/element 取自目标。
-    返回 {"amount","duration","timing","scope","element"} 或 None。
+    """
+    m = re.search(r'(\d+)', str(effect[1]) if len(effect) > 1 else "")
+    amount = int(m.group(1)) if m else 0
+    m2 = re.search(r'(\d+)', str(effect[4]) if len(effect) > 4 else "")
+    duration = int(m2.group(1)) if m2 else 0
+    scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+    unit = str(effect[5]) if len(effect) > 5 and effect[5] else ""
+    return {
+        "amount": amount,
+        "duration": duration,
+        "kind": "use" if "次" in unit else "turn",   # 「次」= 按次数消耗
+        "timing": (unit or None),
+        "scope": scope_info[0] if scope_info else "self",
+        "element": scope_info[1] if scope_info else None,
+        "solo": False,     # 由 _extract_skill 按描述里的「[单独发动]」补充
+    }
+
+
+def _parse_combo_buff(group):
+    """解析技能里的「连击数上升」效果（如 连结未来的苍之意志）。
+
+    带状态变体的技能（如 月芒：「歌姬中」连击+3（特大）／「非歌姬」连击+5（中））：
+    默认值取「非X」那条，同时把各变体放进 ``state_variants``，
+    由排轴按施放者当时是否处于该状态挑选。
+    返回 {"amount","duration","kind","timing","scope","element","solo",
+          "state_variants"} 或 None。
     """
     effects = group[1] if len(group) > 1 and isinstance(group[1], list) else []
-    # 「歌姬/非歌姬」这类形态：默认取「非X」对应的那一条效果
-    preferred = None
     variants = group[4] if len(group) > 4 and isinstance(group[4], dict) else None
+
+    state_variants = {}     # {状态名: {"active": buff, "inactive": buff}}
+    preferred = None        # 默认取「非X」那条
     if variants:
         for key, spec in variants.items():
-            if not str(key).startswith("非") or not isinstance(spec, list):
+            if not isinstance(spec, list):
                 continue
-            for item in spec:
-                if isinstance(item, int):
-                    preferred = item
-                    break
-            break
+            idx = next((it for it in spec if isinstance(it, int)), None)
+            if idx is None or not (0 <= idx < len(effects)):
+                continue
+            eff = effects[idx]
+            if not (isinstance(eff, list) and eff
+                    and "连击数上升" in str(eff[0])):
+                continue
+            k = str(key)
+            if k.startswith("非"):
+                state, active = k[1:], False
+                preferred = idx
+            elif k.endswith("中"):
+                state, active = k[:-1], True
+            else:
+                state, active = k, True
+            state_variants.setdefault(state, {})[
+                "active" if active else "inactive"] = \
+                _combo_buff_from_effect(eff)
+
     for idx, effect in enumerate(effects):
         if not (isinstance(effect, list) and effect
                 and "连击数上升" in str(effect[0])):
             continue
         if preferred is not None and idx != preferred:
             continue
-        m = re.search(r'(\d+)', str(effect[1]) if len(effect) > 1 else "")
-        amount = int(m.group(1)) if m else 0
-        m2 = re.search(r'(\d+)', str(effect[4]) if len(effect) > 4 else "")
-        duration = int(m2.group(1)) if m2 else 0
-        scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
-        unit = str(effect[5]) if len(effect) > 5 and effect[5] else ""
-        return {
-            "amount": amount,
-            "duration": duration,
-            "kind": "use" if "次" in unit else "turn",   # 「次」= 按次数消耗
-            "timing": (unit or None),
-            "scope": scope_info[0] if scope_info else "self",
-            "element": scope_info[1] if scope_info else None,
-            "solo": False,     # 由 _extract_skill 按描述里的「[单独发动]」补充
-        }
+        buff = _combo_buff_from_effect(effect)
+        if state_variants:
+            buff["state_variants"] = state_variants
+        return buff
     return None
+
+
+# 技能赋予的「状态」：效果名 → 状态键（供带状态条件的效果判断）
+STATE_EFFECTS = {
+    "歌姬加护": "歌姬",
+}
+
+
+def _state_condition(desc):
+    """从描述里取出「自身处于X状态」类条件，返回状态键或 None。
+
+    如「若自身处于歌姬之加护状态 则自身消耗SP-2」→ "歌姬"。
+    """
+    text = str(desc or "")
+    for eff_name, state in STATE_EFFECTS.items():
+        base = eff_name.replace("加护", "")
+        if (("处于%s之加护" % base) in text or ("处于%s加护" % base) in text
+                or ("处于%s状态" % base) in text
+                or ("处于%s之%s" % (base, eff_name)) in text):
+            return state
+    return None
+
+
+def _parse_state_grants(group):
+    """解析技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护）。
+
+    返回 [{"state","duration","scope","element"}, ...]。
+    回合数优先取描述里写的「进入…状态N回合」（玩家实际看到的值），
+    取不到再用效果数据里的回合数。
+    """
+    effects = group[1] if len(group) > 1 and isinstance(group[1], list) else []
+    desc = ""
+    try:
+        desc = str(group[0][1])
+    except Exception:
+        pass
+    out = []
+    for effect in effects:
+        if not (isinstance(effect, list) and effect):
+            continue
+        state = STATE_EFFECTS.get(str(effect[0]))
+        if not state:
+            continue
+        m = re.search(r'(\d+)', str(effect[4]) if len(effect) > 4 else "")
+        duration = int(m.group(1)) if m else 0
+        # 描述里的「进入…状态N回合」优先
+        md = re.search(r'进入[^\n]{0,16}状态(\d+)回合', desc)
+        if md:
+            duration = int(md.group(1))
+        if duration <= 0:
+            continue
+        scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
+        out.append({"state": state, "duration": duration,
+                    "scope": scope_info[0] if scope_info else "self",
+                    "element": scope_info[1] if scope_info else None})
+    return out
 
 
 def _parse_share_sp(style_data):
@@ -733,6 +821,10 @@ def _extract_skill(group):
             # 「[单独发动]」类：重复发动不叠加，只刷新回合数
             skill.combo_buff["solo"] = ("[单独发动]" in skill.desc
                                         or "【单独发动】" in skill.desc)
+    except Exception:
+        pass
+    try:
+        skill.state_grants = _parse_state_grants(group)
     except Exception:
         pass
     skill.name = _fix_skill_name(skill.name)
@@ -1505,12 +1597,15 @@ class HBRDataSource:
                         continue          # 已由 front_sp_passives 处理
                     # 敌人处于倒地/被击破状态的回合开始时条件（如 算法）
                     downed_cond = "被击破的敌人" in pdesc
+                    # 「若回合开始时自身处于X状态」（如 共鸣：歌姬之加护→前锋SP+2）
+                    state_cond = _state_condition(pdesc)
                     # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
                     sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
                     if sig is None:
-                        if not (downed_cond or extra_only) and not _sp_condition_ok(pdesc):
+                        if not (downed_cond or extra_only or state_cond) \
+                                and not _sp_condition_ok(pdesc):
                             continue
-                        if (not downed_cond
+                        if (not (downed_cond or state_cond)
                                 and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
                             continue
                     num = re.search(r'\d+', str(pvalue))
@@ -1535,6 +1630,7 @@ class HBRDataSource:
                             re.search(r'超频条不足(\d+)%', pdesc)),
                         "downed": downed_cond,
                         "extra": extra_only,
+                        "state": state_cond,
                         "once": "1次" in pdesc,
                         "sigil_element": sig.group(1) if sig else None,
                         "sigil_min_level": int(sig.group(2)) if sig else None,
@@ -1572,13 +1668,13 @@ class HBRDataSource:
                 added = set()
 
                 def add_cost_mod(mod_name, amount, target, requires=None, lb=0,
-                                 downed=False, extra=False):
+                                 downed=False, extra=False, state=None):
                     if not amount:
                         return
                     scope_info = _sp_recover_scope(target)
                     if not scope_info:
                         return
-                    key = (mod_name, amount, scope_info[0])
+                    key = (mod_name, amount, scope_info[0], state)
                     if key in added:
                         return
                     added.add(key)
@@ -1591,6 +1687,7 @@ class HBRDataSource:
                         "lb": lb,               # 需要的突破数
                         "downed": downed,       # 需敌人处于倒地/被击破状态
                         "extra": extra,         # 需处于追加回合（或特殊回合）
+                        "state": state,         # 需自身处于该状态（如 歌姬）
                     })
 
                 for passive in (style_data.get("PassiveSkills") or []):
@@ -1609,7 +1706,10 @@ class HBRDataSource:
                                    or "被击破的敌人" in pdesc)
                     # 追加回合内的 SP 消耗增减（如 优美的剑技：追加回合中 自身消耗SP-2）
                     extra_cond = "追加回合" in pdesc
-                    if not (downed_cond or extra_cond) and not _sp_condition_ok(pdesc):
+                    # 「若自身处于X状态」（如 绝唱：歌姬之加护 → 自身消耗SP-2）
+                    state_cond = _state_condition(pdesc)
+                    if not (downed_cond or extra_cond or state_cond) \
+                            and not _sp_condition_ok(pdesc):
                         continue
                     if any(k in ptype for k in ("降低", "减少", "下降")):
                         sign = -1
@@ -1621,7 +1721,8 @@ class HBRDataSource:
                     if num:
                         add_cost_mod(pname, sign * int(num.group()), ptarget,
                                      lb=_passive_lb(passive),
-                                     downed=downed_cond, extra=extra_cond)
+                                     downed=downed_cond, extra=extra_cond,
+                                     state=state_cond)
 
                 # 主动技能条目里也可能带效果（如「高阶增强」：SP消耗量增加N）
                 for group in (style_data.get("ActiveSkills") or []):

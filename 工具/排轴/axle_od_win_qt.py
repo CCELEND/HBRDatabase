@@ -124,6 +124,10 @@ HELP_TEXT = """排轴OD计算 使用说明
   标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
   目标是**单名友方**的（如 茅森月歌「月芒」、李映夏「第七击·无中生有」）：
   在行动行的「**对象**」下拉里选择受益的友方，该 buff 只加到他/她身上。
+  带**状态条件**的（如 茅森月歌「月华歌姬」的 月芒：默认 连击+5（中量伤害/5次），
+  **自身处于「歌姬之加护」时变为 连击+3（特大伤害/3次）**）会按施放者当时是否
+  处于该状态自动切换。状态由技能赋予（如 若向流星歌唱：使**全体友方**进入
+  歌姬之加护 **5 己方回合**，含施放当回合），生效期间该队员使用月芒即取「歌姬中」那条。
   一次攻击技能里**主动**给的连击层**最多生效 2 层**；被动给的层（如 梅雨）**不占名额**、
   每次攻击都会生效并被消耗；带「**[单独发动]**」的主动层会**独占**（该次攻击只生效它一个）。
   未生效的层**留到下一次攻击技能**（「次」数的层被生效时才消耗）。
@@ -220,6 +224,10 @@ HELP_TEXT = """排轴OD计算 使用说明
   可判定的条件会结算：「战斗开始时」类仅第 1 回合、「位于前锋/后卫」按回合开始时的前锋、
   「SP不大于N」按当前 SP、「超频条不足N%」按回合开始时的超频条、
   「存在被击破的敌人」（含 SP 消耗增减类，如 算法 / 最佳位置）按是否已发生击破。
+- **状态类被动已支持「歌姬之加护」**（茅森月歌「月华歌姬」）：
+  「若回合开始时自身处于歌姬之加护状态 则前锋SP+2」（共鸣）与
+  「若自身处于歌姬之加护状态 则自身消耗SP-2」（绝唱，需突破3）都会按状态自动结算。
+  状态由「若向流星歌唱」赋予全体友方 5 己方回合（含施放当回合）。
 """
 
 
@@ -1165,10 +1173,31 @@ class ActionRow(QFrame):
     def get_effective_combo(self):
         return float(getattr(self, "_effective_combo", 0.0) or 0.0)
 
-    def get_combo_buff(self):
-        """该技能是否附带「连击数上升」buff（如 连结未来的苍之意志）。"""
+    def get_combo_buff(self, active_states=None):
+        """该技能附带的「连击数上升」buff（如 连结未来的苍之意志）。
+
+        active_states 为施放者当前所处的状态集合（如 {"歌姬"}）；
+        带状态变体的技能（如 月芒）会据此返回对应的那条效果
+        （歌姬中：连击+3（特大）／非歌姬：连击+5（中））。
+        """
         skill = self._find_skill()
-        return getattr(skill, "combo_buff", None) if skill is not None else None
+        buff = getattr(skill, "combo_buff", None) if skill is not None else None
+        if not buff or not active_states:
+            return buff
+        variants = buff.get("state_variants") or {}
+        for state in active_states:
+            spec = variants.get(state)
+            if not spec:
+                continue
+            alt = spec.get("active")
+            if not alt:
+                continue
+            out = dict(alt)
+            out["solo"] = buff.get("solo", False)
+            out["source"] = buff.get("source")
+            out["state_variants"] = variants
+            return out
+        return buff
 
     def _on_combo_changed(self, value):
         """用户手动编辑连击：视为「总连击」，手动部分 = 总 − 自动。"""
@@ -1186,12 +1215,19 @@ class ActionRow(QFrame):
                     + self._auto_combo))))
         finally:
             self._setting_combo = False
-        if self._auto_combo > 0:
+        hint = getattr(self, "_combo_grant_hint", None)
+        if hint:
+            self.combo_spin.setToolTip(hint)
+        elif self._auto_combo > 0:
             self.combo_spin.setToolTip(
                 "连击数：手动 %d ＋ 自动（连击数上升 buff）%g"
                 % (getattr(self, "_manual_combo", 0), self._auto_combo))
         else:
             self.combo_spin.setToolTip("连击数（只对攻击技能、且非通常攻击生效）")
+
+    def set_combo_grant_hint(self, text):
+        """本技能「给予对象」的连击数提示（显示在连击框 tooltip）。"""
+        self._combo_grant_hint = text
 
     def get_auto_combo(self):
         return float(getattr(self, "_auto_combo", 0.0) or 0.0)
@@ -1865,6 +1901,45 @@ class TurnCard(QFrame):
         self.actions = []
 
 
+class _StateTracker:
+    """跟踪技能赋予的「状态」（如 歌姬之加护）。
+
+    技能可以给（自己/前锋/全体友方…）附加持续 N 个己方回合的状态，
+    带状态条件的技能与被动（如 月芒、共鸣、绝唱）据此切换效果。
+    各计算阶段（SP / OD）各自按回合顺序推进一个实例即可。
+    """
+
+    def __init__(self, owner):
+        self.owner = owner
+        self.until = {}      # {(slot, 状态名): 生效到的回合下标（含）}
+        self.active = {}     # {slot: {状态名}} 当前状态（本回合内随行动更新）
+
+    def begin_turn(self, turn_idx):
+        """进入新回合：按已记录的到期时间刷新当前状态。"""
+        self.active = {}
+        for slot in self.owner._active_slots():
+            names = {n for (s, n), u in self.until.items()
+                     if s == slot and turn_idx <= u}
+            if names:
+                self.active[slot] = names
+
+    def states(self, slot):
+        """该队员当前所处的状态集合（无则 None）。"""
+        return self.active.get(slot)
+
+    def apply(self, action, turn_idx, turn_front):
+        """结算该行动赋予的状态（同回合之后的行动即可见）。"""
+        skill = action._find_skill()
+        for grant in (getattr(skill, "state_grants", None) or []):
+            targets = self.owner._scope_targets(
+                grant.get("scope"), grant.get("element"),
+                action.member_index, self.owner._active_slots(), turn_front)
+            for tgt in targets:
+                self.until[(tgt, grant["state"])] = (
+                    turn_idx + max(1, grant.get("duration", 1)) - 1)
+                self.active.setdefault(tgt, set()).add(grant["state"])
+
+
 # ======================================================================
 # 主界面
 # ======================================================================
@@ -2428,12 +2503,15 @@ class AxleODWindow(QFrame):
         # 「连击数上升」buff（如 连结未来的苍之意志）：「己方回合」数消耗——
         # 通常/超频回合**所有队员**各 −1；追加/特殊回合只有**当回合出手的队员** −1
         combo_buffs = {}   # {slot: [{"amount","left","kind","source"}]}
+        # 技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护 N 回合）
+        state_tracker = _StateTracker(self)
         initial_front = self._initial_front()
         for turn_idx, turn in enumerate(self.turns):
             # 本回合行动过的队员（追加/特殊回合也算「己方回合」）
             actors = [a.member_index for a in turn.actions
                       if a.member_index is not None]
             turn_front = set(actors) or start_front
+            state_tracker.begin_turn(turn_idx)
             # 1) 被动类连击（如 山胁「梅雨」：战斗开始时位于前锋 连击+5（1次））
             for slot in self._active_slots():
                 for mod in self._member_passive_combo(slot):
@@ -2458,9 +2536,25 @@ class AxleODWindow(QFrame):
                     })
             # 2) 本回合使用的「连击数上升」技能：当回合即生效
             for action in turn.actions:
-                buff = action.get_combo_buff()
+                action.set_combo_grant_hint(None)
+                # 先结算本行动赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护），
+                # 这样同回合后续行动（如 月芒）即可按新状态取值
+                state_tracker.apply(action, turn_idx, turn_front)
+                skill_now = action._find_skill()
+                states_now = state_tracker.states(action.member_index)
+                buff = action.get_combo_buff(states_now)
                 if not buff or not buff.get("amount") or not buff.get("duration"):
                     continue
+                # 连击框提示：本技能给「对象」的连击数（带状态变体时标注）
+                base_buff = getattr(skill_now, "combo_buff", None) or {}
+                extra = ""
+                if (states_now and base_buff.get("state_variants")
+                        and buff.get("amount") != base_buff.get("amount")):
+                    extra = "（%s状态中）" % "、".join(sorted(states_now))
+                action.set_combo_grant_hint(
+                    "本技能给予对象：连击 +%g，持续 %d %s%s"
+                    % (buff["amount"], buff["duration"],
+                       buff.get("timing") or "己方回合", extra))
                 scope = buff.get("scope")
                 if scope in ("one_any", "one_other"):
                     # 单名友方：取行动里的「对象」
@@ -2714,6 +2808,7 @@ class AxleODWindow(QFrame):
         break_seen = False   # 是否已经发生过击破（用于「首次击破」类被动）
         prev_od_level = 0    # 上一次发动的 OD 等级（同一次发动只给一次额外 SP）
         sp_once_used = set()  # 已触发过「每次出击1次」类 SP 被动的队员
+        state_tracker = _StateTracker(self)   # 技能赋予的状态（如 歌姬之加护）
 
         for turn_idx, turn in enumerate(self.turns):
             # 追加/特殊回合不计回合数：不触发「回合开始回复」与 OD 回复，
@@ -2722,6 +2817,7 @@ class AxleODWindow(QFrame):
             # 占位回合：不算己方回合、不触发任何被动、技能不消耗 SP
             is_placeholder = turn.turn_type() in PLACEHOLDER_TURN_TYPES
             self._passives_off = is_placeholder
+            state_tracker.begin_turn(turn_idx)
             # 回合开始时的前锋（用于回合开始 +3/+2）
             start_front = set(front)
             # 本回合行动的队员 = 回合中/结束时的前锋（用于技能/被动「前锋」范围）
@@ -2781,6 +2877,10 @@ class AxleODWindow(QFrame):
                             if sig_el is not None:
                                 if self._sigil_level(sig_el) < (mod.get("sigil_min_level") or 0):
                                     continue
+                            # 「若回合开始时自身处于X状态」（如 共鸣：歌姬之加护→前锋SP+2）
+                            st_cond = mod.get("state")
+                            if st_cond and st_cond not in (state_tracker.states(i) or ()):
+                                continue
                             pos = mod.get("position")
                             if pos == "front" and i not in start_front:
                                 continue
@@ -2840,6 +2940,8 @@ class AxleODWindow(QFrame):
                 if i not in active:
                     action.set_sp_result(None)
                     continue
+                # 结算该行动赋予的状态（如 歌姬之加护），供后续行动/被动判断
+                state_tracker.apply(action, turn_idx, turn_front)
                 cost = action.get_sp_cost(downed=break_seen,
                                           extra=is_extra_turn,
                                           sigil_levels=sigil_levels)
@@ -2852,7 +2954,7 @@ class AxleODWindow(QFrame):
                     # 「高阶增强」（红宝石香水）不作用于通常攻击与 SP 消耗为 0 的技能
                     cost = max(0, cost + self._sp_cost_modifier(
                         i, active, turn_front, cost, downed=break_seen,
-                        extra=is_extra_turn))
+                        extra=is_extra_turn, states=state_tracker.states(i)))
                 enough = sp[i] >= cost
                 if not enough and action.allows_negative_sp():
                     enough = True     # 「SP0或以上即可使用」：SP 可为负
@@ -3395,7 +3497,7 @@ class AxleODWindow(QFrame):
         return mods
 
     def _sp_cost_modifier(self, actor, active, front_set, base_cost=None,
-                          downed=False, extra=False):
+                          downed=False, extra=False, states=None):
         """作用于该队员的 SP 消耗增减合计。
 
         同种效果只生效一次并取大值：所有「降低SP消耗」取降幅最大者、
@@ -3404,6 +3506,7 @@ class AxleODWindow(QFrame):
         不受任何 SP 消耗增减影响。
         downed=True 表示敌人处于倒地/被击破状态（带该条件的被动生效）。
         extra=True 表示处于追加回合/特殊回合（带「追加回合」条件的被动生效）。
+        states 为该队员当前所处的状态集合（如 {"歌姬"}），带状态条件的被动据此生效。
         """
         if base_cost is not None and base_cost == 0:
             return 0          # SP 消耗为 0 的技能不受增减影响
@@ -3424,6 +3527,10 @@ class AxleODWindow(QFrame):
                 if mod.get("downed") and not downed:
                     continue
                 if mod.get("extra") and not extra:
+                    continue
+                # 「若自身处于X状态」（如 绝唱：歌姬之加护 → 自身消耗SP-2）
+                st_cond = mod.get("state")
+                if st_cond and st_cond not in (states or ()):
                     continue
                 if actor in self._scope_targets(mod.get("scope"),
                                                 mod.get("element"), slot,
