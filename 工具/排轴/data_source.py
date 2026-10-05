@@ -899,22 +899,30 @@ def _extract_skill_inner(group):
             continue
         # 攻击技能：取 Hit 数与破坏倍率
         if len(effect) > 2 and effect[0] in ATTACK_ATTRS:
-            if len(effect) > 1 and effect[1]:
-                attack_element = str(effect[1])
-            else:
-                # 未写元素时，用攻击类型（斩/突/打）作为属性标识
-                attack_element = str(effect[0])
             try:
-                hits = int(effect[2])
+                row_hits = int(effect[2])
             except Exception:
-                hits = None
-            if len(effect) > 8:
-                value = _parse_number(effect[8])
-                destructive = float(value) if value is not None else None
-            # 攻击范围：效果里最后一项（「单体」「全体」…）
-            tail = [x for x in effect if isinstance(x, str)]
-            if tail and ("单体" in tail[-1] or "全体" in tail[-1]):
-                target_scope = tail[-1]
+                row_hits = None
+            # 「随机 N~M 段」的技能会有多条攻击行（如 不给糖就捣乱+：
+            # 成功 2 段 / 失败 1 段），这里取**段数最多**的那条，
+            # 并沿用该行的元素/破坏倍率/范围。
+            take = (hits is None) or (row_hits is not None and row_hits > hits)
+            if take:
+                if row_hits is not None:
+                    hits = row_hits
+                if len(effect) > 1 and effect[1]:
+                    attack_element = str(effect[1])
+                elif not attack_element:
+                    # 未写元素时，用攻击类型（斩/突/打）作为属性标识
+                    attack_element = str(effect[0])
+                if len(effect) > 8:
+                    value = _parse_number(effect[8])
+                    if value is not None:
+                        destructive = float(value)
+                # 攻击范围：效果里最后一项（「单体」「全体」…）
+                tail = [x for x in effect if isinstance(x, str)]
+                if tail and ("单体" in tail[-1] or "全体" in tail[-1]):
+                    target_scope = tail[-1]
             continue
         # OD 条下降（数据写作「OD条下降」）：固定下降值，如 50% → 固定 −50
         if (isinstance(effect[0], str) and effect[0].startswith("OD")
