@@ -11,7 +11,8 @@
         "S",
         "破盾者",
         "斩",
-        null
+        null,
+        {"1002302":"SMinaseDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -60,7 +61,8 @@
         "S",
         "破盾者",
         "斩",
-        "雷"
+        "雷",
+        {"1002305":"SMinaseDefault_R2a"}
     ],
     "ActiveSkills":[
     [

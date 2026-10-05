@@ -11,7 +11,8 @@
         "S",
         "减益者",
         "突",
-        null
+        null,
+        {"1004302":"MKiryuDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -59,7 +60,8 @@
         "S",
         "减益者",
         "突",
-        "冰"
+        "冰",
+        {"1004306":"MKiryuDefault_R2a"}
     ],
     "ActiveSkills":[
     [

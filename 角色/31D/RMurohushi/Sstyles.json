@@ -9,7 +9,8 @@
             "S",
             "治疗者",
             "突",
-            null
+            null,
+            {"1005402":"RMurohushiDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -87,7 +88,8 @@
             "S",
             "治疗者",
             "突",
-            null
+            null,
+            {"1005404":"RMurohushiDefault_R2a"}
         ],
         "ActiveSkills": [
             [
@@ -152,7 +154,8 @@
             "S",
             "治疗者",
             "突",
-            null
+            null,
+            {"1005406":"RMurohushiDefault_R2b"}
         ],
         "ActiveSkills": [
             [

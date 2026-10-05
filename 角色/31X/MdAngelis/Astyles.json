@@ -9,7 +9,8 @@
       "A",
       "治疗者",
       "打",
-      null
+      null,
+      {"1008501":"MdAngelisDefault_R1"}
     ],
     "ActiveSkills": [
       [

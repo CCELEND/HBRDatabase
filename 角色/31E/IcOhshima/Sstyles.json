@@ -9,7 +9,8 @@
             "S",
             "防御者",
             "打",
-            "火"
+            "火",
+            {"1006102":"IcOhshimaDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -75,7 +76,8 @@
             "S",
             "增益者",
             "打",
-            null
+            null,
+            {"1006105":"IcOhshimaDefault_R2a"}
         ],
         "ActiveSkills": [
             [

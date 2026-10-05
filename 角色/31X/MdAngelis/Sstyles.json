@@ -9,7 +9,8 @@
       "S",
       "治疗者",
       "打",
-      null
+      null,
+      {"1008502":"MdAngelisDefault_R2"}
     ],
     "ActiveSkills": [
       [
@@ -79,7 +80,8 @@
       "S",
       "攻击者",
       "打",
-      "火"
+      "火",
+      {"1008506":"MdAngelisDefault_R2a"}
     ],
     "ActiveSkills": [
       [

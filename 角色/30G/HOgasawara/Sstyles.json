@@ -11,7 +11,8 @@
         "S",
         "破盾者",
         "突",
-        null
+        null,
+        {"1004502":"HOgasawaraDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -60,7 +61,8 @@
         "S",
         "破盾者",
         "突",
-        "冰"
+        "冰",
+        {"1004506":"HOgasawaraDefault_R2a"}
     ],
     "ActiveSkills":[
     [
@@ -118,7 +120,8 @@
         "S",
         "治疗者",
         "突",
-        "光"
+        "光",
+        {"1004508":"HOgasawaraHR_R2"}
     ],
     "ActiveSkills":[
     [

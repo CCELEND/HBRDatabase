@@ -11,7 +11,8 @@
         "S",
         "攻击者",
         "打",
-        null
+        null,
+        {"1004202":"MTsukishiroDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -73,7 +74,8 @@
         "S",
         "减益者",
         "打",
-        "火"
+        "火",
+        {"1004206":"MTsukishiroSwim2025_R2"}
     ],
     "ActiveSkills":[
     [

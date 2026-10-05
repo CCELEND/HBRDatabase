@@ -9,7 +9,8 @@
             "A",
             "攻击者",
             "斩",
-            null
+            null,
+            {"1007501":"INatsumeDefault_R1"}
         ],
         "ActiveSkills": [
             [

@@ -11,7 +11,8 @@
         "S",
         "防御者",
         "打",
-        null
+        null,
+        {"1002102":"EAoiDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -58,7 +59,8 @@
         "S",
         "防御者",
         "打",
-        null
+        null,
+        {"1002106":"EAoiDefault_R2a"}
     ],
     "ActiveSkills":[
     [

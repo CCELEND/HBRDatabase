@@ -11,7 +11,8 @@
         "S",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1004602":"SKuraDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -59,7 +60,8 @@
         "S",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1004604":"SKuraDefault_R2a"}
     ],
     "ActiveSkills":[
     [
@@ -122,7 +124,8 @@
         "S",
         "增益者",
         "斩",
-        "光"
+        "光",
+        {"1004607":"SKuraDefault_R2b"}
     ],
     "ActiveSkills":[
     [

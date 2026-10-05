@@ -10,7 +10,8 @@
         "A",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1003501":"AKanzakiDefault_R1"}
     ],
     "ActiveSkills":[
     [

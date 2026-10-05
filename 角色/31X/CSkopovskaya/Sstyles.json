@@ -9,7 +9,8 @@
       "S",
       "减益者",
       "突",
-      null
+      null,
+      {"1008602":"CSkopovskayaDefault_R2"}
     ],
     "ActiveSkills": [
       [
@@ -75,7 +76,8 @@
       "S",
       "攻击者",
       "突",
-      "暗"
+      "暗",
+      {"1008606":"CSkopovskayaDefault_R2a"}
     ],
     "ActiveSkills": [
       [

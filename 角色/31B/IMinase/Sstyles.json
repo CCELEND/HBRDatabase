@@ -11,7 +11,8 @@
         "S",
         "攻击者",
         "突",
-        "雷"
+        "雷",
+        {"1002202":"IMinaseDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -70,7 +71,8 @@
         "S",
         "攻击者",
         "突",
-        null
+        null,
+        {"1002206":"IMinaseSwim2025_R2"}
     ],
     "ActiveSkills":[
     [

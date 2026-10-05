@@ -9,7 +9,8 @@
             "S",
             "增益者",
             "突",
-            null
+            null,
+            {"1005202":"IIshiiDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -88,7 +89,8 @@
             "S",
             "增益者",
             "突",
-            "暗"
+            "暗",
+            {"1005204":"IIshiiDefault_R2a"}
         ],
         "ActiveSkills": [
             [

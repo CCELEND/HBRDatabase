@@ -10,7 +10,8 @@
         "A",
         "治疗者",
         "斩",
-        null
+        null,
+        {"1001701":"TKunimiDefault_R1"}
     ],
     "ActiveSkills":[
     [

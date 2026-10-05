@@ -9,7 +9,8 @@
             "S",
             "治疗者",
             "突",
-            null
+            null,
+            {"1006602":"MuOhshimaDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -74,7 +75,8 @@
             "S",
             "治疗者",
             "突",
-            "火"
+            "火",
+            {"1006604":"MuOhshimaDefault_R2a"}
         ],
         "ActiveSkills": [
             [

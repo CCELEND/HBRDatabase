@@ -10,7 +10,8 @@
         "A",
         "治疗者",
         "打",
-        null
+        null,
+        {"1003201":"SSakurabaDefault_R1"}
     ],
     "ActiveSkills":[
     [

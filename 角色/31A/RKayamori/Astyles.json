@@ -10,7 +10,8 @@
         "A",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1001101":"RKayamoriDefault_R1"}
     ],
     "ActiveSkills":[
     [

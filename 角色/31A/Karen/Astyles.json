@@ -10,7 +10,8 @@
         "A",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1001501":"KarenDefault_R1"}
     ],
     "ActiveSkills":[
     [

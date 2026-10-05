@@ -9,7 +9,8 @@
             "S",
             "破坏者",
             "斩",
-            null
+            null,
+            {"1006202":"NiOhshimaDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -85,7 +86,8 @@
             "S",
             "破坏者",
             "斩",
-            null
+            null,
+            {"1006204":"NiOhshimaDefault_R2a"}
         ],
         "ActiveSkills": [
             [

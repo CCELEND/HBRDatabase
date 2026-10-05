@@ -10,7 +10,8 @@
         "A",
         "防御者",
         "打",
-        null
+        null,
+        {"1002101":"EAoiDefault_R1"}
     ],
     "ActiveSkills":[
     [

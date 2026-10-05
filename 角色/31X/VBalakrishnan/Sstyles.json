@@ -9,7 +9,8 @@
       "S",
       "减益者",
       "打",
-      null
+      null,
+      {"1008402":"VBalakrishnanDefault_R2"}
     ],
     "ActiveSkills": [
       [
@@ -111,7 +112,8 @@
       "S",
       "防御者",
       "打",
-      null
+      null,
+      {"1008404":"VBalakrishnanDefault_R2a"}
     ],
     "ActiveSkills": [
       [

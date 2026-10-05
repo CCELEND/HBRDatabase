@@ -10,7 +10,8 @@
         "A",
         "减益者",
         "打",
-        null
+        null,
+        {"1001301":"MAikawaDefault_R1"}
     ],
     "ActiveSkills":[
     [

@@ -10,7 +10,8 @@
         "A",
         "破盾者",
         "斩",
-        null
+        null,
+        {"1002301":"SMinaseDefault_R1"}
     ],
     "ActiveSkills":[
     [

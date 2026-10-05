@@ -11,7 +11,8 @@
         "S",
         "破坏者",
         "斩",
-        null
+        null,
+        {"1001502":"KarenDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -57,7 +58,8 @@
         "S",
         "破坏者",
         "斩",
-        "火"
+        "火",
+        {"1001506":"KarenDefault_R2a"}
     ],
     "ActiveSkills":[
     [

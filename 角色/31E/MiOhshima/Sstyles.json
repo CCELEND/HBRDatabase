@@ -9,7 +9,8 @@
             "S",
             "攻击者",
             "打",
-            null
+            null,
+            {"1006302":"MiOhshimaDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -77,7 +78,8 @@
             "S",
             "攻击者",
             "打",
-            null
+            null,
+            {"1006305":"MiOhshimaDefault_R2a"}
         ],
         "ActiveSkills": [
             [

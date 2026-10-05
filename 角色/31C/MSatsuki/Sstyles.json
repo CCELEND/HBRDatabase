@@ -11,7 +11,8 @@
         "S",
         "增益者",
         "突",
-        null
+        null,
+        {"1003602":"MSatsukiNewYear2023_R2"}
     ],
     "ActiveSkills":[
     [
@@ -67,7 +68,8 @@
         "S",
         "增益者",
         "突",
-        "冰"
+        "冰",
+        {"1003608":"MSatsukiDefault_R2"}
     ],
     "ActiveSkills":[
     [

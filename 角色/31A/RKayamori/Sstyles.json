@@ -11,7 +11,8 @@
         "S",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1001102":"RKayamoriDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -57,7 +58,8 @@
         "S",
         "攻击者",
         "斩",
-        "火"
+        "火",
+        {"1001106":"RKayamoriSwim2022_R2"}
     ],
     "ActiveSkills":[
     [

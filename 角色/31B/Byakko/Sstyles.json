@@ -11,7 +11,8 @@
         "S",
         "破坏者",
         "突",
-        null
+        null,
+        {"1002602":"ByakkoDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -72,7 +73,8 @@
         "S",
         "增益者",
         "突",
-        null
+        null,
+        {"1002605":"ByakkoSwim2025_R2"}
     ],
     "ActiveSkills":[
     [

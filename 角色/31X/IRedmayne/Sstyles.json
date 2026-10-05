@@ -9,7 +9,8 @@
       "S",
       "破盾者",
       "突",
-      null
+      null,
+      {"1008302":"IRedmayneDefault_R2"}
     ],
     "ActiveSkills": [
       [
@@ -70,7 +71,8 @@
       "S",
       "破盾者",
       "突",
-      "冰"
+      "冰",
+      {"1008306":"IRedmayneDefault_R2a"}
     ],
     "ActiveSkills": [
       [

@@ -11,7 +11,8 @@
         "S",
         "治疗者",
         "打",
-        null
+        null,
+        {"1004402":"CSugaharaDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -59,7 +60,8 @@
         "S",
         "治疗者",
         "打",
-        null
+        null,
+        {"1004405":"CSugaharaDefault_R2a"}
     ],
     "ActiveSkills":[
     [

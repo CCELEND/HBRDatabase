@@ -11,7 +11,8 @@
         "S",
         "增益者",
         "突",
-        null
+        null,
+        {"1002402":"SHiguchiDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -59,7 +60,8 @@
         "S",
         "增益者",
         "突",
-        "火"
+        "火",
+        {"1002405":"SHiguchiNewYear2024_R2"}
     ],
     "ActiveSkills":[
     [

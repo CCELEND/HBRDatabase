@@ -10,7 +10,8 @@
         "A",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1004101":"YShirakawaDefault_R1"}
     ],
     "ActiveSkills":[
     [

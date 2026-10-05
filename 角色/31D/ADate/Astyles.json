@@ -9,7 +9,8 @@
             "A",
             "破盾者",
             "打",
-            null
+            null,
+            {"1005501":"ADateDefault_R1"}
         ],
         "ActiveSkills": [
             [

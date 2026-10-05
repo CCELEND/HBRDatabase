@@ -10,7 +10,8 @@
         "A",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1003101":"BIYamawakiDefault_R1"}
     ],
     "ActiveSkills":[
     [

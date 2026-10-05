@@ -10,7 +10,8 @@
         "A",
         "攻击者",
         "打",
-        null
+        null,
+        {"1005101":"MNikaidoDefault_R1"}
     ],
     "ActiveSkills":[
     [

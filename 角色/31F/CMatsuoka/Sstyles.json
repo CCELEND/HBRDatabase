@@ -9,7 +9,8 @@
             "S",
             "防御者",
             "打",
-            null
+            null,
+            {"1007402":"CMatsuokaDefault_R2"}
         ],
         "ActiveSkills": [
             [

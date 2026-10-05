@@ -10,7 +10,8 @@
             "S",
             "攻击者",
             "打",
-            null
+            null,
+            {"1005102":"MNikaidoDefault_R2"}
         ],
         "ActiveSkills": [
             [
@@ -71,7 +72,8 @@
             "S",
             "攻击者",
             "打",
-            null
+            null,
+            {"1005105":"MNikaidoDefault_R2a"}
         ],
         "ActiveSkills": [
             [

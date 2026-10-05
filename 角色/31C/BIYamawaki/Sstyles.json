@@ -11,7 +11,8 @@
         "S",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1003102":"BIYamawakiDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -60,7 +61,8 @@
         "S",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1003105":"BIYamawakiDefault_R2a"}
     ],
     "ActiveSkills":[
     [

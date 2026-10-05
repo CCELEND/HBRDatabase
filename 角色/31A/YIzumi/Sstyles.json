@@ -11,7 +11,8 @@
         "S",
         "破盾者",
         "突",
-        null
+        null,
+        {"1001202":"YIzumiDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -57,7 +58,8 @@
         "S",
         "破盾者",
         "突",
-        "火"
+        "火",
+        {"1001206":"YIzumiSwim2023_R2"}
     ],
     "ActiveSkills":[
     [

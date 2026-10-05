@@ -11,7 +11,8 @@
         "S",
         "攻击者",
         "斩",
-        null
+        null,
+        {"1004102":"YShirakawaDefault_R2"}
     ],
     "ActiveSkills":[
     [
@@ -61,7 +62,8 @@
         "S",
         "攻击者",
         "斩",
-        "光"
+        "光",
+        {"1004105":"YShirakawaDefault_R2a"}
     ],
     "ActiveSkills":[
     [
@@ -108,7 +110,8 @@
         "S",
         "破坏者",
         "斩",
-        "光"
+        "光",
+        {"1004109":"YShirakawaDefault_R2b"}
     ],
     "ActiveSkills":[
     [
