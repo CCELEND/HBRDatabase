@@ -265,7 +265,7 @@ def creat_search_win(parent_frame, scrollbar_frame_obj):
     team_options = [
         "ALL", "31A", "31B", "31C", "30G",
         "31D", "31E", "31F", "31X",
-        "Angel Beats!", "司令部"
+        "Angel Beats!", "司令部","persona5r"
     ]
     team_selected_values = []
     creat_select_frame("队伍", team_options, team_selected_values, role_search_frame, 1, 0)
