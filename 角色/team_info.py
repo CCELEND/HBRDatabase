@@ -118,8 +118,14 @@ def get_all_team_obj():
             try:
                 future.result()  # 获取结果（如果有异常会抛出）
             except Exception as e:
-                # print(f"加载队伍：{team_name} 时出错: {e}")
                 logger.error(f"加载队伍：{team_name} 时出错: {e}")
+                try:
+                    from 角色.role_info import report_data_error
+                    report_data_error(
+                        "加载队伍「%s」时出错（已跳过该队伍的这部分数据）：\n%s: %s"
+                        % (team_name, type(e).__name__, e))
+                except Exception:
+                    pass
 
 
 def get_role_by_master_name(name) -> Role:

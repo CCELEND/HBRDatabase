@@ -3,8 +3,11 @@ import queue
 from PyQt5.QtWidgets import QMessageBox, QApplication
 from PyQt5.QtCore import QTimer
 
+# 与 tk 版**共用同一个队列**：tools 等模块出错时都是往
+# 日志.error_queue_proc.error_queue 里放消息，这里必须读同一个队列，
+# 否则错误消息会进到没人读的队列里，界面永远不弹提示。
+from 日志.error_queue_proc import error_queue
 
-error_queue = queue.Queue()
 _error_timer = None
 
 

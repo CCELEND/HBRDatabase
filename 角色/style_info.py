@@ -316,12 +316,22 @@ def create_style(data) -> Style:
 
     # 主动技能列表
     activeskills = []
-    for active_skill_list in data['ActiveSkills']:
-        name, description, sp_cost, max_uses = active_skill_list[0]
+    for active_skill_list in (data.get('ActiveSkills') or []):
+        first = active_skill_list[0] if active_skill_list else None
+        if not isinstance(first, (list, tuple)) or len(first) < 3:
+            raise ValueError("主动技能条目缺少 [名称, 描述, 消耗] 中的字段")
+        name = first[0]
+        description = first[1] if len(first) > 1 else ""
+        sp_cost = first[2] if len(first) > 2 else None
+        max_uses = first[3] if len(first) > 3 else None
 
         effects = []
-        for effect in active_skill_list[1]:
-            if effect[0] in ["斩","突","打"]:
+        for effect in (active_skill_list[1]
+                       if len(active_skill_list) > 1
+                       and isinstance(active_skill_list[1], list) else []):
+            if not isinstance(effect, (list, tuple)) or not effect:
+                continue
+            if effect[0] in ["斩", "突", "打"]:
                 effect_obj = AttackSkill.from_list(effect)
             else:
                 effect_obj = SkillEffect.from_list(effect)
@@ -363,7 +373,7 @@ def create_style(data) -> Style:
 
     # 被动技能
     passiveskills = []
-    for passive_skill in data['PassiveSkills']:
+    for passive_skill in (data.get('PassiveSkills') or []):
         PassiveSkill_obj = PassiveSkill.from_list(passive_skill)
         passiveskills.append(PassiveSkill_obj)
 
@@ -400,7 +410,9 @@ def create_style(data) -> Style:
 # 获取风格对象
 def get_style_obj(data) -> Style:
 
-    style_info = data['style_info']
+    style_info = data.get('style_info')
+    if not isinstance(style_info, list) or len(style_info) < 2:
+        raise ValueError("style_info 缺失或不完整（至少需要 [路径, 队伍] 两项）")
     style_name = style_info[1]
 
     # 判断风格对象是否在字典中，在就复用，不在就生成

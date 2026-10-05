@@ -4,6 +4,19 @@ from 角色.style_info import get_style_obj
 from 角色.master_skill_info import get_master_skill_obj
 from tools import load_json, get_dir_values_list
 
+import 日志.error_queue_proc
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
+
+def report_data_error(msg):
+    """数据文件有问题：写日志 + 推到错误队列（主界面会弹提示）。"""
+    logger.error(msg)
+    try:
+        日志.error_queue_proc.error_queue.put(msg)
+    except Exception:
+        pass
+
 # 角色
 class Role:
     def __init__(self, img_path = None, 
@@ -33,14 +46,23 @@ class Role:
 # 根据字典 创建并返回角色对象
 def creat_role(role_json, Astyles, Sstyles, SSstyles, SSRstyles) -> Role:
 
-    img_path = role_json['img_path']
-    name = role_json['name']
-    en = role_json['en']
-    nicknames = role_json['nicknames']
-    description = role_json['description']
-    team = role_json['team']
-    weapon_attribute = role_json['weapon_attribute']
-    weapon = role_json['weapon']
+    # 字段缺失时不再直接抛 KeyError：用空值代替并提示
+    needed = ("img_path", "name", "en", "nicknames", "description",
+              "team", "weapon_attribute", "weapon")
+    missing = [k for k in needed if k not in role_json]
+    if missing:
+        report_data_error(
+            "角色数据缺少字段：%s（已用空值代替，角色：%s）"
+            % ("、".join(missing), role_json.get("name") or "?"))
+
+    img_path = role_json.get('img_path')
+    name = role_json.get('name')
+    en = role_json.get('en')
+    nicknames = role_json.get('nicknames')
+    description = role_json.get('description')
+    team = role_json.get('team')
+    weapon_attribute = role_json.get('weapon_attribute')
+    weapon = role_json.get('weapon')
 
     skill_info = role_json.get("master_skill")
     master_skill = get_master_skill_obj(skill_info)
@@ -72,7 +94,18 @@ def get_styles(role_path, style_rarity) -> list:
     styles_dir = load_json(file_path)
     if not styles_dir:
         return []
-    return [get_style_obj(style_dir) for style_dir in get_dir_values_list(styles_dir)]
+    # 逐个风格解析：某个风格的数据缺字段时只跳过它并提示，不影响其它风格
+    styles = []
+    for style_name, style_dir in styles_dir.items():
+        try:
+            styles.append(get_style_obj(style_dir))
+        except Exception as e:
+            report_data_error(
+                "风格数据解析失败，已跳过该风格：\n"
+                "文件：%s\n风格：%s\n原因：%s: %s"
+                % (file_path.replace("\\", "/"), style_name,
+                   type(e).__name__, e))
+    return styles
 
 
 # 角色对象字典 键：角色名，值：角色对象
@@ -81,7 +114,13 @@ all_roles = {}
 def creat_role_obj(role_path) -> Role:
 
     role_json = load_json(role_path + "/role.json")
-    role_name = role_json['name']
+    role_name = role_json.get('name')
+    if not role_name:
+        report_data_error(
+            "角色数据缺少 name 字段，已跳过该角色：\n文件：%s/role.json"
+            % role_path.replace("\\", "/"))
+        role_name = os.path.basename(str(role_path)) or "?"
+        role_json["name"] = role_name      # 让 Role 对象也有可用的名字
     if role_name in all_roles:
         return all_roles[role_name]
 
