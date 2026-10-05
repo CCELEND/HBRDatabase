@@ -439,10 +439,17 @@ class StyleInfo:
         self.ex_od = []
 
     def display_name(self):
-        """下拉列表中展示的名称，如「谨记死亡的美少女-SS」。"""
+        """下拉列表中展示的名称，如「谨记死亡的美少女-SS-冰」。
+
+        稀有度之后带上风格的元素属性（双属性如「火暗」照原样显示；
+        无属性的风格（多为辅助）只显示「名称-稀有度」）。
+        """
+        parts = [self.name]
         if self.rarity:
-            return "%s-%s" % (self.name, self.rarity)
-        return self.name
+            parts.append(self.rarity)
+        if self.element:
+            parts.append(self.element)
+        return "-".join(parts)
 
     def __repr__(self):
         return "StyleInfo(%r, %r, %d skills)" % (

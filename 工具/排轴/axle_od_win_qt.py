@@ -60,6 +60,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 【排轴】
 - 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数、
   共鸣天赋（含等级）、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
+  风格下拉按「**风格名-稀有度-元素**」显示（双属性如「火暗」照原样；无属性的风格只显示前两项）。
   **默认队伍是空队伍**（角色/风格都为空），首次编入角色时会自动建立第 1 回合。
   共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在勾选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
@@ -227,7 +228,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - **状态类被动已支持「歌姬之加护」**（茅森月歌「月华歌姬」）：
   「若回合开始时自身处于歌姬之加护状态 则前锋SP+2」（共鸣）与
   「若自身处于歌姬之加护状态 则自身消耗SP-2」（绝唱，需突破3）都会按状态自动结算。
-  状态由「若向流星歌唱」赋予全体友方 5 己方回合（含施放当回合）。
+  状态由「若向流星歌唱」赋予全体友方 5 己方回合（含施放当回合）；
+  但状态是在**该技能结算完之后**才生效，所以施放当回合的自身消耗不吃它的加成
+  （例：月歌第 3 回合放「若向流星歌唱」时，消耗仍是 14−1（苍天）=13，不会减到 11）。
 """
 
 
@@ -434,7 +437,7 @@ class TeamMemberRow(QFrame):
         layout.addWidget(self.role_combo)
 
         self.style_combo = QComboBox()
-        self.style_combo.setFixedWidth(190)
+        self.style_combo.setFixedWidth(250)   # 显示「风格名-稀有度-元素」
         self.style_combo.currentTextChanged.connect(self._on_style_changed)
         self.style_combo.currentTextChanged.connect(
             lambda text: self.style_combo.setToolTip(text))
@@ -761,7 +764,7 @@ class TeamMemberRow(QFrame):
         with self._suspended():
             self.style_combo.clear()
             for style in styles:
-                # 显示「风格名-稀有度」，实际值仍保存纯风格名
+                # 显示「风格名-稀有度-元素」，实际值仍保存纯风格名
                 self.style_combo.addItem(style.display_name(), style.name)
             pos = self.style_combo.findData(current)
             if pos >= 0:
@@ -1434,6 +1437,9 @@ class ActionRow(QFrame):
             self._manual_combo = float(data.get("combo", 0) or 0)
             self.combo_spin.setValue(int(self._manual_combo))
             self.fixed_od_spin.setValue(float(data.get("fixed_od", 0) or 0))
+            # 存档里保存的是「手填值」，不含自动部分；这里复位后由下面的
+            # _sync_fixed_od() 重新把自动固定OD加回去（否则会被覆盖掉）
+            self._auto_fixed_added = 0.0
             self.break_check.setChecked(bool(data.get("break", False)))
             self._populate_targets()
             tpos = self.target_combo.findData(data.get("sp_target"))
@@ -2537,12 +2543,12 @@ class AxleODWindow(QFrame):
             # 2) 本回合使用的「连击数上升」技能：当回合即生效
             for action in turn.actions:
                 action.set_combo_grant_hint(None)
-                # 先结算本行动赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护），
-                # 这样同回合后续行动（如 月芒）即可按新状态取值
-                state_tracker.apply(action, turn_idx, turn_front)
                 skill_now = action._find_skill()
                 states_now = state_tracker.states(action.member_index)
                 buff = action.get_combo_buff(states_now)
+                # 本行动结算完再赋予状态（同回合之后的行动即可见；
+                # 施放该技能本身不享受它赋予的状态）
+                state_tracker.apply(action, turn_idx, turn_front)
                 if not buff or not buff.get("amount") or not buff.get("duration"):
                     continue
                 # 连击框提示：本技能给「对象」的连击数（带状态变体时标注）
@@ -2940,8 +2946,6 @@ class AxleODWindow(QFrame):
                 if i not in active:
                     action.set_sp_result(None)
                     continue
-                # 结算该行动赋予的状态（如 歌姬之加护），供后续行动/被动判断
-                state_tracker.apply(action, turn_idx, turn_front)
                 cost = action.get_sp_cost(downed=break_seen,
                                           extra=is_extra_turn,
                                           sigil_levels=sigil_levels)
@@ -2991,6 +2995,9 @@ class AxleODWindow(QFrame):
                 else:
                     # SP 不足：显示红色负值（还差多少），实际 SP 不变
                     action.set_sp_result(sp[i] - cost, False)
+                # 本行动**结算完**再赋予状态（如 若向流星歌唱 → 歌姬之加护）：
+                # 施放当回合的自身消耗不吃该状态，之后（含同回合后续行动）才生效
+                state_tracker.apply(action, turn_idx, turn_front)
 
             # 「追击」：友方使用 SP≤N 的攻击行动时触发（如 温泉巡游）。
             # 追击不计入行动、只在后卫发动；装备 温泉通行木牌 时首变为 猫咪喷射打靶（整回合1次）。
