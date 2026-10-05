@@ -73,6 +73,20 @@ def int_to_comma_str(number: int) -> str:
 def is_file_empty(file_path: str) -> bool:
     return os.path.getsize(file_path) == 0
 
+# 把「服务器返回的相对路径」限制在程序目录内，防止 ../ 越界写入
+def safe_relative_path(file_name: str, base_dir: str = ".") -> str:
+    """返回绝对路径；若解析后跑到 base_dir 之外则抛 ValueError。
+
+    更新/修复会按服务器给出的清单往本地写文件，清单一旦被篡改
+    （或 HTTPS 未校验证书时被中间人替换）就可能写出程序目录之外。
+    """
+    base = os.path.abspath(base_dir)
+    target = os.path.abspath(os.path.join(base, str(file_name)))
+    if target != base and not target.startswith(base + os.sep):
+        raise ValueError("非法的文件路径（越界）：%s" % file_name)
+    return target
+
+
 # 加载 json 文件
 def load_json(json_path: str) -> dict:
     try:

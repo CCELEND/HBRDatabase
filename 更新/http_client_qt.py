@@ -7,7 +7,8 @@ from PyQt5.QtWidgets import (QDialog, QProgressBar, QLabel, QVBoxLayout,
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QIcon
 
-from tools import creat_directory, confirm_restart_qt, sort_dict_by_key
+from tools import (creat_directory, confirm_restart_qt, sort_dict_by_key,
+                   safe_relative_path)
 from 更新.hash import save_hashes_to_json
 from 更新.server_config import requests_kwargs as _tls_kwargs
 from 日志.advanced_logger import AdvancedLogger
@@ -48,6 +49,8 @@ class DownloadThread(QThread):
         for i, file_name in enumerate(self.files_to_download):
             try:
                 self.signals.file_status.emit(f"下载更新：'{file_name}' ({i+1}/{total})")
+                # 服务器给的路径只允许落在程序目录内
+                safe_path = safe_relative_path(file_name)
                 creat_directory(file_name)
 
                 encoded_name = quote(file_name)
@@ -63,7 +66,7 @@ class DownloadThread(QThread):
 
                     total_size = int(response.headers.get('content-length', 0))
                     downloaded = 0
-                    with open(file_name, 'wb') as f:
+                    with open(safe_path, 'wb') as f:
                         for chunk in response.iter_content(chunk_size=8192):
                             if chunk:
                                 f.write(chunk)

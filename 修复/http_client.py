@@ -8,7 +8,7 @@ from threading import Thread
 from urllib.parse import quote
 
 from window import set_window_icon, creat_window
-from tools import creat_directory, sort_dict_by_key
+from tools import (creat_directory, sort_dict_by_key, safe_relative_path)
 from 修复.hash import save_hashes_to_json
 from 更新.server_config import requests_kwargs as _tls_kwargs
 
@@ -76,14 +76,15 @@ def download_single_file(file_name, i, total_files, server_url,
         file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
         progress_window.update()
         
-        # 创建目录
+        # 创建目录（路径只允许落在程序目录内）
+        safe_path = safe_relative_path(file_name)
         creat_directory(file_name)
         
         # 编码特殊字符并下载
         encoded_name = quote(file_name)
         url = f"{server_url}/download/{encoded_name}"
         
-        perform_download(file_name, url, i, total_files, 
+        perform_download(safe_path, url, i, total_files, 
                          progress, percent_var, progress_window)
         return True
         

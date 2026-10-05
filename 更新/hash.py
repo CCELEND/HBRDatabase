@@ -73,14 +73,43 @@ HASH_SKIP_DIRS = frozenset({
     "node_modules", "chrome_user_data",
 })
 
+# 本地哈希缓存：记录每个文件的 mtime/size/hash，没变的文件直接复用，
+# 避免每次启动都把整套资源（约 1.5GB）重新 SHA-256 一遍。
+# 文件名已在 skip_items 里，不会被当成待哈希文件。
+CLIENT_HASH_CACHE = "./关于/client_file_hashes.json"
 
-def calculate_file_hashes(directory):
+
+def _load_hash_cache():
+    try:
+        with open(CLIENT_HASH_CACHE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _save_hash_cache(cache):
+    try:
+        directory = os.path.dirname(CLIENT_HASH_CACHE)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+        with open(CLIENT_HASH_CACHE, "w", encoding="utf-8") as f:
+            json.dump(cache, f)
+    except Exception as e:
+        logger.warning("写入本地哈希缓存失败：%s", e)
+
+
+def calculate_file_hashes(directory, use_cache=True):
     file_hashes = {}
     skip_items = ["__pycache__", ".mp3", ".flac", 
                   "chrome_user_data", ".log", "client_file_hashes.json", "GetEntriesGUILocal/config.ini",
                   "./工具/HBR伤害模拟/1.7.0_0/", "./.git/", "./工具/chrome/chrome-win64/"]  # 要跳过的目录或文件名列表
 
-    # 遍历目录，收集所有需要计算哈希的文件路径
+    cache = _load_hash_cache() if use_cache else {}
+    new_cache = {}
+    reused = 0
+
+    # 遍历目录，能复用缓存的直接取，其余加入待计算列表
     file_tasks = []
     for root, dirs, files in os.walk(directory):
         # 剪枝：不进入 venv/.git/.vs 等目录
@@ -107,25 +136,47 @@ def calculate_file_hashes(directory):
             if skip:
                 continue
 
-            # 将任务添加到任务列表
-            file_tasks.append((filepath, key))
+            try:
+                st = os.stat(filepath)
+            except OSError:
+                continue
 
-    # 使用 ThreadPoolExecutor 并行计算哈希
+            entry = cache.get(key)
+            if (isinstance(entry, dict) and entry.get("hash")
+                    and entry.get("mtime") == st.st_mtime
+                    and entry.get("size") == st.st_size):
+                file_hashes[key] = entry["hash"]
+                new_cache[key] = entry
+                reused += 1
+            else:
+                file_tasks.append((filepath, key, st.st_mtime, st.st_size))
+
+    # 使用 ThreadPoolExecutor 并行计算「缓存未命中」的文件
     with ThreadPoolExecutor() as executor:
-        # 提交任务到线程池
-        futures = {executor.submit(calculate_file_hash, filepath, key): key for filepath, key in file_tasks}
+        futures = {
+            executor.submit(calculate_file_hash, filepath, key):
+                (key, mtime, size)
+            for filepath, key, mtime, size in file_tasks
+        }
 
         # 等待任务完成并收集结果
         for future in as_completed(futures):
-            key = futures[future]
+            key, mtime, size = futures[future]
             try:
                 result_key, file_hash = future.result()
                 if result_key is not None:
                     file_hashes[result_key] = file_hash
+                    new_cache[result_key] = {
+                        "mtime": mtime, "size": size, "hash": file_hash}
             except FileNotFoundError as e:
                 # 文件在遍历后被删除/移动，直接跳过，不再弹窗
                 logger.warning(f"文件已被删除或移动，跳过哈希计算：{key} ({e})")
             except (PermissionError, OSError) as e:
                 logger.error(f"计算文件 {key} 的哈希值时出错：{e}")
+
+    if use_cache:
+        _save_hash_cache(new_cache)
+        logger.info("哈希完成：复用缓存 %d 个，重新计算 %d 个",
+                    reused, len(file_tasks))
 
     return file_hashes
