@@ -142,11 +142,11 @@
         }
     },
 
-    "温馨的时光": {
+    "温馨时光": {
         "style_info": [
             "./角色/31D/RMurohushi/RMurohushiDefault_R2b_Thumbnail.webp",
             "31D","室伏理沙",
-            "温馨的时光",
+            "温馨时光",
             [],
             "被动技能可以在战斗开始时回复我方全体DP的HEALER",
             "S",
