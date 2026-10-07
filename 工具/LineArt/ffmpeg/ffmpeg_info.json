@@ -1,0 +1,9 @@
+{
+  "name": "ffmpeg.exe",
+  "version": "N-127233-g452820cba6-20261007",
+  "source": "https://github.com/BtbN/FFmpeg-Builds (ffmpeg-master-latest-win64-gpl)",
+  "license": "GPL v3 (含 libx264 / ffnvcodec / libvpl)",
+  "raw_size": 168902656,
+  "exe_sha256": "a385b7b437d0b42de3e4d62c242219a1026372cf55bfc1ab7d31c469bad33d51",
+  "gz_sha256": "97780778ba0b86e97f1cfa818d5899c8716a34d47d7583cabec65f034ee2e5d9"
+}

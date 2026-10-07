@@ -10,6 +10,8 @@
 
 线稿算法与「图片转线稿工具 2.0」完全一致，见 :mod:`工具.LineArt.line_art_core`。
 """
+import gzip
+import json
 import os
 import shutil
 import subprocess
@@ -37,21 +39,112 @@ from 工具.LineArt.LineArtGUI2_QT import ImageViewer
 # 让 ffmpeg 子进程不弹出黑色控制台窗口（Windows）
 _NO_WINDOW = 0x08000000 if os.name == "nt" else 0
 
+# ---------------------------------------------------------------------------
+# 项目自带的 ffmpeg（工具/LineArt/ffmpeg/）
+#
+# 原版 ffmpeg.exe 有一百多 MB，直接放进分发包太重，所以压成 ffmpeg.exe.gz
+# 随项目分发；第一次用到时解压到 %LOCALAPPDATA%\HBRDatabase\ffmpeg\ 并复用。
+# 解压目标故意不放在项目目录里：那里的文件会被哈希/更新逻辑当成待分发内容。
+# 项目换了 ffmpeg 版本后，靠 ffmpeg_info.json 里的 exe_sha256 让旧缓存作废重解压。
+# ---------------------------------------------------------------------------
+_HERE = os.path.dirname(os.path.abspath(__file__))
+FFMPEG_DIR = os.path.join(_HERE, "ffmpeg")
+BUNDLED_FFMPEG = os.path.join(FFMPEG_DIR, "ffmpeg.exe")
+BUNDLED_FFMPEG_GZ = os.path.join(FFMPEG_DIR, "ffmpeg.exe.gz")
+FFMPEG_INFO = os.path.join(FFMPEG_DIR, "ffmpeg_info.json")
+
+
+def ffmpeg_cache_path() -> str:
+    """解压出来的 ffmpeg 存放位置。"""
+    base = (os.environ.get("LOCALAPPDATA") or os.environ.get("TEMP")
+            or tempfile.gettempdir())
+    return os.path.join(base, "HBRDatabase", "ffmpeg", "ffmpeg.exe")
+
+
+def _bundled_info() -> dict:
+    """读项目自带的 ffmpeg_info.json（版本 / 大小 / 校验值）。"""
+    try:
+        with open(FFMPEG_INFO, encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def _min_ffmpeg_size() -> int:
+    """缓存文件至少要有这么大才算完整（优先用 ffmpeg_info.json 里的原始大小）。"""
+    size = int(_bundled_info().get("raw_size") or 0)
+    return size if size > 0 else 50 * 1024 * 1024
+
+
+def bundled_ffmpeg_available() -> bool:
+    """项目里带没带 ffmpeg（原版 exe 或压缩包）。"""
+    return os.path.exists(BUNDLED_FFMPEG) or os.path.exists(BUNDLED_FFMPEG_GZ)
+
+
 # 输出方式
 OUT_H264 = "h264"    # ffmpeg 编码 H.264，画质好、体积小，可带音频
 OUT_MP4V = "mp4v"    # OpenCV 内置编码，任何环境都能用，无音频
 OUT_PNG = "png"      # PNG 帧序列
 
 
+def _cache_is_current(cache: str) -> bool:
+    """本地缓存是不是「和项目自带的那个版本一致」。
+
+    项目换了 ffmpeg 版本后，旧缓存必须作废重新解压，否则用户会一直用旧的。
+    """
+    if not os.path.exists(cache) or os.path.getsize(cache) < _min_ffmpeg_size():
+        return False
+    expected = str(_bundled_info().get("exe_sha256") or "")
+    if not expected:
+        return True            # 没有版本信息（比如有人手工放了原版 exe）
+    try:
+        with open(cache + ".json", encoding="utf-8") as f:
+            marker = json.load(f)
+    except Exception:
+        return False
+    return marker.get("exe_sha256") == expected
+
+
 def find_ffmpeg() -> str:
-    """找一个可用的 ffmpeg（优先 PATH）。"""
-    exe = shutil.which("ffmpeg")
-    if exe:
-        return exe
-    for cand in (r"F:\tool\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe",):
-        if os.path.exists(cand):
-            return cand
-    return ""
+    """找一个可用的 ffmpeg（不会解压，立刻返回）。
+
+    优先级：项目自带的原版 exe > 版本匹配的本地缓存 > 系统 PATH。
+    """
+    if os.path.exists(BUNDLED_FFMPEG):
+        return BUNDLED_FFMPEG
+    cache = ffmpeg_cache_path()
+    if _cache_is_current(cache):
+        return cache
+    return shutil.which("ffmpeg") or ""
+
+
+def ensure_ffmpeg() -> str:
+    """确保有 ffmpeg 可用，而且版本和项目自带的一致。
+
+    项目自带的是压缩包，需要时解压到本地缓存；项目换了版本会重新解压。
+    """
+    if os.path.exists(BUNDLED_FFMPEG):
+        return BUNDLED_FFMPEG
+    cache = ffmpeg_cache_path()
+    if _cache_is_current(cache):
+        return cache
+    if not os.path.exists(BUNDLED_FFMPEG_GZ):
+        return find_ffmpeg()          # 没带压缩包，退回系统 PATH
+    os.makedirs(os.path.dirname(cache), exist_ok=True)
+    tmp = cache + ".part"
+    # 先解压到 .part 再改名，避免中途失败留下半个文件被当成可用
+    with gzip.open(BUNDLED_FFMPEG_GZ, "rb") as fin:
+        with open(tmp, "wb") as fout:
+            shutil.copyfileobj(fin, fout, 1024 * 1024)
+    os.replace(tmp, cache)
+    # 记下版本，下次靠它判断缓存还有没有效
+    try:
+        with open(cache + ".json", "w", encoding="utf-8") as f:
+            json.dump(_bundled_info(), f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+    return cache if os.path.exists(cache) else ""
 
 
 def _fmt_time(sec) -> str:
@@ -192,24 +285,41 @@ def probe_encoder(ffmpeg: str, encoder: str) -> bool:
     return ok
 
 
-class EncoderProbeWorker(QThread):
-    """后台试编一下，确认哪些 GPU 编码器在这台机器上真的能用。"""
+# 持有运行中的 QThread 引用：窗口先关掉时，线程对象不能被 Python 回收，
+# 否则 Qt 会报 "QThread: Destroyed while thread is still running" 甚至崩溃。
+_LIVE_WORKERS = set()
 
-    done = pyqtSignal(dict)
 
-    def __init__(self, ffmpeg, encoders):
+def _keep_worker(worker):
+    _LIVE_WORKERS.add(worker)
+    worker.finished.connect(lambda: _LIVE_WORKERS.discard(worker))
+
+
+class FfmpegPrepareWorker(QThread):
+    """后台准备 ffmpeg：需要的话先解压自带压缩包，再试编确认哪些 GPU 编码器真能用。"""
+
+    done = pyqtSignal(str, dict, str)      # (ffmpeg 路径, {编码器: 可用}, 错误信息)
+
+    def __init__(self, ffmpeg):
         super().__init__()
         self.ffmpeg = ffmpeg
-        self.encoders = list(encoders)
 
     def run(self):
-        result = {}
-        for enc in self.encoders:
+        ff = self.ffmpeg
+        error = ""
+        if not ff:
             try:
-                result[enc] = probe_encoder(self.ffmpeg, enc)
-            except Exception:
-                result[enc] = False
-        self.done.emit(result)
+                ff = ensure_ffmpeg()
+            except Exception as e:
+                ff, error = "", "解压 ffmpeg 失败：%s" % e
+        usable = {}
+        if ff:
+            try:
+                for enc in list_ffmpeg_encoders(ff):
+                    usable[enc] = probe_encoder(ff, enc)
+            except Exception as e:
+                error = error or str(e)
+        self.done.emit(ff, usable, error)
 
 
 class FramePreviewWorker(QThread):
@@ -531,6 +641,9 @@ class VideoLineArtGUI(QMainWindow):
         self.ffmpeg = find_ffmpeg()
         self.hw_encoders = list_ffmpeg_encoders(self.ffmpeg)
         self.hw_usable = None       # 后台试编结果，None 表示还在检测
+        # 打开窗口时就要知道「等会儿能不能用上 ffmpeg」，否则界面会先闪一下"未找到"
+        self._preparing = bool(self.ffmpeg) or bundled_ffmpeg_available()
+        self._prepare_error = ""
         self._probe_worker = None
         self.preview_window = None
         self._frame_workers = set()
@@ -542,25 +655,43 @@ class VideoLineArtGUI(QMainWindow):
 
         self._init_ui()
         self._refresh_output_state()
-        self._start_encoder_probe()
+        self._start_ffmpeg_prepare()
 
-    def _start_encoder_probe(self):
-        """后台检测 GPU 编码器，检测完把不能用的从下拉框里去掉。"""
-        if not self.ffmpeg or not self.hw_encoders:
+    def _start_ffmpeg_prepare(self):
+        """后台准备 ffmpeg（必要时解压）+ 检测 GPU 编码器。"""
+        if not self._preparing:
             return
-        self._probe_worker = EncoderProbeWorker(self.ffmpeg, self.hw_encoders)
-        self._probe_worker.done.connect(self._on_encoder_probe_done)
+        self._probe_worker = FfmpegPrepareWorker(self.ffmpeg)
+        self._probe_worker.done.connect(self._on_ffmpeg_prepare_done)
+        _keep_worker(self._probe_worker)
         self._probe_worker.start()
 
-    def _on_encoder_probe_done(self, result):
-        self.hw_usable = result
-        for i in range(self.encoder_combo.count() - 1, -1, -1):
-            name = self.encoder_combo.itemData(i)
-            if name in HW_ENCODERS and not result.get(name):
-                if self.encoder_combo.currentIndex() == i:
-                    self.encoder_combo.setCurrentIndex(0)
-                self.encoder_combo.removeItem(i)
+    def _on_ffmpeg_prepare_done(self, ffmpeg, usable, error):
+        self._preparing = False
+        self._prepare_error = error
+        if ffmpeg:
+            self.ffmpeg = ffmpeg
+            self.hw_encoders = set(usable) or list_ffmpeg_encoders(ffmpeg)
+        self.hw_usable = usable
+        self._rebuild_encoder_combo(usable)
         self.gpu_label.setText(self._encoder_hint())
+        self.gpu_label.setToolTip(
+            "ffmpeg：%s\n版本：%s"
+            % (self.ffmpeg or "(未找到)", _bundled_info().get("version", "?")))
+        self._refresh_output_state()
+
+    def _rebuild_encoder_combo(self, usable):
+        """按「真的能用」的结果重建编码器下拉框（保留用户当前的选择）。"""
+        keep = self.encoder_combo.currentData()
+        self.encoder_combo.blockSignals(True)
+        self.encoder_combo.clear()
+        for name, text in ENCODER_CHOICES:
+            if name in HW_ENCODERS and not usable.get(name):
+                continue
+            self.encoder_combo.addItem(text, name)
+        idx = self.encoder_combo.findData(keep)
+        self.encoder_combo.setCurrentIndex(idx if idx >= 0 else 0)
+        self.encoder_combo.blockSignals(False)
 
     # ------------------------------------------------------------------ UI
     def _init_ui(self):
@@ -814,8 +945,14 @@ class VideoLineArtGUI(QMainWindow):
         return OUT_H264
 
     def _encoder_hint(self):
-        """底部那行小字：本机有哪些 GPU 编码器。"""
+        """底部那行小字：本机 GPU 编码器情况。"""
+        if self._preparing:
+            if self.ffmpeg:
+                return "正在检测 GPU 编码器..."
+            return "正在准备 ffmpeg（项目自带，首次使用需解压约 45MB，请稍候）..."
         if not self.ffmpeg:
+            if self._prepare_error:
+                return "准备 ffmpeg 失败：%s（只能用「内置编码」）" % self._prepare_error
             return "未找到 ffmpeg：只能用「内置编码」，没有 GPU 加速，也不能保留音频。"
         names = {"h264_nvenc": "NVIDIA NVENC", "h264_qsv": "Intel QSV",
                  "h264_amf": "AMD AMF"}
@@ -829,6 +966,10 @@ class VideoLineArtGUI(QMainWindow):
         if not parts:
             return "没有发现可用的 GPU 编码器，将使用 CPU 编码。"
         return "本机 GPU 编码器：" + "   ".join(parts) + "（「自动」会优先使用 GPU）"
+
+    def _ffmpeg_ready(self):
+        """ffmpeg 现在能用，或者正在后台准备（准备完就能用）。"""
+        return bool(self.ffmpeg) or self._preparing
 
     def _resolve_encoder(self):
         """把下拉框选择变成实际要用的编码器；GPU 不可用时自动降级到 CPU。"""
@@ -850,7 +991,7 @@ class VideoLineArtGUI(QMainWindow):
 
     def _refresh_output_state(self):
         """没有 ffmpeg 时禁用 H.264 与音频选项；编码器只在 H.264 模式下有意义。"""
-        has = bool(self.ffmpeg)
+        has = self._ffmpeg_ready()
         self.radio_h264.setEnabled(has)
         if not has and self.radio_h264.isChecked():
             self.radio_mp4v.setChecked(True)
@@ -881,6 +1022,7 @@ class VideoLineArtGUI(QMainWindow):
         w.frame_ready.connect(self._on_frame_ready)
         w.error.connect(self._on_preview_error)
         w.finished.connect(lambda: self._frame_workers.discard(w))
+        _keep_worker(w)
         w.start()
 
     def _on_frame_ready(self, seq, arr):
@@ -904,6 +1046,11 @@ class VideoLineArtGUI(QMainWindow):
 
         mode = self._out_mode()
         if mode == OUT_H264 and not self.ffmpeg:
+            if self._preparing:
+                QMessageBox.information(
+                    self, "提示",
+                    "ffmpeg 正在准备中（首次使用需要解压一次），请等几秒再试。")
+                return
             self.radio_mp4v.setChecked(True)
             mode = OUT_MP4V
             QMessageBox.information(self, "提示", "没有找到 ffmpeg，已改用 OpenCV 内置编码。")
@@ -964,6 +1111,7 @@ class VideoLineArtGUI(QMainWindow):
                                       % ENCODER_LABELS.get(encoder, encoder))
         else:
             self.status_label.setText("开始转换...")
+        _keep_worker(self.convert_worker)
         self.convert_worker.start()
 
     def cancel_convert(self):
