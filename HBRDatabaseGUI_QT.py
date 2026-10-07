@@ -106,13 +106,12 @@ from 敌人.遭遇战.zyz_win_qt import show_zyz_enemys
 from 搜索.search_win_qt import creat_search_win
 from 角色.team_win_qt import creat_team_win
 from 更新.http_update_processing_qt import http_update_data
-from 音乐.music_win_qt import creat_music_win
+from 音乐.Load import creat_music_win
 
 from 工具.GetEntriesGUILocal.seed_tools.Load_qt import load_seed_tools
-from 工具.GetEntriesGUILocal.get_entries_win_qt import creat_ct_win
-from 工具.DamageScoreCal.damage_score_cal_win_qt import creat_dsc_win
-from 工具.DamageScoreCal.damage_score_cal_win_v2_qt import creat_dsc_win_v2
-from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
+from 工具.GetEntriesGUILocal.Load import creat_ct_win
+from 工具.DamageScoreCal.Load import creat_dsc_win, creat_dsc_win_v2
+from 工具.HBRbrochure.Load import get_hbr_brochure
 from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
 from 工具.AFSGTools.Load import load_AFSGTools
 from 工具.hbr_tool.Load import load_hbr_tool

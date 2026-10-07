@@ -1,6 +1,5 @@
 
 
-from selenium.webdriver.chrome.options import Options
 from tools import init_chrome_driver
 
 from 日志.advanced_logger import AdvancedLogger
@@ -13,6 +12,9 @@ chrome_driver = None
 def run_browser_in_thread():
     global chrome_driver
     try:
+        # selenium 比较重，放在真正要用的时候才 import（否则启动就会被拉起来）
+        from selenium.webdriver.chrome.options import Options
+
         # 设置 Chrome 选项
         chrome_options = Options()
         # chrome_options.add_argument("--headless") # 无头模式

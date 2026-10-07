@@ -1,6 +1,5 @@
 import pathlib
 
-from selenium.webdriver.chrome.options import Options
 from tools import delete_all_files_and_subdirs, delete_file
 
 import os
@@ -15,7 +14,9 @@ chrome_driver = None
 def run_browser_in_thread():
     global chrome_driver
     try:
-        
+        # selenium 比较重，放在真正要用的时候才 import（否则启动就会被拉起来）
+        from selenium.webdriver.chrome.options import Options
+
         if not check_dir_exists_pathlib('./工具/HBR伤害模拟/2.1.0_0'):
             unzip_file(os.path.abspath('./工具/HBR伤害模拟/2.1.0_0.zip'), os.path.abspath('./工具/HBR伤害模拟'))
 

@@ -59,14 +59,14 @@ sys.path.append(os.path.abspath("./更新"))
 from 更新.http_update_processing import http_update_data
 
 sys.path.append(os.path.abspath("./音乐"))
-from 音乐.music_win import creat_music_win
+from 音乐.Load import creat_music_win_tk as creat_music_win
 
 sys.path.append(os.path.abspath("./工具"))
 from 工具.GetEntriesGUILocal.seed_tools.Load import load_seed_tools
-from 工具.GetEntriesGUILocal.get_entries_win import creat_ct_win
-from 工具.DamageScoreCal.damage_score_cal_win import creat_dsc_win
-from 工具.DamageScoreCal.damage_score_cal_win_v2 import creat_dsc_win_v2
-from 工具.HBRbrochure.HBRbrochure import get_hbr_brochure
+from 工具.GetEntriesGUILocal.Load import creat_ct_win_tk as creat_ct_win
+from 工具.DamageScoreCal.Load import creat_dsc_win_tk as creat_dsc_win
+from 工具.DamageScoreCal.Load import creat_dsc_win_v2_tk as creat_dsc_win_v2
+from 工具.HBRbrochure.Load import get_hbr_brochure
 from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
 from 工具.AFSGTools.Load import load_AFSGTools
 from 工具.hbr_tool.Load import load_hbr_tool
