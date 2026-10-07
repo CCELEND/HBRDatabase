@@ -827,7 +827,7 @@ def run_video_line_art():
     """)
 
     window = VideoLineArtGUI()
-    window.move(1060, 330)
+    window.move(300, 250)
     window.show()
     sys.exit(app.exec_())
 
