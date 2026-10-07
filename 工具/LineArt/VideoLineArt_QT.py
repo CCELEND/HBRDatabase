@@ -27,7 +27,8 @@ from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import (
     QApplication, QButtonGroup, QCheckBox, QComboBox, QFileDialog, QFormLayout,
     QGroupBox, QHBoxLayout, QLabel, QMainWindow, QMessageBox, QProgressBar,
-    QPushButton, QRadioButton, QSlider, QStatusBar, QVBoxLayout, QWidget
+    QPushButton, QRadioButton, QSlider, QStatusBar, QStyle, QStyleOptionSlider,
+    QVBoxLayout, QWidget
 )
 
 from 工具.LineArt.line_art_core import ENHANCE_MAP, VIDEO_EXTS, to_line_art
@@ -317,6 +318,61 @@ class ConvertWorker(QThread):
                     self._remove_quiet(os.path.join(self.out_path, name))
 
 
+class JumpSlider(QSlider):
+    """点滑槽任意位置直接跳到那里（原生 QSlider 点击只翻一页）。
+
+    点住滑槽不放还能继续拖，行为和其他播放器一致。
+    """
+
+    def _value_at(self, pos):
+        """把鼠标坐标换算成滑块值。"""
+        opt = QStyleOptionSlider()
+        self.initStyleOption(opt)
+        groove = self.style().subControlRect(
+            QStyle.CC_Slider, opt, QStyle.SC_SliderGroove, self)
+        handle = self.style().subControlRect(
+            QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self)
+        if self.orientation() == Qt.Horizontal:
+            span = groove.width() - handle.width()
+            offset = pos.x() - groove.x() - handle.width() // 2
+        else:
+            span = groove.height() - handle.height()
+            offset = pos.y() - groove.y() - handle.height() // 2
+        if span <= 0:
+            return self.value()
+        return QStyle.sliderValueFromPosition(
+            self.minimum(), self.maximum(), offset, span)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            opt = QStyleOptionSlider()
+            self.initStyleOption(opt)
+            handle = self.style().subControlRect(
+                QStyle.CC_Slider, opt, QStyle.SC_SliderHandle, self)
+            if not handle.contains(event.pos()):
+                # 点在滑槽上：直接跳过去，并记下状态以便继续拖
+                self._jumping = True
+                self.setValue(self._value_at(event.pos()))
+                event.accept()
+                return
+        self._jumping = False
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event):
+        if getattr(self, "_jumping", False):
+            self.setValue(self._value_at(event.pos()))
+            event.accept()
+            return
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if getattr(self, "_jumping", False):
+            self._jumping = False
+            event.accept()
+            return
+        super().mouseReleaseEvent(event)
+
+
 class PreviewWindow(QMainWindow):
     """线稿预览窗口（滚轮缩放 / 拖拽平移 / 双击还原）。"""
 
@@ -448,7 +504,7 @@ class VideoLineArtGUI(QMainWindow):
         # --- 预览帧 ---
         prev_row = QHBoxLayout()
         prev_row.addWidget(QLabel("预览帧："))
-        self.frame_slider = QSlider(Qt.Horizontal)
+        self.frame_slider = JumpSlider(Qt.Horizontal)
         self.frame_slider.setRange(0, 0)
         self.frame_slider.setEnabled(False)
         self.frame_slider.valueChanged.connect(self._on_slider_changed)
