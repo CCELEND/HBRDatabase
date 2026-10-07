@@ -12,6 +12,12 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QByteArray, QBuffer, QIODevice, QTimer, QRectF
 from PyQt5.QtGui import QImage, QPixmap, QPainter, QWheelEvent, QFont
 
+# 线稿算法与「视频转线稿」共用，见 line_art_core.to_line_art
+try:
+    from 工具.LineArt.line_art_core import ENHANCE_MAP as CORE_ENHANCE_MAP, to_line_art
+except ImportError:  # 直接从本目录运行本文件时
+    from line_art_core import ENHANCE_MAP as CORE_ENHANCE_MAP, to_line_art
+
 
 # 图像处理工作线程
 class ImageProcessWorker(QThread):
@@ -33,36 +39,10 @@ class ImageProcessWorker(QThread):
             if img is None:
                 raise ValueError("无法解码图片，请检查文件是否损坏")
 
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            inverted = 255 - gray
-            kernel_size = 2 * self.min_radius + 1
-            kernel = np.ones((kernel_size, kernel_size), np.uint8)
-            inverted_min = cv2.erode(inverted, kernel, anchor=(-1, -1), borderType=cv2.BORDER_REPLICATE)
-            result = cv2.add(gray, inverted_min)
-
-            # 亮度补偿
-            offset = (self.brightness_offset - 50) * 1.0
-            if offset != 0:
-                result = np.clip(result.astype(np.int16) + offset, 0, 255).astype(np.uint8)
-
-            # 清晰度增强
-            if self.enhance_mode == 1:  # 对比度拉伸
-                p_low, p_high = np.percentile(result, (2, 98))
-                if p_high > p_low:
-                    result = np.clip((result - p_low) / (p_high - p_low) * 255, 0, 255).astype(np.uint8)
-            elif self.enhance_mode == 2:  # 轻度锐化
-                gaussian = cv2.GaussianBlur(result, (0, 0), sigmaX=1.5)
-                result = cv2.addWeighted(result, 1.5, gaussian, -0.5, 0)
-                result = np.clip(result, 0, 255).astype(np.uint8)
-            elif self.enhance_mode == 3:  # 强锐化+去噪
-                kernel_open = np.ones((2, 2), np.uint8)
-                result = cv2.morphologyEx(result, cv2.MORPH_OPEN, kernel_open)
-                gaussian = cv2.GaussianBlur(result, (0, 0), sigmaX=2.0)
-                result = cv2.addWeighted(result, 2.0, gaussian, -1.0, 0)
-                result = np.clip(result, 0, 255).astype(np.uint8)
-
-            if self.invert:
-                result = 255 - result
+            result = to_line_art(
+                img, self.min_radius, self.brightness_offset,
+                self.enhance_mode, self.invert
+            )
 
             self.finished.emit(result)
         except Exception as e:
@@ -166,7 +146,7 @@ class ImageViewer(QGraphicsView):
 
 # 主窗口
 class LineArtGUI(QMainWindow):
-    ENHANCE_MAP = {"无": 0, "对比度拉伸": 1, "轻度锐化": 2, "强锐化+去噪": 3}
+    ENHANCE_MAP = dict(CORE_ENHANCE_MAP)
 
     def __init__(self):
         super().__init__()
@@ -384,7 +364,10 @@ def run_LineArtGUI2_QT():
     app.setFont(QFont("Microsoft YaHei", 10))
 
     from PyQt5.QtGui import QIcon
-    app.setWindowIcon(QIcon("./工具/LineArt/app_icon.png"))
+    for icon_path in ("./工具/LineArt/app_icon.png", "app_icon.png"):
+        if os.path.exists(icon_path):
+            app.setWindowIcon(QIcon(icon_path))
+            break
 
     # 全局样式
     app.setStyleSheet("""

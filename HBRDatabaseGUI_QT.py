@@ -126,7 +126,7 @@ from 工具.hbr_quest.Load import load_hbr_quest
 from 工具.game8_hbr.Load import load_game8_hbr
 from 工具.gamekee_hbr.Load import load_gamekee_hbr
 from 工具.入队培训手册.Load import load_game_bilibili_com
-from 工具.LineArt.LineArtGUI2_QT import load_LineArtGUI2_QT
+from 工具.LineArt.Load import load_LineArtGUI2_QT, load_video_line_art
 
 from 关于.about_win_qt import creat_about_win
 
@@ -316,6 +316,7 @@ def create_menu(root: QMainWindow, scrollbar_frame_obj: ScrollbarFrameWin):
     menu_tool_calls = [
         ("排轴OD计算", load_hbr_axle_od),
         ("图片转线稿工具2.0", load_LineArtGUI2_QT),
+        ("视频转线稿", load_video_line_art),
         ("seed tools", load_seed_tools),
         ("词条获取", creat_ct_win),
         ("伤害分计算", creat_dsc_win),
