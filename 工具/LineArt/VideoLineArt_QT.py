@@ -84,6 +84,134 @@ def _remux_with_audio(ffmpeg: str, video_path: str, audio_src: str, out_path: st
         return False
 
 
+# ---------------------------------------------------------------------------
+# 编码器（GPU 加速就靠这里）
+#
+# 实测结论（RTX 2060 + 1080p）：
+#   * 硬件编码（NVENC）把编码丢给显卡，CPU 全部留给解码和线稿 -> 整体约 2 倍速；
+#   * 硬件解码（NVDEC）反而更慢，不用；
+#   * 线稿算法走 OpenCL(GPU) 也比 CPU 慢，不用（CPU 的 erode 已经是可分离+多线程）。
+# ---------------------------------------------------------------------------
+
+HW_ENCODERS = ("h264_nvenc", "h264_qsv", "h264_amf")
+
+# 界面上「编码器」下拉框的选项：(内部名, 显示文字)
+ENCODER_CHOICES = [
+    ("auto", "自动（有 GPU 就用 GPU）"),
+    ("h264_nvenc", "NVIDIA NVENC（GPU）"),
+    ("h264_qsv", "Intel QSV（GPU）"),
+    ("h264_amf", "AMD AMF（GPU）"),
+    ("libx264", "CPU x264 高画质"),
+    ("libx264_fast", "CPU x264 快速"),
+]
+
+_ENCODER_PROBE_CACHE = {}
+
+# 编码器内部名 -> 显示名（状态栏用）
+ENCODER_LABELS = {
+    "h264_nvenc": "NVIDIA NVENC（GPU）",
+    "h264_qsv": "Intel QSV（GPU）",
+    "h264_amf": "AMD AMF（GPU）",
+    "libx264": "CPU x264 高画质",
+    "libx264_fast": "CPU x264 快速",
+}
+
+
+def build_encode_cmd(ffmpeg: str, encoder: str, out_path: str,
+                     width: int, height: int, fps: float) -> list:
+    """生成把灰度原始帧编码成 H.264 的 ffmpeg 命令（帧从 stdin 喂进去）。"""
+    cmd = [ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
+           "-f", "rawvideo", "-pix_fmt", "gray",
+           "-s", "%dx%d" % (width, height),
+           "-r", "%.6f" % fps, "-i", "-"]
+    if encoder == "h264_nvenc":       # NVIDIA 显卡
+        cmd += ["-c:v", "h264_nvenc", "-preset", "p5", "-rc", "vbr",
+                "-cq", "19", "-pix_fmt", "yuv420p"]
+    elif encoder == "h264_qsv":       # Intel 核显
+        cmd += ["-c:v", "h264_qsv", "-preset", "medium",
+                "-global_quality", "19", "-pix_fmt", "nv12"]
+    elif encoder == "h264_amf":       # AMD 显卡
+        cmd += ["-c:v", "h264_amf", "-quality", "balanced", "-rc", "cqp",
+                "-qp_i", "20", "-qp_p", "20", "-pix_fmt", "yuv420p"]
+    elif encoder == "libx264_fast":
+        cmd += ["-c:v", "libx264", "-preset", "veryfast", "-crf", "18",
+                "-pix_fmt", "yuv420p"]
+    else:                             # libx264 高画质
+        cmd += ["-c:v", "libx264", "-preset", "medium", "-crf", "18",
+                "-pix_fmt", "yuv420p"]
+    cmd += [out_path]
+    return cmd
+
+
+def list_ffmpeg_encoders(ffmpeg: str) -> set:
+    """ffmpeg 编译里带哪些硬件编码器（只看列表，很快）。"""
+    if not ffmpeg:
+        return set()
+    try:
+        r = subprocess.run([ffmpeg, "-hide_banner", "-encoders"],
+                           capture_output=True, creationflags=_NO_WINDOW,
+                           timeout=30)
+        text = r.stdout.decode("utf-8", "replace")
+        return {name for name in HW_ENCODERS if (" %s " % name) in text}
+    except Exception:
+        return set()
+
+
+def probe_encoder(ffmpeg: str, encoder: str) -> bool:
+    """真的试编一帧，确认这台机器上这个编码器能用（结果会缓存）。"""
+    if encoder not in HW_ENCODERS:
+        return bool(ffmpeg)
+    if not ffmpeg:
+        return False
+    if encoder in _ENCODER_PROBE_CACHE:
+        return _ENCODER_PROBE_CACHE[encoder]
+    ok = False
+    out = ""
+    try:
+        fd, out = tempfile.mkstemp(suffix=".mp4")
+        os.close(fd)
+        cmd = build_encode_cmd(ffmpeg, encoder, out, 320, 240, 25.0)
+        p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                             stdout=subprocess.DEVNULL,
+                             stderr=subprocess.DEVNULL,
+                             creationflags=_NO_WINDOW)
+        p.stdin.write(b"\x80" * (320 * 240))
+        p.stdin.close()
+        p.wait(timeout=60)
+        ok = (p.returncode == 0 and os.path.exists(out)
+              and os.path.getsize(out) > 0)
+    except Exception:
+        ok = False
+    finally:
+        try:
+            if out and os.path.exists(out):
+                os.remove(out)
+        except OSError:
+            pass
+    _ENCODER_PROBE_CACHE[encoder] = ok
+    return ok
+
+
+class EncoderProbeWorker(QThread):
+    """后台试编一下，确认哪些 GPU 编码器在这台机器上真的能用。"""
+
+    done = pyqtSignal(dict)
+
+    def __init__(self, ffmpeg, encoders):
+        super().__init__()
+        self.ffmpeg = ffmpeg
+        self.encoders = list(encoders)
+
+    def run(self):
+        result = {}
+        for enc in self.encoders:
+            try:
+                result[enc] = probe_encoder(self.ffmpeg, enc)
+            except Exception:
+                result[enc] = False
+        self.done.emit(result)
+
+
 class FramePreviewWorker(QThread):
     """读取视频中的某一帧并转成线稿（用于参数预览）。"""
 
@@ -131,7 +259,7 @@ class ConvertWorker(QThread):
     error = pyqtSignal(str)
 
     def __init__(self, video_path, out_path, out_mode, params, scale,
-                 keep_audio, ffmpeg):
+                 keep_audio, ffmpeg, encoder="libx264"):
         super().__init__()
         self.video_path = video_path
         self.out_path = out_path
@@ -140,6 +268,7 @@ class ConvertWorker(QThread):
         self.scale = scale
         self.keep_audio = keep_audio
         self.ffmpeg = ffmpeg
+        self.encoder = encoder
         self.tmp_path = ""
         self._cancel = False
 
@@ -189,14 +318,8 @@ class ConvertWorker(QThread):
             if self.out_mode == OUT_PNG:
                 os.makedirs(self.out_path, exist_ok=True)
             elif self.out_mode == OUT_H264:
-                cmd = [
-                    self.ffmpeg, "-y", "-hide_banner", "-loglevel", "error",
-                    "-f", "rawvideo", "-pix_fmt", "gray",
-                    "-s", "%dx%d" % (out_w, out_h),
-                    "-r", "%.6f" % fps, "-i", "-",
-                    "-c:v", "libx264", "-preset", "medium", "-crf", "18",
-                    "-pix_fmt", "yuv420p", self.tmp_path,
-                ]
+                cmd = build_encode_cmd(self.ffmpeg, self.encoder, self.tmp_path,
+                                       out_w, out_h, fps)
                 err_file = tempfile.TemporaryFile()
                 proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                                         stdout=subprocess.DEVNULL,
@@ -406,6 +529,9 @@ class VideoLineArtGUI(QMainWindow):
         self.video_path = ""
         self.meta = None            # (fps, 总帧数, 宽, 高)
         self.ffmpeg = find_ffmpeg()
+        self.hw_encoders = list_ffmpeg_encoders(self.ffmpeg)
+        self.hw_usable = None       # 后台试编结果，None 表示还在检测
+        self._probe_worker = None
         self.preview_window = None
         self._frame_workers = set()
         self._preview_seq = 0
@@ -416,6 +542,25 @@ class VideoLineArtGUI(QMainWindow):
 
         self._init_ui()
         self._refresh_output_state()
+        self._start_encoder_probe()
+
+    def _start_encoder_probe(self):
+        """后台检测 GPU 编码器，检测完把不能用的从下拉框里去掉。"""
+        if not self.ffmpeg or not self.hw_encoders:
+            return
+        self._probe_worker = EncoderProbeWorker(self.ffmpeg, self.hw_encoders)
+        self._probe_worker.done.connect(self._on_encoder_probe_done)
+        self._probe_worker.start()
+
+    def _on_encoder_probe_done(self, result):
+        self.hw_usable = result
+        for i in range(self.encoder_combo.count() - 1, -1, -1):
+            name = self.encoder_combo.itemData(i)
+            if name in HW_ENCODERS and not result.get(name):
+                if self.encoder_combo.currentIndex() == i:
+                    self.encoder_combo.setCurrentIndex(0)
+                self.encoder_combo.removeItem(i)
+        self.gpu_label.setText(self._encoder_hint())
 
     # ------------------------------------------------------------------ UI
     def _init_ui(self):
@@ -494,11 +639,23 @@ class VideoLineArtGUI(QMainWindow):
         for text, val in (("100%（原始）", 1.0), ("75%", 0.75), ("50%", 0.5), ("25%", 0.25)):
             self.scale_combo.addItem(text, val)
         opt_row.addWidget(self.scale_combo)
+        opt_row.addSpacing(16)
+        opt_row.addWidget(QLabel("编码器："))
+        self.encoder_combo = QComboBox()
+        for name, text in ENCODER_CHOICES:
+            if name in HW_ENCODERS and name not in self.hw_encoders:
+                continue          # 本机没有的硬件编码器就不列出来
+            self.encoder_combo.addItem(text, name)
+        opt_row.addWidget(self.encoder_combo)
         self.audio_check = QCheckBox("保留原视频音频（需要 ffmpeg）")
         opt_row.addSpacing(16)
         opt_row.addWidget(self.audio_check)
         opt_row.addStretch()
         out_box.addLayout(opt_row)
+
+        self.gpu_label = QLabel(self._encoder_hint())
+        self.gpu_label.setStyleSheet("color: #888; font-size: 12px;")
+        out_box.addWidget(self.gpu_label)
         root.addWidget(out_group)
 
         # --- 预览帧 ---
@@ -574,8 +731,9 @@ class VideoLineArtGUI(QMainWindow):
 
         self._inputs = [self.open_btn, self.radius_combo, self.bright_combo,
                         self.enhance_combo, self.invert_check, self.scale_combo,
-                        self.audio_check, self.radio_h264, self.radio_mp4v,
-                        self.radio_png, self.frame_slider, self.preview_btn]
+                        self.encoder_combo, self.audio_check, self.radio_h264,
+                        self.radio_mp4v, self.radio_png, self.frame_slider,
+                        self.preview_btn]
 
     # ------------------------------------------------------- 输入 / 元数据
     def dragEnterEvent(self, event):
@@ -655,15 +813,52 @@ class VideoLineArtGUI(QMainWindow):
             return OUT_MP4V
         return OUT_H264
 
+    def _encoder_hint(self):
+        """底部那行小字：本机有哪些 GPU 编码器。"""
+        if not self.ffmpeg:
+            return "未找到 ffmpeg：只能用「内置编码」，没有 GPU 加速，也不能保留音频。"
+        names = {"h264_nvenc": "NVIDIA NVENC", "h264_qsv": "Intel QSV",
+                 "h264_amf": "AMD AMF"}
+        if self.hw_usable is None:
+            return "正在检测 GPU 编码器..."
+        parts = []
+        for n in HW_ENCODERS:
+            if n not in self.hw_encoders:
+                continue
+            parts.append("%s %s" % (names[n], "✅" if self.hw_usable.get(n) else "❌"))
+        if not parts:
+            return "没有发现可用的 GPU 编码器，将使用 CPU 编码。"
+        return "本机 GPU 编码器：" + "   ".join(parts) + "（「自动」会优先使用 GPU）"
+
+    def _resolve_encoder(self):
+        """把下拉框选择变成实际要用的编码器；GPU 不可用时自动降级到 CPU。"""
+        sel = self.encoder_combo.currentData() or "auto"
+        if not self.ffmpeg:
+            return "libx264"
+        if sel == "auto":
+            for enc in HW_ENCODERS:
+                if enc in self.hw_encoders and probe_encoder(self.ffmpeg, enc):
+                    return enc
+            return "libx264_fast"
+        if sel in HW_ENCODERS and not probe_encoder(self.ffmpeg, sel):
+            QMessageBox.information(
+                self, "提示",
+                "本机无法使用 %s，已改用 CPU 编码。"
+                % dict(ENCODER_CHOICES).get(sel, sel))
+            return "libx264_fast"
+        return sel
+
     def _refresh_output_state(self):
-        """没有 ffmpeg 时禁用 H.264 与音频选项。"""
+        """没有 ffmpeg 时禁用 H.264 与音频选项；编码器只在 H.264 模式下有意义。"""
         has = bool(self.ffmpeg)
         self.radio_h264.setEnabled(has)
         if not has and self.radio_h264.isChecked():
             self.radio_mp4v.setChecked(True)
-        self.audio_check.setEnabled(has and self._out_mode() != OUT_PNG)
-        if self._out_mode() == OUT_PNG:
+        is_png = self._out_mode() == OUT_PNG
+        self.audio_check.setEnabled(has and not is_png)
+        if is_png:
             self.audio_check.setChecked(False)
+        self.encoder_combo.setEnabled(has and self._out_mode() == OUT_H264)
 
     def _on_slider_changed(self, value):
         total = self.meta[1] if self.meta else 0
@@ -743,9 +938,15 @@ class VideoLineArtGUI(QMainWindow):
         if mode != OUT_PNG:
             tmp_path = out_path + ".lineart.tmp.mp4"
 
+        encoder = "libx264"
+        if mode == OUT_H264:
+            self.status_label.setText("正在检测可用编码器...")
+            QApplication.processEvents()
+            encoder = self._resolve_encoder()
+
         self.convert_worker = ConvertWorker(
             self.video_path, out_path, mode, self._params(), scale,
-            keep_audio, self.ffmpeg)
+            keep_audio, self.ffmpeg, encoder)
         self.convert_worker.tmp_path = tmp_path
         self.convert_worker.progress.connect(self._on_progress)
         self.convert_worker.sampled.connect(self._on_sampled)
@@ -758,7 +959,11 @@ class VideoLineArtGUI(QMainWindow):
         self._t0 = time.time()
         self.progress.setRange(0, 100 if not self.meta[1] else self.meta[1])
         self.progress.setValue(0)
-        self.status_label.setText("开始转换...")
+        if mode == OUT_H264:
+            self.status_label.setText("开始转换（编码器：%s）..."
+                                      % ENCODER_LABELS.get(encoder, encoder))
+        else:
+            self.status_label.setText("开始转换...")
         self.convert_worker.start()
 
     def cancel_convert(self):
@@ -802,13 +1007,17 @@ class VideoLineArtGUI(QMainWindow):
         self.progress.setFormat("完成")
         self.out_path = out_path
         self.open_dir_btn.setEnabled(True)
-        if self._out_mode() == OUT_PNG:
+        worker = self.convert_worker
+        if worker is not None and worker.out_mode == OUT_PNG:
             n = len([f for f in os.listdir(out_path) if f.lower().endswith(".png")]) \
                 if os.path.isdir(out_path) else 0
             self.status_label.setText("完成：已输出 %d 张 PNG 到 %s" % (n, out_path))
         else:
             size = os.path.getsize(out_path) / 1024 / 1024 if os.path.exists(out_path) else 0
-            self.status_label.setText("完成：%s（%.1f MB）" % (out_path, size))
+            enc = ENCODER_LABELS.get(getattr(worker, "encoder", ""), "")
+            self.status_label.setText(
+                "完成：%s（%.1f MB%s）"
+                % (out_path, size, "，编码器 " + enc if enc else ""))
         QMessageBox.information(self, "完成", "线稿已输出到：\n%s" % out_path)
 
     def _on_convert_cancelled(self):
