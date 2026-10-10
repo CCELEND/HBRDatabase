@@ -62,7 +62,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   共鸣天赋（含等级）、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
   风格下拉按「**风格名-稀有度-元素**」显示（双属性如「火暗」照原样；无属性的风格只显示前两项）。
   **默认队伍是空队伍**（角色/风格都为空），首次编入角色时会自动建立第 1 回合。
-  共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在勾选「击破敌人」的行动中生效；
+  共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在「条件触发」选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
@@ -100,7 +100,14 @@ HELP_TEXT = """排轴OD计算 使用说明
   尚未有指挥者时各位置都可选，选中一名后**其它位置的「指挥者」职业风格会被禁用（不可选）**。
 - 所有角色共有的通用技能：「点数援助」（自身 SP+3，消耗 SP1）、
   「驱动增益」（超频条 +15%，消耗 SP6）。两者均为「每次出击1次」，但排轴暂不限制使用次数。
-- 击破：勾选行动的「击破敌人」表示该行动击破敌人，触发「击破时回复 SP」的技能/被动。
+- 条件触发：每个行动的「条件触发」下拉框手动指定该行动触发了什么条件（默认「无」）。
+  · **击破敌人**：该行动击破敌人，触发「击破时回复 SP」的技能/被动
+    （以及「击破敌人时超频条+X%」类被动，见下）。
+  · **【炸裂！！贝斯独奏】发动**：逢川惠「特别之夜·少女即兴演奏会」的四破被动
+    「【炸裂！！贝斯独奏】发动时 全体友方的SP+5（可突破上限至30）」。
+    该被动本身是「回合开始时若有处于击破状态的友方则发动」，是否发动由这里手动指定；
+    选中后该行动会给**全体友方 SP+5**，且可以突破当前 SP 上限、最多到 30
+    （已经高于 30 的不会被压回去）。
 - 「单名友方回复SP」的技能（如 日常维护）：行动行的「对象」下拉框选择回复对象
   （「其他友方」类的对象不含自身）；其它技能该列显示「—」。
 
@@ -146,12 +153,12 @@ HELP_TEXT = """排轴OD计算 使用说明
   均为「直接增加超频条」，收益为固定值（不吃 OD 耳环加成）；也需满足突破数。
   「回合开始时」类只结算于：**通常回合**；或「**前置OD 且为本次发动的第一回合**」（如 OD3/Bonus1）。
   后置OD、后续 Bonus 回合（Bonus2/3）与追加/特殊/占位回合都不结算。
-- 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：勾选行动的「击破敌人」**且该行动是攻击**时，
+- 「击破敌人时超频条+X%」类（如 托付给你了 / 势如破竹）：「条件触发」选「击破敌人」**且该行动是攻击**时，
   自动同步到该行动的**固定OD**输入框（X% → X/100，如 25% → 0.250），
-  因此会吃到 OD 耳环加成；取消勾选会自动移除（手填值保留）。
+  因此会吃到 OD 耳环加成；改回「无」会自动移除（手填值保留）。
 - 技能的「OD条上升 X%」效果：**一律按「固定OD」结算（吃 OD 耳环加成）**，
   包括**非攻击技能**（如 驱动增益 / 连结未来的苍之意志）。
-  若限定「以此技能击破敌人时」（如 原子火焰 / 哀伤的雪花莲），则仅在勾选击破敌人时计入。
+  若限定「以此技能击破敌人时」（如 原子火焰 / 哀伤的雪花莲），则仅在「条件触发」选「击破敌人」时计入。
   换其它技能时会自动移除。
 - 概率类被动（如福运 70%）按必定触发计算；
   无法判定的条件（干劲/领域/解除BUFF/EX/SP提升等）不计入。
@@ -184,7 +191,7 @@ HELP_TEXT = """排轴OD计算 使用说明
   **只有与风格属性（火/冰/雷/光/暗/无）相同的天赋才能选**（没有「不限属性」——
   团队天赋也按其所属风格的属性判定；「无」是独立属性）。
   排轴只结算与 OD 相关的效果：如 神圣恩典（回合开始时位于前锋 → 超频条 +5/6/7/8/10%，计入回合开始OD）、
-  Excelsior!（自身攻击击破敌人时 超频条 +12/14/16/18/20%，勾选击破敌人时作为 B19 计入该次行动）。
+  Excelsior!（自身攻击击破敌人时 超频条 +12/14/16/18/20%，「条件触发」选「击破敌人」时作为 B19 计入该次行动）。
 - 回合开始回复/闪光/「回合开始时」被动 只在**通常回合**或**前置OD 的首次发动回合**结算；
   后置OD 与后续 Bonus 回合（Bonus2/3）不结算，只结算 OD 额外 SP（同一次发动只给一次）；
   「追加回合开始时」类被动（如 战场之花：追加回合开始时 自身SP+5）只在追加/特殊回合开始时结算
@@ -288,13 +295,29 @@ OD_COLORS = {
 MEMBER_W, SKILL_W, TARGET_W = 150, 200, 96
 HIT_W, COMBO_W = 58, 58
 FIXED_W, RES_W, EARRING_W = 72, 72, 72
-BREAK_W, SP_W, RESULT_W = 96, 62, 66
+TRIGGER_W, SP_W, RESULT_W = 210, 62, 66
 DEL_W = 26
 ACTION_COLUMNS = [
     ("角色", MEMBER_W), ("行动", SKILL_W), ("对象", TARGET_W),
     ("原始Hit", HIT_W), ("连击", COMBO_W), ("固定OD", FIXED_W),
-    ("击破敌人", BREAK_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
+    ("条件触发", TRIGGER_W), ("剩余SP", SP_W), ("该次OD", RESULT_W), ("", DEL_W),
 ]
+
+# 行动行的「条件触发」下拉：手动指定该次行动触发了什么条件
+#   (显示文字, 内部标识)
+TRIGGER_CHOICES = [
+    ("无", ""),
+    ("击破敌人", "break"),
+    ("【炸裂！！贝斯独奏】发动", "bass_solo"),
+]
+
+# 「条件触发」附带的全队 SP 效果：{标识: (SP 增量, 可突破到的上限)}
+# 例：逢川惠「特别之夜·少女即兴演奏会」四破被动
+#     「【炸裂！！贝斯独奏】发动时 全体友方的SP+5（可突破上限至30）」
+#     —— 该被动在「回合开始时若有处于击破状态的友方」才会发动，是否发动由这里手动指定。
+TRIGGER_SP_EFFECTS = {
+    "bass_solo": (5, 30),
+}
 
 # 下拉框样式：显式指定文字与选中项配色，避免因全局 QSS 只给滚动条设样式
 # 而使用 QStyleSheetStyle 渲染时，下拉项选中文字变成白色难以辨认。
@@ -909,12 +932,19 @@ class ActionRow(QFrame):
         self.fixed_od_spin.valueChanged.connect(self._emit_changed)
         layout.addWidget(self.fixed_od_spin)
 
-        self.break_check = QCheckBox("击破敌人")
-        self.break_check.setFixedWidth(BREAK_W)
-        self.break_check.setToolTip(
-            "本次行动击破敌人（触发「击破时回复SP」的技能/被动）")
-        self.break_check.stateChanged.connect(self._on_break_toggled)
-        layout.addWidget(self.break_check)
+        self.trigger_combo = QComboBox()
+        self.trigger_combo.setFixedWidth(TRIGGER_W)
+        for text, value in TRIGGER_CHOICES:
+            self.trigger_combo.addItem(text, value)
+        self.trigger_combo.setToolTip(
+            "本次行动的「条件触发」（手动指定）：\n"
+            "· 击破敌人 —— 该行动击破敌人，触发「击破时回复SP」的技能/被动\n"
+            "· 【炸裂！！贝斯独奏】发动 —— 逢川惠「特别之夜·少女即兴演奏会」"
+            "四破被动：\n"
+            "    回合开始时若有处于击破状态的友方则发动，"
+            "全体友方 SP+5（可突破上限至 30）")
+        self.trigger_combo.currentIndexChanged.connect(self._on_trigger_changed)
+        layout.addWidget(self.trigger_combo)
 
         self.sp_label = QLabel("-")
         self.sp_label.setFixedWidth(SP_W)
@@ -1130,7 +1160,7 @@ class ActionRow(QFrame):
 
     def get_od_skill(self):
         # 共鸣天赋（B19 31X共鸣）与 OD耳环 在队伍配置里按角色设置；
-        # 共鸣天赋的「击破敌人时 超频条+N%」仅在勾选击破敌人时生效
+        # 共鸣天赋的「击破敌人时 超频条+N%」仅在「条件触发」选「击破敌人」时生效
         earring = float(self._member_setting("od_earring", 1.0) or 0)
         is_normal = self.is_normal_attack()
         if is_normal or self._od_earring_exempt():
@@ -1284,9 +1314,9 @@ class ActionRow(QFrame):
     def _auto_fixed_od(self):
         """该行动自动计入「固定OD」的部分（吃 OD 耳环）：
 
-        * 「击破敌人时超频条+X%」被动（勾选击破敌人且为攻击行为时）；
+        * 「击破敌人时超频条+X%」被动（「条件触发」选「击破敌人」且为攻击行为时）；
         * 技能自带的「OD条上升 X%」效果（攻击技能，或标记吃耳环的例外，
-          如 驱动增益；若限定「以此技能击破敌人时」则需勾选击破敌人）。
+          如 驱动增益；若限定「以此技能击破敌人时」则需选「击破敌人」）。
         """
         total = 0.0
         if self.owner is None:
@@ -1312,7 +1342,7 @@ class ActionRow(QFrame):
             self.fixed_od_spin.setValue(self.fixed_od_spin.value() - prev + frac)
             self._auto_fixed_added = frac
 
-    def _on_break_toggled(self, *args):
+    def _on_trigger_changed(self, *args):
         self._sync_fixed_od()
         self._emit_changed()
 
@@ -1360,8 +1390,12 @@ class ActionRow(QFrame):
         return (getattr(skill, "sp_recover_extra", 0) or 0,
                 getattr(skill, "sp_recover_extra_team", None))
 
+    def trigger(self):
+        """本次行动的「条件触发」标识（'' / 'break' / 'bass_solo' …）。"""
+        return self.trigger_combo.currentData() or ""
+
     def is_break(self):
-        return self.break_check.isChecked()
+        return self.trigger() == "break"
 
     def get_attack_element(self):
         """本次行动的攻击元素：通常攻击固定为「无」；其余取技能攻击元素 → 角色风格元素 → 无。"""
@@ -1413,7 +1447,8 @@ class ActionRow(QFrame):
             # 只存「手动」固定OD；击破被动的部分读取时再自动加上
             "fixed_od": (self.fixed_od_spin.value()
                          - getattr(self, "_auto_fixed_added", 0.0)),
-            "break": self.break_check.isChecked(),
+            "break": self.is_break(),
+            "trigger": self.trigger(),
             "sp_target": self.get_sp_target(),
         }
 
@@ -1440,7 +1475,12 @@ class ActionRow(QFrame):
             # 存档里保存的是「手填值」，不含自动部分；这里复位后由下面的
             # _sync_fixed_od() 重新把自动固定OD加回去（否则会被覆盖掉）
             self._auto_fixed_added = 0.0
-            self.break_check.setChecked(bool(data.get("break", False)))
+            # 「条件触发」：新存档读 trigger，旧存档（只有 break 布尔）向后兼容
+            trigger = data.get("trigger")
+            if trigger is None:
+                trigger = "break" if data.get("break") else ""
+            tpos = self.trigger_combo.findData(trigger)
+            self.trigger_combo.setCurrentIndex(tpos if tpos >= 0 else 0)
             self._populate_targets()
             tpos = self.target_combo.findData(data.get("sp_target"))
             if tpos >= 0:
@@ -2984,6 +3024,8 @@ class AxleODWindow(QFrame):
                             action, i, sp, active, turn_front, limit,
                             not break_seen)
                         break_seen = True
+                    # 「条件触发」附带的全队 SP 效果（如 贝斯独奏：全体 SP+5，上限 30）
+                    self._apply_trigger_sp(action.trigger(), sp, active, limit)
                     # 「自身使用EX技能后」回复SP（如 注入活力 / 开辟希望的一箭）
                     if action.get_skill_is_ex():
                         for mod in self._member_ex_sp(i):
@@ -3135,6 +3177,21 @@ class AxleODWindow(QFrame):
         for t in self._scope_targets(scope, element, actor, active, front_set):
             if sp[t] < limit:
                 sp[t] = min(limit, sp[t] + amount)
+
+    def _apply_trigger_sp(self, trigger, sp, active, limit):
+        """「条件触发」附带的全队 SP 回复。
+
+        如 贝斯独奏：全体友方 SP+5，且可突破上限至 30（超过 30 的部分不加）。
+        只加不减——已经高于上限的队员不会被压回去。
+        """
+        effect = TRIGGER_SP_EFFECTS.get(trigger)
+        if not effect:
+            return
+        amount, cap_override = effect
+        cap = max(limit, cap_override)
+        for m in active:
+            if sp[m] < cap:
+                sp[m] = min(cap, sp[m] + amount)
 
     def _member_lb(self, slot):
         """队员风格突破数（0~4）。"""
