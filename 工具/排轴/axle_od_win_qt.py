@@ -43,7 +43,7 @@ from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_to
 from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
 from 工具.排轴.data_source import (
     get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
-    resonance_od_effect)
+    resonance_od_effect, generic_skill_names)
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -64,6 +64,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   **默认队伍是空队伍**（角色/风格都为空），首次编入角色时会自动建立第 1 回合。
   共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在「条件触发」选「击破敌人」的行动中生效；
   OD耳环对该角色所有回合生效）。
+  「角色」下拉框按**队伍分组**（31A / 31B / 31C / 30G / 31D / 31E / 31F / 31X / Angel Beats! / 司令部 / persona5r），
+  每个队伍前面有一个**不可选的分组标题**；「无」在最上面，表示该位置空着。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
   回合窗口关闭后，可用配置窗口顶部的「打开回合窗口」按钮重新打开。
@@ -101,7 +103,8 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 所有角色共有的通用技能：**全部光球技能**（数据取自 `持有物/饰品/光球/Orbs.json`）。
   光球技能里除了**「遗能光球」是专属角色**的之外，其余**所有角色都能使用**，
   所以每个角色的行动列表里都能选到它们（如 软体化、暴击冥想、修缮之光、点数援助、驱动增益、
-  5 种重力子、保护、专注、自我复原、衰灭之力、防御提升、充能注入、加油助威 等）。
+  5 种重力子、保护、专注、自我复原、衰灭之力、防御提升、充能注入、加油助威 等）；
+  行动下拉框里用一个不可选的 **「通用技能」分组标题**把它们和角色自身的技能隔开。
   排轴只结算其中的 SP 消耗、回复 SP（点数援助：自身 SP+3，消耗 SP1）与超频条
   （驱动增益：+15%，消耗 SP6，按固定OD结算且吃 OD 耳环）；其余效果不影响 OD / SP。
   这些技能大多写「每次出击1次」，但排轴暂不限制使用次数。
@@ -324,6 +327,13 @@ TRIGGER_SP_EFFECTS = {
     "bass_solo": (5, 30),
 }
 
+# 技能下拉框里「通用技能」（光球技能）分组标题（不可选中）
+SKILL_GROUP_GENERIC = "──────  通用技能  ──────"
+
+# 队伍配置里「角色」下拉框按队伍分组的标题（不可选中）
+ROLE_GROUP_FMT = "── %s ──"
+ROLE_GROUP_DATA = "__role_group__"
+
 # 下拉框样式：显式指定文字与选中项配色，避免因全局 QSS 只给滚动条设样式
 # 而使用 QStyleSheetStyle 渲染时，下拉项选中文字变成白色难以辨认。
 COMBO_QSS = """
@@ -459,7 +469,15 @@ class TeamMemberRow(QFrame):
         self.role_combo = QComboBox()
         # 「无」表示该位置不安排角色，从而可自由调整队伍人数
         self.role_combo.addItem("无")
-        self.role_combo.addItems(self.data_source.role_names())
+        # 角色按队伍分组：每组前插一个不可选的分组标题
+        # （弹出列表会自动加宽到最长条目，所以下拉框本身不用变宽）
+        for team, names in self.data_source.roles_by_team():
+            self.role_combo.addItem(ROLE_GROUP_FMT % team, ROLE_GROUP_DATA)
+            heading = self.role_combo.model().item(self.role_combo.count() - 1)
+            if heading is not None:
+                heading.setEnabled(False)
+            for name in names:
+                self.role_combo.addItem(name)
         self.role_combo.setFixedWidth(104)
         self.role_combo.currentTextChanged.connect(self._on_role_changed)
         layout.addWidget(self.role_combo)
@@ -713,6 +731,8 @@ class TeamMemberRow(QFrame):
         self._block_role_signal = True
         try:
             for j in range(self.role_combo.count()):
+                if self.role_combo.itemData(j) == ROLE_GROUP_DATA:
+                    continue          # 分组标题：保持不可选
                 role = self.role_combo.itemText(j)
                 if not role or role == "无":
                     continue
@@ -821,6 +841,9 @@ class TeamMemberRow(QFrame):
         self.role_combo.setCurrentText(role if role else "无")
 
     def role(self):
+        # 分组标题不可选，这里再兜一层，避免被程序设成标题
+        if self.role_combo.currentData() == ROLE_GROUP_DATA:
+            return ""
         text = self.role_combo.currentText()
         return "" if text == "无" else text
 
@@ -1008,9 +1031,19 @@ class ActionRow(QFrame):
     def _populate_skills(self, preserve=None):
         current = preserve if preserve is not None else self._current_skill_name()
         skills = self._all_skills()
+        generic = generic_skill_names()
         with self._suspended():
             self.skill_combo.clear()
+            heading_added = False
             for skill in skills:
+                # 通用（光球）技能前插一个不可选的「通用技能」分组标题
+                if not heading_added and skill.name in generic:
+                    heading_added = True
+                    self.skill_combo.addItem(SKILL_GROUP_GENERIC)
+                    idx = self.skill_combo.count() - 1
+                    item = self.skill_combo.model().item(idx)
+                    if item is not None:
+                        item.setEnabled(False)   # 标题不可选中
                 # 显示「技能名（SP消耗）」，实际值保存纯技能名
                 self.skill_combo.addItem(skill.display_name(), skill.name)
                 tip = skill.sp_tooltip()

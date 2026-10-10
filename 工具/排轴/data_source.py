@@ -425,6 +425,17 @@ def get_generic_skills():
     return _GENERIC_SKILLS_CACHE
 
 
+_GENERIC_SKILL_NAMES = None
+
+
+def generic_skill_names():
+    """通用（光球）技能名集合，供界面做「通用技能」分组标题。"""
+    global _GENERIC_SKILL_NAMES
+    if _GENERIC_SKILL_NAMES is None:
+        _GENERIC_SKILL_NAMES = {s.name for s in get_generic_skills()}
+    return _GENERIC_SKILL_NAMES
+
+
 class StyleInfo:
     """风格及其技能列表。"""
 
@@ -1415,6 +1426,17 @@ class HBRDataSource:
     def role_names(self):
         return [role_name for _, role_name, _ in self.load_roles()]
 
+    def roles_by_team(self):
+        """按队伍分组的角色名：[(队伍, [角色名, ...]), ...]（顺序同 teams.json）。"""
+        groups = []
+        by_team = {}
+        for team_name, role_name, _ in self.load_roles():
+            if team_name not in by_team:
+                by_team[team_name] = []
+                groups.append((team_name, by_team[team_name]))
+            by_team[team_name].append(role_name)
+        return groups
+
     def _load_master_skills(self):
         """读取各角色 role.json 里的「大师技能」（SP 消耗相关）。"""
         if self._master_mods is not None:
@@ -1982,13 +2004,14 @@ class HBRDataSource:
             for skill in style.skills:
                 if not skill.is_exclusive:
                     add(skill)
-        # 所有角色共有的通用技能（光球技能；遗能光球除外）
-        for skill in get_generic_skills():
-            add(skill)
-        # 该角色可主动释放的大师技能
+        # 该角色可主动释放的大师技能（属于角色自身，排在通用技能前面）
         master_action = self.master_action_skill(role_name)
         if master_action is not None:
             add(master_action)
+        # 所有角色共有的通用技能（光球技能；遗能光球除外）
+        # 界面会用「通用技能」分组标题把它们和角色自身技能隔开
+        for skill in get_generic_skills():
+            add(skill)
         return result
 
     def master_action_skill(self, role_name):
