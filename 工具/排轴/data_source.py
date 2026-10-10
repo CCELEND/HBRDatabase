@@ -360,16 +360,69 @@ class SkillInfo:
             self.name, self.hits, self.sp_cost, self.sp_recover)
 
 
-# 所有角色共有的通用技能（出击中每名角色都能使用）
-GENERIC_SKILLS = [
-    # 点数援助：自身 SP+3，消耗 SP1，使用次数1
-    SkillInfo("点数援助", sp_cost=1, sp_cost_note="1",
-              sp_recover=3, sp_recover_scope="self"),
-    # 驱动增益：超频条（OD 槽）+15%（消耗 SP6，使用次数1）
-    # 特殊：虽非攻击技能，但实测会吃 OD 耳环（按固定OD结算）
-    SkillInfo("驱动增益", sp_cost=6, sp_cost_note="6", od_up_fixed=0.15,
-              od_up_earring=True),
-]
+# ---------------------------------------------------------------------------
+# 所有角色共有的通用技能
+#
+# 光球技能（持有物/饰品/光球/Orbs.json）里，除了「遗能光球」是专属角色的，
+# 其余光球技能**所有角色都能使用**，所以直接按数据生成——以后新增光球会自动同步。
+# ---------------------------------------------------------------------------
+_ORB_JSON = "./持有物/饰品/光球/Orbs.json"
+# 专属角色的光球：不对全体角色开放
+_EXCLUSIVE_ORBS = ("遗能光球",)
+
+
+def _percent_to_float(text):
+    """「15%」→ 0.15；解析不了返回 0。"""
+    try:
+        return float(str(text).strip().rstrip("%")) / 100.0
+    except (TypeError, ValueError):
+        return 0.0
+
+
+def _build_orb_generic_skills():
+    """把光球技能转成「通用技能」列表（遗能光球除外）。
+
+    排轴只关心 SP 消耗 / 回复 SP / OD 条上升；其余（攻击、防御、暴击、士气等）
+    不影响 OD 与 SP，保留 SP 消耗即可。
+    """
+    data = _load_json(_ORB_JSON) or {}
+    skills = []
+    for orb_name, orb in data.items():
+        if orb_name in _EXCLUSIVE_ORBS or not isinstance(orb, dict):
+            continue
+        info = orb.get("skill") or []
+        if len(info) < 3 or not info[0]:
+            continue
+        kwargs = {}
+        for effect in (info[4] if len(info) > 4 and info[4] else []):
+            if not effect:
+                continue
+            kind = effect[0]
+            value = effect[1] if len(effect) > 1 else None
+            target = effect[6] if len(effect) > 6 else None
+            if kind == "回复SP":
+                scope = _sp_recover_scope(target)
+                kwargs["sp_recover"] = _to_int(value) or 0
+                if scope:
+                    kwargs["sp_recover_scope"], kwargs["sp_recover_element"] = scope
+            elif kind == "OD条上升":
+                # 非攻击技能，但按固定OD结算（吃 OD 耳环）——与原来手写的 驱动增益 一致
+                kwargs["od_up_fixed"] = _percent_to_float(value)
+                kwargs["od_up_earring"] = True
+        skills.append(SkillInfo(info[0], sp_cost=_to_int(info[2]) or 0,
+                                sp_cost_note=str(info[2]), **kwargs))
+    return skills
+
+
+_GENERIC_SKILLS_CACHE = None
+
+
+def get_generic_skills():
+    """所有角色共有的通用技能（光球技能；遗能光球除外）。"""
+    global _GENERIC_SKILLS_CACHE
+    if _GENERIC_SKILLS_CACHE is None:
+        _GENERIC_SKILLS_CACHE = _build_orb_generic_skills()
+    return _GENERIC_SKILLS_CACHE
 
 
 class StyleInfo:
@@ -1929,8 +1982,8 @@ class HBRDataSource:
             for skill in style.skills:
                 if not skill.is_exclusive:
                     add(skill)
-        # 所有角色共有的通用技能
-        for skill in GENERIC_SKILLS:
+        # 所有角色共有的通用技能（光球技能；遗能光球除外）
+        for skill in get_generic_skills():
             add(skill)
         # 该角色可主动释放的大师技能
         master_action = self.master_action_skill(role_name)
