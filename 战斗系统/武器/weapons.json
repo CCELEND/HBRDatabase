@@ -62,7 +62,7 @@
     "赤手空拳":{
         "name":"赤手空拳","en":"BareHands",
         "path":"./战斗系统/武器/BareHands.webp",
-        "description":"赤手空拳（打武器属性）","hit":"3"
+        "description":"赤手空拳（打武器属性）","hit":"4"
     },
 
     "细剑":{
