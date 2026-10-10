@@ -38,7 +38,6 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtGui import QKeySequence, QIcon
 
-from canvas_events_qt import ResizableArtworkDisplayerHeight
 from window_qt import (
     set_global_bg, creat_window, set_window_icon,
     load_menu_icon, get_ico_path_by_name
@@ -385,12 +384,11 @@ if __name__ == "__main__":
         main_layout = QVBoxLayout(central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        scrollbar_frame_obj = ScrollbarFrameWin(central_widget, columnspan=6)
-        create_menu(root, scrollbar_frame_obj)
-
-        ResizableArtworkDisplayerHeight(
-            scrollbar_frame_obj.scrollable_frame, "vbg_hbr.png", "70%"
+        scrollbar_frame_obj = ScrollbarFrameWin(
+            central_widget, columnspan=6,
+            bg_image_path="vbg_hbr.png", bg_opacity="70%"
         )
+        create_menu(root, scrollbar_frame_obj)
 
         check_error_queue_qt(root)
         check_for_updates()
