@@ -8,7 +8,7 @@ from PIL import Image, ImageFilter
 
 from PyQt5.QtWidgets import (
     QLabel, QWidget, QScrollArea, QVBoxLayout, QGridLayout,
-    QSizePolicy, QMainWindow
+    QSizePolicy, QMainWindow, QStyle
 )
 from PyQt5.QtCore import Qt, QObject, QTimer, QSize, QRect, pyqtSignal, QEvent
 from PyQt5.QtGui import (
@@ -300,6 +300,23 @@ class _ResizableArtworkLabel(QLabel):
         # 初始化时计算一次高度
         self._update_height()
 
+    def refresh(self):
+        """立刻按当前宽度重新适配一次（窗口尺寸变化后调用）。"""
+        self._pending_width = None
+        self._cached_size = None
+        self._cached_pixmap = None
+        self._update_height()
+        self.update()
+
+    def close_image(self):
+        """释放原始图片占用的文件句柄。"""
+        try:
+            if self.original_image is not None:
+                self.original_image.close()
+        except Exception:
+            pass
+        self.original_image = None
+
     def _target_height(self, width=None):
         if width is None:
             width = self.width()
@@ -354,7 +371,7 @@ class _ResizableArtworkLabel(QLabel):
         super().paintEvent(event)
 
     def _scaled_pixmap(self, width, height):
-        if width <= 0 or height <= 0:
+        if width <= 0 or height <= 0 or self.original_image is None:
             return QPixmap()
         resized = self.original_image.resize((width, height), Image.LANCZOS)
         if self.opacity_value != 255:
@@ -417,24 +434,49 @@ class ArtworkDisplayer:
         self._pixmap = QPixmap.fromImage(qimg.copy())
 
 
+class _AutoFitScrollArea(QScrollArea):
+    """尺寸变化时回调外面重新适配图片。
+
+    ImageViewerWithScrollbar 不是 QObject，装不了 eventFilter，所以用一个子类。
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.on_resize = None
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if self.on_resize is not None:
+            self.on_resize()
+
+
 class ImageViewerWithScrollbar:
+    """带滚动条的图片查看器（敌人图鉴 / 战斗系统说明图都用它）。
+
+    图片按窗口宽度自动缩放并保持宽高比：窗口拉宽拉窄时跟着变，
+    高度超出窗口时由竖向滚动条查看。
+    """
+
     def __init__(self, parent_widget: QWidget, parent_width: int,
                  parent_height: int, image_path: str):
         self.parent_widget = parent_widget
-        self.parent_width = parent_width
+        self.parent_width = parent_width      # 只是初始尺寸参考，实际宽度跟随窗口
         self.parent_height = parent_height
         self.image_path = image_path
 
-        self.image = Image.open(self.image_path)
-        self.original_width, self.original_height = self.image.size
-
-        self.scroll_area = QScrollArea(parent_widget)
+        self.scroll_area = _AutoFitScrollArea(parent_widget)
+        # 宽度自己算，所以不让 QScrollArea 自动拉伸内容：否则「滚动条出现/消失」
+        # 会反过来改变可用宽度，高度就会在两个值之间反复横跳（实测会死循环）。
         self.scroll_area.setWidgetResizable(False)
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # 极少数情况下会预留一点滚动条宽度，居中一下看起来更整齐
+        self.scroll_area.setAlignment(Qt.AlignHCenter)
 
-        self.image_label = QLabel()
-        self.image_label.setAlignment(Qt.AlignCenter)
+        # 复用主界面同款「随宽度自动重算高度」的标签
+        self.image_label = _ResizableArtworkLabel(self.scroll_area, image_path, 255)
         self.scroll_area.setWidget(self.image_label)
+        self.scroll_area.on_resize = self.resize_image
 
         target = _get_layout_target(parent_widget)
         parent_layout = target.layout()
@@ -444,19 +486,31 @@ class ImageViewerWithScrollbar:
         self.resize_image()
 
     def resize_image(self):
-        new_width = self.parent_width
-        new_height = int(self.original_height * (new_width / self.original_width))
+        """按当前窗口宽度重新适配图片（窗口尺寸变化时自动调用）。"""
+        area = self.scroll_area
+        avail = area.width() - 2 * area.frameWidth()
+        if avail <= 0:
+            return
+        original = self.image_label.original_image
+        if original is None:
+            return
+        ow, oh = original.size
+        if ow <= 0:
+            return
 
-        resized = self.image.resize((new_width, new_height), Image.LANCZOS)
-        resized = resized.convert('RGB')
-        qimg = QImage(resized.tobytes("raw", "RGB"),
-                      resized.width, resized.height,
-                      resized.width * 3, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimg.copy())
-        self.image_label.setPixmap(pixmap)
-        self.image_label.resize(new_width, new_height)
+        # 先按「不出现滚动条」的宽度算高度；放不下再让出滚动条宽度。
+        # 判断只看 scroll_area 宽度和视口高度——这两个都不受滚动条影响，
+        # 所以不会出现「有滚动条→变窄→放得下→没滚动条→变宽→放不下」的循环。
+        width = avail
+        if max(1, int(width * oh / ow)) > area.viewport().height():
+            width = max(1, avail - area.style().pixelMetric(QStyle.PM_ScrollBarExtent))
+        if self.image_label.width() != width:
+            self.image_label.setFixedWidth(width)
+        self.image_label.refresh()
 
     def destroy(self):
+        self.scroll_area.on_resize = None
+        self.image_label.close_image()
         self.scroll_area.deleteLater()
 
 
