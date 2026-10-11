@@ -208,6 +208,10 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 发动 OD 额外获得 OD1 +5 / OD2 +12 / OD3 +20（同一次发动只给一次）。
 - 「分享」类被动（如 东城司「哀情挽歌」的 分享 / 惹人怜爱）：**友方的主动技能使自身 SP 提升时**，
   额外给全体友方 / 自身 **SP+N**（可突破上限，最高到 SP30）。
+  按**每一段 SP 回复**各触发一次——例如 逢川惠大师技能「灵能充能」对 31A 对象
+  是「本体回复3」+「额外回复3」两段，司的被动会触发**两次**（自身 +3×2、全体 +2×2）。
+  这类被动**在回合结束时统一结算**——只体现在「行动后」的队伍SP里，
+  **不计入本回合各行动的「剩余SP」**（实测：同伴给东城司补SP后，后续行动的剩余SP不受这份加成影响）。
 - 「自身使用EX技能后 …」类效果（如 注入活力：全体友方SP+2、桐生美也大师技能
   「开辟希望的一箭」；追加支援 / 千里眼：超频条+10%）：在该队员使用 **EX技能** 后结算。
   **EX技能** = SS/SSR 风格的第一个主动技能（及其「+」进化版）；被通用化的
@@ -3020,6 +3024,10 @@ class AxleODWindow(QFrame):
             is_extra_turn = turn.turn_type() in EXTRA_TURN_TYPES
             action_order = sorted(
                 turn.actions, key=lambda a: 1 if a._is_attack() else 0)
+            # 「分享」类被动（自身以外的友方的主动技能使自身SP提升时 额外使全体SP+N）：
+            # 先登记，**回合结束时再统一结算**——实测这部分不计入本回合各行动的
+            # 「剩余SP」，只体现在「行动后」的队伍 SP 里（如 东城司「分享」）。
+            share_pending = []
             for action in action_order:
                 i = action.member_index
                 if i not in active:
@@ -3046,18 +3054,11 @@ class AxleODWindow(QFrame):
                     # 「剩余SP」= 行动前SP − 本次消耗（**不含任何回复**：
                     # 技能自身回复、被动/天赋/大师技能触发的回复都不计入）
                     remaining_after_cost = sp[i]
-                    before_share = list(sp)
+                    # 「分享」类被动按**每一段 SP 回复**各触发一次，
+                    # 由 _apply_sp_recover 内部登记到 share_pending，
+                    # 回合结束时统一结算（见下面 set_team_sp 之前）
                     self._apply_sp_recover(action, i, sp, active,
-                                           turn_front, limit)
-                    # 「分享」类：友方主动技能使自身 SP 提升时 额外使全体 SP+N
-                    for m in active:
-                        if m == i or sp[m] <= before_share[m]:
-                            continue
-                        for mod in self._member_share_sp(m):
-                            self._apply_scope_recover(
-                                mod.get("amount", 0), mod.get("scope"),
-                                mod.get("element"), m, sp, active,
-                                turn_front, mod.get("limit") or limit)
+                                           turn_front, limit, share_pending)
                     if action.is_break():
                         self._apply_break_recover(
                             action, i, sp, active, turn_front, limit,
@@ -3121,6 +3122,13 @@ class AxleODWindow(QFrame):
                             mod.get("element"), m_slot, sp, active,
                             turn_front, limit)
             turn.set_follow_up_od(follow_entries)
+
+            # 回合结束：统一结算本回合登记下来的「分享」类被动
+            # （放在这里是为了让它们只进入「行动后」的队伍SP，不影响各行动的剩余SP）
+            for owner, mod in share_pending:
+                self._apply_scope_recover(
+                    mod.get("amount", 0), mod.get("scope"), mod.get("element"),
+                    owner, sp, active, turn_front, mod.get("limit") or limit)
 
             # 记录本回合结束时全队 SP（含后卫）；前锋标注用回合中的前锋
             entries = [(i, self.team[i].get("role"), sp[i], i in turn_front)
@@ -3676,8 +3684,13 @@ class AxleODWindow(QFrame):
         role = self.team[slot].get("role") or ""
         return any(n and n in role for n in names)
 
-    def _apply_sp_recover(self, action, actor, sp, active, front_set, limit):
-        """结算技能自带的 SP 回复效果。"""
+    def _apply_sp_recover(self, action, actor, sp, active, front_set, limit,
+                          share_pending=None):
+        """结算技能自带的 SP 回复效果。
+
+        **每一段回复都会单独触发一次「分享」类被动**：例如「灵能充能」对 31A 对象
+        是「本体回复3」+「额外回复3」两段，司的被动会触发**两次**。
+        """
         amount, scope, element = action.get_sp_recover()
         if scope in ("one_other", "one_any"):
             # 单名友方：回复到行动里选择的「对象」
@@ -3685,13 +3698,43 @@ class AxleODWindow(QFrame):
             if target is None or not (0 <= target < len(sp)):
                 return
             extra, team = action.get_sp_recover_extra()
+            # 第一段：技能本体回复
+            self._recover_and_share(
+                lambda: self._recover_one(sp, target, amount, limit),
+                actor, sp, active, share_pending)
+            # 第二段：「对象属于指定队伍时额外回复」（如 灵能充能 对 31A +3）
             if extra and team and self._member_in_team(target, team):
-                amount += extra
-            if sp[target] < limit:
-                sp[target] = min(limit, sp[target] + amount)
+                self._recover_and_share(
+                    lambda: self._recover_one(sp, target, extra, limit),
+                    actor, sp, active, share_pending)
             return
-        self._apply_scope_recover(amount, scope, element, actor,
-                                  sp, active, front_set, limit)
+        self._recover_and_share(
+            lambda: self._apply_scope_recover(amount, scope, element, actor,
+                                              sp, active, front_set, limit),
+            actor, sp, active, share_pending)
+
+    @staticmethod
+    def _recover_one(sp, target, amount, limit):
+        """给单个队员回复 SP（不超过 SP 上限）。"""
+        if 0 <= target < len(sp) and sp[target] < limit:
+            sp[target] = min(limit, sp[target] + amount)
+
+    def _recover_and_share(self, apply_fn, actor, sp, active, share_pending):
+        """执行一次 SP 回复，并登记这次回复触发的「分享」类被动。
+
+        「分享」类（友方主动技能使自身SP提升时 额外使全体/自身 SP+N）按**每次回复**
+        触发，所以这里一次只处理一段回复（登记后回合结束时统一结算）。
+        """
+        if share_pending is None:
+            apply_fn()
+            return
+        before = list(sp)
+        apply_fn()
+        for m in active:
+            if m == actor or sp[m] <= before[m]:
+                continue
+            for mod in self._member_share_sp(m):
+                share_pending.append((m, mod))
 
     def _member_break_sp(self, slot):
         """队员所装备风格里「击破敌人时回复SP」的被动（满足突破要求）。
