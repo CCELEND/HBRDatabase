@@ -1,0 +1,150 @@
+{
+  "version": 2,
+  "team": [
+    {
+      "role": "东城司",
+      "style": "哀情挽歌",
+      "passives": [
+        "背阴处的小憩（被动技能）"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "山胁·冯·伊瓦尔",
+      "style": "拨云见日",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "大岛五十铃",
+      "style": "出浴后的朦胧天地",
+      "passives": [
+        "打开你的心扉吧"
+      ],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    },
+    {
+      "role": "",
+      "style": "",
+      "passives": [],
+      "lb": 4,
+      "resonance_talent": null,
+      "resonance_level": 4,
+      "od_earring": 1.0
+    }
+  ],
+  "battle": {
+    "target_count": 1,
+    "resistance": false,
+    "resist_elements": [],
+    "other_od": 0.0,
+    "enemy_od_rate": 1.0,
+    "sp_init": 4,
+    "sp_regen_front": 2,
+    "sp_regen_back": 2,
+    "sp_limit": 20
+  },
+  "turns": [
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "梦的边际",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": 0
+        },
+        {
+          "member": 2,
+          "skill": "打开你的心扉吧",
+          "base_hits": 0,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": 0
+        }
+      ]
+    },
+    {
+      "type": "通常回合",
+      "od": "无",
+      "od_timing": "前置OD",
+      "actions": [
+        {
+          "member": 0,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": null
+        },
+        {
+          "member": 1,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": null
+        },
+        {
+          "member": 2,
+          "skill": "通常攻击",
+          "base_hits": 3,
+          "combo": 0,
+          "fixed_od": 0.0,
+          "break": false,
+          "trigger": "",
+          "sp_target": null
+        }
+      ]
+    }
+  ]
+}

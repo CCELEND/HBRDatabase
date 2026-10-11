@@ -136,7 +136,11 @@ def _parse_master_skill_action(ms):
     name = str(ms[0])
     desc = str(ms[1])
     effects = ms[4] if isinstance(ms[4], list) else []
-    skill = _extract_skill([[name, desc, None, None], effects])
+    # 大师技能的结构与 ActiveSkills 一致：[技能名, 描述, SP消耗, 使用次数, 效果…]
+    # SP 消耗/使用次数要一起带进去，否则会当成 0 消耗（如 大岛五十铃「打开你的心扉吧」是 SP5）
+    sp_cost = str(ms[2]) if len(ms) > 2 else None
+    max_uses = str(ms[3]) if len(ms) > 3 else None
+    skill = _extract_skill([[name, desc, sp_cost, max_uses], effects])
     # 「一名XX友方」的条件回复：对象属于该队伍时额外回复（如 灵能充能 对 31A）
     for eff in effects:
         if not (isinstance(eff, list) and eff and eff[0] == "回复SP"):

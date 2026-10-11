@@ -210,8 +210,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   额外给全体友方 / 自身 **SP+N**（可突破上限，最高到 SP30）。
   按**每一段 SP 回复**各触发一次——例如 逢川惠大师技能「灵能充能」对 31A 对象
   是「本体回复3」+「额外回复3」两段，「分享」（范围=全体）会触发**两次**（全体 +2×2）；
-  但**范围是「自身」的**（如「惹人怜爱」）**每个行动只触发一次**（自身 +3×1）——
-  按实测特例处理（若也按两段触发，司的行动后SP 会比游戏里多 3）。
+  但**范围是「自身」的**（如「惹人怜爱」）**每个回合只触发一次**（自身 +3×1）——
+  按实测特例处理（若按每段/每行动触发，司的行动后SP 会比游戏里多）。
   这类被动**在回合结束时统一结算**——只体现在「行动后」的队伍SP里，
   **不计入本回合各行动的「剩余SP」**（实测：同伴给东城司补SP后，后续行动的剩余SP不受这份加成影响）。
 - 「自身使用EX技能后 …」类效果（如 注入活力：全体友方SP+2、桐生美也大师技能
@@ -222,12 +222,16 @@ HELP_TEXT = """排轴OD计算 使用说明
   （按固定OD结算），非攻击时**直接加 X 点**超频条。
 - 技能/被动里的「前锋」回复范围按本回合行动的队员结算。
 - 同一回合内 SP 的结算顺序：**非攻击技能先于攻击技能**（同类按行动行顺序）。
+  该顺序只影响「状态」（如 歌姬之加护）的传承，**不影响各行动的「剩余SP」**（见下）。
 - 行动扣除技能 SP；被动/大师技能对 SP 消耗的增减会自动结算
   （同种效果只生效一次：降低取最大降幅、增加取最大增幅，两者相抵；
   且 SP 消耗为 0 的技能不受任何增减影响）；「剩余SP」列红色负值表示不足（缺口，实际 SP 不变）。
-- 「**剩余SP**」列 = **行动前SP − 本次消耗**，**不含任何 SP 回复**：
-  技能自身的回复、以及被动/天赋（共鸣）/大师技能触发的回复都**不计入**该列
-  （它们只影响之后的回合与「队伍SP（行动后）」）。
+- 「**剩余SP**」列 = **该队员的「行动前SP」− 本次消耗**。
+  一回合内每个队员只行动一次，所以它对每个行动是**唯一确定**的，
+  **与行动顺序无关**，也**不含任何 SP 回复**。
+- **行动触发的所有 SP 回复**（技能自身的回复、被动/天赋/大师技能、击破回复、EX 回复、
+  追击回复、条件触发、以及「分享」类被动…）**统一累加到「队伍SP（行动后）」**，
+  不会让本回合其它行动的「剩余SP」变多——它们只影响之后的回合。
 - 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
   它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
 - 部分技能带「N(M)」式条件消耗，满足条件时改用较小值：
@@ -3018,6 +3022,10 @@ class AxleODWindow(QFrame):
                 prev_od_level = level
 
             # 记录「行动前」全队 SP（回合开始回复 / 前置OD 之后）
+            # pre_sp：「行动前SP」——各行动的「剩余SP」都以它为基准（不随行动中的回复变化）
+            # post ：累积本次回合的**扣费**与**所有行动触发的 SP 回复** → 就是「行动后」的队伍SP
+            pre_sp = list(sp)
+            post = list(sp)
             pre_entries = [(i, self.team[i].get("role"), sp[i], i in start_front)
                            for i in active]
 
@@ -3027,9 +3035,10 @@ class AxleODWindow(QFrame):
             action_order = sorted(
                 turn.actions, key=lambda a: 1 if a._is_attack() else 0)
             # 「分享」类被动（自身以外的友方的主动技能使自身SP提升时 额外使全体SP+N）：
-            # 先登记，**回合结束时再统一结算**——实测这部分不计入本回合各行动的
-            # 「剩余SP」，只体现在「行动后」的队伍 SP 里（如 东城司「分享」）。
+            # 先登记，回合结束时再统一结算到 post（如 东城司「分享」）。
+            # share_self_seen：「自身」范围类（如 惹人怜爱）按**回合**去重，每回合只触发一次。
             share_pending = []
+            share_self_seen = set()
             for action in action_order:
                 i = action.member_index
                 if i not in active:
@@ -3041,44 +3050,43 @@ class AxleODWindow(QFrame):
                 if is_placeholder:
                     cost = 0          # 占位回合：所有技能不消耗 SP
                 elif cost >= 99:      # 消耗全部 SP
-                    cost = sp[i]
+                    cost = pre_sp[i]
                 else:
                     # SP 消耗增减被动（同名只叠加一次）；
                     # 「高阶增强」（红宝石香水）不作用于通常攻击与 SP 消耗为 0 的技能
                     cost = max(0, cost + self._sp_cost_modifier(
                         i, active, turn_front, cost, downed=break_seen,
                         extra=is_extra_turn, states=state_tracker.states(i)))
-                enough = sp[i] >= cost
+                enough = pre_sp[i] >= cost
                 if not enough and action.allows_negative_sp():
                     enough = True     # 「SP0或以上即可使用」：SP 可为负
                 if enough:
-                    sp[i] -= cost
-                    # 「剩余SP」= 行动前SP − 本次消耗（**不含任何回复**：
-                    # 技能自身回复、被动/天赋/大师技能触发的回复都不计入）
-                    remaining_after_cost = sp[i]
-                    # 「分享」类被动按**每一段 SP 回复**各触发一次，
-                    # 由 _apply_sp_recover 内部登记到 share_pending，
-                    # 回合结束时统一结算（见下面 set_team_sp 之前）
-                    self._apply_sp_recover(action, i, sp, active,
-                                           turn_front, limit, share_pending)
+                    post[i] -= cost
+                    # 「剩余SP」= **行动前SP − 本次消耗**（用行动前的值算，
+                    # 与行动顺序、与行动中产生的任何 SP 回复都无关）
+                    remaining_after_cost = pre_sp[i] - cost
+                    # 以下回复全部作用在 post 上（不会影响本回合其它行动的剩余SP）
+                    self._apply_sp_recover(action, i, post, active,
+                                           turn_front, limit, share_pending,
+                                           share_self_seen)
                     if action.is_break():
                         self._apply_break_recover(
-                            action, i, sp, active, turn_front, limit,
+                            action, i, post, active, turn_front, limit,
                             not break_seen)
                         break_seen = True
                     # 「条件触发」附带的全队 SP 效果（如 贝斯独奏：全体 SP+5，上限 30）
-                    self._apply_trigger_sp(action.trigger(), sp, active, limit)
+                    self._apply_trigger_sp(action.trigger(), post, active, limit)
                     # 「自身使用EX技能后」回复SP（如 注入活力 / 开辟希望的一箭）
                     if action.get_skill_is_ex():
                         for mod in self._member_ex_sp(i):
                             self._apply_scope_recover(
                                 mod.get("amount", 0), mod.get("scope"),
-                                mod.get("element"), i, sp, active,
+                                mod.get("element"), i, post, active,
                                 turn_front, limit)
                     action.set_sp_result(remaining_after_cost, True)
                 else:
                     # SP 不足：显示红色负值（还差多少），实际 SP 不变
-                    action.set_sp_result(sp[i] - cost, False)
+                    action.set_sp_result(pre_sp[i] - cost, False)
                 # 本行动**结算完**再赋予状态（如 若向流星歌唱 → 歌姬之加护）：
                 # 施放当回合的自身消耗不吃该状态，之后（含同回合后续行动）才生效
                 state_tracker.apply(action, turn_idx, turn_front)
@@ -3108,11 +3116,11 @@ class AxleODWindow(QFrame):
                     elem = fu.get("element")
                     is_switch = False
                     if (switch is not None and not used_switch
-                            and sp[m_slot] >= switch["skill"].sp_cost):
+                            and post[m_slot] >= switch["skill"].sp_cost):
                         sk = switch["skill"]
                         hits = sk.hits or 1
                         elem = sk.element
-                        sp[m_slot] -= sk.sp_cost
+                        post[m_slot] -= sk.sp_cost
                         used_switch = True
                         is_switch = True
                     # 追击本体（温泉巡游）不吃 OD 耳环；替换后的「猫咪喷射打靶」是实际技能，吃耳环
@@ -3121,21 +3129,22 @@ class AxleODWindow(QFrame):
                     for mod in self._member_follow_up_sp(m_slot):
                         self._apply_scope_recover(
                             mod.get("amount", 0), mod.get("scope"),
-                            mod.get("element"), m_slot, sp, active,
+                            mod.get("element"), m_slot, post, active,
                             turn_front, limit)
             turn.set_follow_up_od(follow_entries)
 
-            # 回合结束：统一结算本回合登记下来的「分享」类被动
-            # （放在这里是为了让它们只进入「行动后」的队伍SP，不影响各行动的剩余SP）
+            # 回合结束：把本回合登记下来的「分享」类被动也结算到 post（即「行动后」）
             for owner, mod in share_pending:
                 self._apply_scope_recover(
                     mod.get("amount", 0), mod.get("scope"), mod.get("element"),
-                    owner, sp, active, turn_front, mod.get("limit") or limit)
+                    owner, post, active, turn_front, mod.get("limit") or limit)
 
             # 记录本回合结束时全队 SP（含后卫）；前锋标注用回合中的前锋
-            entries = [(i, self.team[i].get("role"), sp[i], i in turn_front)
+            entries = [(i, self.team[i].get("role"), post[i], i in turn_front)
                        for i in active]
             turn.set_team_sp(entries, before=pre_entries)
+            # 本回合的「行动后」SP 成为下一回合的起点
+            sp = list(post)
 
             # 回合结束：本回合行动的队员成为新的前锋（供下一回合开始使用）
             if actors:
@@ -3687,18 +3696,16 @@ class AxleODWindow(QFrame):
         return any(n and n in role for n in names)
 
     def _apply_sp_recover(self, action, actor, sp, active, front_set, limit,
-                          share_pending=None):
+                          share_pending=None, seen_self=None):
         """结算技能自带的 SP 回复效果。
 
         **每一段回复都会单独触发一次「分享」类被动**：例如「灵能充能」对 31A 对象
-        是「本体回复3」+「额外回复3」两段，全体类的「分享」会触发**两次**
-        （实测：东城司 13 → 26）。
+        是「本体回复3」+「额外回复3」两段，全体类的「分享」会触发**两次**。
 
-        特例：作用范围是**自身**的分享类（如「惹人怜爱」）**每个行动只触发一次**
-        ——若每段都触发，实测司的行动后SP会比游戏里多 3。
+        特例：作用范围是**自身**的分享类（如「惹人怜爱」）**每个回合只触发一次**
+        （见 seen_self，由 _recalc_sp 按回合维护）——若每段都触发，实测会比游戏里多。
         """
         amount, scope, element = action.get_sp_recover()
-        seen_self = set()      # 本次行动已触发过的「自身」类（每个行动只算一次）
         if scope in ("one_other", "one_any"):
             # 单名友方：回复到行动里选择的「对象」
             target = action.get_sp_target()
@@ -3732,7 +3739,7 @@ class AxleODWindow(QFrame):
 
         「分享」类（友方主动技能使自身SP提升时 额外使全体/自身 SP+N）按**每次回复**
         触发，所以这里一次只处理一段回复（登记后回合结束时统一结算）。
-        作用范围是「自身」的（如 惹人怜爱）每个行动只登记一次（见 seen_self）。
+        作用范围是「自身」的（如 惹人怜爱）每个回合只登记一次（见 seen_self）。
         """
         if share_pending is None:
             apply_fn()
@@ -3746,7 +3753,7 @@ class AxleODWindow(QFrame):
                 if mod.get("scope") == "self" and seen_self is not None:
                     key = (m, mod.get("name"))
                     if key in seen_self:
-                        continue      # 自身类：每个行动只触发一次
+                        continue      # 自身类：每个回合只触发一次
                     seen_self.add(key)
                 share_pending.append((m, mod))
 
