@@ -209,7 +209,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 「分享」类被动（如 东城司「哀情挽歌」的 分享 / 惹人怜爱）：**友方的主动技能使自身 SP 提升时**，
   额外给全体友方 / 自身 **SP+N**（可突破上限，最高到 SP30）。
   按**每一段 SP 回复**各触发一次——例如 逢川惠大师技能「灵能充能」对 31A 对象
-  是「本体回复3」+「额外回复3」两段，司的被动会触发**两次**（自身 +3×2、全体 +2×2）。
+  是「本体回复3」+「额外回复3」两段，「分享」（范围=全体）会触发**两次**（全体 +2×2）；
+  但**范围是「自身」的**（如「惹人怜爱」）**每个行动只触发一次**（自身 +3×1）——
+  按实测特例处理（若也按两段触发，司的行动后SP 会比游戏里多 3）。
   这类被动**在回合结束时统一结算**——只体现在「行动后」的队伍SP里，
   **不计入本回合各行动的「剩余SP」**（实测：同伴给东城司补SP后，后续行动的剩余SP不受这份加成影响）。
 - 「自身使用EX技能后 …」类效果（如 注入活力：全体友方SP+2、桐生美也大师技能
@@ -3689,9 +3691,14 @@ class AxleODWindow(QFrame):
         """结算技能自带的 SP 回复效果。
 
         **每一段回复都会单独触发一次「分享」类被动**：例如「灵能充能」对 31A 对象
-        是「本体回复3」+「额外回复3」两段，司的被动会触发**两次**。
+        是「本体回复3」+「额外回复3」两段，全体类的「分享」会触发**两次**
+        （实测：东城司 13 → 26）。
+
+        特例：作用范围是**自身**的分享类（如「惹人怜爱」）**每个行动只触发一次**
+        ——若每段都触发，实测司的行动后SP会比游戏里多 3。
         """
         amount, scope, element = action.get_sp_recover()
+        seen_self = set()      # 本次行动已触发过的「自身」类（每个行动只算一次）
         if scope in ("one_other", "one_any"):
             # 单名友方：回复到行动里选择的「对象」
             target = action.get_sp_target()
@@ -3701,17 +3708,17 @@ class AxleODWindow(QFrame):
             # 第一段：技能本体回复
             self._recover_and_share(
                 lambda: self._recover_one(sp, target, amount, limit),
-                actor, sp, active, share_pending)
+                actor, sp, active, share_pending, seen_self)
             # 第二段：「对象属于指定队伍时额外回复」（如 灵能充能 对 31A +3）
             if extra and team and self._member_in_team(target, team):
                 self._recover_and_share(
                     lambda: self._recover_one(sp, target, extra, limit),
-                    actor, sp, active, share_pending)
+                    actor, sp, active, share_pending, seen_self)
             return
         self._recover_and_share(
             lambda: self._apply_scope_recover(amount, scope, element, actor,
                                               sp, active, front_set, limit),
-            actor, sp, active, share_pending)
+            actor, sp, active, share_pending, seen_self)
 
     @staticmethod
     def _recover_one(sp, target, amount, limit):
@@ -3719,11 +3726,13 @@ class AxleODWindow(QFrame):
         if 0 <= target < len(sp) and sp[target] < limit:
             sp[target] = min(limit, sp[target] + amount)
 
-    def _recover_and_share(self, apply_fn, actor, sp, active, share_pending):
+    def _recover_and_share(self, apply_fn, actor, sp, active, share_pending,
+                           seen_self=None):
         """执行一次 SP 回复，并登记这次回复触发的「分享」类被动。
 
         「分享」类（友方主动技能使自身SP提升时 额外使全体/自身 SP+N）按**每次回复**
         触发，所以这里一次只处理一段回复（登记后回合结束时统一结算）。
+        作用范围是「自身」的（如 惹人怜爱）每个行动只登记一次（见 seen_self）。
         """
         if share_pending is None:
             apply_fn()
@@ -3734,6 +3743,11 @@ class AxleODWindow(QFrame):
             if m == actor or sp[m] <= before[m]:
                 continue
             for mod in self._member_share_sp(m):
+                if mod.get("scope") == "self" and seen_self is not None:
+                    key = (m, mod.get("name"))
+                    if key in seen_self:
+                        continue      # 自身类：每个行动只触发一次
+                    seen_self.add(key)
                 share_pending.append((m, mod))
 
     def _member_break_sp(self, slot):
