@@ -187,6 +187,7 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 回合开始：基础回复（前锋/后卫）+ 风格被动的前锋SP（闪光/佳音/机敏/俊敏…，需满足突破数）；
   以及「回合开始时回复友方SP」的被动（如 与伙伴一起【朝仓可怜专属】：除自身外全体友方 SP+1）。
 - 「X之印」（雷之印/冰之印/火之印…）：等级 = **初战开始时同属性风格的数量**，
+  **双属性风格（如「冰雷」）只要含该属性就算一份**（自身也计入）。
   满 6 级时该属性风格位于前锋者在回合开始时**自身 SP+1**。
   印记来源有两种：被动里常驻的（如 白虎「兽之心暖」的 雷之印、苍井绘里香「传承·Legacy」的 冰之印），
   以及「（被动技能）」条目（如 桐生美也「海风的邀约」的 夏日晴空：需在队伍配置里携带）。
@@ -3302,27 +3303,34 @@ class AxleODWindow(QFrame):
         return found
 
     def _sigil_level(self, element):
-        """「X之印」等级 = 初战开始时同属性风格的数量（队伍里存在该印记时才有效）。"""
+        """「X之印」等级 = 初战开始时同属性风格的数量（队伍里存在该印记时才有效）。
+
+        双属性风格（如「冰雷」）只要含该属性就算一份，所以这里用属性包含判断。
+        """
         if element is None or element not in self._team_sigils():
             return 0
         return sum(1 for slot in self._active_slots()
-                   if self._member_element(slot) == element)
+                   if _element_matches(self._member_element(slot), element))
 
     def _team_sigil_levels(self):
         """当前队伍各「X之印」的等级：{元素: 等级}。"""
         return {el: self._sigil_level(el) for el in self._team_sigils()}
 
     def _member_sigil_bonus(self, slot):
-        """该队员因「X之印」等级6 获得的回合开始自身 SP（需位于前锋，0 表示不触发）。"""
+        """该队员因「X之印」等级6 获得的回合开始自身 SP（需位于前锋，0 表示不触发）。
+
+        队员可能是双属性风格（如「冰雷」），此时只要**任一**属性命中印记就算生效。
+        """
         if getattr(self, "_passives_off", False):
             return 0           # 占位回合：不触发任何被动
-        element = self._member_element(slot)
-        sig = self._team_sigils().get(element)
-        if not sig:
-            return 0
-        if self._sigil_level(element) < sig.get("level", 6):
-            return 0
-        return int(sig.get("amount", 0) or 0)
+        member_element = self._member_element(slot)
+        for element, sig in self._team_sigils().items():
+            if not _element_matches(member_element, element):
+                continue
+            if self._sigil_level(element) < sig.get("level", 6):
+                continue
+            return int(sig.get("amount", 0) or 0)
+        return 0
 
     def _selected_passives(self, slot):
         """队员在队伍配置里携带的「（被动技能）」；None 表示全部。"""
