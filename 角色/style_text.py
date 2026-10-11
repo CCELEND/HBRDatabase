@@ -25,7 +25,10 @@ def output_skill_effect(turn_num, duration, target, effect_type,
     # 如果 effect_type 是 special_effects 中字符串的父串
     if is_parentstring(effect_type, special_effects):
         if value:
-            text += description + "：" + value
+            if effect_type == "充能":
+                text += output_string(value)
+            else:
+                text += description + "：" + value
         else:
             text += description
     else:
