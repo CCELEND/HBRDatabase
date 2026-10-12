@@ -176,7 +176,7 @@ def calculate_file_hashes(directory, use_cache=True):
 
     if use_cache:
         _save_hash_cache(new_cache)
-        logger.info("哈希完成：复用缓存 %d 个，重新计算 %d 个",
-                    reused, len(file_tasks))
+        # logger.info("哈希完成：复用缓存 %d 个，重新计算 %d 个",
+        #             reused, len(file_tasks))
 
     return file_hashes
