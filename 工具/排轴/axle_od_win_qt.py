@@ -66,6 +66,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   OD耳环对该角色所有回合生效）。
   「角色」下拉框按**队伍分组**（31A / 31B / 31C / 30G / 31D / 31E / 31F / 31X / Angel Beats! / 司令部 / persona5r），
   每个队伍前面有一个**不可选的分组标题**；「无」在最上面，表示该位置空着。
+  配置窗口顶部有「**清空角色**」按钮：一键清空 6 个位置的角色/风格
+  （回合列表与「全局战斗设置」会保留，点击后会先确认；队伍为空时按钮置灰）。
 - 「回合列表」在**独立窗口**打开（与主窗口同时出现）；主窗口只保留队伍/全局设置，不显拥挤。
   回合的「添加/上移/下移/清空/保存/读取」等操作按钮也在该窗口，方便操作。
   回合窗口关闭后，可用配置窗口顶部的「打开回合窗口」按钮重新打开。
@@ -80,6 +82,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   **不触发任何被动**（回合开始回复、OD条上升、击破回复、印记/律动/共鸣、SP消耗被动、追击、EX 被动等一律不生效）、
   **所有技能不消耗 SP**（技能自身的 OD/连击等效果照常结算）。
 - 选了 OD 的回合，类型会显示为「超频回合」（与通常回合等价，仅作标识）。
+- 回合卡片按类型配色，方便一眼区分：**追加回合=紫、特殊回合=橙、占位回合=灰**
+  （通常/超频回合仍按所选 OD 等级配色）。
 - 新增回合会自动沿用上一回合行动的队员；修改上一回合前锋会同步后续（未手动编辑的）回合。
 - 技能：同角色各风格技能通用；但 SSR/SS 的第一个主动技能为专属（仅装备该风格时可用）。
   已通用化的例外：第一个 SS 风格的专属技能（如 幻象泡影）、星火燎原+。
@@ -138,6 +142,10 @@ HELP_TEXT = """排轴OD计算 使用说明
   带「**[单独发动]**」的这类效果**不会叠加**：重复发动只刷新持续回合数（连击值不变）。
   被动里的同类效果（如 山胁「梅雨」：战斗开始时位于前锋 自身连击+5（1次））同样自动计入；
   标「**次**」的按**释放攻击技能的次数**消耗——每释放一次攻击技能消耗 1 次。
+  写「**持续+N**」的（如 QUEEN「微积分」+2/+5、伊达朱里「阴暗的五球连击」+5）是**常驻**加成，
+  整场都生效、不会过期，也不会重复叠加。
+  「**XX（小）**」与「**XX[天赋强化]**」是同一效果的基础/强化版（突破2 / 突破3），
+  强化版解锁后**替换**基础版（不会 +2 与 +5 叠加成 +7）。
   目标是**单名友方**的（如 茅森月歌「月芒」、李映夏「第七击·无中生有」）：
   在行动行的「**对象**」下拉里选择受益的友方，该 buff 只加到他/她身上。
   带**状态条件**的（如 茅森月歌「月华歌姬」的 月芒：默认 连击+5（中量伤害/5次），
@@ -310,13 +318,35 @@ OD_OPTIONS = [
 # 发动 OD 时全队获得的 SP（下标为 OD 等级，参考 hbr-tool）
 OD_SP_BONUS = [0, 5, 12, 20, 20, 20]
 
-# OD 等级 -> 行背景色（参考站点配色）
+# OD 等级 -> 主色（游戏里 OD 条的颜色）；卡片背景自动用同色淡化
 OD_COLORS = {
-    "OD1": "rgba(229, 131, 207, 0.25)",
-    "OD2": "rgba(189, 247, 211, 0.25)",
-    "OD3": "rgba(237, 225, 108, 0.25)",
-    "OD4": "rgba(91, 163, 239, 0.25)",
-    "OD5": "rgba(177, 98, 237, 0.25)",
+    "OD1": "#FD99E0",   # 粉
+    "OD2": "#6BE9D6",   # 青
+    "OD3": "#E2FF7D",   # 黄绿
+    "OD4": "#5BA3EF",   # 暂无对应，保留
+    "OD5": "#B162ED",   # 暂无对应，保留
+}
+
+
+def _color_with_alpha(hex_color, alpha=0.22):
+    """#RRGGBB -> rgba(r, g, b, alpha)，用作卡片浅色背景。"""
+    c = str(hex_color or "").lstrip("#")
+    if len(c) != 6:
+        return hex_color
+    try:
+        r, g, b = (int(c[i:i + 2], 16) for i in (0, 2, 4))
+    except ValueError:
+        return hex_color
+    return "rgba(%d, %d, %d, %.2f)" % (r, g, b, alpha)
+
+# 回合类型 -> (左侧竖条颜色, 背景浅色)：
+# 用来在回合列表里一眼区分 追加 / 特殊 / 占位 回合（通常/超频回合仍按 OD 配色）
+TURN_TYPE_COLORS = {
+    "通常回合": ("#c0c0c0", None),
+    "超频回合": ("#c0c0c0", None),
+    "追加回合": ("#7b61c9", "rgba(123, 97, 201, 0.10)"),   # 紫
+    "特殊回合": ("#e08a2e", "rgba(224, 138, 46, 0.10)"),   # 橙
+    "占位回合": ("#8a8a8a", "rgba(138, 138, 138, 0.12)"),  # 灰
 }
 
 # 行动列宽（表头与数据行共用）
@@ -1945,12 +1975,20 @@ class TurnCard(QFrame):
 
     def _apply_style(self):
         od = self.od_combo.currentText()
-        bg = OD_COLORS.get(od[:3], "#ffffff")
-        accent = "#c0c0c0"
-        for key, color in OD_COLORS.items():
-            if od.startswith(key):
-                accent = color
-                break
+        turn_type = (self.type_combo.currentText()
+                     if hasattr(self, "type_combo") else "")
+        # 回合类型配色：追加/特殊/占位回合用固定颜色区分
+        type_color, type_bg = TURN_TYPE_COLORS.get(turn_type, ("#c0c0c0", None))
+        accent = type_color
+        bg = type_bg
+        if type_bg is None:
+            # 通常/超频回合：按所选 OD 等级上色（主色做竖条，淡化后做背景）
+            bg = "#ffffff"
+            for key, color in OD_COLORS.items():
+                if od.startswith(key):
+                    accent = color
+                    bg = _color_with_alpha(color)
+                    break
         self.setStyleSheet(TURN_CARD_STYLE % {"bg": bg, "accent": accent})
 
     def to_data(self):
@@ -2072,6 +2110,7 @@ class AxleODWindow(QFrame):
         self.team = [row.to_data() for row in self.team_rows]
         self._refresh_role_choices()
         self._update_turn_buttons()
+        self._update_clear_roles_btn()
         self.add_turn()
 
     def _default_team(self):
@@ -2107,8 +2146,38 @@ class AxleODWindow(QFrame):
         button.setToolTip("回合列表在独立窗口；关闭后可在此重新打开")
         button.clicked.connect(self.open_turns_window)
         bar.addWidget(button)
+
+        self.clear_roles_btn = QPushButton("清空角色")
+        self.clear_roles_btn.setMinimumWidth(110)
+        self.clear_roles_btn.setToolTip(
+            "一键清空 6 个位置的角色与风格（回合列表与全局战斗设置会保留）")
+        self.clear_roles_btn.clicked.connect(self.clear_roles)
+        bar.addWidget(self.clear_roles_btn)
+
         bar.addStretch(1)
         return bar
+
+    def clear_roles(self):
+        """一键清空 6 个位置的角色/风格（回合列表与全局战斗设置保留）。"""
+        if not any(row.role() for row in self.team_rows):
+            return
+        ret = QMessageBox.question(
+            self, "清空角色",
+            "确定要清空全部 6 个位置的角色吗？\n"
+            "（回合列表与「全局战斗设置」会保留）",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if ret != QMessageBox.Yes:
+            return
+        with self._suspend_recalc():
+            for row in self.team_rows:
+                row.set_role("")
+        self._on_team_changed()
+
+    def _update_clear_roles_btn(self):
+        """队伍为空时「清空角色」置灰。"""
+        btn = getattr(self, "clear_roles_btn", None)
+        if btn is not None:
+            btn.setEnabled(any(row.role() for row in self.team_rows))
 
     def open_turns_window(self):
         """打开/置顶回合窗口。"""
@@ -2362,6 +2431,7 @@ class AxleODWindow(QFrame):
         with self._suspend_recalc():
             self._refresh_role_choices()
             self._update_turn_buttons()
+            self._update_clear_roles_btn()
             # 默认是空队伍，因此开始时没有回合；首次编入角色后自动建一个回合
             if not self.turns and self._active_slots():
                 self.add_turn()
@@ -2634,10 +2704,12 @@ class AxleODWindow(QFrame):
                     if pos == "back" and slot in initial_front:
                         continue
                     entries = combo_buffs.setdefault(slot, [])
-                    if mod.get("timing") == "battle" and any(
-                            e.get("source") == mod.get("name")
-                            and e.get("passive") for e in entries):
-                        continue          # 出击中仅1次
+                    # 「出击中仅1次」的被动、以及「持续+N」的**常驻**被动都只登记一次
+                    if (mod.get("timing") == "battle"
+                            or int(mod.get("count", 0) or 0) >= 999):
+                        if any(e.get("source") == mod.get("name")
+                               and e.get("passive") for e in entries):
+                            continue
                     entries.append({
                         "amount": mod.get("amount", 0),
                         "left": mod.get("count", 0),
@@ -3500,6 +3572,21 @@ class AxleODWindow(QFrame):
         return sum(m.get("amount", 0.0)
                    for m in self._member_ex_od(slot)) / 100.0
 
+    @staticmethod
+    def _filter_passive_mods(mods, lb):
+        """按突破数过滤被动项，并处理「XX[天赋强化]」**替换**「XX（小）」。
+
+        两者是同一效果的基础/强化版（突破2/3）：强化版解锁后基础版不再单独生效，
+        否则会重复计算（如 QUEEN 微积分 +2 与 +5 叠加成 +7）。
+        """
+        ok = [m for m in mods if m.get("lb", 0) <= lb]
+        enhanced = {m.get("family") for m in ok
+                    if m.get("enhanced") and m.get("family")}
+        if not enhanced:
+            return ok
+        return [m for m in ok
+                if not (m.get("family") in enhanced and not m.get("enhanced"))]
+
     def _member_passive_combo(self, slot):
         """该队员风格被动里的「连击数上升」项（满足突破要求）。"""
         if getattr(self, "_passives_off", False):
@@ -3509,7 +3596,7 @@ class AxleODWindow(QFrame):
         lb = self._member_lb(slot)
         for st in self.data_source.styles(role):
             if st.name == style:
-                return [m for m in st.passive_combo if m.get("lb", 0) <= lb]
+                return self._filter_passive_mods(st.passive_combo, lb)
         return []
 
     def _member_share_sp(self, slot):
@@ -3533,7 +3620,7 @@ class AxleODWindow(QFrame):
         lb = self._member_lb(slot)
         for st in self.data_source.styles(role):
             if st.name == style:
-                return [m for m in st.turn_start_sp if m.get("lb", 0) <= lb]
+                return self._filter_passive_mods(st.turn_start_sp, lb)
         return []
 
     def _member_follow_up(self, slot):

@@ -867,6 +867,23 @@ def _parse_share_sp(style_data):
     return result
 
 
+def _passive_family(name):
+    """把「XX（小）」与「XX[天赋强化]」归到同一族名。
+
+    返回 (族名, 是否为强化版)。同一族的两个被动是**同一效果的升级版**
+    （基础版突破2、强化版突破3），强化版解锁后应**替换**基础版，不能再叠加。
+    """
+    text = str(name or "")
+    enhanced = False
+    for mark in ("[天赋强化]", "［天赋强化］"):
+        if mark in text:
+            text = text.split(mark)[0]
+            enhanced = True
+            break
+    text = re.sub(r'（小）|\(小\)', '', text).strip()
+    return text, enhanced
+
+
 def _parse_passive_combo(style_data):
     """解析被动里的「连击数上升」项。
 
@@ -892,6 +909,10 @@ def _parse_passive_combo(style_data):
         amount = int(m.group(1)) if m else 0
         m2 = re.search(r'(\d+)', str(pcount))
         count = int(m2.group(1)) if m2 else 0
+        # 「持续+N」（如 QUEEN「微积分」、伊达朱里「阴暗的五球连击」）：
+        # 数据里没有回合数，是**常驻**的连击加成 → 记成很大的层数，永不过期
+        if count <= 0 and "持续" in pdesc:
+            count = 999
         position = None
         if "位于前锋" in pdesc:
             position = "front"
@@ -899,6 +920,7 @@ def _parse_passive_combo(style_data):
             position = "back"
         timing = ("battle" if ("战斗开始时" in pdesc
                                or "初战开始时" in pdesc) else "turn")
+        family, enhanced = _passive_family(pname)
         result.append({
             "name": pname,
             "amount": amount,
@@ -908,6 +930,8 @@ def _parse_passive_combo(style_data):
             "timing": timing,
             "target": ptarget,
             "lb": _passive_lb(passive),
+            "family": family,
+            "enhanced": enhanced,
         })
     return result
 
@@ -1772,6 +1796,7 @@ class HBRDataSource:
                         position = "front"
                     elif "位于后卫" in pdesc:
                         position = "back"
+                    family, enhanced = _passive_family(pname)
                     turn_start_sp.append({
                         "name": pname,
                         "amount": int(num.group()),
@@ -1791,6 +1816,8 @@ class HBRDataSource:
                         "sigil_element": sig.group(1) if sig else None,
                         "sigil_min_level": int(sig.group(2)) if sig else None,
                         "lb": _passive_lb(passive),
+                        "family": family,
+                        "enhanced": enhanced,
                     })
                 # 检测「高阶增幅状态」的启用被动（如 红宝石香水（被动技能））；
                 # 只有存在该被动时，高阶增强的 SP+2 / SP上限+10 才生效。
