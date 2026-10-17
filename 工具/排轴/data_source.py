@@ -170,12 +170,14 @@ def _group_exclusive(group):
 
 
 def _apply_exclusive(styles):
-    """标记 SSR/SS 的第一个主动技能为专属技能。
+    """标记 SSR/SS 的专属技能。
 
-    优先用数据里显式写的 ``{"exclusive":1}``（``工具/排轴/fill_exclusive.py`` 补的）；
-    没有该字段才按旧规则推断。旧规则的两个例外：
-      * 该角色第一个 SS 风格（style_id 最小）的专属技能；
-      * GENERALIZED_SKILLS 中列出的技能。
+    优先用数据里显式写的 ``{"exclusive":1}``（``工具/排轴/fill_exclusive.py`` 补的）。
+    **可以不止一个条目**：任何带该标记的 ``ActiveSkills`` 条目都算专属技能
+    （有些风格有 2 个以上专属技）。
+
+    数据里完全没有标记时，才按旧规则推断：第一个主动技能是专属，
+    但该角色**第一个 SS 风格**的专属技能、以及 ``GENERALIZED_SKILLS`` 里列出的技能已通用化。
     """
     ss_styles = [s for s in styles if s.rarity == "SS" and s.style_id]
     first_ss = min(ss_styles, key=lambda s: s.style_id) if ss_styles else None
@@ -187,16 +189,26 @@ def _apply_exclusive(styles):
         if style.rarity not in ("SSR", "SS") or len(style.skills) < 2:
             continue
         first = style.skills[1]      # skills[0] 为通常攻击
-        flag = getattr(first, "exclusive_flag", None)
-        if flag is None:
-            generalized = (first.name in GENERALIZED_SKILLS or style is first_ss)
-        else:
-            generalized = not bool(flag)
+        # 数据里的显式标记：{条目下标: 1/0}（0 = 明确不是专属）
+        flags = {}
         for skill in style.skills:
-            # 同一 ActiveSkills 条目下的可切换形态也一并标记
+            if (skill.source_group is not None
+                    and skill.exclusive_flag is not None):
+                flags.setdefault(skill.source_group, skill.exclusive_flag)
+        if flags:
+            for skill in style.skills:
+                if flags.get(skill.source_group):
+                    skill.is_exclusive = True
+        else:
+            generalized = (first.name in GENERALIZED_SKILLS or style is first_ss)
+            for skill in style.skills:
+                if skill is first or (first.source_group is not None
+                                      and skill.source_group == first.source_group):
+                    skill.is_exclusive = not generalized
+        # EX 技能（= 第一个主动技能，含同条目的切换形态）
+        for skill in style.skills:
             if skill is first or (first.source_group is not None
                                   and skill.source_group == first.source_group):
-                skill.is_exclusive = not generalized
                 skill.is_ex_skill = True
             # 「+」进化版（如 光茫一闪+）同样属于该风格的 EX 技能
             elif skill.name.endswith("+") and skill.name[:-1] == first.name:
