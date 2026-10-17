@@ -4,10 +4,7 @@
     {
       "role": "苍井绘里香",
       "style": "传承·Legacy",
-      "passives": [
-        "战吼（被动技能）",
-        "私人课程（被动技能）"
-      ],
+      "passives": [],
       "lb": 4,
       "resonance_talent": "神圣恩典",
       "resonance_level": 4,
@@ -27,10 +24,7 @@
     {
       "role": "茅森月歌",
       "style": "Glorious Blades",
-      "passives": [
-        "交织而成的记忆",
-        "怪物般的球威（被动技能）"
-      ],
+      "passives": [],
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
@@ -92,6 +86,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -101,6 +96,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -110,6 +106,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -126,6 +123,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -135,6 +133,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -144,6 +143,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -160,6 +160,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -169,6 +170,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": true,
+          "trigger": "break",
           "sp_target": null
         },
         {
@@ -178,6 +180,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -194,6 +197,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -203,6 +207,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -212,6 +217,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -228,6 +234,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -237,6 +244,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -246,6 +254,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -262,6 +271,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -271,6 +281,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -280,6 +291,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]

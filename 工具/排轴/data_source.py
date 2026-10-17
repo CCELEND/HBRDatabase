@@ -499,6 +499,9 @@ class StyleInfo:
         self.team = None
         # 职业（如 攻击者/破盾者/指挥者…），取自 style_info[7]
         self.career = None
+        # 风格缩略图（相对仓库根目录的路径，如
+        # "./角色/31A/Karen/KarenDefault_R1_Thumbnail.webp"），取自 style_info[0]
+        self.icon_path = None
         # 「X之律动」（超越条，如 冰之律动）：
         # {"name","element","initial_per_style","per_action","threshold","od_bonus","once","lb"}
         self.rhythm = None
@@ -1978,6 +1981,10 @@ class HBRDataSource:
                 styles[-1].career = (str(style_info[7])
                                      if len(style_info) > 7 and style_info[7]
                                      else None)
+                # 缩略图（轴图用）：style_info[0] 是相对仓库根目录的路径
+                styles[-1].icon_path = (str(style_info[0])
+                                        if style_info and style_info[0]
+                                        else None)
                 # 「X之律动」（超越条）
                 styles[-1].rhythm = _parse_rhythm(style_data)
                 # 「自身使用EX技能后 …」的回复 SP 被动
@@ -2041,6 +2048,9 @@ class HBRDataSource:
                 name = res["name"]
                 if name not in pool:
                     pool[name] = dict(res)
+                    # 轴图用：该天赋所属风格的缩略图（同名天赋取第一个来源风格）
+                    pool[name]["icon_path"] = getattr(st, "icon_path", None)
+                    pool[name]["owner_style"] = st.name
                     owners[name] = set()
                     teams[name] = set()
                 # 元素未知的风格视为「无」属性（无 是一个独立属性）

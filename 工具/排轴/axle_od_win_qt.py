@@ -33,9 +33,10 @@ from PyQt5.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QComboBox, QSpinBox,
     QDoubleSpinBox, QCheckBox, QHBoxLayout, QVBoxLayout, QGridLayout,
     QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy,
-    QToolButton, QMenu
+    QToolButton, QMenu, QDialog, QApplication
 )
 from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtGui import QPixmap
 
 from window_qt import set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
@@ -274,6 +275,23 @@ HELP_TEXT = """排轴OD计算 使用说明
     （山胁 lb1 +1 / lb3 +5、丰后 +1）。
   · 「若回合开始时处于该状态的友方为 6 名或以上 则超频条 +100%（出击中限1次）」
     （山胁 lb4 / 丰后 lb4）→ 人数不足 6 时不触发，且只结算一次。
+
+【生成轴图】
+- **回合窗口**工具栏里的「预览轴图」/「生成轴图」会把当前排轴渲染成一张图片：
+  「预览轴图」不写文件、直接弹预览（预览窗里也有「保存为图片」按钮）；
+  「生成轴图」直接选保存位置（PNG / JPG，默认存到「图片」文件夹）。
+- 版式参考 `工具/排轴/hbr_axle.jpg`：
+  · 顶部 6 个角色头像（右上角徽章 = 突破数；左下角徽章 = 该位置的共鸣天赋等级，
+    **徽章左边还会画上该共鸣天赋「所属风格」的小缩略图**，配了共鸣天赋的位置才有）；
+  · 「Passive Skill」= 每名成员在队伍配置里携带的被动；
+  · 「Skill」= 每名成员在这条轴里用到的技能（按游戏技能顺序排列，长名字自动换行；
+    **用过多次的会标出次数**，如「放学后的小小刺激[2]」「先导的领袖魅力[3]」）；
+  · 红色分隔线下面按回合列出行动：左侧是回合标签（`T1` / `追加回合` / `T1` + `OD2 · Bonus 1`），
+    每行最多 3 个行动（小头像 + 技能名）。
+- **通常攻击 / 指挥行动不是技能**：**回合行照样显示**（它们也是行动），
+  但**不会出现在「Skill」栏里**，也不统计使用次数。
+- **通常回合才计 T 序号**（追加/特殊/占位不计），超频回合沿用当前回合号并标出
+  「OD 等级 · Bonus N」，底色用深绿；追加回合底色用深灰。
 """
 
 
@@ -682,17 +700,22 @@ class TeamMemberRow(QFrame):
         """指挥者只能编入一名：非指挥者的位置禁用「指挥者」职业的风格。
 
         （「指挥行动」专属且只有指挥者能用，故一个队伍不能编入两名指挥者。）
+
+        注意：Qt 在「禁用当前项」时也会发 currentTextChanged，
+        如果不管就会触发 _on_style_changed() 把已携带的被动重置成「全部携带」，
+        所以这一段用 _suspended() 屏蔽掉。
         """
         model = self.style_combo.model()
-        for j in range(self.style_combo.count()):
-            item = model.item(j)
-            if item is None:
-                continue
-            career = self._style_career_at(j)
-            item.setEnabled(not (career == "指挥者" and not is_commander))
+        with self._suspended():
+            for j in range(self.style_combo.count()):
+                item = model.item(j)
+                if item is None:
+                    continue
+                career = self._style_career_at(j)
+                item.setEnabled(not (career == "指挥者" and not is_commander))
         if is_commander:
             return
-        # 当前选中的风格若被禁用，回到第一个可用风格
+        # 当前选中的风格若被禁用，回到第一个可用风格（这是真的换风格，保留信号）
         cur = model.item(self.style_combo.currentIndex())
         if cur is not None and not cur.isEnabled():
             for j in range(self.style_combo.count()):
@@ -2157,6 +2180,116 @@ class AxleODWindow(QFrame):
         bar.addStretch(1)
         return bar
 
+    # ------------------------------------------------------------ 轴图
+    @staticmethod
+    def _default_image_path():
+        """轴图默认存到「图片」文件夹 —— 不放项目目录，免得被更新逻辑当成待分发文件。"""
+        home = os.path.expanduser("~")
+        pics = os.path.join(home, "Pictures")
+        if not os.path.isdir(pics):
+            pics = home
+        return os.path.join(pics, "轴图.png")
+
+    def generate_axle_image(self):
+        """把当前排轴导出成轴图（PNG / JPG）。"""
+        image = self._build_axle_image()
+        if image is None:
+            return
+        default = self._default_image_path()
+        path, _ = QFileDialog.getSaveFileName(
+            self, "生成轴图", os.path.abspath(default),
+            "PNG 图片 (*.png);;JPG 图片 (*.jpg)")
+        if not path:
+            return
+        try:
+            from 工具.排轴.axle_image import save_image
+            save_image(image, path)
+        except Exception as e:
+            logger.error("生成轴图失败: %s", e)
+            QMessageBox.warning(self, "错误", "生成轴图失败：%s" % e)
+            return
+        self.show_image_preview(path)
+
+    def preview_axle_image(self):
+        """只预览轴图，不保存文件。"""
+        image = self._build_axle_image()
+        if image is None:
+            return
+        self.show_image_preview(QPixmap.fromImage(image), "轴图预览（未保存）")
+
+    def _build_axle_image(self):
+        """渲染当前排轴；空轴或渲染失败时提示并返回 None。"""
+        data = self.to_dict()
+        if not any(turn.get("actions") for turn in data.get("turns") or []):
+            QMessageBox.information(self, "提示", "排轴为空，无法生成轴图")
+            return None
+        try:
+            from 工具.排轴.axle_image import render_axle_image
+            return render_axle_image(data, ds=self.data_source)
+        except Exception as e:
+            logger.error("渲染轴图失败: %s", e)
+            QMessageBox.warning(self, "错误", "渲染轴图失败：%s" % e)
+            return None
+
+    def show_image_preview(self, source, title=None):
+        """弹预览窗；source 可以是图片路径，也可以直接是 QPixmap。"""
+        from_pixmap = isinstance(source, QPixmap)
+        if from_pixmap:
+            pixmap = source
+            tip_text = "预览（未保存到文件）"
+            name = "轴图"
+        else:
+            pixmap = QPixmap(source)
+            tip_text = "已生成：%s" % source
+            name = os.path.basename(source)
+        dlg = QDialog(self)
+        dlg.setWindowTitle(title or ("轴图预览 · %s" % name))
+        layout = QVBoxLayout(dlg)
+        layout.setContentsMargins(10, 10, 10, 10)
+        tip = QLabel(tip_text)
+        tip.setWordWrap(True)
+        layout.addWidget(tip)
+        area = QScrollArea()
+        area.setWidgetResizable(True)
+        label = QLabel()
+        if pixmap.isNull():
+            label.setText("图片无法预览")
+        else:
+            screen = QApplication.desktop().availableGeometry(dlg) \
+                if QApplication.instance() else None
+            max_w = int(screen.width() * 0.8) if screen else 1100
+            max_h = int(screen.height() * 0.75) if screen else 800
+            if pixmap.width() > max_w or pixmap.height() > max_h:
+                pixmap = pixmap.scaled(max_w, max_h, Qt.KeepAspectRatio,
+                                       Qt.SmoothTransformation)
+            label.setPixmap(pixmap)
+        area.setWidget(label)
+        layout.addWidget(area, 1)
+        row = QHBoxLayout()
+        row.addStretch(1)
+        if from_pixmap:
+            save_btn = QPushButton("保存为图片")
+            save_btn.clicked.connect(self.generate_axle_image)
+            row.addWidget(save_btn)
+        else:
+            open_btn = QPushButton("打开图片")
+            open_btn.clicked.connect(lambda: self._open_local_file(source))
+            row.addWidget(open_btn)
+        close_btn = QPushButton("关闭")
+        close_btn.clicked.connect(dlg.accept)
+        row.addWidget(close_btn)
+        layout.addLayout(row)
+        dlg.resize(min(1200, pixmap.width() + 60), min(900, pixmap.height() + 130))
+        self._image_preview = dlg          # 防止被 GC
+        dlg.exec_()
+
+    @staticmethod
+    def _open_local_file(path):
+        try:
+            os.startfile(path)             # Windows
+        except Exception as e:
+            logger.warning("打开文件失败: %s", e)
+
     def clear_roles(self):
         """一键清空 6 个位置的角色/风格（回合列表与全局战斗设置保留）。"""
         if not any(row.role() for row in self.team_rows):
@@ -2221,6 +2354,23 @@ class AxleODWindow(QFrame):
             add_buttons.append(button)
         # 前四个是「添加回合」类：空队伍时禁用
         self.add_turn_buttons = add_buttons[:4]
+
+        self.preview_image_btn = QPushButton("预览轴图")
+        self.preview_image_btn.setMinimumWidth(92)
+        self.preview_image_btn.setToolTip(
+            "不保存文件，直接把当前排轴渲染成轴图看一眼\n"
+            "（头像 + 突破/共鸣徽章 + 共鸣天赋所属风格缩略图 + 携带被动 + 用到的技能 + 回合行动）")
+        self.preview_image_btn.clicked.connect(self.preview_axle_image)
+        bar.addWidget(self.preview_image_btn)
+
+        self.image_btn = QPushButton("生成轴图")
+        self.image_btn.setMinimumWidth(92)
+        self.image_btn.setToolTip(
+            "把当前排轴导出成一张轴图（PNG / JPG），方便直接分享；\n"
+            "配色与版式参考 工具/排轴/hbr_axle.jpg")
+        self.image_btn.clicked.connect(self.generate_axle_image)
+        bar.addWidget(self.image_btn)
+
         bar.addStretch(1)
         return bar
 
