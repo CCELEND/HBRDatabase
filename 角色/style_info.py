@@ -123,7 +123,7 @@ class ActiveSkill:
     def __init__(self, name = None, description = None, 
         sp_cost = None, max_uses = None, 
         effects = None, 
-        level_reqs = None, level_max="10", switch = None):
+        level_reqs = None, level_max="10", switch = None, exclusive=None):
         self.name = name
         self.description = description      # 技能描述
         self.sp_cost = sp_cost              # SP 消耗
@@ -133,7 +133,8 @@ class ActiveSkill:
 
         self.level_max = level_max          # 最大等级
         self.switch = switch                # 存在切换状态时
-        
+        self.exclusive = exclusive          # 是否为独占技能
+
 # 被动技能
 class PassiveSkill:
     def __init__(self, name = None, description = None, 
@@ -340,16 +341,47 @@ def create_style(data) -> Style:
 
         # 特殊技能最大等级
         if len(active_skill_list) == 4:
-            level_max = active_skill_list[3]
-            # 主动技能对象
-            ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                effects,
-                active_skill_list[2],
-                level_max
-            )
+            if not isinstance(active_skill_list[3], dict):
+                level_max = active_skill_list[3]
+                # 主动技能对象
+                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                    effects,
+                    active_skill_list[2],
+                    level_max
+                )
+            else:
+                level_max = "10"
+                # 主动技能对象
+                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                    effects,
+                    active_skill_list[2],
+                    level_max
+                )
 
         # 存在切换状态
         elif len(active_skill_list) == 5:
+            level_max = active_skill_list[3]
+            if not "exclusive" in active_skill_list[4]:
+                switch = active_skill_list[4]
+                # 主动技能对象
+                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                    effects,
+                    active_skill_list[2],
+                    level_max,
+                    switch
+
+                )
+            else:
+                level_max = active_skill_list[3]
+                # 主动技能对象
+                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
+                    effects,
+                    active_skill_list[2],
+                    level_max
+                )
+
+        # 存在切换状态
+        elif len(active_skill_list) == 6:
             level_max = active_skill_list[3]
             switch = active_skill_list[4]
             # 主动技能对象

@@ -154,10 +154,26 @@ def _parse_master_skill_action(ms):
     return skill
 
 
+def _group_exclusive(group):
+    """读 ``ActiveSkills`` 条目末尾的 ``{"exclusive":1}``。
+
+    返回 1 / 0；没有该字段时返回 None（= 按旧规则推断：SSR/SS 的第一个主动技能，
+    通用化的除外）。
+    """
+    for item in reversed(group):
+        if isinstance(item, dict) and "exclusive" in item:
+            try:
+                return int(item["exclusive"])
+            except (TypeError, ValueError):
+                return None
+    return None
+
+
 def _apply_exclusive(styles):
     """标记 SSR/SS 的第一个主动技能为专属技能。
 
-    例外（已通用化，不再算专属）：
+    优先用数据里显式写的 ``{"exclusive":1}``（``工具/排轴/fill_exclusive.py`` 补的）；
+    没有该字段才按旧规则推断。旧规则的两个例外：
       * 该角色第一个 SS 风格（style_id 最小）的专属技能；
       * GENERALIZED_SKILLS 中列出的技能。
     """
@@ -171,7 +187,11 @@ def _apply_exclusive(styles):
         if style.rarity not in ("SSR", "SS") or len(style.skills) < 2:
             continue
         first = style.skills[1]      # skills[0] 为通常攻击
-        generalized = (first.name in GENERALIZED_SKILLS or style is first_ss)
+        flag = getattr(first, "exclusive_flag", None)
+        if flag is None:
+            generalized = (first.name in GENERALIZED_SKILLS or style is first_ss)
+        else:
+            generalized = not bool(flag)
         for skill in style.skills:
             # 同一 ActiveSkills 条目下的可切换形态也一并标记
             if skill is first or (first.source_group is not None
@@ -274,6 +294,8 @@ class SkillInfo:
         self.element = element                        # 攻击效果的元素属性
         # 同一 ActiveSkills 条目的分组号（含可切换的多个技能形态）
         self.source_group = None
+        # 数据里显式标注的专属标记（1 / 0 / None=未标注），见 _group_exclusive
+        self.exclusive_flag = None
         self.desc = ""                                # 技能描述
         # 专属技能（SSR/SS 的第一个主动技能）：仅在装备该风格时可用
         self.is_exclusive = is_exclusive
@@ -1595,8 +1617,10 @@ class HBRDataSource:
                 skills = [SkillInfo(NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
                                     None, True)]
                 for gi, group in enumerate(style_data.get("ActiveSkills") or []):
+                    flag = _group_exclusive(group)
                     for sk in _extract_skills(group):
                         sk.source_group = gi
+                        sk.exclusive_flag = flag
                         skills.append(sk)
                 # 特殊被动里的攻击（如 魔界骑兵启动）也可作为行动使用
                 for passive in (style_data.get("PassiveSkills") or []):
