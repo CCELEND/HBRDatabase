@@ -339,69 +339,29 @@ def create_style(data) -> Style:
 
             effects.append(effect_obj)
 
-        # 特殊技能最大等级
-        if len(active_skill_list) == 4:
-            if not isinstance(active_skill_list[3], dict):
-                level_max = active_skill_list[3]
-                # 主动技能对象
-                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                    effects,
-                    active_skill_list[2],
-                    level_max
-                )
-            else:
-                level_max = "10"
-                # 主动技能对象
-                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                    effects,
-                    active_skill_list[2],
-                    level_max
-                )
+        # 3 项之后：字符串 = 最大等级，dict = 切换字典 或 {"exclusive":1}
+        # （按内容判断，不再依赖条目长度/顺序）
+        level_max, switch, exclusive = "10", None, None
+        for item in active_skill_list[3:]:
+            if isinstance(item, dict):
+                if "exclusive" in item:
+                    exclusive = item["exclusive"]
+                else:
+                    switch = item
+            elif isinstance(item, str):
+                level_max = item
 
-        # 存在切换状态
-        elif len(active_skill_list) == 5:
-            level_max = active_skill_list[3]
-            if not "exclusive" in active_skill_list[4]:
-                switch = active_skill_list[4]
-                # 主动技能对象
-                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                    effects,
-                    active_skill_list[2],
-                    level_max,
-                    switch
-
-                )
-            else:
-                level_max = active_skill_list[3]
-                # 主动技能对象
-                ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                    effects,
-                    active_skill_list[2],
-                    level_max
-                )
-
-        # 存在切换状态
-        elif len(active_skill_list) == 6:
-            level_max = active_skill_list[3]
-            switch = active_skill_list[4]
-            # 主动技能对象
-            ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                effects,
-                active_skill_list[2],
-                level_max,
-                switch
-
-            )
-
-        else:
-            # 主动技能对象
-            ActiveSkill_obj = ActiveSkill(name, description, sp_cost, max_uses,
-                effects,
-                active_skill_list[2]
-            )
+        # 主动技能对象
+        ActiveSkill_obj = ActiveSkill(
+            name, description, sp_cost, max_uses,
+            effects,
+            active_skill_list[2],
+            level_max,
+            switch,
+            exclusive
+        )
 
         activeskills.append(ActiveSkill_obj)
-
 
     # 被动技能
     passiveskills = []
