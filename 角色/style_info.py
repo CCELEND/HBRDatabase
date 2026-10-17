@@ -133,7 +133,7 @@ class ActiveSkill:
 
         self.level_max = level_max          # 最大等级
         self.switch = switch                # 存在切换状态时
-        self.exclusive = exclusive          # 是否为独占技能
+        self.exclusive = bool(exclusive)    # 是否为独占技能（没标记就是 False）
 
 # 被动技能
 class PassiveSkill:
