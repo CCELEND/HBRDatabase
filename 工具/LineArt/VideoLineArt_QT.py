@@ -199,6 +199,8 @@ ENCODER_CHOICES = [
 ]
 
 _ENCODER_PROBE_CACHE = {}
+# 试编失败的原因（如「minimum required Nvidia driver …」），给界面提示用
+_ENCODER_PROBE_ERRORS = {}
 
 # 编码器内部名 -> 显示名（状态栏用）
 ENCODER_LABELS = {
@@ -250,8 +252,21 @@ def list_ffmpeg_encoders(ffmpeg: str) -> set:
         return set()
 
 
+def _short_probe_error(text: str) -> str:
+    """从 ffmpeg 的错误输出里取最关键的一行（给界面提示用）。"""
+    for line in str(text or "").splitlines():
+        line = line.strip()
+        if line:
+            return line[:140]
+    return ""
+
+
 def probe_encoder(ffmpeg: str, encoder: str) -> bool:
-    """真的试编一帧，确认这台机器上这个编码器能用（结果会缓存）。"""
+    """真的试编一帧，确认这台机器上这个编码器能用（结果会缓存）。
+
+    失败原因记在 ``_ENCODER_PROBE_ERRORS[encoder]`` 里，界面上可以看到
+    （例如显卡驱动太旧时 ffmpeg 会报「minimum required Nvidia driver …」）。
+    """
     if encoder not in HW_ENCODERS:
         return bool(ffmpeg)
     if not ffmpeg:
@@ -260,21 +275,22 @@ def probe_encoder(ffmpeg: str, encoder: str) -> bool:
         return _ENCODER_PROBE_CACHE[encoder]
     ok = False
     out = ""
+    err_text = ""
     try:
         fd, out = tempfile.mkstemp(suffix=".mp4")
         os.close(fd)
         cmd = build_encode_cmd(ffmpeg, encoder, out, 320, 240, 25.0)
         p = subprocess.Popen(cmd, stdin=subprocess.PIPE,
                              stdout=subprocess.DEVNULL,
-                             stderr=subprocess.DEVNULL,
+                             stderr=subprocess.PIPE,
                              creationflags=_NO_WINDOW)
-        p.stdin.write(b"\x80" * (320 * 240))
-        p.stdin.close()
-        p.wait(timeout=60)
+        _, err_b = p.communicate(b"\x80" * (320 * 240), timeout=60)
+        err_text = err_b.decode("utf-8", "replace")
         ok = (p.returncode == 0 and os.path.exists(out)
               and os.path.getsize(out) > 0)
-    except Exception:
+    except Exception as e:
         ok = False
+        err_text = str(e)
     finally:
         try:
             if out and os.path.exists(out):
@@ -282,6 +298,7 @@ def probe_encoder(ffmpeg: str, encoder: str) -> bool:
         except OSError:
             pass
     _ENCODER_PROBE_CACHE[encoder] = ok
+    _ENCODER_PROBE_ERRORS[encoder] = "" if ok else _short_probe_error(err_text)
     return ok
 
 
@@ -465,7 +482,21 @@ class ConvertWorker(QThread):
                     buf.tofile(os.path.join(self.out_path, name))
                     written.append(name)
                 elif self.out_mode == OUT_H264:
-                    proc.stdin.write(gray.tobytes())
+                    try:
+                        proc.stdin.write(gray.tobytes())
+                    except (BrokenPipeError, OSError) as e:
+                        # ffmpeg 提前退出（例如显卡驱动不支持该编码器）：
+                        # 把它的报错信息带出来，否则只会看到「Broken pipe」
+                        err_text = ""
+                        try:
+                            if err_file is not None:
+                                err_file.seek(0)
+                                err_text = err_file.read().decode("utf-8", "replace")
+                        except Exception:
+                            pass
+                        raise ValueError(
+                            "ffmpeg 编码中断（%s）：%s"
+                            % (e, _short_probe_error(err_text) or "未知原因"))
                 else:
                     writer.write(cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR))
 
@@ -675,9 +706,24 @@ class VideoLineArtGUI(QMainWindow):
         self.hw_usable = usable
         self._rebuild_encoder_combo(usable)
         self.gpu_label.setText(self._encoder_hint())
+        # tooltip：ffmpeg 路径/版本 + 各硬件编码器不可用的**具体原因**
+        names = {"h264_nvenc": "NVIDIA NVENC", "h264_qsv": "Intel QSV",
+                 "h264_amf": "AMD AMF"}
+        detail = []
+        for enc in HW_ENCODERS:
+            if enc not in self.hw_encoders:
+                continue
+            if usable.get(enc):
+                detail.append("%s：可用" % names[enc])
+            else:
+                reason = _ENCODER_PROBE_ERRORS.get(enc) or ""
+                detail.append("%s：不可用%s"
+                              % (names[enc], (" —— " + reason) if reason else ""))
         self.gpu_label.setToolTip(
-            "ffmpeg：%s\n版本：%s"
-            % (self.ffmpeg or "(未找到)", _bundled_info().get("version", "?")))
+            "ffmpeg：%s\n版本：%s\n\n%s"
+            % (self.ffmpeg or "(未找到)",
+               _bundled_info().get("version", "?"),
+               "\n".join(detail)))
         self._refresh_output_state()
 
     def _rebuild_encoder_combo(self, usable):
