@@ -472,6 +472,9 @@ class StyleInfo:
         # 回合开始时回复友方 SP 的被动（如 与伙伴一起【朝仓可怜专属】）：
         # [{name, amount, scope, element, lb}, ...]
         self.turn_start_sp = turn_start_sp or []
+        # 「战斗/初战开始时 使自身进入X状态」的被动（如 山胁大人的仆人/万岁）：
+        # [{name, state, lb}, ...]
+        self.battle_states = []
         # 可在队伍配置里选择的「（被动技能）」条目名
         self.passive_options = passive_options or []
         # 「高阶增幅状态」的启用被动名（无则为 None）
@@ -529,6 +532,7 @@ _SP_SCOPE_FIXED = {
     "全体友方": ("all", None),
     "全体其他友方": ("others", None),
     "前锋": ("front", None),
+    "后卫": ("back", None),
     "前锋其他友方": ("front_others", None),
     # 单名友方（需要在行动里选择「对象」）
     "其他友方": ("one_other", None),
@@ -742,6 +746,9 @@ def _parse_combo_buff(group):
 # 技能赋予的「状态」：效果名 → 状态键（供带状态条件的效果判断）
 STATE_EFFECTS = {
     "歌姬加护": "歌姬",
+    # 「山胁大人的仆人」：山胁自己身上显示为「山胁大人万岁！」，实际是同一个状态
+    "山胁大人的仆人": "仆人",
+    "山胁大人万岁！": "仆人",
 }
 
 
@@ -758,6 +765,32 @@ def _state_condition(desc):
                 or ("处于%s之%s" % (base, eff_name)) in text):
             return state
     return None
+
+
+def _parse_battle_states(style_data):
+    """「战斗/初战开始时 使自身进入X状态」的被动（如 山胁大人的仆人 / 万岁）。
+
+    返回 [{"name","state","lb"}, ...]。
+    """
+    out = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            ptarget = passive[7] if len(passive) > 7 else None
+        except Exception:
+            continue
+        state = STATE_EFFECTS.get(ptype)
+        if not state:
+            continue
+        if not ("战斗开始时" in pdesc or "初战开始时" in pdesc):
+            continue
+        if str(ptarget) != "自身":
+            continue
+        out.append({"name": pname, "state": state,
+                    "lb": _passive_lb(passive)})
+    return out
 
 
 def _parse_state_grants(group):
@@ -786,6 +819,10 @@ def _parse_state_grants(group):
         md = re.search(r'进入[^\n]{0,16}状态(\d+)回合', desc)
         if md:
             duration = int(md.group(1))
+        # 「永久」状态（如 山胁大人的仆人 / 山胁大人万岁！）：持续整场
+        if duration <= 0 and ("永久" in desc or
+                              ("永久" in str(effect[1]) if len(effect) > 1 else False)):
+            duration = 999
         if duration <= 0:
             continue
         scope_info = _sp_recover_scope(effect[6] if len(effect) > 6 else None)
@@ -1613,6 +1650,25 @@ class HBRDataSource:
                             "lb": _passive_lb(passive),
                         })
                         continue
+                    # 「处于X状态的友方为N名或以上 → 超频条+X%」
+                    # （如 山胁「魔王军的大攻势！」/ 丰后「开始征服世界了的说！」）
+                    m_cnt = re.search(r'处于(.+?)状态的友方为(\d+)名或以上',
+                                      pdesc, re.S)
+                    if m_cnt:
+                        state = STATE_EFFECTS.get(
+                            re.sub(r'\s+', '', m_cnt.group(1)))
+                        if state:
+                            turn_start_od.append({
+                                "name": pname,
+                                "amount": amount,
+                                "threshold": None,
+                                "position": None,
+                                "timing": "turn",
+                                "once": "1次" in pdesc,
+                                "lb": _passive_lb(passive),
+                                "state_count": [state, int(m_cnt.group(2))],
+                            })
+                            continue
                     if any(k in pdesc for k in skip_od_keywords):
                         continue
                     threshold = None
@@ -1693,6 +1749,11 @@ class HBRDataSource:
                     downed_cond = "被击破的敌人" in pdesc
                     # 「若回合开始时自身处于X状态」（如 共鸣：歌姬之加护→前锋SP+2）
                     state_cond = _state_condition(pdesc)
+                    # 「处于X状态的友方SP+N」：目标 = **拥有该状态**的队员
+                    # （如 山胁「开始进军！」/ 丰后「帮忙毁灭世界的说！」）
+                    ts = re.search(r'处于(.+?)状态的友方', pdesc, re.S)
+                    target_state = (STATE_EFFECTS.get(re.sub(r'\s+', '', ts.group(1)))
+                                    if ts else None)
                     # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
                     sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
                     if sig is None:
@@ -1724,7 +1785,8 @@ class HBRDataSource:
                             re.search(r'超频条不足(\d+)%', pdesc)),
                         "downed": downed_cond,
                         "extra": extra_only,
-                        "state": state_cond,
+                        "state": None if target_state else state_cond,
+                        "target_state": target_state,
                         "once": "1次" in pdesc,
                         "sigil_element": sig.group(1) if sig else None,
                         "sigil_min_level": int(sig.group(2)) if sig else None,
@@ -1879,6 +1941,8 @@ class HBRDataSource:
                     for sk in skills)
                 # 「X之印记」（雷之印 / 冰之印…）
                 styles[-1].sigil = _parse_sigil(style_data)
+                # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
+                styles[-1].battle_states = _parse_battle_states(style_data)
                 # 所属队伍（如 31D）
                 styles[-1].team = (str(style_info[1])
                                    if len(style_info) > 1 and style_info[1]

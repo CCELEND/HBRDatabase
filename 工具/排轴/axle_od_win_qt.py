@@ -257,6 +257,15 @@ HELP_TEXT = """排轴OD计算 使用说明
   状态由「若向流星歌唱」赋予全体友方 5 己方回合（含施放当回合）；
   但状态是在**该技能结算完之后**才生效，所以施放当回合的自身消耗不吃它的加成
   （例：月歌第 3 回合放「若向流星歌唱」时，消耗仍是 14−1（苍天）=13，不会减到 11）。
+- **「山胁大人的仆人 / 山胁大人万岁！」状态**（魔王系风格，永久）：
+  · 山胁「高傲魔王的凯旋 / 高处不胜寒」、丰后弥生「邪恶军团开始进军的说！」
+    以及 神崎 / 佐月 / 天音 / 樱庭 的「侍奉魔王…」风格，**战斗开始时自身**进入该状态
+    （山胁自己显示为「山胁大人万岁！」，按同一个状态计算，也计入人数）；
+    山胁的「好心情之舞 / 魔王御前」、丰后的「增加同伴之舞」可以战斗中再授予他人。
+  · 「回合开始时 处于该状态的友方 SP+N」→ **只给拥有该状态的队员**
+    （山胁 lb1 +1 / lb3 +5、丰后 +1）。
+  · 「若回合开始时处于该状态的友方为 6 名或以上 则超频条 +100%（出击中限1次）」
+    （山胁 lb4 / 丰后 lb4）→ 人数不足 6 时不触发，且只结算一次。
 """
 
 
@@ -2600,13 +2609,20 @@ class AxleODWindow(QFrame):
         combo_buffs = {}   # {slot: [{"amount","left","kind","source"}]}
         # 技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护 N 回合）
         state_tracker = _StateTracker(self)
+        # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
+        self._seed_battle_states(state_tracker)
         initial_front = self._initial_front()
+        turn_states = {}      # {回合下标: {slot: 状态集合}}（回合**开始时**的快照）
         for turn_idx, turn in enumerate(self.turns):
             # 本回合行动过的队员（追加/特殊回合也算「己方回合」）
             actors = [a.member_index for a in turn.actions
                       if a.member_index is not None]
             turn_front = set(actors) or start_front
             state_tracker.begin_turn(turn_idx)
+            # 记录本回合**开始时**的状态持有者（供 OD 的「仆人≥N名」条件）
+            turn_states[turn_idx] = {
+                slot: set(state_tracker.states(slot) or ())
+                for slot in self._active_slots()}
             # 1) 被动类连击（如 山胁「梅雨」：战斗开始时位于前锋 连击+5（1次））
             for slot in self._active_slots():
                 for mod in self._member_passive_combo(slot):
@@ -2751,6 +2767,11 @@ class AxleODWindow(QFrame):
                         continue
                     threshold = mod.get("threshold")
                     if threshold is not None and running_od >= threshold:
+                        continue
+                    # 「处于X状态的友方为N名或以上」（如 魔王军的大攻势！）
+                    sc = mod.get("state_count")
+                    if sc and self._state_holders(turn_states.get(turn_idx),
+                                                  sc[0]) < sc[1]:
                         continue
                     turn_bonus += mod.get("amount", 0.0)
                     if mod.get("once", True):
@@ -2904,6 +2925,8 @@ class AxleODWindow(QFrame):
         prev_od_level = 0    # 上一次发动的 OD 等级（同一次发动只给一次额外 SP）
         sp_once_used = set()  # 已触发过「每次出击1次」类 SP 被动的队员
         state_tracker = _StateTracker(self)   # 技能赋予的状态（如 歌姬之加护）
+        # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
+        self._seed_battle_states(state_tracker)
 
         for turn_idx, turn in enumerate(self.turns):
             # 追加/特殊回合不计回合数：不触发「回合开始回复」与 OD 回复，
@@ -2990,6 +3013,18 @@ class AxleODWindow(QFrame):
                             if mod.get("downed") and not break_seen:
                                 continue
                             if mod.get("once") and i in sp_once_used:
+                                continue
+                            # 「处于X状态的友方SP+N」：只给**拥有该状态**的队员
+                            # （如 山胁「开始进军！」/ 丰后「帮忙毁灭世界的说！」）
+                            ts = mod.get("target_state")
+                            if ts:
+                                for t in active:
+                                    if ts in (state_tracker.states(t) or ()):
+                                        self._apply_scope_recover(
+                                            mod.get("amount", 0), "self", None,
+                                            t, sp, active, start_front, limit)
+                                if mod.get("once"):
+                                    sp_once_used.add(i)
                                 continue
                             self._apply_scope_recover(
                                 mod.get("amount", 0), mod.get("scope"),
@@ -3213,6 +3248,9 @@ class AxleODWindow(QFrame):
         if scope == "front":
             # 前锋：包含自身
             return [i for i in active if i in front_set]
+        if scope == "back":
+            # 后卫：不在前锋里的友方（如 增加同伴之舞：使后卫友方进入仆人状态）
+            return [i for i in active if i not in front_set]
         if scope == "front_others":
             # 前锋其他友方：前锋中除自身外
             return [i for i in active if i in front_set and i != actor]
@@ -3334,6 +3372,31 @@ class AxleODWindow(QFrame):
     def _team_sigil_levels(self):
         """当前队伍各「X之印」的等级：{元素: 等级}。"""
         return {el: self._sigil_level(el) for el in self._team_sigils()}
+
+    def _seed_battle_states(self, tracker):
+        """把「战斗/初战开始时 使自身进入X状态」的被动记进状态跟踪器。
+
+        如 山胁「魔王大人降临！」→ 自身进入山胁大人万岁！（= 仆人），
+        以及神崎/松冈/天音/樱庭/丰后等「侍奉魔王…」风格 → 自身进入山胁大人的仆人。
+        这些状态是**永久**的，所以直接记成「一直有效」。
+        """
+        for slot in self._active_slots():
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            lb = self._member_lb(slot)
+            for st in self.data_source.styles(role):
+                if st.name != style:
+                    continue
+                for bs in (getattr(st, "battle_states", None) or []):
+                    if bs.get("lb", 0) > lb:
+                        continue
+                    tracker.until[(slot, bs["state"])] = 10 ** 6
+
+    def _state_holders(self, turn_states, state):
+        """某回合开始时，处于指定状态的队员数量。"""
+        if not turn_states:
+            return 0
+        return sum(1 for names in turn_states.values() if state in names)
 
     def _member_sigil_bonus(self, slot):
         """该队员因「X之印」等级6 获得的回合开始自身 SP（需位于前锋，0 表示不触发）。
