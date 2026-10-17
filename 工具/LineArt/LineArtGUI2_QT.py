@@ -14,9 +14,19 @@ from PyQt5.QtGui import QImage, QPixmap, QPainter, QWheelEvent, QFont
 
 # 线稿算法与「视频转线稿」共用，见 line_art_core.to_line_art
 try:
-    from 工具.LineArt.line_art_core import ENHANCE_MAP as CORE_ENHANCE_MAP, to_line_art
+    from 工具.LineArt.line_art_core import (
+        DEFAULT_DENOISE as CORE_DEFAULT_DENOISE,
+        DEFAULT_GAIN_MAX as CORE_DEFAULT_GAIN_MAX,
+        DENOISE_MAP as CORE_DENOISE_MAP,
+        ENHANCE_MAP as CORE_ENHANCE_MAP,
+        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art)
 except ImportError:  # 直接从本目录运行本文件时
-    from line_art_core import ENHANCE_MAP as CORE_ENHANCE_MAP, to_line_art
+    from line_art_core import (
+        DEFAULT_DENOISE as CORE_DEFAULT_DENOISE,
+        DEFAULT_GAIN_MAX as CORE_DEFAULT_GAIN_MAX,
+        DENOISE_MAP as CORE_DENOISE_MAP,
+        ENHANCE_MAP as CORE_ENHANCE_MAP,
+        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art)
 
 
 # 图像处理工作线程
@@ -24,13 +34,16 @@ class ImageProcessWorker(QThread):
     finished = pyqtSignal(np.ndarray)  # 返回numpy数组
     error = pyqtSignal(str)
 
-    def __init__(self, input_path, min_radius, brightness_offset, enhance_mode, invert=False):
+    def __init__(self, input_path, min_radius, brightness_offset, enhance_mode,
+                 invert=False, denoise=None, gain_max=None):
         super().__init__()
         self.input_path = input_path
         self.min_radius = min_radius
         self.brightness_offset = brightness_offset
         self.enhance_mode = enhance_mode
         self.invert = invert
+        self.denoise = denoise
+        self.gain_max = gain_max
 
     def run(self):
         try:
@@ -41,7 +54,9 @@ class ImageProcessWorker(QThread):
 
             result = to_line_art(
                 img, self.min_radius, self.brightness_offset,
-                self.enhance_mode, self.invert
+                self.enhance_mode, self.invert,
+                denoise=self.denoise or CORE_DEFAULT_DENOISE,
+                gain_max=self.gain_max or CORE_DEFAULT_GAIN_MAX
             )
 
             self.finished.emit(result)
@@ -147,6 +162,8 @@ class ImageViewer(QGraphicsView):
 # 主窗口
 class LineArtGUI(QMainWindow):
     ENHANCE_MAP = dict(CORE_ENHANCE_MAP)
+    DENOISE_MAP = dict(CORE_DENOISE_MAP)
+    GAIN_MAX_MAP = dict(CORE_GAIN_MAX_MAP)
 
     def __init__(self):
         super().__init__()
@@ -196,7 +213,29 @@ class LineArtGUI(QMainWindow):
 
         self.enhance_combo = QComboBox()
         self.enhance_combo.addItems(list(self.ENHANCE_MAP.keys()))
+        self.enhance_combo.currentIndexChanged.connect(self._on_enhance_changed)
         param_layout.addRow("清晰度增强：", self.enhance_combo)
+
+        self.denoise_combo = QComboBox()
+        self.denoise_combo.addItems(list(self.DENOISE_MAP.keys()))
+        self.denoise_combo.setCurrentText(CORE_DEFAULT_DENOISE)
+        self.denoise_combo.currentIndexChanged.connect(self._on_enhance_changed)
+        self.denoise_combo.setToolTip(
+            "只对「对比度拉伸」有效。\n"
+            "压得越狠背景越干净，但很淡的细节线条也会越浅。\n"
+            "「重」适合噪点多的照片，「关」最保细节。")
+        param_layout.addRow("去杂点：", self.denoise_combo)
+
+        self.gain_combo = QComboBox()
+        self.gain_combo.addItems(list(self.GAIN_MAX_MAP.keys()))
+        self.gain_combo.setCurrentText(CORE_DEFAULT_GAIN_MAX)
+        self.gain_combo.setToolTip(
+            "限制「对比度拉伸」最多把原来的明暗差放大多少倍（最大 10 倍）。\n"
+            "画面几乎没有暗部时（例如白底上的淡线条），不限制会把\n"
+            "一点点噪声放大成一片；「关」档时这一项最关键。\n"
+            "5 倍以下每 0.5 一档，倍数越小越干净、线条也越淡。")
+        param_layout.addRow("放大上限：", self.gain_combo)
+        self._on_enhance_changed()
 
         main_layout.addWidget(param_group)
 
@@ -230,6 +269,13 @@ class LineArtGUI(QMainWindow):
         main_layout.addLayout(btn_layout)
         main_layout.addStretch()
 
+    def _on_enhance_changed(self):
+        """「去杂点」只有「对比度拉伸」用得上；「放大上限」只在「关」档显示可用。"""
+        stretch = self.enhance_combo.currentText() == "对比度拉伸"
+        self.denoise_combo.setEnabled(stretch)
+        self.gain_combo.setEnabled(
+            stretch and self.denoise_combo.currentText() == "关（最保细节）")
+
     # 文件操作
     def open_file(self):
         path, _ = QFileDialog.getOpenFileName(
@@ -247,7 +293,9 @@ class LineArtGUI(QMainWindow):
             self.input_path,
             int(self.radius_combo.currentText()),
             int(self.bright_combo.currentText()),
-            self.ENHANCE_MAP[self.enhance_combo.currentText()]
+            self.ENHANCE_MAP[self.enhance_combo.currentText()],
+            self.denoise_combo.currentText(),
+            self.gain_combo.currentText()
         )
 
     # 预览
@@ -259,8 +307,9 @@ class LineArtGUI(QMainWindow):
         self.preview_btn.setEnabled(False)
         self.preview_btn.setText("预览中...")
 
-        input_path, radius, bright, enhance = self._get_params()
-        self.worker = ImageProcessWorker(input_path, radius, bright, enhance)
+        input_path, radius, bright, enhance, denoise, gain = self._get_params()
+        self.worker = ImageProcessWorker(input_path, radius, bright, enhance,
+                                         denoise=denoise, gain_max=gain)
         self.worker.finished.connect(self._on_preview_ready)
         self.worker.error.connect(self._on_error)
         self.worker.start()
@@ -294,8 +343,9 @@ class LineArtGUI(QMainWindow):
         self.gen_btn.setEnabled(False)
         self.gen_btn.setText("生成中...")
 
-        input_path, radius, bright, enhance = self._get_params()
-        self.worker = ImageProcessWorker(input_path, radius, bright, enhance)
+        input_path, radius, bright, enhance, denoise, gain = self._get_params()
+        self.worker = ImageProcessWorker(input_path, radius, bright, enhance,
+                                         denoise=denoise, gain_max=gain)
         self.worker.finished.connect(lambda arr: self._on_save_ready(arr, output_path))
         self.worker.error.connect(self._on_error)
         self.worker.start()

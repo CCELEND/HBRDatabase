@@ -33,7 +33,9 @@ from PyQt5.QtWidgets import (
     QVBoxLayout, QWidget
 )
 
-from 工具.LineArt.line_art_core import ENHANCE_MAP, VIDEO_EXTS, to_line_art
+from 工具.LineArt.line_art_core import (DEFAULT_DENOISE, DEFAULT_GAIN_MAX,
+                                        DENOISE_MAP, ENHANCE_MAP, GAIN_MAX_MAP,
+                                        VIDEO_EXTS, to_line_art)
 from 工具.LineArt.LineArtGUI2_QT import ImageViewer
 
 # 让 ffmpeg 子进程不弹出黑色控制台窗口（Windows）
@@ -784,7 +786,29 @@ class VideoLineArtGUI(QMainWindow):
 
         self.enhance_combo = QComboBox()
         self.enhance_combo.addItems(list(ENHANCE_MAP.keys()))
+        self.enhance_combo.currentIndexChanged.connect(self._on_enhance_changed)
         form.addRow("清晰度增强：", self.enhance_combo)
+
+        self.denoise_combo = QComboBox()
+        self.denoise_combo.addItems(list(DENOISE_MAP.keys()))
+        self.denoise_combo.setCurrentText(DEFAULT_DENOISE)
+        self.denoise_combo.currentIndexChanged.connect(self._on_enhance_changed)
+        self.denoise_combo.setToolTip(
+            "只对「对比度拉伸」有效。\n"
+            "压得越狠背景越干净，但很淡的细节线条也会越浅。\n"
+            "「重」适合噪点多的视频，「关」最保细节。")
+        form.addRow("去杂点：", self.denoise_combo)
+
+        self.gain_combo = QComboBox()
+        self.gain_combo.addItems(list(GAIN_MAX_MAP.keys()))
+        self.gain_combo.setCurrentText(DEFAULT_GAIN_MAX)
+        self.gain_combo.setToolTip(
+            "限制「对比度拉伸」最多把原来的明暗差放大多少倍（最大 10 倍）。\n"
+            "画面几乎没有暗部时（例如白底上的淡线条），不限制会把\n"
+            "一点点噪声放大成一片；「关」档时这一项最关键。\n"
+            "5 倍以下每 0.5 一档，倍数越小越干净、线条也越淡。")
+        form.addRow("放大上限：", self.gain_combo)
+        self._on_enhance_changed()
 
         self.invert_check = QCheckBox("反相输出（黑底白线）")
         form.addRow("", self.invert_check)
@@ -907,7 +931,8 @@ class VideoLineArtGUI(QMainWindow):
         root.addStretch()
 
         self._inputs = [self.open_btn, self.radius_combo, self.bright_combo,
-                        self.enhance_combo, self.invert_check, self.scale_combo,
+                        self.enhance_combo, self.denoise_combo, self.gain_combo,
+                        self.invert_check, self.scale_combo,
                         self.encoder_combo, self.audio_check, self.radio_h264,
                         self.radio_mp4v, self.radio_png, self.frame_slider,
                         self.preview_btn]
@@ -975,11 +1000,20 @@ class VideoLineArtGUI(QMainWindow):
             self.frame_label.setText("第 - / - 帧")
 
     # ------------------------------------------------------------ 参数
+    def _on_enhance_changed(self):
+        """「去杂点」只有「对比度拉伸」用得上；「放大上限」只在「关」档显示可用。"""
+        stretch = self.enhance_combo.currentText() == "对比度拉伸"
+        self.denoise_combo.setEnabled(stretch)
+        self.gain_combo.setEnabled(
+            stretch and self.denoise_combo.currentText() == "关（最保细节）")
+
     def _params(self):
         return {
             "min_radius": int(self.radius_combo.currentText()),
             "brightness_offset": int(self.bright_combo.currentText()),
             "enhance_mode": ENHANCE_MAP[self.enhance_combo.currentText()],
+            "denoise": self.denoise_combo.currentText(),
+            "gain_max": self.gain_combo.currentText(),
             "invert": self.invert_check.isChecked(),
         }
 
@@ -1172,6 +1206,7 @@ class VideoLineArtGUI(QMainWindow):
         self.start_btn.setEnabled(not running)
         self.cancel_btn.setEnabled(running)
         if not running:
+            self._on_enhance_changed()   # 「去杂点」按增强模式重新置灰
             self._refresh_output_state()
 
     def _on_progress(self, done, total):
