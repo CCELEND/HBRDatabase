@@ -36,8 +36,8 @@ from PyQt5.QtWidgets import (
     QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy,
     QToolButton, QMenu, QDialog, QApplication
 )
-from PyQt5.QtCore import Qt, pyqtSignal
-from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal
+from PyQt5.QtGui import QPainter, QPixmap
 
 from window_qt import set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
@@ -289,7 +289,9 @@ HELP_TEXT = """排轴OD计算 使用说明
 
 【生成轴图】
 - **回合窗口**工具栏里的「预览轴图」/「生成轴图」会把当前排轴渲染成一张图片：
-  「预览轴图」不写文件、直接弹预览（预览窗里也有「保存为图片」按钮）；
+  「预览轴图」不写文件、直接弹预览（预览窗里也有「保存为图片」按钮；
+  预览图会**随窗口缩放**——按窗口宽度适配，拉动窗口时图片跟着拉伸，保持宽高比；
+  **轴很长（图很高）时用垂直滚动条查看**，不会被压缩变形）；
   「生成轴图」直接选保存位置（PNG / JPG，默认存到「图片」文件夹）。
 - 版式参考 `工具/排轴/hbr_axle.jpg`：
   · 顶部 6 个角色头像（右上角徽章 = 突破数；左下角徽章 = 该位置的共鸣天赋等级，
@@ -543,6 +545,93 @@ def _talent_display(name, entry, element, ok):
     else:
         text = "%s（%s）" % (name, "·".join(x for x in (team, "属性不符") if x))
     return text, tip
+
+
+class _AspectCanvas(QWidget):
+    """按控件宽度显示图片，高度按宽高比自动增长（超长时交给外层滚动）。"""
+
+    def __init__(self, source=None, parent=None):
+        super().__init__(parent)
+        self._src = None
+        self._last = None
+        self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        self.setMinimumHeight(80)
+        if source is not None:
+            self.set_source(source)
+
+    # ------------------------------------------------------------ 数据
+    def set_source(self, source):
+        self._src = source
+        self._sync_height()
+        self.update()
+
+    def source(self):
+        return self._src
+
+    def drawn(self):
+        """最近一次绘制用的像素图（测试用）。"""
+        return self._last
+
+    def target_height(self, width=None):
+        """给定宽度下，按原图宽高比算出的显示高度（不超过原图尺寸）。"""
+        if self._src is None or self._src.isNull() or self._src.width() <= 0:
+            return 80
+        w = self.width() if width is None else width
+        if w >= self._src.width():          # 比原图窄才缩放；否则保持原尺寸
+            return self._src.height()
+        return int(round(w * self._src.height() / float(self._src.width())))
+
+    def _sync_height(self):
+        h = max(80, self.target_height())
+        if self.minimumHeight() != h:
+            self.setMinimumHeight(h)
+
+    # ------------------------------------------------------------ Qt
+    def sizeHint(self):
+        if self._src is None or self._src.isNull():
+            return QSize(480, 320)
+        return QSize(self._src.width(), self._src.height())
+
+    def minimumSizeHint(self):
+        return QSize(160, 80)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._sync_height()
+
+    def paintEvent(self, event):
+        if self._src is None or self._src.isNull():
+            return
+        h = max(80, self.target_height())
+        pm = self._src.scaled(self.width(), h, Qt.KeepAspectRatio,
+                              Qt.SmoothTransformation)
+        self._last = pm
+        painter = QPainter(self)
+        painter.drawPixmap(0, 0, pm)
+
+
+class _ScaledImageView(QScrollArea):
+    """轴图查看器：**宽度始终铺满窗口**（超长时出现垂直滚动条，不压缩变形）。"""
+
+    def __init__(self, pixmap=None, parent=None):
+        super().__init__(parent)
+        self.setWidgetResizable(True)                 # 画布宽度跟随可视区
+        self.setAlignment(Qt.AlignHCenter | Qt.AlignTop)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self._canvas = _AspectCanvas()
+        self.setWidget(self._canvas)
+        if pixmap is not None:
+            self.set_source(pixmap)
+
+    def set_source(self, pixmap):
+        self._canvas.set_source(pixmap)
+
+    def source(self):
+        return self._canvas.source()
+
+    def canvas(self):
+        return self._canvas
 
 
 class TeamMemberRow(QFrame):
@@ -2346,22 +2435,13 @@ class AxleODWindow(QFrame):
         tip = QLabel(tip_text)
         tip.setWordWrap(True)
         layout.addWidget(tip)
-        area = QScrollArea()
-        area.setWidgetResizable(True)
-        label = QLabel()
+        # 图片按窗口宽度自适应；图很高时用垂直滚动条查看（不压缩）
+        view = _ScaledImageView()
         if pixmap.isNull():
-            label.setText("图片无法预览")
+            view.setToolTip("图片无法预览")
         else:
-            screen = QApplication.desktop().availableGeometry(dlg) \
-                if QApplication.instance() else None
-            max_w = int(screen.width() * 0.8) if screen else 1100
-            max_h = int(screen.height() * 0.75) if screen else 800
-            if pixmap.width() > max_w or pixmap.height() > max_h:
-                pixmap = pixmap.scaled(max_w, max_h, Qt.KeepAspectRatio,
-                                       Qt.SmoothTransformation)
-            label.setPixmap(pixmap)
-        area.setWidget(label)
-        layout.addWidget(area, 1)
+            view.set_source(pixmap)
+        layout.addWidget(view, 1)
         row = QHBoxLayout()
         row.addStretch(1)
         if from_pixmap:
@@ -2376,7 +2456,14 @@ class AxleODWindow(QFrame):
         close_btn.clicked.connect(dlg.accept)
         row.addWidget(close_btn)
         layout.addLayout(row)
-        dlg.resize(min(1200, pixmap.width() + 60), min(900, pixmap.height() + 130))
+        # 初始尺寸：图片原尺寸，但不超过屏幕 80%×75%（之后随窗口缩放）
+        screen = QApplication.desktop().availableGeometry(dlg) \
+            if QApplication.instance() else None
+        max_w = int(screen.width() * 0.8) if screen else 1100
+        max_h = int(screen.height() * 0.7) if screen else 760
+        w = min(max_w, max(640, pixmap.width() + 40))
+        h = min(max_h, max(360, pixmap.height() + 130))
+        dlg.resize(w, h)
         self._image_preview = dlg          # 防止被 GC
         dlg.exec_()
 
