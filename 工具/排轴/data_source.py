@@ -127,6 +127,16 @@ def _sp_below(desc):
     return int(m.group(1)) if m else None
 
 
+def _sp_destruction_min(desc):
+    """解析「若回合开始时存在破坏率为N%或以上的敌人」；无则返回 None。
+
+    破坏率由回合行手动设置，所以这类条件可以判定（如 山胁「最终手段」：
+    破坏率≥200% 时 全体友方 SP+5，每次出击限 1 次）。
+    """
+    m = re.search(r'破坏率为?(\d+)%或以上', str(desc))
+    return int(m.group(1)) if m else None
+
+
 def _parse_master_skill_action(ms):
     """主动释放的大师技能 -> SkillInfo（被动技能则返回 None）。"""
     if not isinstance(ms, list) or len(ms) < 5:
@@ -1055,7 +1065,12 @@ def _extract_skill_inner(group):
         desc = str(group[0][1]) if len(group[0]) > 1 else ""
         nums = [int(n) for n in re.findall(r'\d+', str(raw_sp))]
         if len(nums) >= 2 and min(nums) != sp_cost:
-            if "倒地" in desc or "倒下" in desc:
+            if "首次" in desc:
+                # 「首次使用时，消耗SP-5 / 减半」（如 血腥之舞+ 6(11)、无色子弹+ 6(12)）：
+                # 较大值是正常消耗，较小值是**第一次使用**时的消耗
+                sp_cost_alt = min(nums)
+                sp_cost_cond = "first"
+            elif "倒地" in desc or "倒下" in desc:
                 # 敌人处于倒地/超倒地状态时改用较小值
                 sp_cost_alt = min(nums)
                 sp_cost_cond = "downed"
@@ -1171,7 +1186,10 @@ def _extract_skills(group):
         if not isinstance(spec, list) or not spec:
             continue
         strs = [str(x) for x in spec if isinstance(x, str)]
-        name = strs[-1] if strs else str(key)
+        if not strs:
+            # 只有效果下标的「条件变体」（如 {"首次使用": [0,1,2]}）：不是新技能，跳过
+            continue
+        name = strs[-1]
         if not name or name == base.name:
             continue        # 与基础技能同名（仅条件不同），无需另列
         idx = [x for x in spec if isinstance(x, int)]
@@ -1834,9 +1852,12 @@ class HBRDataSource:
                                     if ts else None)
                     # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
                     sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
+                    # 「若回合开始时存在破坏率为N%或以上的敌人」类（如 山胁「最终手段」）：
+                    # 破坏率在回合行手动设置，所以这类条件也判定得了
+                    destruction_min = _sp_destruction_min(pdesc)
                     if sig is None:
-                        if not (downed_cond or extra_only or state_cond) \
-                                and not _sp_condition_ok(pdesc):
+                        if not (downed_cond or extra_only or state_cond
+                                or destruction_min) and not _sp_condition_ok(pdesc):
                             continue
                         if (not (downed_cond or state_cond)
                                 and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
@@ -1864,6 +1885,7 @@ class HBRDataSource:
                             re.search(r'超频条不足(\d+)%', pdesc)),
                         "downed": downed_cond,
                         "extra": extra_only,
+                        "destruction_min": destruction_min,
                         "state": None if target_state else state_cond,
                         "target_state": target_state,
                         "once": "1次" in pdesc,

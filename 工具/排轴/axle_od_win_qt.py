@@ -14,7 +14,8 @@
     * 队伍配置：6 个位置，各选择角色与风格。
     * 排轴：每个回合最多 3 次行动，每次行动选择队员、技能，并配置
       该次行动的 OD 参数（原始Hit数 / 连击数 / 固定OD / 31X共鸣(=共鸣天赋) / OD耳环）。
-    * 全局战斗设置：敌人数量、抗性、其他OD增量、敌方OD率。
+    * 全局战斗设置：敌人数量、抗性、其他OD增量、敌方OD率、**初始OD**
+      （战斗开始时的 OD 槽，默认 0；可选 100/200/300 或 -100/-200/-300）。
     * 按公式实时计算每个回合的 OD 与累计总 OD。
     * SP：参考 https://www.hbr-tool.com/#/simulator 模拟每名队员的 SP。
       回合开始按「回合开始时的前锋」回复（第 1 回合 = 队伍配置前 3 人，
@@ -248,7 +249,13 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 「红宝石香水（被动技能）」启用「高阶增强」（SP消耗 +2、SP上限 30），仅在携带该被动时生效；
   它只作用于消耗 SP 的技能，通常攻击与 SP 消耗为 0 的技能不受影响。
 - 部分技能带「N(M)」式条件消耗，满足条件时改用较小值：
-  「倒地/超倒地」（如 对称·启示 0(16)）、「追加回合内」（如 苍焰螺旋 7(14)：通常 14、追加回合 7）。
+  「倒地/超倒地」（如 对称·启示 0(16)）、「追加回合内」（如 苍焰螺旋 7(14)：通常 14、追加回合 7）、
+  **「首次使用该技能」**（如 血腥之舞+ 6(11)：首次 6、之后 11；无色子弹+ 6(12) 首次减半 6）。
+  「首次使用」按**整条轴**算：每名队员的每个技能只有第一次使用享受折扣，之后按正常消耗。
+- 回合行可手动设置**破坏率**（该回合**开始时**敌人的破坏率 %）：
+  用于「若回合开始时存在破坏率为 N% 或以上的敌人」类被动 —— 如 山胁 SSR「拨云见日」
+  3 突被动「最终手段」：破坏率 ≥200% 时 全体友方 SP+5（每次出击限 1 次，整条轴只结算一次）。
+  没设（0%）就不触发；突破数不足 3 也不触发。
 - 「追加回合内」的 SP 消耗增减被动也只在追加回合/特殊回合生效
   （如 优美的剑技：追加回合中 自身消耗SP-2）。
 - 每回合下方显示两行全队 SP（含未行动的后卫）：
@@ -293,7 +300,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   · 「Skill」= 每名成员在这条轴里用到的技能（按游戏技能顺序排列，长名字自动换行；
     **用过多次的会标出次数**，如「放学后的小小刺激[2]」「先导的领袖魅力[3]」）；
   · 红色分隔线下面按回合列出行动：左侧是回合标签（`T1` / `追加回合` / `T1` + `OD2 · Bonus 1`），
-    每行最多 3 个行动（小头像 + 技能名）。
+    每行最多 3 个行动（小头像 + 技能名）；**「对象」是单名友方时（回复SP / 连击数上升），
+    技能名右边会画上目标队员的小头像**（如 柳美音「日常维护」→ 大岛一千子）。
 - **通常攻击 / 指挥行动不是技能**：**回合行照样显示**（它们也是行动），
   但**不会出现在「Skill」栏里**，也不统计使用次数。
 - **通常回合才计 T 序号**（追加/特殊/占位不计），超频回合沿用当前回合号并标出
@@ -1508,7 +1516,8 @@ class ActionRow(QFrame):
     def set_result(self, contribution):
         self.result_label.setText("%.2f" % contribution)
 
-    def get_sp_cost(self, downed=False, extra=False, sigil_levels=None):
+    def get_sp_cost(self, downed=False, extra=False, sigil_levels=None,
+                    first_use=False):
         """该次行动消耗的 SP；通常攻击为 0。
 
         downed=True 表示敌人处于倒地/超倒地状态：带该条件的技能
@@ -1517,11 +1526,15 @@ class ActionRow(QFrame):
         （如 苍焰螺旋 7(14)）改用条件消耗。
         sigil_levels 为当前各「X之印」等级 {元素: 等级}：带该条件的技能
         （如 暮色中升腾绽放的幻影：火之印≥4 时 SP消耗减半）改用条件消耗。
+        first_use=True 表示该队员是**第一次**使用这个技能：带该条件的技能
+        （如 血腥之舞+ 6(11)：首次使用时消耗SP-5）改用折扣后的消耗。
         """
         skill = self._find_skill()
         if not skill:
             return 0
         if skill.sp_cost_alt is not None:
+            if skill.sp_cost_cond == "first" and first_use:
+                return skill.sp_cost_alt
             if skill.sp_cost_cond == "downed" and downed:
                 return skill.sp_cost_alt
             if skill.sp_cost_cond == "extra" and extra:
@@ -1677,6 +1690,10 @@ class TurnCard(QFrame):
         header = QHBoxLayout()
         header.setSpacing(6)
 
+        # 第二行：OD 发动 / 破坏率 / 超越条（第一行太长了）
+        row2 = QHBoxLayout()
+        row2.setSpacing(6)
+
         self.index_label = QLabel("第1回合")
         self.index_label.setFixedWidth(118)
         self.index_label.setAlignment(Qt.AlignCenter)
@@ -1712,37 +1729,55 @@ class TurnCard(QFrame):
 
         header.addStretch(1)
 
+        # 破坏率：手动设置该回合**开始时**敌人的破坏率（%）
+        # 用于「若回合开始时存在破坏率为 N% 或以上的敌人」类被动（如山胁「最终手段」）
+        self.destruction_label = QLabel("破坏率")
+        self.destruction_spin = QSpinBox()
+        self.destruction_spin.setRange(0, 999)
+        self.destruction_spin.setSingleStep(10)
+        self.destruction_spin.setSuffix(" %")
+        self.destruction_spin.setFixedWidth(84)
+        tip = ("该回合**开始时**敌人的破坏率（%）。\n"
+               "用于「若回合开始时存在破坏率为 N% 或以上的敌人」类被动，\n"
+               "例如山胁「最终手段」：破坏率 ≥200% 时 全体友方 SP+5（每次出击限1次）。")
+        self.destruction_label.setToolTip(tip)
+        self.destruction_spin.setToolTip(tip)
+        self.destruction_spin.valueChanged.connect(self._on_destruction_changed)
+        row2.addWidget(self.destruction_label)
+        row2.addWidget(self.destruction_spin)
+
         self.rhythm_label = QLabel("超越条：—")
         self.rhythm_label.setToolTip(
             "超越条（X之律动）：战斗开始时 = 15%×该属性风格数；该属性风格行动后 +4%；\n"
             "达到 100% 时触发「OD条上升 100%」（出击中限1次，计入当前OD）。\n"
             "显示的是本回合行动结束后的值")
         self.rhythm_label.setStyleSheet("color: #7a5c00;")
-        header.addWidget(self.rhythm_label)
+        row2.addStretch(1)
+        row2.addWidget(self.rhythm_label)
 
         self.start_od_label = QLabel("回合开始OD：0.00")
         self.start_od_label.setFixedWidth(140)
         self.start_od_label.setToolTip(
             "该回合开始时的 OD 槽 = 上一回合结束OD + 回合开始被动 − 发动OD消耗")
         self.start_od_label.setStyleSheet("color: #555555;")
-        header.addWidget(self.start_od_label)
+        row2.addWidget(self.start_od_label)
 
         self.result_label = QLabel("本回合OD：0.00")
         self.result_label.setStyleSheet("font-weight: bold;")
         self.result_label.setToolTip(
             "本回合行动产生的 OD（不含回合开始被动；回合开始被动计入「回合开始OD」）")
-        header.addWidget(self.result_label)
+        row2.addWidget(self.result_label)
 
         self.cumulative_label = QLabel("累计：0.00")
         self.cumulative_label.setFixedWidth(110)
-        header.addWidget(self.cumulative_label)
+        row2.addWidget(self.cumulative_label)
 
         self.current_od_label = QLabel("当前OD：0.00")
         self.current_od_label.setFixedWidth(130)
         self.current_od_label.setToolTip(
             "行动结束后的 OD 槽：累计获得 − 已发动 OD 消耗")
         self.current_od_label.setStyleSheet("font-weight: bold; color: #3355aa;")
-        header.addWidget(self.current_od_label)
+        row2.addWidget(self.current_od_label)
 
         self.delete_button = QPushButton("删除回合")
         self.delete_button.setFixedWidth(80)
@@ -1751,6 +1786,7 @@ class TurnCard(QFrame):
         header.addWidget(self.delete_button)
 
         root.addLayout(header)
+        root.addLayout(row2)
         root.addWidget(_build_action_header())
 
         self.actions_layout = QVBoxLayout()
@@ -1963,6 +1999,14 @@ class TurnCard(QFrame):
         self.owner._reindex()   # 后置OD 沿用上一回合号
         self.changed.emit()
 
+    def _on_destruction_changed(self, value):
+        """破坏率变化：重算（影响「破坏率≥N%」类 SP 被动）。"""
+        self.changed.emit()
+
+    def destruction(self):
+        """该回合开始时敌人的破坏率（%，手动设置）。"""
+        return self.destruction_spin.value()
+
     def mousePressEvent(self, event):
         self.turn_selected.emit(self)
         super().mousePressEvent(event)
@@ -2067,6 +2111,7 @@ class TurnCard(QFrame):
             "type": self.turn_type(),
             "od": self.od_combo.currentText(),
             "od_timing": self.od_timing(),
+            "destruction": self.destruction(),
             "actions": [a.to_data() for a in self.actions],
         }
 
@@ -2082,6 +2127,10 @@ class TurnCard(QFrame):
             timing = data.get("od_timing", OD_TIMING_OPTIONS[0])
             if timing in OD_TIMING_OPTIONS:
                 self.od_timing_combo.setCurrentText(timing)
+            try:
+                self.destruction_spin.setValue(int(data.get("destruction") or 0))
+            except (TypeError, ValueError):
+                self.destruction_spin.setValue(0)
             for action in list(self.actions):
                 self.actions_layout.removeWidget(action)
                 action.setParent(None)
@@ -2467,6 +2516,19 @@ class AxleODWindow(QFrame):
         self.enemy_od_spin.setToolTip("敌方 OD 率倍率（默认 1.0）")
         self.enemy_od_spin.valueChanged.connect(self.recalculate)
         layout.addWidget(self.enemy_od_spin)
+
+        # 初始OD：战斗开始时的 OD 槽（默认 0；也可设为 100/200/300 或 -100/-200/-300）
+        layout.addWidget(QLabel("初始OD"))
+        self.initial_od_combo = QComboBox()
+        for _v in (0, 100, 200, 300, -100, -200, -300):
+            self.initial_od_combo.addItem(str(_v), _v)
+        self.initial_od_combo.setCurrentIndex(0)
+        self.initial_od_combo.setFixedWidth(80)
+        self.initial_od_combo.setToolTip(
+            "战斗开始时的 OD 槽（默认 0）；之后按各回合的 OD 增减计算。\n"
+            "上限 300（OD3 所需）；填负数表示开局 OD 不足 / 被扣。")
+        self.initial_od_combo.currentIndexChanged.connect(self.recalculate)
+        layout.addWidget(self.initial_od_combo)
         layout.addStretch(1)
         outer.addLayout(layout)
 
@@ -2857,7 +2919,8 @@ class AxleODWindow(QFrame):
         blanket = self.resistance_check.isChecked()
         resisted = self._resisted_elements()
         cumulative = 0.0
-        running_od = 0.0   # 行动结束后的 OD 槽（累计获得 − 已发动消耗）
+        # 行动结束后的 OD 槽（= 初始OD + 累计获得 − 已发动消耗）
+        running_od = float(self.initial_od_combo.currentData() or 0)
         consumed = 0.0
         prev_level = 0     # 上一次发动的 OD 等级（连续同等级视为同一次发动）
         od_gain_used = set()   # 已触发「OD条上升」被动的队员（出击中1次）
@@ -3198,6 +3261,20 @@ class AxleODWindow(QFrame):
         # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
         self._seed_battle_states(state_tracker)
 
+        # 「首次使用该技能」类的 SP 折扣（如 血腥之舞+ 6(11)：首次使用时消耗SP-5）：
+        # 按整条轴的行动顺序（同回合内非攻击技能在前，与下面的扣费顺序一致），
+        # 每名队员的每个技能只有**第一次使用**享受折扣。
+        seen_skill_use = set()
+        for _turn in self.turns:
+            for _action in sorted(_turn.actions,
+                                  key=lambda a: 1 if a._is_attack() else 0):
+                _skill = _action._find_skill()
+                _name = getattr(_skill, "name", None)
+                _key = (_action.member_index, _name)
+                _action._first_use = bool(_name) and _key not in seen_skill_use
+                if _name:
+                    seen_skill_use.add(_key)
+
         for turn_idx, turn in enumerate(self.turns):
             # 追加/特殊回合不计回合数：不触发「回合开始回复」与 OD 回复，
             # 但行动仍然消耗 SP、技能回复 SP 也照常生效。
@@ -3282,6 +3359,11 @@ class AxleODWindow(QFrame):
                                 continue
                             if mod.get("downed") and not break_seen:
                                 continue
+                            # 「若回合开始时存在破坏率为N%或以上的敌人」
+                            # （如 山胁「最终手段」）：破坏率由回合行手动设置
+                            dmin = mod.get("destruction_min")
+                            if dmin is not None and turn.destruction() < dmin:
+                                continue
                             if mod.get("once") and i in sp_once_used:
                                 continue
                             # 「处于X状态的友方SP+N」：只给**拥有该状态**的队员
@@ -3351,7 +3433,8 @@ class AxleODWindow(QFrame):
                     continue
                 cost = action.get_sp_cost(downed=break_seen,
                                           extra=is_extra_turn,
-                                          sigil_levels=sigil_levels)
+                                          sigil_levels=sigil_levels,
+                                          first_use=getattr(action, "_first_use", False))
                 if is_placeholder:
                     cost = 0          # 占位回合：所有技能不消耗 SP
                 elif cost >= 99:      # 消耗全部 SP
@@ -3409,7 +3492,8 @@ class AxleODWindow(QFrame):
                     if not a._is_attack():
                         continue
                     c = a.get_sp_cost(downed=break_seen, extra=is_extra_turn,
-                                      sigil_levels=sigil_levels)
+                                      sigil_levels=sigil_levels,
+                                      first_use=getattr(a, "_first_use", False))
                     if 0 < c <= threshold:
                         quals.append(a)
                 if not quals:
@@ -4149,6 +4233,7 @@ class AxleODWindow(QFrame):
                 "resist_elements": sorted(self._resisted_elements()),
                 "other_od": self.other_od_spin.value(),
                 "enemy_od_rate": self.enemy_od_spin.value(),
+                "initial_od": int(self.initial_od_combo.currentData() or 0),
                 "sp_init": self.sp_init_spin.value(),
                 "sp_regen_front": self.sp_regen_front_spin.value(),
                 "sp_regen_back": self.sp_regen_back_spin.value(),
@@ -4182,6 +4267,9 @@ class AxleODWindow(QFrame):
                 cb.setChecked(element in resist)
             self.other_od_spin.setValue(float(battle.get("other_od", 0)))
             self.enemy_od_spin.setValue(float(battle.get("enemy_od_rate", 1)))
+            init_od = int(battle.get("initial_od", 0) or 0)
+            pos = self.initial_od_combo.findData(init_od)
+            self.initial_od_combo.setCurrentIndex(pos if pos >= 0 else 0)
             self.sp_init_spin.setValue(int(battle.get("sp_init", 4)))
             self.sp_regen_front_spin.setValue(
                 int(battle.get("sp_regen_front", battle.get("sp_regen", 3))))

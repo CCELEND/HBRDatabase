@@ -37,6 +37,7 @@ COLUMN_GAP_RIGHT = 20.0    # 右侧留白
 PORTRAIT_D = 92            # 顶部头像直径
 RESONANCE_ICON_D = 30      # 共鸣天赋所属风格的小缩略图边长
 ACTION_PORTRAIT_D = 46     # 回合行里的小头像直径
+TARGET_PORTRAIT_D = 35     # 回合行里「对象」小头像直径
 LABEL_W = 176              # 回合行左侧标签宽度
 ROW_H = 88                 # 回合行高
 
@@ -331,8 +332,12 @@ def collect_turn_rows(data):
             skill = str(act.get("skill") or "").strip()
             if not skill:
                 continue
+            target = act.get("sp_target", None)
+            if not isinstance(target, int) or isinstance(target, bool):
+                target = None
             actions.append({"member": int(act.get("member", 0) or 0),
-                            "skill": skill})
+                            "skill": skill,
+                            "target": target})
         rows.append({"line1": line1, "line2": line2, "type": ttype,
                      "actions": actions})
     return rows
@@ -560,6 +565,16 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
                 act["skill"], Qt.ElideRight, int(max(40, text_w)))
             p.drawText(QRectF(rect.right() + 16 * scale, top, text_w, row_h),
                        Qt.AlignLeft | Qt.AlignVCenter, label)
+            # 「对象」：单名友方技能（回复SP / 连击数上升）的目标头像，画在技能名右边
+            tgt = act.get("target")
+            if isinstance(tgt, int) and 0 <= tgt < 6:
+                tw = QFontMetrics(f_row).horizontalAdvance(label)
+                td = TARGET_PORTRAIT_D * scale
+                tx = rect.right() + 16 * scale + tw + 8 * scale + td / 2.0
+                if tx + td / 2.0 <= x0 + col_w:
+                    _draw_round(p, QRectF(tx - td / 2.0,
+                                          top + (row_h - td) / 2.0, td, td),
+                                action_pixmap(tgt), border_alpha=30)
 
     # ---- 页脚 ----
     p.setFont(_font(14 * scale))
