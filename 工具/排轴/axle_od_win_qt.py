@@ -2431,6 +2431,13 @@ class AxleODWindow(QFrame):
             tip_text = "已生成：%s" % source
             name = os.path.basename(source)
         dlg = QDialog(self)
+        # 标题栏要「最小化 / 最大化 / 关闭」（QDialog 默认只有关闭 + 「?」帮助）
+        dlg.setWindowFlags(Qt.Window | Qt.WindowMinMaxButtonsHint
+                           | Qt.WindowCloseButtonHint)
+        try:
+            set_window_icon(dlg, "./工具/help.png")
+        except Exception as e:
+            logger.debug("预览窗图标加载失败: %s", e)
         dlg.setWindowTitle(title or ("轴图预览 · %s" % name))
         layout = QVBoxLayout(dlg)
         layout.setContentsMargins(10, 10, 10, 10)
@@ -2458,13 +2465,13 @@ class AxleODWindow(QFrame):
         close_btn.clicked.connect(dlg.accept)
         row.addWidget(close_btn)
         layout.addLayout(row)
-        # 初始尺寸：图片原尺寸，但不超过屏幕 80%×75%（之后随窗口缩放）
+        # 初始尺寸：宽=图片原尺寸（≤屏幕 80%），**高固定 900**（≤屏幕 85%）
         screen = QApplication.desktop().availableGeometry(dlg) \
             if QApplication.instance() else None
         max_w = int(screen.width() * 0.8) if screen else 1100
-        max_h = int(screen.height() * 0.7) if screen else 760
+        max_h = int(screen.height() * 0.92) if screen else 900
         w = min(max_w, max(640, pixmap.width() + 40))
-        h = min(max_h, max(360, pixmap.height() + 130))
+        h = min(max_h, 900)          # 初始高度固定 900（屏幕放不下时才收缩）
         dlg.resize(w, h)
         self._image_preview = dlg          # 防止被 GC
         dlg.exec_()
