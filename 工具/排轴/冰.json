@@ -48,8 +48,7 @@
       "role": "茅森月歌",
       "style": "Glorious Blades",
       "passives": [
-        "交织而成的记忆",
-        "怪物般的球威（被动技能）"
+        "交织而成的记忆"
       ],
       "lb": 4,
       "resonance_talent": null,
@@ -60,7 +59,6 @@
       "role": "苍井绘里香",
       "style": "传承·Legacy",
       "passives": [
-        "战吼（被动技能）",
         "私人课程（被动技能）"
       ],
       "lb": 4,

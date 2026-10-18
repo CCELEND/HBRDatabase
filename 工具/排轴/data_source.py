@@ -556,6 +556,8 @@ class StyleInfo:
         self.resonance = None
         # 所属队伍（如 31D），取自 style_info
         self.team = None
+        # 「（被动技能）」里标了专属（{"exclusive":1}）的条目：只在本风格可选
+        self.private_passive_options = ()
         # 职业（如 攻击者/破盾者/指挥者…），取自 style_info[7]
         self.career = None
         # 风格缩略图（相对仓库根目录的路径，如
@@ -1900,8 +1902,10 @@ class HBRDataSource:
                 enables_boost = False
                 boost_enabler = None
                 sp_limit_override = None
-                # 「（被动技能）」条目：可在队伍配置里选择携带（默认全选）
+                # 「（被动技能）」条目：可在队伍配置里选择携带（默认全选）。
+                # 其中标了 {"exclusive":1} 的是**该风格专属**，不能给同角色其它风格选。
                 passive_options = []
+                private_passive_options = []
                 for group in (style_data.get("ActiveSkills") or []):
                     try:
                         gname = str(group[0][0])
@@ -1910,6 +1914,8 @@ class HBRDataSource:
                         continue
                     if "（被动技能）" in gname or "(被动技能)" in gname:
                         passive_options.append(gname)
+                        if _group_exclusive(group):
+                            private_passive_options.append(gname)
                         if "高阶增幅状态" in gtext:
                             enables_boost = True
                             boost_enabler = gname
@@ -2050,6 +2056,9 @@ class HBRDataSource:
                 styles[-1].team = (str(style_info[1])
                                    if len(style_info) > 1 and style_info[1]
                                    else None)
+                # 该风格专属的「（被动技能）」条目（标了 exclusive 的）
+                styles[-1].private_passive_options = tuple(
+                    private_passive_options)
                 # 职业（如 指挥者）
                 styles[-1].career = (str(style_info[7])
                                      if len(style_info) > 7 and style_info[7]
@@ -2080,10 +2089,15 @@ class HBRDataSource:
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
-        # 「（被动技能）」条目按**角色**通用：任一风格解锁后，该角色所有风格都能携带
-        all_options = _dedupe([opt for st in styles for opt in st.passive_options])
+        # 「（被动技能）」条目按**角色**通用（任一风格解锁后该角色所有风格都能携带），
+        # 但标了 {"exclusive":1} 的只属于那个风格，不进公共列表。
+        shared_options = _dedupe(
+            [opt for st in styles
+             for opt in st.passive_options
+             if opt not in getattr(st, "private_passive_options", ())])
         for st in styles:
-            st.passive_options = list(all_options)
+            own = list(getattr(st, "private_passive_options", ()) or ())
+            st.passive_options = _dedupe(list(shared_options) + own)
         self._style_cache[role_path] = styles
         return styles
 

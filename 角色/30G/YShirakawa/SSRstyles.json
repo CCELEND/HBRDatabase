@@ -236,7 +236,7 @@
             ["额外回合", null, null ,null, null, null, "前锋"]
         ],
         ["10", "", ""],
-        "1"
+        "1",{"exclusive":1}
     ],
 
 
