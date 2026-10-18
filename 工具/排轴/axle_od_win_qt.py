@@ -44,7 +44,7 @@ from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_to
 from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
 from 工具.排轴.data_source import (
     get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
-    resonance_od_effect, generic_skill_names)
+    resonance_od_effect, generic_skill_names, talent_element_ok)
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -205,7 +205,11 @@ HELP_TEXT = """排轴OD计算 使用说明
   暮色中升腾绽放的幻影（火之印≥4 → SP消耗减半 16→8）。
 - 「共鸣天赋」（相当于角色的装备，也就是队伍配置里的这一项，对应计算表的 **B19 31X共鸣**）：
   **只有 SSR 风格才能配置**；每个位置可选（默认 = 风格自带、或无），**等级可自由选择（0~4）**。
-  列表里标明**所属队伍**（如 神圣恩典（31D·冰））。
+  列表里**只列该风格可选的共鸣天赋**（非 SSR、或属性不符的天赋不会出现在列表里）。
+  标签标明**所属队伍·属性·提供该天赋的风格**（如 `Excelsior!（31X·无·绚烂华美琉璃色 等 3 个风格）`）。
+  **属性按当前风格显示**：同一个天赋在不同属性上由不同风格提供，不会把属性堆在一起
+  （不会出现「31X·无/暗/火」这种写法）；把鼠标停在选项上能看到该天赋的**全部来源**
+  （队伍·属性·风格）。
   **只有与风格属性（火/冰/雷/光/暗/无）相同的天赋才能选**（没有「不限属性」——
   团队天赋也按其所属风格的属性判定；「无」是独立属性）。
   排轴只结算与 OD 相关的效果：如 神圣恩典（回合开始时位于前锋 → 超频条 +5/6/7/8/10%，计入回合开始OD）、
@@ -282,7 +286,9 @@ HELP_TEXT = """排轴OD计算 使用说明
   「生成轴图」直接选保存位置（PNG / JPG，默认存到「图片」文件夹）。
 - 版式参考 `工具/排轴/hbr_axle.jpg`：
   · 顶部 6 个角色头像（右上角徽章 = 突破数；左下角徽章 = 该位置的共鸣天赋等级，
-    **徽章左边还会画上该共鸣天赋「所属风格」的小缩略图**，配了共鸣天赋的位置才有）；
+    **徽章左边还会画上该共鸣天赋「所属风格」的小缩略图**，配了共鸣天赋的位置才有；
+    同名天赋有多个来源风格时**按该队员风格的属性挑**，如 SSR·无 的 Excelsior! 用
+    「绚烂华美琉璃色」的图，而不是别属性的来源）；
   · 「Passive Skill」= 每名成员在队伍配置里携带的被动；
   · 「Skill」= 每名成员在这条轴里用到的技能（按游戏技能顺序排列，长名字自动换行；
     **用过多次的会标出次数**，如「放学后的小小刺激[2]」「先导的领袖魅力[3]」）；
@@ -496,18 +502,39 @@ def _element_matches(style_element, element):
 
 
 def _talent_element_ok(allowed, element):
-    """共鸣天赋的属性是否与风格属性相符（**没有**「不限属性」这种说法）。
+    """（转发到 data_source.talent_element_ok，保留旧名字给界面/测试用。）"""
+    return talent_element_ok(allowed, element)
 
-    allowed 为该天赋**可装备的属性集合**（即拥有该天赋的风格元素；「无」是独立属性）；
-    风格属性 element 为 None 时视为「无」；双属性风格（如「冰雷」）任一属性相同即可。
+
+def _talent_display(name, entry, element, ok):
+    """共鸣天赋下拉项的文字 + tooltip。
+
+    可装备时只列**与该风格元素相符**的来源，例如
+    ``Excelsior!（31X·无·绚烂华美琉璃色）``；不可装备时标注「属性不符」，
+    并把该天赋的全部来源（队伍·属性·风格）放进 tooltip。
     """
-    if not allowed:
-        return False
-    if not element:
-        return "无" in allowed
-    if element in allowed:
-        return True
-    return any(ch in allowed for ch in element)
+    team = entry.get("team")
+    sources = list(entry.get("sources") or [])
+    match = [s for s in sources
+             if _talent_element_ok([s.get("element") or "无"], element)]
+    tip_lines = ["   %s·%s·%s" % (s.get("team") or "—", s.get("element") or "无",
+                                  s.get("style") or "—")
+                 for s in sources]
+    tip = "可装备该天赋的风格（队伍·属性·风格）：\n" + \
+          ("\n".join(tip_lines) if tip_lines else "   —")
+    if ok and match:
+        first = match[0]
+        part = "%s·%s" % (first.get("element") or "无",
+                          first.get("style") or "—")
+        if len(match) > 1:
+            part += " 等 %d 个风格" % len(match)
+        text = "%s（%s）" % (name, "·".join(x for x in (team, part) if x))
+    elif ok:                      # 兼容没有 sources 的旧数据
+        attrs = "/".join(entry.get("owners") or [])
+        text = "%s（%s）" % (name, "·".join(x for x in (team, attrs) if x))
+    else:
+        text = "%s（%s）" % (name, "·".join(x for x in (team, "属性不符") if x))
+    return text, tip
 
 
 class TeamMemberRow(QFrame):
@@ -556,8 +583,7 @@ class TeamMemberRow(QFrame):
         self.style_combo.currentTextChanged.connect(
             lambda text: self.style_combo.setToolTip(text))
         self.style_combo.currentTextChanged.connect(
-            lambda *a: (self._refresh_talent_enabled(),
-                        self._update_talent_tip()))
+            lambda *a: self._populate_talents())   # 换风格 -> 重建「可选天赋」列表
         layout.addWidget(self.style_combo)
 
         # 「（被动技能）」选择：配置时携带，之后所有回合都生效
@@ -611,25 +637,36 @@ class TeamMemberRow(QFrame):
         self._update_talent_tip()
         self._emit_changed()
 
+    def _talent_candidates(self):
+        """当前风格**可选**的共鸣天赋名（属性匹配；非 SSR 或没选风格时为空）。
+
+        天赋与属性一一对应，所以这里只保留与该风格元素相符的那些。
+        """
+        if self._style_rarity() != "SSR":
+            return []
+        element = self._style_element()
+        pool = self.data_source.resonance_pool()
+        return sorted(name for name, entry in pool.items()
+                      if _talent_element_ok(entry.get("owners") or [], element))
+
     def _populate_talents(self):
-        """填充「共鸣天赋」下拉：（默认）= 风格自带、无、以及全部天赋（标明所属队伍）。"""
+        """填充「共鸣天赋」下拉：只列**该风格可选**的天赋，外加（默认）/无。
+
+        不可选的（属性不符、非 SSR）**不入列表**，而不是列出来置灰。
+        """
         prev = self.talent_combo.currentData() if self.talent_combo.count() else None
         pool = self.data_source.resonance_pool()
+        element = self._style_element()
         with self._suspended():
             self.talent_combo.clear()
             self.talent_combo.addItem("（默认）", None)
             self.talent_combo.addItem("无", "")
-            for name in sorted(pool.keys()):
-                entry = pool[name]
-                attrs = "/".join(entry.get("owners") or [])
-                tags = "·".join(t for t in (entry.get("team"), attrs) if t)
-                text = "%s（%s）" % (name, tags) if tags else name
+            for name in self._talent_candidates():
+                entry = pool.get(name) or {}
+                text, tip = _talent_display(name, entry, element, True)
                 self.talent_combo.addItem(text, name)
-                self.talent_combo.setItemData(
-                    self.talent_combo.count() - 1,
-                    "所属队伍：%s\n属性：%s" % (entry.get("team") or "—",
-                                                attrs or "—"),
-                    Qt.ToolTipRole)
+                self.talent_combo.setItemData(self.talent_combo.count() - 1, tip,
+                                              Qt.ToolTipRole)
             pos = self.talent_combo.findData(prev)
             self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
         self._refresh_talent_enabled()
@@ -658,7 +695,11 @@ class TeamMemberRow(QFrame):
         return None
 
     def _refresh_talent_enabled(self):
-        """只有 SSR 风格才能配置共鸣天赋；且天赋属性需与风格相同。"""
+        """只有 SSR 风格才能配置共鸣天赋；下拉里只会有「该风格可选」的天赋。
+
+        （列表本身由 _populate_talents 按当前风格重建，这里只负责
+        整体可用性和标签/tooltip 的兜底刷新。）
+        """
         if self.talent_combo.count() == 0:
             return
         is_ssr = (self._style_rarity() == "SSR")
@@ -675,8 +716,13 @@ class TeamMemberRow(QFrame):
             if name is None or name == "":
                 item.setEnabled(is_ssr)
                 continue
-            allowed = (pool.get(name) or {}).get("owners") or []
-            item.setEnabled(is_ssr and _talent_element_ok(allowed, element))
+            entry = pool.get(name) or {}
+            ok = is_ssr and _talent_element_ok(entry.get("owners") or [], element)
+            item.setEnabled(ok)
+            text, tip = _talent_display(name, entry, element, ok)
+            if self.talent_combo.itemText(i) != text:
+                self.talent_combo.setItemText(i, text)
+            self.talent_combo.setItemData(i, tip, Qt.ToolTipRole)
         # 当前选择不合法时回到「（默认）」
         cur = model.item(self.talent_combo.currentIndex())
         if cur is not None and not cur.isEnabled():
@@ -878,6 +924,7 @@ class TeamMemberRow(QFrame):
                 self.style_combo.clear()
                 self.style_combo.setEnabled(False)
                 self.style_combo.setToolTip("")
+            self._populate_talents()      # 没风格 -> 只留（默认）/无
             return
         self.style_combo.setEnabled(True)
         current = preserve if preserve is not None else self.style()
@@ -894,6 +941,7 @@ class TeamMemberRow(QFrame):
                 self.style_combo.setCurrentIndex(0)
             self.style_combo.setToolTip(self.style_combo.currentText())
         self._populate_passives()
+        self._populate_talents()          # 风格变了 -> 重建「可选天赋」列表
 
     def _emit_changed(self, *args):
         if self._loading:

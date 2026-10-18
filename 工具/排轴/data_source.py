@@ -154,6 +154,21 @@ def _parse_master_skill_action(ms):
     return skill
 
 
+def talent_element_ok(allowed, element):
+    """共鸣天赋的属性是否与风格属性相符（**没有**「不限属性」这种说法）。
+
+    allowed 为该天赋**可装备的属性集合**（即拥有该天赋的风格元素；「无」是独立属性）；
+    风格属性 element 为 None 时视为「无」；双属性风格（如「冰雷」）任一属性相同即可。
+    """
+    if not allowed:
+        return False
+    if not element:
+        return "无" in allowed
+    if element in allowed:
+        return True
+    return any(ch in allowed for ch in element)
+
+
 def _group_exclusive(group):
     """读 ``ActiveSkills`` 条目末尾的 ``{"exclusive":1}``。
 
@@ -2076,6 +2091,7 @@ class HBRDataSource:
         pool = {}
         owners = {}
         teams = {}
+        sources = {}
         for role in self.role_names():
             for st in self.styles(role):
                 res = getattr(st, "resonance", None)
@@ -2089,14 +2105,32 @@ class HBRDataSource:
                     pool[name]["owner_style"] = st.name
                     owners[name] = set()
                     teams[name] = set()
+                    sources[name] = []
                 # 元素未知的风格视为「无」属性（无 是一个独立属性）
                 owners[name].add(st.element or "无")
                 if getattr(st, "team", None):
                     teams[name].add(st.team)
+                # 具体来源（队伍 / 元素 / 风格名）：界面按当前风格的元素挑出对应的那条，
+                # 例如 31X「Excelsior!」在 无/光/冰 上都有，但不会显示成「31X·无/光/冰」。
+                sources[name].append({
+                    "role": role,
+                    "team": getattr(st, "team", None),
+                    "element": st.element or "无",
+                    "style": st.name,
+                    "rarity": st.rarity,
+                    "style_id": st.style_id or 0,
+                    # 轴图用：该来源风格自己的缩略图
+                    "icon_path": getattr(st, "icon_path", None),
+                })
         for name, elements in owners.items():
             pool[name]["owners"] = sorted(elements)
             pool[name]["team"] = (next(iter(teams[name]))
                                   if len(teams[name]) == 1 else None)
+            # 来源按（队伍, style_id, 风格名）排序，保证显示顺序稳定
+            pool[name]["sources"] = sorted(
+                sources[name],
+                key=lambda s: (str(s.get("team") or ""), s.get("style_id") or 0,
+                               str(s.get("style") or "")))
         self._resonance_pool = pool
         return pool
 

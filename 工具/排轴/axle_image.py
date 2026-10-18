@@ -24,9 +24,9 @@ from PyQt5.QtGui import (QColor, QFont, QFontDatabase, QFontMetrics, QImage,
                          QPainter, QPainterPath, QPen, QPixmap)
 
 try:
-    from 工具.排轴.data_source import get_data_source
+    from 工具.排轴.data_source import get_data_source, talent_element_ok
 except ImportError:                                  # 直接在本目录运行
-    from data_source import get_data_source
+    from data_source import get_data_source, talent_element_ok
 
 # ----------------------------------------------------------------------------
 # 版式常量（数值参考 hbr_axle.jpg，宽 1170）
@@ -259,15 +259,28 @@ def _split_od(text):
     return level, bonus
 
 
-def _resonance_icon(ds, talent_name):
-    """共鸣天赋「所属风格」的缩略图路径（找不到返回 None）。"""
+def _resonance_icon(ds, talent_name, element=None):
+    """共鸣天赋「所属风格」的缩略图路径（找不到返回 None）。
+
+    同名天赋可能有多个来源风格（不同属性），优先取**属性与 element 相符**的那一个
+    （和下拉标签的取法一致），例如 SSR·无 的 Excelsior! 取「绚烂华美琉璃色」。
+    """
     if not talent_name:
         return None
     try:
-        res = (ds.resonance_pool() or {}).get(str(talent_name)) or {}
+        entry = (ds.resonance_pool() or {}).get(str(talent_name)) or {}
     except Exception:
         return None
-    icon = res.get("icon_path")
+    sources = entry.get("sources") or []
+    picked = None
+    for src in sources:
+        # element=None 表示「无」属性，交给同一个匹配规则判断
+        if talent_element_ok([src.get("element") or "无"], element):
+            picked = src
+            break
+    if picked is None and sources:
+        picked = sources[0]
+    icon = (picked or {}).get("icon_path") or entry.get("icon_path")
     if not icon:
         return None
     return os.path.join(ds.base_dir, str(icon).lstrip("./"))
@@ -384,8 +397,14 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
     images = [_load_image(_icon_path(ds, m.get("role"), m.get("style")),
                           PORTRAIT_D * scale) for m in team]
     # 共鸣天赋「所属风格」的小缩略图（画在共鸣等级徽章左边）
-    res_icons = [_load_image(_resonance_icon(ds, m.get("resonance_talent")),
-                             RESONANCE_ICON_D * scale) for m in team]
+    # 按该队员风格的属性挑来源（如 SSR·无 的 Excelsior! 取「绚烂华美琉璃色」的图）
+    res_icons = []
+    for m in team:
+        st = _style_of(ds, m.get("role"), m.get("style"))
+        res_icons.append(_load_image(
+            _resonance_icon(ds, m.get("resonance_talent"),
+                            getattr(st, "element", None)),
+            RESONANCE_ICON_D * scale))
     action_images = {}
 
     def action_pixmap(member):
