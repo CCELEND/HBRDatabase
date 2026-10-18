@@ -30,7 +30,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "",
+      "earring": "破坏耳坠",
       "od_earring": 0.0
     },
     {
@@ -42,7 +42,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "",
+      "earring": "破坏耳坠",
       "od_earring": 0.0
     },
     {
@@ -52,7 +52,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "",
+      "earring": "攻击耳坠",
       "od_earring": 0.0
     },
     {
@@ -64,7 +64,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "",
+      "earring": "破坏耳坠",
       "od_earring": 0.0
     }
   ],
@@ -74,6 +74,7 @@
     "resist_elements": [],
     "other_od": 0.0,
     "enemy_od_rate": 1.0,
+    "initial_od": 0,
     "sp_init": 4,
     "sp_regen_front": 2,
     "sp_regen_back": 2,
@@ -84,6 +85,7 @@
       "type": "通常回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 0,
@@ -121,6 +123,7 @@
       "type": "追加回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 0,
@@ -158,6 +161,7 @@
       "type": "超频回合",
       "od": "OD2/Bonus1",
       "od_timing": "后置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 3,
@@ -195,6 +199,7 @@
       "type": "追加回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 3,
@@ -232,6 +237,7 @@
       "type": "超频回合",
       "od": "OD2/Bonus2",
       "od_timing": "后置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 1,
@@ -269,6 +275,7 @@
       "type": "追加回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
       "actions": [
         {
           "member": 1,
