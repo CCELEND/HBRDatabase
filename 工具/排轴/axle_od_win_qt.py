@@ -52,6 +52,10 @@ logger = AdvancedLogger.get_logger(__name__)
 
 
 WINDOW_TITLE = "排轴OD计算"
+# 耳坠：只有「驱动耳坠」提升 OD 获取量（旧字段 od_earring 记 1），其余记 0；
+# 轴图会把所选耳坠的图标画在风格头像右下角（图标见 持有物/饰品/耳坠/Earrings.json）
+EARRING_CHOICES = ("", "击碎耳坠", "攻击耳坠", "驱动耳坠", "破坏耳坠")
+OD_EARRING_NAME = "驱动耳坠"
 MODULE_NAME = __name__
 DEFAULT_SAVE_PATH = os.path.join("工具", "排轴", "排轴存档.json")
 HELP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "help.txt")
@@ -61,11 +65,14 @@ HELP_TEXT = """排轴OD计算 使用说明
 
 【排轴】
 - 一个队伍 6 人（前锋 3 / 后卫 3）；队伍配置可选 角色、风格、携带被动、突破数、
-  共鸣天赋（含等级）、OD耳环；角色不可重复（已选的角色在其它位置会置灰不可选）。
+  共鸣天赋（含等级）、耳坠；角色不可重复（已选的角色在其它位置会置灰不可选）。
   风格下拉按「**风格名-稀有度-元素**」显示（双属性如「火暗」照原样；无属性的风格只显示前两项）。
   **默认队伍是空队伍**（角色/风格都为空），首次编入角色时会自动建立第 1 回合。
-  共鸣天赋 / OD耳环 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在「条件触发」选「击破敌人」的行动中生效；
-  OD耳环对该角色所有回合生效）。
+  共鸣天赋 / 耳坠 按角色设置（共鸣天赋里「击破敌人时 超频条+N%」仅在「条件触发」选「击破敌人」的行动中生效；
+  耳坠对该角色所有回合生效）。
+  **「耳坠」下拉**：击碎耳坠 / 攻击耳坠 / **驱动耳坠** / 破坏耳坠（另有「无（不装备）」）。
+  其中**只有「驱动耳坠」会提升 OD 获取量**（计算时记 1），其余记 0（不影响 OD / SP），
+  但所选耳坠会在**轴图**里画在该队员风格头像的**右下角**（图标取自 持有物/饰品/耳坠/Earrings.json）。
   「角色」下拉框按**队伍分组**（31A / 31B / 31C / 30G / 31D / 31E / 31F / 31X / Angel Beats! / 司令部 / persona5r），
   每个队伍前面有一个**不可选的分组标题**；「无」在最上面，表示该位置空着。
   配置窗口顶部有「**清空角色**」按钮：一键清空 6 个位置的角色/风格
@@ -296,7 +303,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   **轴很长（图很高）时用垂直滚动条查看**，不会被压缩变形）；
   「生成轴图」直接选保存位置（PNG / JPG，默认存到「图片」文件夹）。
 - 版式参考 `工具/排轴/hbr_axle.jpg`：
-  · 顶部 6 个角色头像（右上角徽章 = 突破数；左下角徽章 = 该位置的共鸣天赋等级，
+  · 顶部 6 个角色头像（右上角徽章 = 突破数；右下角 = 所装备**耳坠**的图标；
+    左下角徽章 = 该位置的共鸣天赋等级，
     **徽章左边还会画上该共鸣天赋「所属风格」的小缩略图**，配了共鸣天赋的位置才有；
     同名天赋有多个来源风格时**按该队员风格的属性挑**，如 SSR·无 的 Excelsior! 用
     「绚烂华美琉璃色」的图，而不是别属性的来源）；
@@ -724,11 +732,16 @@ class TeamMemberRow(QFrame):
 
         ear_label = QLabel("OD耳环")
         layout.addWidget(ear_label)
-        self.earring_spin = _make_double_spin(0.0, 10.0, 1.0, 2, 1.0, 56)
-        self.earring_spin.setToolTip(
-            "该角色的 OD 耳环（对所有回合生效；通常攻击不享受）")
-        self.earring_spin.valueChanged.connect(self._emit_changed)
-        layout.addWidget(self.earring_spin)
+        self.earring_combo = QComboBox()
+        self.earring_combo.setFixedWidth(104)
+        for _name in EARRING_CHOICES:
+            self.earring_combo.addItem(_name or "无（不装备）", _name)
+        self.earring_combo.setToolTip(
+            "该角色装备的耳坠。\n"
+            "只有「驱动耳坠」会提升 OD 获取量（对所有回合生效；通常攻击不享受），\n"
+            "其余耳坠按 0 计算（不影响 OD），但会显示在轴图上。")
+        self.earring_combo.currentIndexChanged.connect(self._emit_changed)
+        layout.addWidget(self.earring_combo)
 
         self._selected_passives = None   # None = 全部携带
 
@@ -826,6 +839,10 @@ class TeamMemberRow(QFrame):
         cur = model.item(self.talent_combo.currentIndex())
         if cur is not None and not cur.isEnabled():
             self.talent_combo.setCurrentIndex(0)
+
+    def earring(self):
+        """所选耳坠名（空串 = 不装备）。"""
+        return self.earring_combo.currentData() or ""
 
     def talent(self):
         """所选共鸣天赋名：None = 用风格自带的；"" = 不装备。"""
@@ -1078,7 +1095,8 @@ class TeamMemberRow(QFrame):
                 "lb": self.lb_spin.value(),
                 "resonance_talent": self.talent(),
                 "resonance_level": self.talent_level(),
-                "od_earring": self.earring_spin.value()}
+                "earring": self.earring(),
+                "od_earring": 1.0 if self.earring() == OD_EARRING_NAME else 0.0}
 
     def set_data(self, data):
         with self._suspended():
@@ -1088,7 +1106,11 @@ class TeamMemberRow(QFrame):
                 self._selected_passives = None
             if "lb" in data:
                 self.lb_spin.setValue(int(data.get("lb") or 0))
-            self.earring_spin.setValue(float(data.get("od_earring", 1) or 0))
+            name = str(data.get("earring") or "")
+            if not name and float(data.get("od_earring", 1) or 0) > 0:
+                name = OD_EARRING_NAME        # 旧存档：数值 1 = 驱动耳坠
+            _pos = self.earring_combo.findData(name)
+            self.earring_combo.setCurrentIndex(_pos if _pos >= 0 else 0)
             self.talent_lb.setValue(int(data.get("resonance_level", 4) or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
@@ -2473,8 +2495,18 @@ class AxleODWindow(QFrame):
         w = min(max_w, max(640, pixmap.width() + 40))
         h = min(max_h, 900)          # 初始高度固定 900（屏幕放不下时才收缩）
         dlg.resize(w, h)
+        # 关掉上一次的预览，避免开一堆窗口
+        old = getattr(self, "_image_preview", None)
+        if old is not None and old is not dlg:
+            try:
+                old.close()
+                old.deleteLater()
+            except Exception:
+                pass
         self._image_preview = dlg          # 防止被 GC
-        dlg.exec_()
+        # 非模态显示：最小化、点其它窗口都正常（exec_() 模态时最小化会把主窗口卡住）
+        dlg.setModal(False)
+        dlg.show()
 
     @staticmethod
     def _open_local_file(path):

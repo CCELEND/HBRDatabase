@@ -17,6 +17,8 @@
 输入就是存档 dict，方便单独测试与批量出图。
 """
 import datetime
+import io
+import json
 import os
 
 from PyQt5.QtCore import QPointF, QRect, QRectF, Qt
@@ -38,6 +40,8 @@ PORTRAIT_D = 92            # 顶部头像直径
 RESONANCE_ICON_D = 30      # 共鸣天赋所属风格的小缩略图边长
 ACTION_PORTRAIT_D = 46     # 回合行里的小头像直径
 TARGET_PORTRAIT_D = 35     # 回合行里「对象」小头像直径
+EARRING_ICON_D = 30        # 顶部头像右下角「耳坠」图标边长
+OD_EARRING_NAME = "驱动耳坠"   # 只有它算 OD 耳环（旧字段 od_earring=1）
 LABEL_W = 176              # 回合行左侧标签宽度
 ROW_H = 88                 # 回合行高
 
@@ -293,6 +297,44 @@ def is_non_skill(name):
     return str(name or "").strip() in NON_SKILL_ACTIONS
 
 
+_EARRING_CACHE = None
+
+
+def _earring_icon(ds, name):
+    """耳坠图标路径（读 ``持有物/饰品/耳坠/Earrings.json``）；没有返回 None。"""
+    global _EARRING_CACHE
+    if not name:
+        return None
+    if _EARRING_CACHE is None:
+        _EARRING_CACHE = {}
+        path = os.path.join(ds.base_dir, "持有物", "饰品", "耳坠", "Earrings.json")
+        data = {}
+        try:
+            with io.open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except Exception:
+            data = {}
+        for key, info in (data or {}).items():
+            icon = (info or {}).get("path")
+            if icon:
+                _EARRING_CACHE[str(key)] = os.path.join(
+                    ds.base_dir, str(icon).lstrip("./"))
+    return _EARRING_CACHE.get(str(name))
+
+
+def _member_earring(member):
+    """该队员的耳坠名：优先 ``earring``；旧数据只有 od_earring=1 时按驱动耳坠算。"""
+    name = str((member or {}).get("earring") or "")
+    if name:
+        return name
+    try:
+        if float((member or {}).get("od_earring", 0) or 0) > 0:
+            return OD_EARRING_NAME
+    except (TypeError, ValueError):
+        pass
+    return ""
+
+
 def _clean_passive(name):
     """界面上被动名带「（被动技能）」后缀，轴图里去掉更清爽。"""
     text = str(name or "").strip()
@@ -393,6 +435,9 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
             pairs.sort(key=lambda p: order.get(p[0], len(order) + 1))
         member_skills.append([("%s[%d]" % (name, cnt)) if cnt > 1 else name
                               for name, cnt in pairs])
+    # 耳坠图标（画在头像右下角）
+    earring_icons = [_load_image(_earring_icon(ds, _member_earring(m)),
+                                 EARRING_ICON_D * scale) for m in team]
     # 被动名去掉「（被动技能）」后缀
     member_passives = [[_clean_passive(x) for x in (m.get("passives") or []) if x]
                        for m in team]
@@ -470,6 +515,13 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
         if lb is not None and m.get("role"):
             _badge(p, (rect.center().x() + d * 0.34, rect.center().y() - d * 0.34),
                    int(lb), dark=True, radius=15 * scale)
+        # 耳坠：画在头像右下角（与左下角的共鸣天赋缩略图对称）
+        if earring_icons[i] is not None:
+            es = EARRING_ICON_D * scale
+            _draw_thumb(p, QRectF(rect.center().x() + d * 0.34 - es / 2.0,
+                                  rect.center().y() + d * 0.34 - es / 2.0,
+                                  es, es),
+                        earring_icons[i], radius=7 * scale)
         res_lv = m.get("resonance_level")
         if m.get("resonance_talent") and res_lv is not None:
             by = rect.center().y() + d * 0.34

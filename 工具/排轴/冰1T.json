@@ -8,6 +8,7 @@
       "lb": 4,
       "resonance_talent": "神圣恩典",
       "resonance_level": 4,
+      "earring": "驱动耳坠",
       "od_earring": 1.0
     },
     {
@@ -19,6 +20,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
+      "earring": "驱动耳坠",
       "od_earring": 1.0
     },
     {
@@ -28,6 +30,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
+      "earring": "",
       "od_earring": 0.0
     },
     {
@@ -39,6 +42,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
+      "earring": "",
       "od_earring": 0.0
     },
     {
@@ -48,6 +52,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
+      "earring": "",
       "od_earring": 0.0
     },
     {
@@ -59,6 +64,7 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
+      "earring": "",
       "od_earring": 0.0
     }
   ],
