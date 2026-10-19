@@ -54,8 +54,8 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "驱动耳坠",
-      "od_earring": 1.0
+      "earring": "",
+      "od_earring": 0.0
     },
     {
       "role": "",
@@ -64,8 +64,8 @@
       "lb": 4,
       "resonance_talent": null,
       "resonance_level": 4,
-      "earring": "驱动耳坠",
-      "od_earring": 1.0
+      "earring": "",
+      "od_earring": 0.0
     }
   ],
   "battle": {
@@ -74,6 +74,7 @@
     "resist_elements": [],
     "other_od": 0.0,
     "enemy_od_rate": 1.0,
+    "initial_od": 0,
     "sp_init": 4,
     "sp_regen_front": 2,
     "sp_regen_back": 2,
@@ -84,6 +85,9 @@
       "type": "通常回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0,
       "actions": [
         {
           "member": 0,
@@ -92,6 +96,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -101,6 +106,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -110,6 +116,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -118,6 +125,9 @@
       "type": "通常回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0,
       "actions": [
         {
           "member": 0,
@@ -126,6 +136,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -135,6 +146,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -144,6 +156,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
@@ -152,6 +165,9 @@
       "type": "通常回合",
       "od": "无",
       "od_timing": "前置OD",
+      "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0,
       "actions": [
         {
           "member": 0,
@@ -160,6 +176,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -169,6 +186,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         },
         {
@@ -178,6 +196,7 @@
           "combo": 0,
           "fixed_od": 0.0,
           "break": false,
+          "trigger": "",
           "sp_target": null
         }
       ]
