@@ -535,10 +535,11 @@ def _talent_element_ok(allowed, element):
     return talent_element_ok(allowed, element)
 
 
-def _fmt_sp(value, width=2):
-    """SP 数值显示：整数、定宽（默认 2 字符），避免出现「8.0」。
+def _fmt_sp(value, width=3):
+    """SP 数值显示：整数、定宽（默认 3 字符），避免出现「8.0」。
 
-    中文字体里 ASCII 数字与空格都是半宽，所以「%2d」能让各行的 SP 数字对齐。
+    中文字体里 ASCII 数字与空格都是半宽，所以「%3d」能让各行的 SP 数字对齐；
+    留 3 字符是为了容纳负数（如「-3」）。
     """
     try:
         f = float(value)
