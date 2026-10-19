@@ -56,6 +56,8 @@ WINDOW_TITLE = "排轴OD计算"
 # 轴图会把所选耳坠的图标画在风格头像右下角（图标见 持有物/饰品/耳坠/Earrings.json）
 EARRING_CHOICES = ("", "击碎耳坠", "攻击耳坠", "驱动耳坠", "破坏耳坠")
 OD_EARRING_NAME = "驱动耳坠"
+# 回合行可以手动加 SP 消耗（0 / +2 / +4）；与其它「增加SP消耗」取最大，不叠加
+SP_COST_UP_CHOICES = (0, 2, 4)
 MODULE_NAME = __name__
 DEFAULT_SAVE_PATH = os.path.join("工具", "排轴", "排轴存档.json")
 HELP_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "help.txt")
@@ -265,6 +267,13 @@ HELP_TEXT = """排轴OD计算 使用说明
   用于「若回合开始时存在破坏率为 N% 或以上的敌人」类被动 —— 如 山胁 SSR「拨云见日」
   3 突被动「最终手段」：破坏率 ≥200% 时 全体友方 SP+5（每次出击限 1 次，整条轴只结算一次）。
   没设（0%）就不触发；突破数不足 3 也不触发。
+- 回合行（第二行）还能手动**增加SP消耗**（0 / +2 / +4，默认 0）：
+  选 +N 时，该回合所有**有 SP 消耗**的技能 SP 消耗 +N；
+  与其它「增加SP消耗」的被动冲突时**取最大**（不叠加，例：被动 +2 与手动 +4 只算 +4），
+  并与「降低SP消耗」相抵；SP 消耗为 0 的技能（通常攻击等）不受影响。
+- 同一行还有 **OD调整** 输入框（-300~300，默认 0）：**直接加在该回合的「回合开始OD」上**，
+  例如填 -10 就是该回合回合开始OD −10，并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
+  正数同样生效，整体仍受 300 上限约束。
 - 「追加回合内」的 SP 消耗增减被动也只在追加回合/特殊回合生效
   （如 优美的剑技：追加回合中 自身消耗SP-2）。
 - 每回合下方显示两行全队 SP（含未行动的后卫）：
@@ -524,6 +533,17 @@ def _element_matches(style_element, element):
 def _talent_element_ok(allowed, element):
     """（转发到 data_source.talent_element_ok，保留旧名字给界面/测试用。）"""
     return talent_element_ok(allowed, element)
+
+
+def _fmt_sp(value):
+    """SP 数值显示：整数就不带小数点（避免出现「8.0」）。"""
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return str(value)
+    if abs(f - round(f)) < 1e-9:
+        return "%d" % int(round(f))
+    return "%g" % f
 
 
 def _talent_display(name, entry, element, ok):
@@ -1711,7 +1731,7 @@ class ActionRow(QFrame):
                 "background-color: #f0f0f0; color: #888888;"
                 "border-radius: 3px;")
             return
-        self.sp_label.setText(str(remaining))
+        self.sp_label.setText(_fmt_sp(remaining))
         if enough:
             self.sp_label.setStyleSheet(
                 "background-color: #eef3ff; border-radius: 3px;")
@@ -1858,6 +1878,35 @@ class TurnCard(QFrame):
         self.destruction_spin.valueChanged.connect(self._on_destruction_changed)
         row2.addWidget(self.destruction_label)
         row2.addWidget(self.destruction_spin)
+
+        # 增加SP消耗：该回合所有有消耗的技能 SP 消耗 +N（0 / +2 / +4）
+        self.sp_up_label = QLabel("增加SP消耗")
+        self.sp_up_combo = QComboBox()
+        for _up in SP_COST_UP_CHOICES:
+            self.sp_up_combo.addItem("+%d" % _up if _up else "0", _up)
+        self.sp_up_combo.setFixedWidth(78)
+        _tip = ("该回合所有**有 SP 消耗**的技能 SP 消耗 +N。\n"
+                "与其它「增加SP消耗」的被动冲突时**取最大**（不叠加），\n"
+                "并与「降低SP消耗」相抵；SP 消耗为 0 的技能不受影响。")
+        self.sp_up_label.setToolTip(_tip)
+        self.sp_up_combo.setToolTip(_tip)
+        self.sp_up_combo.currentIndexChanged.connect(self._on_destruction_changed)
+        row2.addWidget(self.sp_up_label)
+        row2.addWidget(self.sp_up_combo)
+
+        # OD调整：直接加在该回合的「回合开始OD」上（例 -10 -> 回合开始OD −10）
+        self.od_adjust_label = QLabel("OD调整")
+        self.od_adjust_spin = QSpinBox()
+        self.od_adjust_spin.setRange(-300, 300)
+        self.od_adjust_spin.setSingleStep(5)
+        self.od_adjust_spin.setFixedWidth(84)
+        _tip2 = ("直接加在该回合的「回合开始OD」上（例：-10 = 回合开始OD −10），\n"
+                 "并计入之后的累计（相当于回合开始时 OD 槽被加减）。")
+        self.od_adjust_label.setToolTip(_tip2)
+        self.od_adjust_spin.setToolTip(_tip2)
+        self.od_adjust_spin.valueChanged.connect(self._on_destruction_changed)
+        row2.addWidget(self.od_adjust_label)
+        row2.addWidget(self.od_adjust_spin)
 
         self.rhythm_label = QLabel("超越条：—")
         self.rhythm_label.setToolTip(
@@ -2120,6 +2169,14 @@ class TurnCard(QFrame):
         """该回合开始时敌人的破坏率（%，手动设置）。"""
         return self.destruction_spin.value()
 
+    def sp_cost_up(self):
+        """该回合手动增加的 SP 消耗（0 / 2 / 4）。"""
+        return int(self.sp_up_combo.currentData() or 0)
+
+    def od_adjust(self):
+        """直接加在该回合「回合开始OD」上的调整值（默认 0）。"""
+        return int(self.od_adjust_spin.value())
+
     def mousePressEvent(self, event):
         self.turn_selected.emit(self)
         super().mousePressEvent(event)
@@ -2186,7 +2243,7 @@ class TurnCard(QFrame):
         parts = []
         for slot, role, sp, is_front in entries:
             pos = "前" if is_front else "后"
-            parts.append("角色%d(%s) %s:%s" % (slot + 1, pos, role, sp))
+            parts.append("角色%d(%s) %s:%s" % (slot + 1, pos, role, _fmt_sp(sp)))
         return "%s　%s" % (prefix, "　".join(parts))
 
     def set_team_sp(self, entries, before=None):
@@ -2225,6 +2282,8 @@ class TurnCard(QFrame):
             "od": self.od_combo.currentText(),
             "od_timing": self.od_timing(),
             "destruction": self.destruction(),
+            "sp_cost_up": self.sp_cost_up(),
+            "od_adjust": self.od_adjust(),
             "actions": [a.to_data() for a in self.actions],
         }
 
@@ -2244,6 +2303,16 @@ class TurnCard(QFrame):
                 self.destruction_spin.setValue(int(data.get("destruction") or 0))
             except (TypeError, ValueError):
                 self.destruction_spin.setValue(0)
+            try:
+                _up = int(data.get("sp_cost_up") or 0)
+            except (TypeError, ValueError):
+                _up = 0
+            _pos_up = self.sp_up_combo.findData(_up)
+            self.sp_up_combo.setCurrentIndex(_pos_up if _pos_up >= 0 else 0)
+            try:
+                self.od_adjust_spin.setValue(int(data.get("od_adjust") or 0))
+            except (TypeError, ValueError):
+                self.od_adjust_spin.setValue(0)
             for action in list(self.actions):
                 self.actions_layout.removeWidget(action)
                 action.setParent(None)
@@ -3253,7 +3322,10 @@ class AxleODWindow(QFrame):
 
             # 「回合开始OD」= 上一回合结束OD + 回合开始被动 − 发动OD消耗（上限 300）
             # 「本回合OD」只统计本回合行动；因此 回合开始OD + 本回合OD = 当前OD
-            turn.set_start_od(min(running_od + turn_bonus - cost, OD_GAUGE_MAX))
+            # 手动「OD调整」：直接加在该回合的回合开始OD 上（并影响之后的累计）
+            od_adjust = turn.od_adjust()
+            turn.set_start_od(min(running_od + turn_bonus - cost + od_adjust,
+                                  OD_GAUGE_MAX))
             turn_actions = 0.0
             for action in turn.actions:
                 element = action.get_attack_element()
@@ -3303,7 +3375,7 @@ class AxleODWindow(QFrame):
                 turn.set_rhythm("")
 
             cumulative += turn_bonus + turn_actions
-            running_od += turn_bonus + turn_actions - cost
+            running_od += turn_bonus + turn_actions - cost + od_adjust
             running_od = min(running_od, OD_GAUGE_MAX)   # OD 槽上限 300
             turn.set_result(turn_actions, cumulative)
             turn.set_current_od(running_od)
@@ -3572,7 +3644,9 @@ class AxleODWindow(QFrame):
                     # 「高阶增强」（红宝石香水）不作用于通常攻击与 SP 消耗为 0 的技能
                     cost = max(0, cost + self._sp_cost_modifier(
                         i, active, turn_front, cost, downed=break_seen,
-                        extra=is_extra_turn, states=state_tracker.states(i)))
+                        extra=is_extra_turn, states=state_tracker.states(i),
+                        manual_up=turn.sp_cost_up()))
+                    cost = int(round(cost))    # SP 是整数，避免出现 8.0
                 enough = pre_sp[i] >= cost
                 if not enough and action.allows_negative_sp():
                     enough = True     # 「SP0或以上即可使用」：SP 可为负
@@ -4186,7 +4260,7 @@ class AxleODWindow(QFrame):
         return mods
 
     def _sp_cost_modifier(self, actor, active, front_set, base_cost=None,
-                          downed=False, extra=False, states=None):
+                          downed=False, extra=False, states=None, manual_up=0):
         """作用于该队员的 SP 消耗增减合计。
 
         同种效果只生效一次并取大值：所有「降低SP消耗」取降幅最大者、
@@ -4204,6 +4278,10 @@ class AxleODWindow(QFrame):
 
         reductions = []   # 负值
         increases = []    # 正值
+        if manual_up:     # 回合行手动增加的 SP 消耗（与其它增耗取最大）
+            collect_manual = int(manual_up)
+        else:
+            collect_manual = 0
 
         def collect(amount):
             if amount < 0:
@@ -4238,6 +4316,8 @@ class AxleODWindow(QFrame):
                 else:
                     continue          # 目标无法判定 -> 不生效
                 collect(mod.get("amount", 0))
+        if collect_manual > 0:
+            increases.append(collect_manual)
         total = 0
         if reductions:
             total += min(reductions)
