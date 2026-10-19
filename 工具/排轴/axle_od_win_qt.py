@@ -535,15 +535,18 @@ def _talent_element_ok(allowed, element):
     return talent_element_ok(allowed, element)
 
 
-def _fmt_sp(value):
-    """SP 数值显示：整数就不带小数点（避免出现「8.0」）。"""
+def _fmt_sp(value, width=2):
+    """SP 数值显示：整数、定宽（默认 2 字符），避免出现「8.0」。
+
+    中文字体里 ASCII 数字与空格都是半宽，所以「%2d」能让各行的 SP 数字对齐。
+    """
     try:
         f = float(value)
     except (TypeError, ValueError):
         return str(value)
     if abs(f - round(f)) < 1e-9:
-        return "%d" % int(round(f))
-    return "%g" % f
+        return "%*d" % (int(width), int(round(f)))
+    return "%*g" % (int(width), f)
 
 
 def _talent_display(name, entry, element, ok):
