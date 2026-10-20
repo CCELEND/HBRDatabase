@@ -4784,7 +4784,7 @@ def _open_turns_window(view):
     frame = getattr(view, "turns_frame", None)
     if frame is not None:
         return frame
-    frame = creat_Toplevel(TURNS_TITLE, 1280, 760, 380, 155)
+    frame = creat_Toplevel(TURNS_TITLE, 1295, 760, 530, 170)
     set_window_icon(frame, "./工具/help.png")
     frame.grid_layout.addWidget(view.turns_panel, 0, 0)
     frame.grid_layout.setRowStretch(0, 1)
