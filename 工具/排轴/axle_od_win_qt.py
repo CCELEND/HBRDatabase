@@ -4818,7 +4818,7 @@ def _open_state_window(view):
     frame = getattr(view, "state_frame", None)
     if frame is not None:
         return frame
-    frame = creat_Toplevel(STATE_TITLE, 980, 460, 420, 210)
+    frame = creat_Toplevel(STATE_TITLE, 980, 460, 75, 520)
     set_window_icon(frame, "./工具/help.png")
     frame.grid_layout.addWidget(view.state_box, 0, 0)
     frame.grid_layout.setRowStretch(0, 1)
@@ -4872,7 +4872,7 @@ def creat_axle_od_win():
             win_set_top(TURNS_TITLE, TURNS_MODULE)
         return "break"
 
-    win_frame = creat_Toplevel(WINDOW_TITLE, 780, 400, 120, 60)
+    win_frame = creat_Toplevel(WINDOW_TITLE, 780, 400, 75, 40)
     set_window_icon(win_frame, "./工具/help.png")
 
     view = AxleODWindow(win_frame.centralWidget())
