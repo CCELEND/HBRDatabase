@@ -16,7 +16,6 @@
 只依赖 PyQt5（QImage / QPainter），不创建窗口、不读界面控件状态，
 输入就是存档 dict，方便单独测试与批量出图。
 """
-import datetime
 import io
 import json
 import os
@@ -633,12 +632,8 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
     p.setFont(_font(14 * scale))
     p.setPen(_color(FOOTER_TEXT))
     foot_top = rows_top + len(rows) * row_h + 12 * scale
-    p.drawText(QRectF(20 * scale, foot_top, width / 2.0, 22 * scale),
+    p.drawText(QRectF(20 * scale, foot_top, width - 40 * scale, 22 * scale),
                Qt.AlignLeft | Qt.AlignVCenter, "HBRDatabase · 排轴 OD 计算")
-    stamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-    p.drawText(QRectF(width / 2.0, foot_top, width / 2.0 - 20 * scale,
-                      22 * scale),
-               Qt.AlignRight | Qt.AlignVCenter, stamp)
     p.end()
     return image
 
