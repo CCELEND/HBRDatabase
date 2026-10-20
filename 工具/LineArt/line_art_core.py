@@ -112,13 +112,32 @@ def stretch_levels(gray, lo_p=2, hi_p=98, white_knee=None,
     return np.clip(out, 0, 255).astype(np.uint8)
 
 
+# 「最小值半径」可选值：**小于 5 时步长 0.5**（细调线条粗细），5 及以上步长 1
+RADIUS_VALUES = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0,
+                 6.0, 7.0, 8.0, 9.0, 10.0]
+
+
+def radius_label(value):
+    """半径显示文字：整数不带 .0（1 / 1.5 / 10）。"""
+    value = float(value)
+    if abs(value - round(value)) < 1e-9:
+        return "%d" % int(round(value))
+    return "%g" % value
+
+
+def radius_choices():
+    """下拉框用的半径文字列表（<5 步长 0.5，>=5 步长 1）。"""
+    return [radius_label(v) for v in RADIUS_VALUES]
+
+
 def to_line_art(img, min_radius=2, brightness_offset=50, enhance_mode=0,
                 invert=False, denoise=DEFAULT_DENOISE,
                 gain_max=DEFAULT_GAIN_MAX):
     """把一张图片转成线稿，返回灰度 numpy 数组（uint8）。
 
     :param img: 原始图片（BGR / BGRA / 灰度）
-    :param min_radius: 最小值半径 1~10，越大线条越粗
+    :param min_radius: 最小值半径 1~10，越大线条越粗；小于 5 时可用 0.5 档
+                       （核大小按 2r 四舍五入，半档会落到偶数核）
     :param brightness_offset: 亮度补偿 0~100，50 为不补偿
     :param enhance_mode: 0 无 / 1 对比度拉伸 / 2 轻度锐化 / 3 强锐化+去噪
     :param invert: True 输出黑底白线
@@ -130,7 +149,8 @@ def to_line_art(img, min_radius=2, brightness_offset=50, enhance_mode=0,
 
     # 取「反相后的最小值滤波」再与原图相加，得到线稿效果
     inverted = 255 - gray
-    kernel_size = 2 * int(min_radius) + 1
+    # 支持 0.5 档：2r 四舍五入后 +1（r=2.5 -> 6，介于 r=2 的 5 与 r=3 的 7 之间）
+    kernel_size = max(3, int(round(2 * float(min_radius))) + 1)
     kernel = np.ones((kernel_size, kernel_size), np.uint8)
     inverted_min = cv2.erode(inverted, kernel, anchor=(-1, -1),
                              borderType=cv2.BORDER_REPLICATE)

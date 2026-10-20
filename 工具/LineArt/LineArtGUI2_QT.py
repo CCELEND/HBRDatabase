@@ -19,14 +19,16 @@ try:
         DEFAULT_GAIN_MAX as CORE_DEFAULT_GAIN_MAX,
         DENOISE_MAP as CORE_DENOISE_MAP,
         ENHANCE_MAP as CORE_ENHANCE_MAP,
-        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art)
+        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art,
+        radius_choices as core_radius_choices)
 except ImportError:  # 直接从本目录运行本文件时
     from line_art_core import (
         DEFAULT_DENOISE as CORE_DEFAULT_DENOISE,
         DEFAULT_GAIN_MAX as CORE_DEFAULT_GAIN_MAX,
         DENOISE_MAP as CORE_DENOISE_MAP,
         ENHANCE_MAP as CORE_ENHANCE_MAP,
-        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art)
+        GAIN_MAX_MAP as CORE_GAIN_MAX_MAP, to_line_art,
+        radius_choices as core_radius_choices)
 
 
 # 图像处理工作线程
@@ -202,9 +204,11 @@ class LineArtGUI(QMainWindow):
         param_layout.setContentsMargins(12, 18, 12, 12)
 
         self.radius_combo = QComboBox()
-        self.radius_combo.addItems([str(i) for i in range(1, 11)])
-        self.radius_combo.setCurrentIndex(1)  # 默认2
-        param_layout.addRow("最小值半径（1~10）：", self.radius_combo)
+        self.radius_combo.addItems(core_radius_choices())   # <5 步长 0.5
+        self.radius_combo.setCurrentText("2")               # 默认 2
+        self.radius_combo.setToolTip(
+            "线条粗细。小于 5 时可按 0.5 细调（1 / 1.5 / 2 …），5 以上按 1 递增。")
+        param_layout.addRow("最小值半径（1~10，<5 步长 0.5）：", self.radius_combo)
 
         self.bright_combo = QComboBox()
         self.bright_combo.addItems([str(i) for i in range(0, 101, 5)])
@@ -291,7 +295,7 @@ class LineArtGUI(QMainWindow):
     def _get_params(self):
         return (
             self.input_path,
-            int(self.radius_combo.currentText()),
+            float(self.radius_combo.currentText()),
             int(self.bright_combo.currentText()),
             self.ENHANCE_MAP[self.enhance_combo.currentText()],
             self.denoise_combo.currentText(),

@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import (
 
 from 工具.LineArt.line_art_core import (DEFAULT_DENOISE, DEFAULT_GAIN_MAX,
                                         DENOISE_MAP, ENHANCE_MAP, GAIN_MAX_MAP,
-                                        VIDEO_EXTS, to_line_art)
+                                        VIDEO_EXTS, to_line_art, radius_choices)
 from 工具.LineArt.LineArtGUI2_QT import ImageViewer
 
 # 让 ffmpeg 子进程不弹出黑色控制台窗口（Windows）
@@ -775,9 +775,11 @@ class VideoLineArtGUI(QMainWindow):
         form.setContentsMargins(12, 18, 12, 12)
 
         self.radius_combo = QComboBox()
-        self.radius_combo.addItems([str(i) for i in range(1, 11)])
-        self.radius_combo.setCurrentIndex(1)          # 默认 2
-        form.addRow("最小值半径（1~10）：", self.radius_combo)
+        self.radius_combo.addItems(radius_choices())   # <5 步长 0.5
+        self.radius_combo.setCurrentText("2")          # 默认 2
+        self.radius_combo.setToolTip(
+            "线条粗细。小于 5 时可按 0.5 细调（1 / 1.5 / 2 …），5 以上按 1 递增。")
+        form.addRow("最小值半径（1~10，<5 步长 0.5）：", self.radius_combo)
 
         self.bright_combo = QComboBox()
         self.bright_combo.addItems([str(i) for i in range(0, 101, 5)])
@@ -1009,7 +1011,7 @@ class VideoLineArtGUI(QMainWindow):
 
     def _params(self):
         return {
-            "min_radius": int(self.radius_combo.currentText()),
+            "min_radius": float(self.radius_combo.currentText()),
             "brightness_offset": int(self.bright_combo.currentText()),
             "enhance_mode": ENHANCE_MAP[self.enhance_combo.currentText()],
             "denoise": self.denoise_combo.currentText(),
