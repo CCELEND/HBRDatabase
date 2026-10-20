@@ -272,8 +272,9 @@ HELP_TEXT = """排轴OD计算 使用说明
   选 +N 时，该回合所有**有 SP 消耗**的技能 SP 消耗 +N；
   与其它「增加SP消耗」的被动冲突时**取最大**（不叠加，例：被动 +2 与手动 +4 只算 +4），
   并与「降低SP消耗」相抵；SP 消耗为 0 的技能（通常攻击等）不受影响。
-- 同一行还有 **OD调整** 输入框（-300~300，默认 0）：**直接加在该回合的「回合开始OD」上**，
-  例如填 -10 就是该回合回合开始OD −10，并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
+- 同一行还有 **OD调整** 输入框（-300~300，默认 0，**支持小数**）：
+  **直接加在该回合的「回合开始OD」上**，例如填 -10 就是该回合回合开始OD −10，
+  也可以填 -12.5 / +0.32 这类小数；并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
   正数同样生效，整体仍受 300 上限约束。
 - 回合窗口工具栏的 **「状态总览」** 按钮会**单独打开状态总览窗口**
   （点选回合后刷新，默认显示最后一个回合）：
@@ -1947,12 +1948,13 @@ class TurnCard(QFrame):
 
         # OD调整：直接加在该回合的「回合开始OD」上（例 -10 -> 回合开始OD −10）
         self.od_adjust_label = QLabel("OD调整")
-        self.od_adjust_spin = QSpinBox()
-        self.od_adjust_spin.setRange(-300, 300)
-        self.od_adjust_spin.setSingleStep(5)
-        self.od_adjust_spin.setFixedWidth(84)
+        self.od_adjust_spin = QDoubleSpinBox()
+        self.od_adjust_spin.setDecimals(2)          # OD 有小数，允许到 0.01
+        self.od_adjust_spin.setRange(-300.0, 300.0)
+        self.od_adjust_spin.setSingleStep(0.5)
+        self.od_adjust_spin.setFixedWidth(92)
         _tip2 = ("直接加在该回合的「回合开始OD」上（例：-10 = 回合开始OD −10），\n"
-                 "并计入之后的累计（相当于回合开始时 OD 槽被加减）。")
+                 "可输入小数（如 -12.5、+0.32）；并计入之后的累计。")
         self.od_adjust_label.setToolTip(_tip2)
         self.od_adjust_spin.setToolTip(_tip2)
         self.od_adjust_spin.valueChanged.connect(self._on_destruction_changed)
@@ -2225,8 +2227,8 @@ class TurnCard(QFrame):
         return int(self.sp_up_combo.currentData() or 0)
 
     def od_adjust(self):
-        """直接加在该回合「回合开始OD」上的调整值（默认 0）。"""
-        return int(self.od_adjust_spin.value())
+        """直接加在该回合「回合开始OD」上的调整值（默认 0，可为小数）。"""
+        return round(float(self.od_adjust_spin.value()), 2)
 
     def mousePressEvent(self, event):
         self.turn_selected.emit(self)
@@ -2361,9 +2363,9 @@ class TurnCard(QFrame):
             _pos_up = self.sp_up_combo.findData(_up)
             self.sp_up_combo.setCurrentIndex(_pos_up if _pos_up >= 0 else 0)
             try:
-                self.od_adjust_spin.setValue(int(data.get("od_adjust") or 0))
+                self.od_adjust_spin.setValue(float(data.get("od_adjust") or 0))
             except (TypeError, ValueError):
-                self.od_adjust_spin.setValue(0)
+                self.od_adjust_spin.setValue(0.0)
             for action in list(self.actions):
                 self.actions_layout.removeWidget(action)
                 action.setParent(None)
