@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QMenu, QTextEdit, QLineEdit,
     QMessageBox, QLabel, QGridLayout,
     QGraphicsView, QGraphicsScene, QGraphicsPixmapItem,
-    QSizePolicy, QStatusBar
+    QSizePolicy, QStatusBar, QComboBox, QAbstractSpinBox, QAbstractScrollArea
 )
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QEvent, QObject
 from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
 
 # numpy / cv2 只在「按路径加载图片到图像查看器」时用到，
@@ -15,6 +15,53 @@ from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
 
 
 MONO_FONT = QFont("Monospace", 10, QFont.Bold)
+
+
+class _WheelGuard(QObject):
+    """下拉框 / 数值框：鼠标滚轮**不改值**。
+
+    鼠标滚动页面时很容易扫过下拉框/数值框而误改（如技能等级）；
+    这里把滚轮吞掉并转给最近的滚动区域，页面仍然照常滚动。
+    控件仍可点击后用键盘 / 箭头修改。
+    """
+
+    def eventFilter(self, obj, event):
+        if event.type() != QEvent.Wheel:
+            return False
+        parent = obj.parentWidget()
+        while parent is not None and not isinstance(parent, QAbstractScrollArea):
+            parent = parent.parentWidget()
+        if parent is not None:
+            QApplication.sendEvent(parent.viewport(), event)
+        return True        # 无论如何都吞掉：绝不改值
+
+
+_WHEEL_GUARD = None
+
+
+def wheel_guard():
+    """全局共用一个滚轮守卫实例（被 installEventFilter 引用，需常驻）。"""
+    global _WHEEL_GUARD
+    if _WHEEL_GUARD is None:
+        _WHEEL_GUARD = _WheelGuard()
+    return _WHEEL_GUARD
+
+
+def disable_wheel(*widgets):
+    """给这些控件禁用鼠标滚轮改值（下拉框 / 数值框）。"""
+    guard = wheel_guard()
+    for widget in widgets:
+        if widget is not None:
+            widget.installEventFilter(guard)
+    return widgets[0] if len(widgets) == 1 else widgets
+
+
+def install_no_wheel(root):
+    """给 root 下**所有**下拉框 / 数值框禁用鼠标滚轮改值。"""
+    guard = wheel_guard()
+    for widget in root.findChildren((QComboBox, QAbstractSpinBox)):
+        widget.installEventFilter(guard)
+    return root
 
 
 def set_global_bg(parent: QApplication, bg="#f0f0f0"):

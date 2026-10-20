@@ -1,7 +1,7 @@
 
 from PyQt5.QtWidgets import QComboBox, QSizePolicy
 from PyQt5.QtCore import Qt
-from window_qt import MONO_FONT
+from window_qt import MONO_FONT, disable_wheel
 from 角色.style_proc import on_attack_combo_select, on_buff_attack_combo_select
 from 角色.style_proc import on_heal_combo_select
 from 角色.style_proc import on_hit_combo_select, on_defense_combo_select, on_buff_combo_select
@@ -246,6 +246,7 @@ def creat_lv_combo_lab(parent_frame, level_max) -> QComboBox:
     lv_combo.setMinimumContentsLength(10)
     lv_combo.setMaxVisibleItems(10)
 
+    disable_wheel(lv_combo)      # 滚轮不修改技能等级
     return lv_combo
 
 def bind_lv_combo_lab(lv_combo, lv_combo_labs, lv_combo_texts):

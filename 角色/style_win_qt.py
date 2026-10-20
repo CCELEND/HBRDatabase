@@ -8,6 +8,7 @@ from PyQt5.QtCore import Qt
 from canvas_events_qt import VideoPlayerWithScrollbar
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top, PreviewWindow
+from window_qt import install_no_wheel
 from scrollbar_frame_qt import ScrollbarFrameWin
 from tools import replace_file_extension
 
@@ -78,6 +79,8 @@ def show_style(scrollbar_frame_obj, style):
     if style.resonance:
         creat_resonance_frame(skill_bg_frame, growth_status_frame_row + 1, style)
 
+    # 滚轮只滚动页面，不改下拉框 / 数值框（如技能等级）
+    install_no_wheel(skill_bg_frame)
     scrollbar_frame_obj.update_canvas()
 
 

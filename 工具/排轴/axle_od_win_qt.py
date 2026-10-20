@@ -35,13 +35,12 @@ from PyQt5.QtWidgets import (
     QDoubleSpinBox, QCheckBox, QHBoxLayout, QVBoxLayout, QGridLayout,
     QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy,
     QToolButton, QMenu, QDialog, QApplication,
-    QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
-    QAbstractSpinBox, QAbstractScrollArea, QLayout
+    QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 )
-from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal
 from PyQt5.QtGui import QPainter, QPixmap
 
-from window_qt import set_window_icon, creat_Toplevel
+from window_qt import set_window_icon, creat_Toplevel, install_no_wheel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
 
 from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
@@ -570,44 +569,6 @@ class _StatePanel(QFrame):
 
     def title(self):
         return self.title_label.text()
-
-
-class _WheelGuard(QObject):
-    """禁用「下拉框 / 数值框」的鼠标滚轮改值。
-
-    鼠标在回合窗口里滚动页面时，很容易扫过下拉框/数值框而无意改值；
-    这里把滚轮事件吞掉，并转给最近的滚动区域，保证页面照常滚动。
-    控件仍可点击后用键盘/箭头修改。
-    """
-
-    def eventFilter(self, obj, event):
-        if event.type() != QEvent.Wheel:
-            return False
-        parent = obj.parentWidget()
-        while parent is not None and not isinstance(parent, QAbstractScrollArea):
-            parent = parent.parentWidget()
-        if parent is not None:
-            # 让页面继续滚动（滚轮转给滚动区域）
-            QApplication.sendEvent(parent.viewport(), event)
-        return True        # 无论如何都吞掉：绝不改值
-
-
-_NO_WHEEL_GUARD = None
-
-
-def _wheel_guard():
-    """全局共用一个滚轮守卫实例（被 installEventFilter 引用，需常驻）。"""
-    global _NO_WHEEL_GUARD
-    if _NO_WHEEL_GUARD is None:
-        _NO_WHEEL_GUARD = _WheelGuard()
-    return _NO_WHEEL_GUARD
-
-
-def _install_no_wheel(root):
-    """给 root 下所有下拉框 / 数值框装上「禁用滚轮改值」的过滤器。"""
-    guard = _wheel_guard()
-    for widget in root.findChildren((QComboBox, QAbstractSpinBox)):
-        widget.installEventFilter(guard)
 
 
 def _left_text(left, kind=None):
@@ -1263,7 +1224,7 @@ class ActionRow(QFrame):
         self._populate_targets()
         if data:
             self.set_data(data)
-        _install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
+        install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
 
     def _build_ui(self):
         layout = QHBoxLayout(self)
@@ -1903,7 +1864,7 @@ class TurnCard(QFrame):
         self._build_ui()
         self.add_action()
         self._apply_style()
-        _install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
+        install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
 
     def _build_ui(self):
         root = QVBoxLayout(self)
