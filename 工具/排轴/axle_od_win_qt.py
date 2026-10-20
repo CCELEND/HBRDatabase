@@ -34,9 +34,11 @@ from PyQt5.QtWidgets import (
     QWidget, QFrame, QLabel, QPushButton, QComboBox, QSpinBox,
     QDoubleSpinBox, QCheckBox, QHBoxLayout, QVBoxLayout, QGridLayout,
     QScrollArea, QFileDialog, QMessageBox, QGroupBox, QSizePolicy,
-    QToolButton, QMenu, QDialog, QApplication
+    QToolButton, QMenu, QDialog, QApplication,
+    QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView,
+    QAbstractSpinBox, QAbstractScrollArea, QLayout
 )
-from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal
+from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal, QObject
 from PyQt5.QtGui import QPainter, QPixmap
 
 from window_qt import set_window_icon, creat_Toplevel
@@ -274,6 +276,14 @@ HELP_TEXT = """排轴OD计算 使用说明
 - 同一行还有 **OD调整** 输入框（-300~300，默认 0）：**直接加在该回合的「回合开始OD」上**，
   例如填 -10 就是该回合回合开始OD −10，并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
   正数同样生效，整体仍受 300 上限约束。
+- 回合窗口工具栏的 **「状态总览」** 按钮会**单独打开状态总览窗口**
+  （点选回合后刷新，默认显示最后一个回合）：
+  按风格列出该回合**开始时**队员所处的状态、状态效果、**剩余回合**与来源，
+  以及「连击数上升」buff 的剩余回合 / 次数。
+  「剩余」按**己方回合**计（含当前回合），永久状态（如仆人）显示「永久」；
+  只列出**实际参与 OD / SP 计算**的状态与 buff，方便核对持续时间。
+- 回合窗口里的**下拉框 / 数值框不响应鼠标滚轮**（防止滚动页面时误改数值）：
+  滚轮会转去滚动页面；要改值请先点击，再用键盘 / 箭头或直接输入。
 - 「追加回合内」的 SP 消耗增减被动也只在追加回合/特殊回合生效
   （如 优美的剑技：追加回合中 自身消耗SP-2）。
 - 每回合下方显示两行全队 SP（含未行动的后卫）：
@@ -533,6 +543,80 @@ def _element_matches(style_element, element):
 def _talent_element_ok(allowed, element):
     """（转发到 data_source.talent_element_ok，保留旧名字给界面/测试用。）"""
     return talent_element_ok(allowed, element)
+
+
+class _StatePanel(QFrame):
+    """「状态总览」容器：标题单独占一行。
+
+    不用 QGroupBox 的标题：它的标题画在边框上，某些字体 / 缩放下
+    预留高度不足，会被下面的表格表头压掉下半截。
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("statePanel")
+        self.setFrameShape(QFrame.StyledPanel)
+        self.title_label = QLabel()
+        self.title_label.setTextFormat(Qt.PlainText)
+        self.title_label.setStyleSheet(
+            "font-weight: bold; padding: 2px 0 2px 2px;")
+        self.body = QVBoxLayout(self)
+        self.body.setContentsMargins(8, 4, 8, 4)
+        self.body.setSpacing(4)
+        self.body.addWidget(self.title_label)
+
+    def setTitle(self, text):
+        self.title_label.setText(text)
+
+    def title(self):
+        return self.title_label.text()
+
+
+class _WheelGuard(QObject):
+    """禁用「下拉框 / 数值框」的鼠标滚轮改值。
+
+    鼠标在回合窗口里滚动页面时，很容易扫过下拉框/数值框而无意改值；
+    这里把滚轮事件吞掉，并转给最近的滚动区域，保证页面照常滚动。
+    控件仍可点击后用键盘/箭头修改。
+    """
+
+    def eventFilter(self, obj, event):
+        if event.type() != QEvent.Wheel:
+            return False
+        parent = obj.parentWidget()
+        while parent is not None and not isinstance(parent, QAbstractScrollArea):
+            parent = parent.parentWidget()
+        if parent is not None:
+            # 让页面继续滚动（滚轮转给滚动区域）
+            QApplication.sendEvent(parent.viewport(), event)
+        return True        # 无论如何都吞掉：绝不改值
+
+
+_NO_WHEEL_GUARD = None
+
+
+def _wheel_guard():
+    """全局共用一个滚轮守卫实例（被 installEventFilter 引用，需常驻）。"""
+    global _NO_WHEEL_GUARD
+    if _NO_WHEEL_GUARD is None:
+        _NO_WHEEL_GUARD = _WheelGuard()
+    return _NO_WHEEL_GUARD
+
+
+def _install_no_wheel(root):
+    """给 root 下所有下拉框 / 数值框装上「禁用滚轮改值」的过滤器。"""
+    guard = _wheel_guard()
+    for widget in root.findChildren((QComboBox, QAbstractSpinBox)):
+        widget.installEventFilter(guard)
+
+
+def _left_text(left, kind=None):
+    """「剩余」列的文字：永久 / N 回合 / N 次。"""
+    if left is None:
+        return "永久"
+    if kind == "use":
+        return "%d 次" % int(left)
+    return "%d 回合" % int(left)
 
 
 def _fmt_sp(value, width=3):
@@ -1179,6 +1263,7 @@ class ActionRow(QFrame):
         self._populate_targets()
         if data:
             self.set_data(data)
+        _install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
 
     def _build_ui(self):
         layout = QHBoxLayout(self)
@@ -1818,6 +1903,7 @@ class TurnCard(QFrame):
         self._build_ui()
         self.add_action()
         self._apply_style()
+        _install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
 
     def _build_ui(self):
         root = QVBoxLayout(self)
@@ -2349,6 +2435,19 @@ class TurnCard(QFrame):
         self.actions = []
 
 
+# 「状态」的显示名（内部键 → 游戏内名称）
+STATE_DISPLAY = {
+    "歌姬": "歌姬之加护",
+    "仆人": "山胁大人的仆人",
+}
+
+# 状态对计算的实际影响（只写工具**已建模**的效果，供「状态总览」展示）
+STATE_EFFECT_TEXT = {
+    "歌姬": "月芒→连击+3（特大/3次）；共鸣 前锋SP+2；绝唱 自身消耗SP-2",
+    "仆人": "「处于该状态的友方 SP+N」；「处于该状态的友方≥N名」的 OD/被动条件",
+}
+
+
 class _StateTracker:
     """跟踪技能赋予的「状态」（如 歌姬之加护）。
 
@@ -2361,6 +2460,7 @@ class _StateTracker:
         self.owner = owner
         self.until = {}      # {(slot, 状态名): 生效到的回合下标（含）}
         self.active = {}     # {slot: {状态名}} 当前状态（本回合内随行动更新）
+        self.sources = {}    # {(slot, 状态名): 来源描述}（供状态总览展示）
 
     def begin_turn(self, turn_idx):
         """进入新回合：按已记录的到期时间刷新当前状态。"""
@@ -2382,10 +2482,17 @@ class _StateTracker:
             targets = self.owner._scope_targets(
                 grant.get("scope"), grant.get("element"),
                 action.member_index, self.owner._active_slots(), turn_front)
+            label = getattr(skill, "name", "") or "技能"
+            src_role = ""
+            if (action.member_index is not None
+                    and 0 <= action.member_index < len(self.owner.team)):
+                src_role = self.owner.team[action.member_index].get("role") or ""
+            source = "%s（%s）" % (label, src_role) if src_role else label
             for tgt in targets:
                 self.until[(tgt, grant["state"])] = (
                     turn_idx + max(1, grant.get("duration", 1)) - 1)
                 self.active.setdefault(tgt, set()).add(grant["state"])
+                self.sources[(tgt, grant["state"])] = source
 
 
 # ======================================================================
@@ -2407,6 +2514,8 @@ class AxleODWindow(QFrame):
         self.turns = []
         self.team_rows = []
         self.selected_turn = None
+        self._state_book = {}       # {回合下标: [该回合开始时的队员状态]}
+        self._state_sig = None      # 状态总览的缓存签名（内容没变就不重建表格）
         self._team_updating = False
         self._recalc_suspend = 0    # 批量修改时挂起重算
         self._recalc_pending = False
@@ -2442,6 +2551,9 @@ class AxleODWindow(QFrame):
         root.addStretch(1)
         # 回合列表（含操作按钮）放到独立窗口，避免主窗口拥挤
         self.turns_panel = self._build_turns_panel()
+        # 状态总览也是独立窗口（由回合窗口的「状态总览」按钮打开）
+        self.state_box = self._build_state_panel()
+        self.state_box.hide()
 
     def _build_main_toolbar(self):
         bar = QHBoxLayout()
@@ -2610,6 +2722,14 @@ class AxleODWindow(QFrame):
         if btn is not None:
             btn.setEnabled(any(row.role() for row in self.team_rows))
 
+    def open_state_window(self):
+        """打开/置顶「状态总览」窗口。"""
+        frame = _open_state_window(self)
+        if frame is not None:
+            self._state_sig = None      # 重新排版（窗口宽度可能变了）
+            self._refresh_state_panel()
+            win_set_top(STATE_TITLE, STATE_MODULE)
+
     def open_turns_window(self):
         """打开/置顶回合窗口。"""
         frame = _open_turns_window(self)
@@ -2668,6 +2788,14 @@ class AxleODWindow(QFrame):
             "配色与版式参考 工具/排轴/hbr_axle.jpg")
         self.image_btn.clicked.connect(self.generate_axle_image)
         bar.addWidget(self.image_btn)
+
+        self.state_btn = QPushButton("状态总览")
+        self.state_btn.setMinimumWidth(92)
+        self.state_btn.setToolTip(
+            "单独打开「状态总览」窗口：按风格列出该回合开始时的\n"
+            "状态 / 效果 / 剩余回合 / 来源（只列参与 OD·SP 计算的内容）")
+        self.state_btn.clicked.connect(self.open_state_window)
+        bar.addWidget(self.state_btn)
 
         bar.addStretch(1)
         return bar
@@ -2825,6 +2953,129 @@ class AxleODWindow(QFrame):
 
         layout.addStretch(1)
         return group
+
+    def _build_state_panel(self):
+        """「状态总览」面板（独立窗口的内容）。
+
+        按风格列出该回合**开始时**的状态 / 效果 / 剩余回合 / 来源，
+        只收录实际参与 OD / SP 计算的状态与「连击数上升」buff。
+        """
+        box = _StatePanel()
+        box.setTitle("状态总览（回合开始时）")
+        self.state_box = box
+        layout = box.body
+
+        table = QTableWidget(0, 6)
+        table.setHorizontalHeaderLabels(
+            ["角色", "风格", "状态", "效果", "剩余", "来源"])
+        table.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        table.setSelectionMode(QAbstractItemView.NoSelection)
+        table.setWordWrap(True)
+        table.verticalHeader().setVisible(False)
+        table.setMinimumHeight(62)
+        table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        header = table.horizontalHeader()
+        for col, mode in ((0, QHeaderView.ResizeToContents),
+                          (1, QHeaderView.ResizeToContents),
+                          (2, QHeaderView.ResizeToContents),
+                          (3, QHeaderView.Stretch),
+                          (4, QHeaderView.ResizeToContents),
+                          (5, QHeaderView.ResizeToContents)):
+            header.setSectionResizeMode(col, mode)
+        self.state_table = table
+        layout.addWidget(table)
+
+        hint = QLabel("「剩余」按己方回合计（含当前回合）；永久状态显示「永久」。"
+                      "只列出参与 OD / SP 计算的状态与 buff。")
+        hint.setStyleSheet("color: #888888;")
+        layout.addWidget(hint)
+        return box
+
+    def _snapshot_turn_states(self, turn_idx, tracker, combo_buffs):
+        """记录该回合**开始时**每名队员的状态 / 连击 buff。"""
+        entries = []
+        for slot in self._active_slots():
+            role = self.team[slot].get("role") or ""
+            style = self.team[slot].get("style") or ""
+            states = []
+            for name in sorted(tracker.states(slot) or ()):
+                until = tracker.until.get((slot, name))
+                if until is None:
+                    continue
+                left = (None if until >= 10 ** 5
+                        else max(0, int(until) - turn_idx + 1))
+                states.append({
+                    "name": STATE_DISPLAY.get(name, name),
+                    "left": left,
+                    "effect": STATE_EFFECT_TEXT.get(name, ""),
+                    "source": tracker.sources.get((slot, name), ""),
+                })
+            combos = []
+            for entry in combo_buffs.get(slot, []):
+                left = int(entry.get("left", 0) or 0)
+                if left <= 0:
+                    continue
+                combos.append({
+                    "amount": entry.get("amount", 0),
+                    "left": left,
+                    "kind": entry.get("kind", "turn"),
+                    "source": entry.get("source") or "",
+                    "source_role": entry.get("source_role") or "",
+                })
+            if states or combos:
+                entries.append({"slot": slot, "role": role, "style": style,
+                                "states": states, "combos": combos})
+        return entries
+
+    def _refresh_state_panel(self):
+        """按「选中的回合」刷新状态总览（没选中则显示最后一个回合）。"""
+        table = getattr(self, "state_table", None)
+        if table is None:
+            return
+        turn = self.selected_turn
+        if turn not in self.turns:
+            turn = self.turns[-1] if self.turns else None
+        if turn is None:
+            self.state_box.setTitle("状态总览（回合开始时）")
+            if self._state_sig is not None:
+                self._state_sig = None
+                table.setRowCount(0)
+            return
+
+        idx = self.turns.index(turn)
+        rows = []
+        for entry in self._state_book.get(idx, []):
+            who = "角色%d %s" % (entry["slot"] + 1, entry["role"])
+            for st in entry["states"]:
+                rows.append((who, entry["style"], st["name"],
+                             st.get("effect", ""), _left_text(st.get("left")),
+                             st.get("source", "")))
+            for cb in entry["combos"]:
+                src = cb.get("source") or ""
+                if cb.get("source_role"):
+                    src = "%s（%s）" % (src, cb["source_role"]) if src else cb["source_role"]
+                rows.append((who, entry["style"],
+                             "连击数上升 +%g" % cb["amount"],
+                             "连击 +%g" % cb["amount"],
+                             _left_text(cb["left"], cb.get("kind")),
+                             src))
+        if not rows:
+            rows = [("—", "", "（本回合开始时没有状态）", "", "", "")]
+
+        title = "状态总览 · %s（回合开始时）" % turn.index_label.text()
+        sig = (title, tuple(rows))
+        if sig == self._state_sig:
+            return
+        self._state_sig = sig
+        self.state_box.setTitle(title)
+        table.setRowCount(len(rows))
+        for r, cells in enumerate(rows):
+            for c, text in enumerate(cells):
+                item = QTableWidgetItem(str(text))
+                if c == 3:
+                    item.setToolTip(str(text))
+                table.setItem(r, c, item)
+        table.resizeRowsToContents()
 
     def _build_rows_area(self):
         scroll = QScrollArea()
@@ -3043,6 +3294,7 @@ class AxleODWindow(QFrame):
 
     def _select_turn(self, turn):
         self.selected_turn = turn
+        self._refresh_state_panel()
         for item in self.turns:
             if item is turn:
                 item.index_label.setStyleSheet(
@@ -3114,6 +3366,7 @@ class AxleODWindow(QFrame):
         if self._recalc_suspend:
             self._recalc_pending = True
             return
+        self._state_book = {}
         # 先结算一次 SP：「追击」及其 SP 消耗/回复会影响 OD，需要先算出来
         self._recalc_sp()
 
@@ -3155,6 +3408,9 @@ class AxleODWindow(QFrame):
             turn_states[turn_idx] = {
                 slot: set(state_tracker.states(slot) or ())
                 for slot in self._active_slots()}
+            # 「状态总览」：记录该回合**开始时**的状态 / 连击 buff
+            self._state_book[turn_idx] = self._snapshot_turn_states(
+                turn_idx, state_tracker, combo_buffs)
             # 1) 被动类连击（如 山胁「梅雨」：战斗开始时位于前锋 连击+5（1次））
             for slot in self._active_slots():
                 for mod in self._member_passive_combo(slot):
@@ -3222,6 +3478,7 @@ class AxleODWindow(QFrame):
                         "left": buff["duration"],
                         "kind": buff.get("kind", "turn"),
                         "source": buff.get("source"),
+                        "source_role": self.team[action.member_index].get("role") or "",
                         "solo": bool(buff.get("solo")),
                     })
             # 3) 连击框显示全部可用层之和；一次攻击技能**最多生效 2 层**，
@@ -3414,6 +3671,7 @@ class AxleODWindow(QFrame):
             self.sp_limit_hint.setText("")
 
         self._recalc_sp()
+        self._refresh_state_panel()
 
     def _active_slots(self):
         """队伍中已安排角色的位置下标。"""
@@ -3951,6 +4209,8 @@ class AxleODWindow(QFrame):
                     if bs.get("lb", 0) > lb:
                         continue
                     tracker.until[(slot, bs["state"])] = 10 ** 6
+                    tracker.sources[(slot, bs["state"])] = "%s（战斗开始时）" % (
+                        bs.get("name") or "被动")
 
     def _state_holders(self, turn_states, state):
         """某回合开始时，处于指定状态的队员数量。"""
@@ -4553,6 +4813,8 @@ class AxleODWindow(QFrame):
 
 TURNS_TITLE = WINDOW_TITLE + "-回合"
 TURNS_MODULE = MODULE_NAME + "_TURNS"
+STATE_TITLE = WINDOW_TITLE + "-状态总览"
+STATE_MODULE = MODULE_NAME + "_STATE"
 _active_view = None   # 当前打开的排轴窗口（用于重新打开回合窗口）
 
 
@@ -4590,6 +4852,46 @@ def _open_turns_window(view):
     return frame
 
 
+def _open_state_window(view):
+    """把「状态总览」放到独立窗口。"""
+    frame = getattr(view, "state_frame", None)
+    if frame is not None:
+        return frame
+    frame = creat_Toplevel(STATE_TITLE, 980, 460, 420, 210)
+    set_window_icon(frame, "./工具/help.png")
+    frame.grid_layout.addWidget(view.state_box, 0, 0)
+    frame.grid_layout.setRowStretch(0, 1)
+    frame.grid_layout.setColumnStretch(0, 1)
+    view.state_box.show()
+    view.state_frame = frame
+    win_open_manage(frame, STATE_MODULE)
+
+    def on_close(self, event):
+        if getattr(view, "_state_closing", False):
+            event.accept()
+            return
+        view._state_closing = True
+        try:
+            view.state_frame = None
+            panel = view.state_box
+            panel.setParent(None)
+            panel.hide()
+            win_close_manage(frame, STATE_MODULE, None)
+        finally:
+            view._state_closing = False
+        event.accept()
+
+    frame.closeEvent = types.MethodType(on_close, frame)
+    return frame
+
+
+def _close_state_window(view):
+    frame = getattr(view, "state_frame", None)
+    if frame is not None:
+        view.state_frame = None
+        win_close_manage(frame, STATE_MODULE, None)
+
+
 def _close_turns_window(view):
     frame = getattr(view, "turns_frame", None)
     if frame is not None:
@@ -4625,6 +4927,7 @@ def creat_axle_od_win():
         global _active_view
         _active_view = None
         _close_turns_window(view)
+        _close_state_window(view)
         win_close_manage(win_frame, MODULE_NAME, view)
         event.accept()
 
