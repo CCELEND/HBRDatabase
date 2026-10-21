@@ -81,7 +81,7 @@ OD、SP排轴工具，支持OD、SP、被动、大师技能自动获取计算
 * 行动行的「条件触发」下拉框可手动指定触发条件（击破敌人 / 【炸裂！！贝斯独奏】发动等）
 * 支持存档读档，可保存/载入排轴方案
 * **一键生成轴图**（在回合窗口工具栏）：「预览轴图」直接看效果不落盘，「生成轴图」导出 PNG/JPG；图里含头像 + 突破/共鸣徽章 + 共鸣天赋所属风格缩略图 + 携带被动 + 技能及使用次数 + 回合行动
-![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/axle_od_win_show1.png)
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/axle_od_win_show.png)
 
 #### 图片转线稿工具2.0
 
