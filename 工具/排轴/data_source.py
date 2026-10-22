@@ -518,6 +518,9 @@ class StyleInfo:
         self.style_label = style_label
         # 影响技能 SP 消耗的被动：[{name, amount(带符号), scope, element}, ...]
         self.sp_cost_mods = sp_cost_mods or []
+        # 「指定SP消耗」类（如 速攻◯：指定EX技能在开局 N 回合内消耗固定为 X）：
+        # [{"passive","skill","cost","turns","unit"}, ...]
+        self.sp_cost_pins = []
         # SP 上限覆盖（如「SP上限变为30」）；需携带 boost_enabler 才生效
         self.sp_limit_override = sp_limit_override
         # 回合开始时「位于前锋则自身 SP+X」的被动（如 闪光/佳音/机敏/俊敏…）
@@ -678,6 +681,9 @@ def _sp_recover_scope(target):
         element = target[len("全体"):-len("属性风格")]
         if element:
             return ("all_element", element)
+    # 「全体干劲极佳友方」这类带条件的全体目标：范围算全体，条件另行判定
+    if target.startswith("全体") and target.endswith("友方"):
+        return ("all", None)
     return None
 
 
@@ -816,6 +822,25 @@ STATE_EFFECTS = {
 }
 
 
+# 「干劲」阶段（1~5 阶段）：下标越大越好，默认极佳
+CONDITION_TIERS = ("极差", "不佳", "一般", "良好", "极佳")
+
+
+def _condition_requirement(desc):
+    """「干劲为极佳 / 干劲为良好或以上」类条件。
+
+    返回 (最低阶段下标, 是否必须恰好该阶段)；无「干劲为X」则 (None, False)。
+    """
+    text = str(desc or "")
+    m = re.search(r'干劲为(极差|不佳|一般|良好|极佳)', text)
+    if not m:
+        return None, False
+    rank = CONDITION_TIERS.index(m.group(1))
+    inclusive = bool(re.search(
+        r'干劲为(?:极差|不佳|一般|良好|极佳)(?:或)?以上', text))
+    return rank, (not inclusive)
+
+
 def _state_condition(desc):
     """从描述里取出「自身处于X状态」类条件，返回状态键或 None。
 
@@ -829,6 +854,47 @@ def _state_condition(desc):
                 or ("处于%s之%s" % (base, eff_name)) in text):
             return state
     return None
+
+
+def _parse_sp_cost_pins(style_data):
+    """「指定SP消耗」类效果（如 速攻◯（被动技能））。
+
+    描述：战斗开始时【夺取荣耀！满垒本垒打！】消耗的SP为8（2回合）
+    效果：["指定SP消耗", "指定EX技能的消耗为8SP", null, null, "2", "敌方回合", "自身"]
+
+    返回 [{"passive","skill","cost","turns","unit"}, ...]；
+    unit = "enemy"（按敌方回合计）或 "turn"（按己方回合计）。
+    """
+    out = []
+    for group in (style_data.get("ActiveSkills") or []):
+        try:
+            gname = str(group[0][0])
+            gdesc = str(group[0][1])
+        except Exception:
+            continue
+        if "（被动技能）" not in gname and "(被动技能)" not in gname:
+            continue
+        effects = (group[1] if len(group) > 1 and isinstance(group[1], list)
+                   else [])
+        m_skill = re.search(r'【(.+?)】', gname + gdesc)
+        for eff in effects:
+            if not isinstance(eff, list) or not eff:
+                continue
+            if str(eff[0]) != "指定SP消耗":
+                continue
+            mc = re.search(r'(\d+)', str(eff[1]) if len(eff) > 1 else "")
+            if not mc or not m_skill:
+                continue
+            turns = 0
+            if len(eff) > 4:
+                mt = re.search(r'(\d+)', str(eff[4]))
+                turns = int(mt.group(1)) if mt else 0
+            unit = ("enemy" if (len(eff) > 5 and "敌方回合" in str(eff[5]))
+                    else "turn")
+            out.append({"passive": gname, "skill": m_skill.group(1),
+                        "cost": int(mc.group(1)), "turns": turns,
+                        "unit": unit})
+    return out
 
 
 def _parse_battle_states(style_data):
@@ -1857,9 +1923,14 @@ class HBRDataSource:
                     # 「若回合开始时存在破坏率为N%或以上的敌人」类（如 山胁「最终手段」）：
                     # 破坏率在回合行手动设置，所以这类条件也判定得了
                     destruction_min = _sp_destruction_min(pdesc)
+                    # 「干劲为极佳 / 良好或以上」类条件（如 干劲极佳的少女 / 怪童）
+                    cond_min, cond_exact = _condition_requirement(pdesc)
+                    cond_on = ("self" if "自身干劲" in pdesc
+                               else ("target" if cond_min is not None else None))
                     if sig is None:
                         if not (downed_cond or extra_only or state_cond
-                                or destruction_min) and not _sp_condition_ok(pdesc):
+                                or destruction_min or cond_min is not None) \
+                                and not _sp_condition_ok(pdesc):
                             continue
                         if (not (downed_cond or state_cond)
                                 and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
@@ -1890,6 +1961,9 @@ class HBRDataSource:
                         "destruction_min": destruction_min,
                         "state": None if target_state else state_cond,
                         "target_state": target_state,
+                        "condition_min": cond_min,
+                        "condition_exact": cond_exact,
+                        "condition_on": cond_on,
                         "once": "1次" in pdesc,
                         "sigil_element": sig.group(1) if sig else None,
                         "sigil_min_level": int(sig.group(2)) if sig else None,
@@ -2052,6 +2126,8 @@ class HBRDataSource:
                 styles[-1].sigil = _parse_sigil(style_data)
                 # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
                 styles[-1].battle_states = _parse_battle_states(style_data)
+                # 「指定SP消耗」类（如 速攻◯）
+                styles[-1].sp_cost_pins = _parse_sp_cost_pins(style_data)
                 # 所属队伍（如 31D）
                 styles[-1].team = (str(style_info[1])
                                    if len(style_info) > 1 and style_info[1]

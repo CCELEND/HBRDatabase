@@ -46,7 +46,8 @@ from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_to
 from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
 from 工具.排轴.data_source import (
     get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
-    resonance_od_effect, generic_skill_names, talent_element_ok)
+    resonance_od_effect, generic_skill_names, talent_element_ok,
+    CONDITION_TIERS)
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -276,6 +277,14 @@ HELP_TEXT = """排轴OD计算 使用说明
   **直接加在该回合的「回合开始OD」上**，例如填 -10 就是该回合回合开始OD −10，
   也可以填 -12.5 / +0.32 这类小数；并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
   正数同样生效，整体仍受 300 上限约束。
+- **干劲**（队伍配置每个位置的「干劲」下拉，默认**极佳**）：
+  「回合开始时 干劲为极佳的友方SP+1」（如 水濑莓「激战！奋力全垒打！」）、
+  「回合开始时若自身干劲为良好或以上 则自身SP+1」（如 月歌「激烈！带来胜利的全力一球！」）
+  都会按各队员的干劲自动结算。
+- **敌方回合**：两个**通常回合**之间的敌方行动算 1 个敌方回合
+  （T1=0、T2=1、T3=2；追加/特殊/占位/超频回合不产生），显示在回合行里。
+  「速攻◯（被动技能）」（水濑莓）：战斗开始时【夺取荣耀！满垒本垒打！】
+  消耗的SP为 8（2 个敌方回合内），即前两个通常回合该技能只花 8 SP。
 - 回合窗口工具栏的 **「状态总览」** 按钮会**单独打开状态总览窗口**
   （点选回合后刷新，默认显示最后一个回合）：
   按风格列出该回合**开始时**队员所处的状态、状态效果、**剩余回合**与来源，
@@ -351,6 +360,9 @@ def write_help_file():
 TEAM_SIZE = 6
 MAX_ACTIONS_PER_TURN = 3
 TURN_OPTIONS = ["通常回合", "超频回合", "追加回合", "特殊回合", "占位回合"]
+# 「敌方回合」= 两个**通常回合**之间的敌方行动；
+# 第 1 个通常回合前为 0，第 2 个前为 1，依此类推（速攻◯ 等按此计数）
+NORMAL_TURN_TYPE = "通常回合"
 # 额外回合（带「追加回合」条件的技能/被动在此生效）：
 # 不计回合数、不触发回合开始、不能发动 OD
 EXTRA_TURN_TYPES = ("追加回合", "特殊回合")
@@ -813,6 +825,20 @@ class TeamMemberRow(QFrame):
         self.earring_combo.currentIndexChanged.connect(self._emit_changed)
         layout.addWidget(self.earring_combo)
 
+        # 「干劲」阶段（默认极佳）：影响「干劲为极佳的友方SP+1」等被动
+        cond_label = QLabel("干劲")
+        layout.addWidget(cond_label)
+        self.condition_combo = QComboBox()
+        self.condition_combo.setFixedWidth(76)
+        for _cond in reversed(CONDITION_TIERS):      # 极佳 → 极差
+            self.condition_combo.addItem(_cond)
+        self.condition_combo.setToolTip(
+            "该队员的「干劲」阶段（默认极佳）。\n"
+            "用于「回合开始时 干劲为极佳的友方SP+1」这类被动；\n"
+            "没有干劲效果的队伍保持默认即可。")
+        self.condition_combo.currentIndexChanged.connect(self._emit_changed)
+        layout.addWidget(self.condition_combo)
+
         self._selected_passives = None   # None = 全部携带
 
     def _on_talent_changed(self, *args):
@@ -1159,8 +1185,13 @@ class TeamMemberRow(QFrame):
         data = self.style_combo.currentData()
         return data if data else self.style_combo.currentText()
 
+    def condition(self):
+        """该队员的「干劲」阶段（默认极佳）。"""
+        return self.condition_combo.currentText() or "极佳"
+
     def to_data(self):
         return {"role": self.role(), "style": self.style(),
+                "condition": self.condition(),
                 "passives": self.selected_passives(),
                 "lb": self.lb_spin.value(),
                 "resonance_talent": self.talent(),
@@ -1170,6 +1201,9 @@ class TeamMemberRow(QFrame):
 
     def set_data(self, data):
         with self._suspended():
+            cond = str(data.get("condition") or "极佳")
+            self.condition_combo.setCurrentText(
+                cond if cond in CONDITION_TIERS else "极佳")
             if "passives" in data:
                 self._selected_passives = set(data.get("passives") or [])
             else:
@@ -1961,6 +1995,14 @@ class TurnCard(QFrame):
         row2.addWidget(self.od_adjust_label)
         row2.addWidget(self.od_adjust_spin)
 
+        self.enemy_turn_label = QLabel("敌方回合：0")
+        self.enemy_turn_label.setToolTip(
+            "该回合开始前已经历的「敌方回合」数：\n"
+            "两个通常回合之间的敌方行动算 1 次（T1=0、T2=1、T3=2）。\n"
+            "用于「速攻◯」这类按敌方回合计的效果。")
+        self.enemy_turn_label.setStyleSheet("color: #666666;")
+        row2.addWidget(self.enemy_turn_label)
+
         self.rhythm_label = QLabel("超越条：—")
         self.rhythm_label.setToolTip(
             "超越条（X之律动）：战斗开始时 = 15%×该属性风格数；该属性风格行动后 +4%；\n"
@@ -2271,6 +2313,10 @@ class TurnCard(QFrame):
     def set_current_od(self, value):
         self.current_od_label.setText("当前OD：%.2f" % value)
 
+    def set_enemy_turns(self, count):
+        """显示该回合开始前已经历的「敌方回合」数。"""
+        self.enemy_turn_label.setText("敌方回合：%d" % int(count))
+
     def set_rhythm(self, text):
         """显示超越条（本回合行动结束后的值）。"""
         self.rhythm_label.setText(text if text else "超越条：—")
@@ -2471,7 +2517,8 @@ class AxleODWindow(QFrame):
             self.team = self._default_team()
         except Exception as e:
             logger.warning("初始化默认队伍失败: %s", e)
-            self.team = [{"role": "", "style": "", "resonance_talent": None,
+            self.team = [{"role": "", "style": "", "condition": "极佳",
+                          "resonance_talent": None,
                           "resonance_level": 4,
                           "od_earring": 1.0} for _ in range(TEAM_SIZE)]
         self.turns = []
@@ -2493,7 +2540,8 @@ class AxleODWindow(QFrame):
 
     def _default_team(self):
         """默认队伍为**空队伍**（角色/风格都为空，由用户自行编入）。"""
-        return [{"role": "", "style": "", "resonance_talent": None,
+        return [{"role": "", "style": "", "condition": "极佳",
+                 "resonance_talent": None,
                  "resonance_level": 4, "od_earring": 1.0}
                 for _ in range(TEAM_SIZE)]
 
@@ -3481,6 +3529,8 @@ class AxleODWindow(QFrame):
                     if e["left"] > 0 and e.get("kind") != "use":
                         e["left"] -= 1
         for turn_idx, turn in enumerate(self.turns):
+            # 「敌方回合」数（两个通常回合之间的敌方行动）：供速攻◯等使用
+            turn.set_enemy_turns(self._enemy_turns_before(turn_idx))
             # 占位回合：不触发任何被动
             self._passives_off = turn.turn_type() in PLACEHOLDER_TURN_TYPES
             # 发动 OD 消耗（同一次发动只扣一次：连续相同等级视为同一次发动）
@@ -3771,6 +3821,24 @@ class AxleODWindow(QFrame):
                             st_cond = mod.get("state")
                             if st_cond and st_cond not in (state_tracker.states(i) or ()):
                                 continue
+                            # 「干劲为极佳 / 良好或以上」（如 干劲极佳的少女 / 怪童）
+                            cmin = mod.get("condition_min")
+                            if cmin is not None:
+                                exact = bool(mod.get("condition_exact"))
+                                if mod.get("condition_on") == "self":
+                                    if not self._condition_ok(i, cmin, exact):
+                                        continue
+                                else:
+                                    # 「干劲为X的友方SP+N」：只给满足干劲的队员
+                                    for ct in active:
+                                        if self._condition_ok(ct, cmin, exact):
+                                            self._apply_scope_recover(
+                                                mod.get("amount", 0), "self",
+                                                None, ct, sp, active,
+                                                start_front, limit)
+                                    if mod.get("once"):
+                                        sp_once_used.add(i)
+                                    continue
                             pos = mod.get("position")
                             if pos == "front" and i not in start_front:
                                 continue
@@ -3860,6 +3928,10 @@ class AxleODWindow(QFrame):
                                           extra=is_extra_turn,
                                           sigil_levels=sigil_levels,
                                           first_use=getattr(action, "_first_use", False))
+                # 「速攻◯」类：开局 N 回合内指定技能 SP 消耗固定为 X
+                _pin = self._member_sp_cost_pin(i, action, turn_idx)
+                if _pin is not None:
+                    cost = _pin
                 if is_placeholder:
                     cost = 0          # 占位回合：所有技能不消耗 SP
                 elif cost >= 99:      # 消耗全部 SP
@@ -4322,6 +4394,19 @@ class AxleODWindow(QFrame):
                 return [m for m in st.share_sp if m.get("lb", 0) <= lb]
         return []
 
+    def _member_condition_rank(self, slot):
+        """队员「干劲」阶段下标（0=极差 … 4=极佳；默认极佳）。"""
+        name = self.team[slot].get("condition") or "极佳"
+        try:
+            return CONDITION_TIERS.index(name)
+        except ValueError:
+            return len(CONDITION_TIERS) - 1
+
+    def _condition_ok(self, slot, minimum, exact=False):
+        """该队员的干劲是否满足「阶段 = minimum（或以上）」。"""
+        rank = self._member_condition_rank(slot)
+        return rank == minimum if exact else rank >= minimum
+
     def _member_turn_start_sp(self, slot):
         """风格被动里「回合开始时回复友方 SP」的项（如 与伙伴一起，满足突破要求）。"""
         if getattr(self, "_passives_off", False):
@@ -4450,6 +4535,62 @@ class AxleODWindow(QFrame):
         """击破敌人时增加 OD 槽的被动，换算为「固定OD」小数（25% → 0.25）。"""
         return sum(m.get("amount", 0.0)
                    for m in self._member_break_od(slot)) / 100.0
+
+    def _enemy_turn_counts(self):
+        """每个回合开始前的「敌方回合」数（按回合顺序一次性算好）。
+
+        两个通常回合之间敌方行动一次；追加 / 特殊 / 超频 / 占位回合
+        都属于同一个玩家回合，不额外产生敌方回合。
+        T1=0、T2=1、T3=2；T1 后面的追加回合仍是 0。
+        """
+        counts = []
+        count = 0
+        seen_normal = False
+        for turn in self.turns:
+            if turn.turn_type() == NORMAL_TURN_TYPE:
+                if seen_normal:
+                    count += 1
+                seen_normal = True
+            counts.append(count)
+        return counts
+
+    def _enemy_turns_before(self, turn_idx):
+        """该回合开始前已经历的「敌方回合」数。"""
+        counts = self._enemy_turn_counts()
+        if 0 <= turn_idx < len(counts):
+            return counts[turn_idx]
+        return counts[-1] if counts else 0
+
+    def _member_sp_cost_pin(self, slot, action, turn_idx):
+        """「指定 SP 消耗」类被动（如 速攻◯）。
+
+        战斗开始时【夺取荣耀！满垒本垒打！】消耗的SP为8（2回合）：
+        开局 N 个（敌方）回合内，该技能的 SP 消耗固定为 X。
+        """
+        if getattr(self, "_passives_off", False):
+            return None
+        role = self.team[slot].get("role")
+        style = self.team[slot].get("style")
+        selected = self._selected_passives(slot)
+        name = action._current_skill_name()
+        for st in self.data_source.styles(role):
+            if st.name != style:
+                continue
+            for pin in (getattr(st, "sp_cost_pins", None) or []):
+                if pin.get("skill") != name:
+                    continue
+                req = pin.get("passive")
+                if req and selected is not None and req not in selected:
+                    continue
+                turns = int(pin.get("turns") or 0)
+                if turns > 0:
+                    used = (self._enemy_turns_before(turn_idx)
+                            if pin.get("unit") == "enemy" else turn_idx)
+                    if used >= turns:
+                        continue
+                return int(pin.get("cost") or 0)
+            return None
+        return None
 
     def _member_sp_cost_mods(self, slot):
         """队员所装备风格里影响 SP 消耗的被动（过滤未携带的）。"""
