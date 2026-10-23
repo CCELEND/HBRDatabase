@@ -92,7 +92,6 @@ OD、SP排轴工具，支持OD、SP、被动、大师技能自动获取计算
 * 预览后可保存为 PNG
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show1.png)
 ![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show2.png)
-![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/LineArt_show3.png)
 
 #### 视频转线稿
 
@@ -107,6 +106,7 @@ OD、SP排轴工具，支持OD、SP、被动、大师技能自动获取计算
 * 带**进度 / 速度 / 预计剩余时间**，随时可取消（取消后不会留下半成品文件）
 * 输出分辨率可缩放到 100% / 75% / 50% / 25%，也可以把视频文件直接拖进窗口
 * **不依赖系统安装 ffmpeg**：项目自带（压缩存放），第一次使用时自动解压到本地缓存，之后一直复用
+![Image text](https://github.com/CCELEND/HBRDatabase/blob/main/show/VideoLineArt_show.png)
 
 #### 词条获取
 
