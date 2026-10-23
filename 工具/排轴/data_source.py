@@ -521,6 +521,9 @@ class StyleInfo:
         # 「指定SP消耗」类（如 速攻◯：指定EX技能在开局 N 回合内消耗固定为 X）：
         # [{"passive","skill","cost","turns","unit"}, ...]
         self.sp_cost_pins = []
+        # 该风格是否在战斗开始时给全体友方「干劲」（如 比赛开始）：
+        # 没有这类风格时，全队都没有干劲，干劲相关的被动不生效
+        self.grants_condition = False
         # SP 上限覆盖（如「SP上限变为30」）；需携带 boost_enabler 才生效
         self.sp_limit_override = sp_limit_override
         # 回合开始时「位于前锋则自身 SP+X」的被动（如 闪光/佳音/机敏/俊敏…）
@@ -854,6 +857,29 @@ def _state_condition(desc):
                 or ("处于%s之%s" % (base, eff_name)) in text):
             return state
     return None
+
+
+def _parse_condition_grant(style_data):
+    """「战斗开始时 赋予全体友方任意一种干劲」类被动（如 比赛开始）。
+
+    返回 True 表示该风格会给**全队**赋予干劲（永久）。
+    """
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            pdesc = str(passive[1])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            ptarget = str(passive[7]) if len(passive) > 7 else ""
+        except Exception:
+            continue
+        if "干劲" not in ptype and "干劲" not in pname:
+            continue
+        if "战斗开始时" not in pdesc and "初战开始时" not in pdesc:
+            continue
+        if "友方" not in ptarget and "全体" not in ptarget:
+            continue
+        return True
+    return False
 
 
 def _parse_sp_cost_pins(style_data):
@@ -1300,11 +1326,16 @@ def _passive_action_skill(passive):
 
 
 def _passive_lb(passive):
-    """被动的突破要求（第 3 项）。"""
+    """被动的突破要求（第 3 项）。
+
+    工具只模拟 0~4 突破；S/A 风格的解锁需求写作 5 / 10，
+    按「最高突破 4」处理（突破 4 视为解锁，突破更低则不生效）。
+    """
     try:
-        return int(str(passive[2]).strip() or 0)
+        value = int(str(passive[2]).strip() or 0)
     except Exception:
         return 0
+    return 4 if value > 4 else value
 
 
 def _parse_follow_up(style_data, skills):
@@ -1753,10 +1784,12 @@ class HBRDataSource:
                 else:
                     style_label = None
                 def _passive_lb(passive):
+                    # 同 _passive_lb：>4 的解锁需求按最高突破 4 处理
                     try:
-                        return int(str(passive[2]).strip() or 0)
+                        value = int(str(passive[2]).strip() or 0)
                     except Exception:
                         return 0
+                    return 4 if value > 4 else value
 
                 # 解析「击破敌人时回复SP」类被动
                 break_sp = []
@@ -1789,8 +1822,9 @@ class HBRDataSource:
                 # 阈值（超频条不足N%）、是否出击中1次；无法判定的条件跳过。
                 turn_start_od = []
                 break_od = []
+                # 仍无法判定的条件（干劲已支持，见下方 condition_min）
                 skip_od_keywords = ("解除", "EX技能",
-                                    "SP提升", "仆人", "干劲", "DP", "领域")
+                                    "SP提升", "仆人", "DP", "领域")
                 for passive in (style_data.get("PassiveSkills") or []):
                     try:
                         pname = str(passive[0])
@@ -1833,6 +1867,22 @@ class HBRDataSource:
                                 "state_count": [state, int(m_cnt.group(2))],
                             })
                             continue
+                    # 「若自身干劲为良好或以上」（如 小笠原「球界头脑」→ 超频条+10%）
+                    cond_min, cond_exact = _condition_requirement(pdesc)
+                    if cond_min is not None:
+                        turn_start_od.append({
+                            "name": pname,
+                            "amount": amount,
+                            "threshold": None,
+                            "position": None,
+                            "timing": "turn",
+                            "once": False,
+                            "lb": _passive_lb(passive),
+                            "condition_min": cond_min,
+                            "condition_exact": cond_exact,
+                            "condition_on": "self",
+                        })
+                        continue
                     if any(k in pdesc for k in skip_od_keywords):
                         continue
                     threshold = None
@@ -1935,7 +1985,9 @@ class HBRDataSource:
                         if (not (downed_cond or state_cond)
                                 and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
                             continue
-                    num = re.search(r'\d+', str(pvalue))
+                    # 回复量优先取描述里的「SP+N」（个别条目 pvalue 不是回复量）
+                    num = (re.search(r'SP\+(\d+)', pdesc)
+                           or re.search(r'(\d+)', str(pvalue)))
                     scope_info = _sp_recover_scope(ptarget)
                     if not num or not scope_info:
                         continue
@@ -1947,7 +1999,7 @@ class HBRDataSource:
                     family, enhanced = _passive_family(pname)
                     turn_start_sp.append({
                         "name": pname,
-                        "amount": int(num.group()),
+                        "amount": int(num.group(1)),
                         "scope": scope_info[0],
                         "element": scope_info[1],
                         "position": position,
@@ -2128,6 +2180,8 @@ class HBRDataSource:
                 styles[-1].battle_states = _parse_battle_states(style_data)
                 # 「指定SP消耗」类（如 速攻◯）
                 styles[-1].sp_cost_pins = _parse_sp_cost_pins(style_data)
+                # 是否给全队赋予「干劲」（没有这类风格时全队都没有干劲）
+                styles[-1].grants_condition = _parse_condition_grant(style_data)
                 # 所属队伍（如 31D）
                 styles[-1].team = (str(style_info[1])
                                    if len(style_info) > 1 and style_info[1]

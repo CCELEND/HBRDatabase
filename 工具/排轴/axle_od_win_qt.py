@@ -277,10 +277,16 @@ HELP_TEXT = """排轴OD计算 使用说明
   **直接加在该回合的「回合开始OD」上**，例如填 -10 就是该回合回合开始OD −10，
   也可以填 -12.5 / +0.32 这类小数；并且**计入之后的累计**（相当于回合开始时 OD 槽被加减）；
   正数同样生效，整体仍受 300 上限约束。
-- **干劲**（队伍配置每个位置的「干劲」下拉，默认**极佳**）：
+- **干劲**：只有队伍里有「战斗开始时 赋予全体友方任意一种干劲」的风格
+  （如 月歌「激烈！带来胜利的全力一球！」、水濑莓「激战！奋力全垒打！」）时才存在，
+  否则全队**没有干劲**、干劲相关被动不生效。默认按**极佳**结算
+  （队伍配置里**不显示**该项；存档的 `condition` 字段保留）：
   「回合开始时 干劲为极佳的友方SP+1」（如 水濑莓「激战！奋力全垒打！」）、
-  「回合开始时若自身干劲为良好或以上 则自身SP+1」（如 月歌「激烈！带来胜利的全力一球！」）
+  「回合开始时若自身干劲为良好或以上 则自身SP+1」（如 月歌「激烈！带来胜利的全力一球！」）、
+  「回合开始时若自身干劲为良好或以上 则超频条+10%」（如 小笠原「球界头脑」）
   都会按各队员的干劲自动结算。
+- 突破数按 0~4 模拟；S/A 风格的被动解锁需求在数据里写作 5 / 10，
+  按「最高突破 4」处理（即突破 4 才算解锁，突破 3 及以下不生效）。
 - **敌方回合**：两个**通常回合**之间的敌方行动算 1 个敌方回合
   （T1=0、T2=1、T3=2；追加/特殊/占位/超频回合不产生），显示在回合行里。
   「速攻◯（被动技能）」（水濑莓）：战斗开始时【夺取荣耀！满垒本垒打！】
@@ -825,20 +831,7 @@ class TeamMemberRow(QFrame):
         self.earring_combo.currentIndexChanged.connect(self._emit_changed)
         layout.addWidget(self.earring_combo)
 
-        # 「干劲」阶段（默认极佳）：影响「干劲为极佳的友方SP+1」等被动
-        cond_label = QLabel("干劲")
-        layout.addWidget(cond_label)
-        self.condition_combo = QComboBox()
-        self.condition_combo.setFixedWidth(76)
-        for _cond in reversed(CONDITION_TIERS):      # 极佳 → 极差
-            self.condition_combo.addItem(_cond)
-        self.condition_combo.setToolTip(
-            "该队员的「干劲」阶段（默认极佳）。\n"
-            "用于「回合开始时 干劲为极佳的友方SP+1」这类被动；\n"
-            "没有干劲效果的队伍保持默认即可。")
-        self.condition_combo.currentIndexChanged.connect(self._emit_changed)
-        layout.addWidget(self.condition_combo)
-
+        self._condition = "极佳"         # 干劲阶段（默认极佳；界面不显示）
         self._selected_passives = None   # None = 全部携带
 
     def _on_talent_changed(self, *args):
@@ -1186,8 +1179,13 @@ class TeamMemberRow(QFrame):
         return data if data else self.style_combo.currentText()
 
     def condition(self):
-        """该队员的「干劲」阶段（默认极佳）。"""
-        return self.condition_combo.currentText() or "极佳"
+        """该队员的「干劲」阶段（默认极佳；界面上不显示）。"""
+        name = getattr(self, "_condition", "极佳") or "极佳"
+        return name if name in CONDITION_TIERS else "极佳"
+
+    def set_condition(self, name):
+        """设置干劲阶段（界面上不显示，存档 / 程序内使用）。"""
+        self._condition = name if name in CONDITION_TIERS else "极佳"
 
     def to_data(self):
         return {"role": self.role(), "style": self.style(),
@@ -1201,9 +1199,7 @@ class TeamMemberRow(QFrame):
 
     def set_data(self, data):
         with self._suspended():
-            cond = str(data.get("condition") or "极佳")
-            self.condition_combo.setCurrentText(
-                cond if cond in CONDITION_TIERS else "极佳")
+            self.set_condition(str(data.get("condition") or "极佳"))
             if "passives" in data:
                 self._selected_passives = set(data.get("passives") or [])
             else:
@@ -2448,12 +2444,14 @@ class TurnCard(QFrame):
 STATE_DISPLAY = {
     "歌姬": "歌姬之加护",
     "仆人": "山胁大人的仆人",
+    "干劲": "干劲",
 }
 
 # 状态对计算的实际影响（只写工具**已建模**的效果，供「状态总览」展示）
 STATE_EFFECT_TEXT = {
     "歌姬": "月芒→连击+3（特大/3次）；共鸣 前锋SP+2；绝唱 自身消耗SP-2",
     "仆人": "「处于该状态的友方 SP+N」；「处于该状态的友方≥N名」的 OD/被动条件",
+    "干劲": "「干劲为极佳的友方SP+1」「自身干劲良好以上SP+1」等被动据此判定",
 }
 
 
@@ -3015,8 +3013,12 @@ class AxleODWindow(QFrame):
                     continue
                 left = (None if until >= 10 ** 5
                         else max(0, int(until) - turn_idx + 1))
+                display = STATE_DISPLAY.get(name, name)
+                if name == "干劲":
+                    display = "干劲（%s）" % (self.team[slot].get("condition")
+                                           or "极佳")
                 states.append({
-                    "name": STATE_DISPLAY.get(name, name),
+                    "name": display,
                     "left": left,
                     "effect": STATE_EFFECT_TEXT.get(name, ""),
                     "source": tracker.sources.get((slot, name), ""),
@@ -3571,6 +3573,11 @@ class AxleODWindow(QFrame):
                         continue
                     threshold = mod.get("threshold")
                     if threshold is not None and running_od >= threshold:
+                        continue
+                    # 「若自身干劲为良好或以上」（如 球界头脑：超频条+10%）
+                    cmin = mod.get("condition_min")
+                    if cmin is not None and not self._condition_ok(
+                            slot, cmin, bool(mod.get("condition_exact"))):
                         continue
                     # 「处于X状态的友方为N名或以上」（如 魔王军的大攻势！）
                     sc = mod.get("state_count")
@@ -4246,6 +4253,11 @@ class AxleODWindow(QFrame):
                     tracker.until[(slot, bs["state"])] = 10 ** 6
                     tracker.sources[(slot, bs["state"])] = "%s（战斗开始时）" % (
                         bs.get("name") or "被动")
+        # 「比赛开始」给全队赋予干劲：没有这类风格时就不记
+        if self._team_has_condition():
+            for slot in self._active_slots():
+                tracker.until[(slot, "干劲")] = 10 ** 6
+                tracker.sources[(slot, "干劲")] = "比赛开始（战斗开始时）"
 
     def _state_holders(self, turn_states, state):
         """某回合开始时，处于指定状态的队员数量。"""
@@ -4394,8 +4406,23 @@ class AxleODWindow(QFrame):
                 return [m for m in st.share_sp if m.get("lb", 0) <= lb]
         return []
 
+    def _team_has_condition(self):
+        """队伍里是否有「战斗开始时 赋予友方干劲」的风格。
+
+        没有这类风格时，全队都**没有干劲**（干劲相关被动不生效）。
+        """
+        for slot in self._active_slots():
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            for st in self.data_source.styles(role):
+                if st.name == style and getattr(st, "grants_condition", False):
+                    return True
+        return False
+
     def _member_condition_rank(self, slot):
-        """队员「干劲」阶段下标（0=极差 … 4=极佳；默认极佳）。"""
+        """队员「干劲」阶段下标（0=极差 … 4=极佳）；队伍没有干劲时返回 None。"""
+        if not self._team_has_condition():
+            return None
         name = self.team[slot].get("condition") or "极佳"
         try:
             return CONDITION_TIERS.index(name)
@@ -4403,8 +4430,10 @@ class AxleODWindow(QFrame):
             return len(CONDITION_TIERS) - 1
 
     def _condition_ok(self, slot, minimum, exact=False):
-        """该队员的干劲是否满足「阶段 = minimum（或以上）」。"""
+        """该队员的干劲是否满足「阶段 = minimum（或以上）」；没有干劲则 False。"""
         rank = self._member_condition_rank(slot)
+        if rank is None:
+            return False
         return rank == minimum if exact else rank >= minimum
 
     def _member_turn_start_sp(self, slot):
