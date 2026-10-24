@@ -21,6 +21,23 @@ import 战斗系统.武器.weapons_info
 def load_resources():
     战斗系统.武器.weapons_info.get_all_weapon_obj()
 
+# 队伍背景图：默认 ./bg/<队伍名>_kv.<扩展名>；个别队伍用指定图片
+_TEAM_BG_EXTS = (".jpg", ".jpeg", ".png", ".webp")
+_TEAM_BG_OVERRIDES = {
+    "司令部": "tipsimage_0010",
+    "Angel Beats!": "alice",
+}
+
+def get_team_bg_path(team_name) -> str:
+    if not team_name:
+        return None
+    base_name = _TEAM_BG_OVERRIDES.get(team_name, "%s_kv" % team_name)
+    for ext in _TEAM_BG_EXTS:
+        path = "./bg/%s%s" % (base_name, ext)
+        if os.path.exists(path):
+            return path
+    return None
+
 def creat_role_right_menu(event, parent_frame, role: Role, team: Team):
     right_click_menu = QMenu(parent_frame)
     right_click_menu.addAction("全身画", lambda: show_role_full_img(event, parent_frame, role, team))
@@ -340,7 +357,10 @@ def creat_team_win(parent_frame, team_name):
     team_win_frame = creat_Toplevel(team_name, 1130, 880, 90, 80)
     set_window_icon(team_win_frame, team.logo_path)
     set_window_expand(team_win_frame, rowspan=1, columnspan=2)
-    scrollbar_frame_obj = ScrollbarFrameWin(team_win_frame, columnspan=2)
+    bg_image_path = get_team_bg_path(team.name or team_name)
+    scrollbar_frame_obj = ScrollbarFrameWin(
+        team_win_frame, columnspan=2,
+        bg_image_path=bg_image_path, bg_opacity="60%")
     win_open_manage(team_win_frame, __name__)
 
     def on_close(self, event):
