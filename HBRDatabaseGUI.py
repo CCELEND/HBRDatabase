@@ -335,6 +335,7 @@ if __name__ == "__main__":
 
     check_error_queue(root)
 
-    check_for_updates()
+    # 更新检查会扫描/哈希大量文件，延后到首屏绘制完成再执行
+    root.after(1500, check_for_updates)
 
     root.mainloop()

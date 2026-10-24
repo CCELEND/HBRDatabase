@@ -35,7 +35,7 @@ from PyQt5.QtWidgets import (
     QMenu, QToolButton, QAction, QToolBar,
     QShortcut
 )
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QTimer
 from PyQt5.QtGui import QKeySequence, QIcon
 
 from window_qt import (
@@ -391,9 +391,11 @@ if __name__ == "__main__":
         create_menu(root, scrollbar_frame_obj)
 
         check_error_queue_qt(root)
-        check_for_updates()
 
         root.show()
+
+        # 更新检查会扫描/哈希大量文件（首次约 1s+），延后到首屏绘制完成再执行
+        QTimer.singleShot(1500, check_for_updates)
         
         exit_code = app.exec_()
         

@@ -378,6 +378,12 @@ def creat_team_win(parent_frame, team_name):
 
     team_win_frame.closeEvent = types.MethodType(on_close, team_win_frame)
 
-    show_team(scrollbar_frame_obj, team)
+    # 批量创建角色/风格控件时关闭刷新，建完再一次性绘制
+    team_win_frame.setUpdatesEnabled(False)
+    try:
+        show_team(scrollbar_frame_obj, team)
+    finally:
+        team_win_frame.setUpdatesEnabled(True)
+        team_win_frame.update()
 
     return "break"

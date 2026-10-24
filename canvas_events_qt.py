@@ -53,13 +53,15 @@ def _pil_to_qpixmap(pil_img: Image.Image) -> QPixmap:
     return QPixmap.fromImage(qimg.copy())
 
 
-@lru_cache(maxsize=64)
+@lru_cache(maxsize=256)
 def get_pixmap(img_path: str, img_resize: tuple) -> QPixmap:
     """加载图片并缩放为指定尺寸的 QPixmap，带缓存。
 
     统一使用 PIL 解码 + LANCZOS 缩放（缩小时平滑、放大时清晰）；
     小于 128px 的缩小图会再做一次轻微高斯模糊抗锯齿。
-    缓存上限 64 张，避免大量缩略图长期占用内存。
+    缓存上限 256 张：一个队伍窗口通常就要 60~80 张缩略图，
+    64 张会频繁淘汰，导致切换队伍时反复解码 WebP；256 张能覆盖
+    最近查看的队伍，同时缩略图本身很小，额外内存有限。
     """
     if not os.path.exists(img_path):
         return QPixmap()
