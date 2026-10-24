@@ -10,11 +10,49 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QTimer, QEvent, QObject
 from PyQt5.QtGui import QIcon, QPixmap, QImage, QPainter, QFont
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # numpy / cv2 只在「按路径加载图片到图像查看器」时用到，
 # 改成函数内延迟导入，启动时不再加载这两个大库。
 
 
 MONO_FONT = QFont("Monospace", 10, QFont.Bold)
+
+# 右键菜单样式。
+# 队伍/风格窗口的滚动内容通过 QWidget { background-color: transparent; }
+# 让背景图透出来，这个规则也会作用到 QMenu，导致菜单变成黑底。
+# 在菜单自身设置样式可以覆盖祖先的透明规则。
+CONTEXT_MENU_STYLE = """
+QMenu {
+    background-color: #f7f7f7;
+    color: #222222;
+    border: 1px solid #b8b8b8;
+    padding: 4px 0px;
+}
+QMenu::item {
+    background-color: transparent;
+    color: #222222;
+    padding: 6px 24px 6px 20px;
+}
+QMenu::item:selected {
+    background-color: #d6e9ff;
+    color: #111111;
+}
+QMenu::item:disabled {
+    color: #999999;
+}
+QMenu::separator {
+    height: 1px;
+    background: #d0d0d0;
+    margin: 4px 8px;
+}
+"""
+
+
+def apply_context_menu_style(menu):
+    menu.setStyleSheet(CONTEXT_MENU_STYLE)
+    return menu
 
 
 class _WheelGuard(QObject):
@@ -287,7 +325,7 @@ def select_all_text(event, text_widget):
 
 
 def show_context_menu(event, text_widget):
-    menu = QMenu(text_widget)
+    menu = apply_context_menu_style(QMenu(text_widget))
     menu.addAction("复制", lambda: copy_text(event, text_widget))
     menu.addAction("粘贴", lambda: paste_text(event, text_widget))
     menu.addAction("剪切", lambda: cut_text(event, text_widget))
@@ -352,23 +390,53 @@ def win_open_manage(open_win_frame: QMainWindow, module: str):
 
 def win_close_manage(open_win_frame: QMainWindow, module: str, class_resources=None):
     open_win_name = f"{module}_{open_win_frame.windowTitle()}"
-    if open_win_name in open_wins:
-        del open_wins[open_win_name]
-    if class_resources:
-        if hasattr(class_resources, 'destroy'):
-            class_resources.destroy()
-        elif hasattr(class_resources, 'release'):
-            class_resources.release()
-    open_win_frame.close()
-    open_win_frame.deleteLater()
+    open_wins.pop(open_win_name, None)
+
+    # 关闭可能被重入（closeEvent 里又调用 close()）：资源只释放一次
+    if getattr(open_win_frame, "_win_cleanup_done", False):
+        return
+    open_win_frame._win_cleanup_done = True
+
+    # 支持单个资源，也支持 (player, displayer) 这类组合
+    if isinstance(class_resources, (list, tuple)):
+        resources = class_resources
+    else:
+        resources = [class_resources]
+    for resource in resources:
+        if resource is None:
+            continue
+        try:
+            if hasattr(resource, 'destroy'):
+                resource.destroy()
+            elif hasattr(resource, 'release'):
+                resource.release()
+        except Exception as e:
+            # 资源释放失败不能阻断窗口关闭，否则窗口会一直留在屏幕上
+            logger.warning("释放窗口资源失败（%s）: %s", open_win_name, e)
+
+    try:
+        open_win_frame.close()
+    except Exception as e:
+        logger.warning("关闭窗口失败（%s）: %s", open_win_name, e)
+    finally:
+        try:
+            open_win_frame.deleteLater()
+        except RuntimeError:
+            pass
 
 
 def win_close_all():
-    for open_win_name in list(open_wins.keys()):
-        win_frame = open_wins[open_win_name]
-        del open_wins[open_win_name]
-        win_frame.close()
-        win_frame.deleteLater()
+    for open_win_name, win_frame in list(open_wins.items()):
+        open_wins.pop(open_win_name, None)
+        try:
+            win_frame.close()
+        except Exception as e:
+            logger.warning("关闭窗口失败（%s）: %s", open_win_name, e)
+        finally:
+            try:
+                win_frame.deleteLater()
+            except RuntimeError:
+                pass
 
 
 def win_set_top(open_win, module: str):

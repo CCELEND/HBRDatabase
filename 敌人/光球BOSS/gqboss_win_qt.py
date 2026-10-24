@@ -45,10 +45,10 @@ def creat_gqboss_win(event, parent_frame, gqboss):
 
     gqboss_win_frame = creat_Toplevel(gqboss.name, 600, 840, 230, 110)
     set_window_icon(gqboss_win_frame, gqboss.logo_path)
-    win_open_manage(gqboss_win_frame, __name__)
 
     gqboss_image_viewer = ImageViewerWithScrollbar(gqboss_win_frame, 600, 840, gqboss.guide_path)
 
+    win_open_manage(gqboss_win_frame, __name__)
     gqboss_win_frame.mousePressEvent = lambda ev: win_set_top(gqboss_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(gqboss_win_frame, __name__, gqboss_image_viewer)

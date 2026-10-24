@@ -375,6 +375,24 @@ class LineArtGUI(QMainWindow):
         self.gen_btn.setText("生成线稿")
         QMessageBox.critical(self, "错误", msg)
 
+    def closeEvent(self, event):
+        # 先等处理线程结束，避免 QThread 在运行中被销毁
+        worker = self.worker
+        if worker is not None and worker.isRunning():
+            worker.wait()
+
+        # 预览窗口是独立的父窗口，主窗口关闭时一并释放
+        preview = self.preview_window
+        self.preview_window = None
+        if preview is not None:
+            try:
+                preview.hide()
+                preview.deleteLater()
+            except RuntimeError:
+                pass
+
+        event.accept()
+
 
 # 预览窗口
 class PreviewWindow(QMainWindow):

@@ -45,10 +45,10 @@ def creat_ljz_win(event, parent_frame, ljz):
 
     ljz_win_frame = creat_Toplevel(ljz.name, 600, 840, 230, 110)
     set_window_icon(ljz_win_frame, ljz.logo_path)
-    win_open_manage(ljz_win_frame, __name__)
 
     ljz_image_viewer = ImageViewerWithScrollbar(ljz_win_frame, 600, 840, ljz.guide_path)
 
+    win_open_manage(ljz_win_frame, __name__)
     ljz_win_frame.mousePressEvent = lambda ev: win_set_top(ljz_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(ljz_win_frame, __name__, ljz_image_viewer)

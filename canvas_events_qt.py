@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QObject, QTimer, QSize, QRect, pyqtSignal, QEvent
 from PyQt5.QtGui import (
-    QPixmap, QImage, QPainter, QCursor
+    QPixmap, QImage, QImageReader, QPainter, QCursor
 )
 
 # 说明：cv2 / numpy 只在**播放动画视频**时才需要（见文件末尾的视频播放器），
@@ -782,7 +782,8 @@ class BackgroundFrame(QWidget):
     """带背景图片的容器，子控件会显示在背景之上"""
     def __init__(self, parent_widget: QWidget, image_path: str, opacity: str = "100%"):
         super().__init__(parent_widget)
-        self._original_pixmap = QPixmap(image_path)
+        # 只保存路径，不在这里整张加载 4K 原图（否则每个窗口常驻约 33MB）
+        self._image_path = image_path
         opacity_percentage = int(opacity.strip('%')) / 100
         self.opacity_value = opacity_percentage
 
@@ -805,9 +806,49 @@ class BackgroundFrame(QWidget):
             }
         """)
 
-        self._cached_pixmap = None
-        self._cached_size = None
+    def _load_scaled(self, frame_w, frame_h):
+        """按窗口尺寸解码并裁成 frame_w×frame_h，避免保留原图。
 
+        使用 QImageReader.setScaledSize 让解码器直接读小图（JPEG 等格式
+        可以少分配内存），最后再居中裁剪到目标尺寸。
+        """
+        if not self._image_path:
+            return None
+
+        reader = QImageReader(self._image_path)
+        reader.setAutoTransform(True)
+        src_size = reader.size()
+        if src_size.isValid() and src_size.width() > 0 and src_size.height() > 0:
+            sw, sh = src_size.width(), src_size.height()
+            # KeepAspectRatioByExpanding：先缩放到刚好铺满窗口的尺寸
+            scale = max(frame_w / sw, frame_h / sh)
+            w = max(1, min(sw, int(sw * scale + 0.5)))
+            h = max(1, min(sh, int(sh * scale + 0.5)))
+            reader.setScaledSize(QSize(w, h))
+
+        image = reader.read()
+        if image.isNull():
+            # 少数 Qt 图片插件不支持 scaled read，退回普通加载
+            pixmap = QPixmap(self._image_path)
+            if pixmap.isNull():
+                return None
+            scaled = pixmap.scaled(
+                frame_w, frame_h,
+                Qt.KeepAspectRatioByExpanding,
+                Qt.SmoothTransformation)
+        else:
+            pixmap = QPixmap.fromImage(image)
+            scaled = pixmap.scaled(
+                frame_w, frame_h,
+                Qt.KeepAspectRatioByExpanding,
+                Qt.SmoothTransformation)
+
+        # 裁剪到窗口大小：缓存里只留一张视口大小的图
+        if scaled.width() != frame_w or scaled.height() != frame_h:
+            offset_x = max(0, (scaled.width() - frame_w) // 2)
+            offset_y = max(0, (scaled.height() - frame_h) // 2)
+            scaled = scaled.copy(offset_x, offset_y, frame_w, frame_h)
+        return scaled
 
     def resizeEvent(self, event):
         # 记录最新尺寸，启动/重置定时器
@@ -825,14 +866,15 @@ class BackgroundFrame(QWidget):
         frame_w, frame_h = size.width(), size.height()
         if frame_w <= 0 or frame_h <= 0:
             return
-        # 只当尺寸变化时才重新缩放
+        # 只当尺寸变化时才重新解码/缩放
         if self._cached_size != (frame_w, frame_h):
-            self._cached_size = (frame_w, frame_h)
-            self._cached_pixmap = self._original_pixmap.scaled(
-                frame_w, frame_h,
-                Qt.KeepAspectRatioByExpanding,
-                Qt.SmoothTransformation
-            )
+            pixmap = self._load_scaled(frame_w, frame_h)
+            if pixmap is None:
+                self._cached_pixmap = None
+                self._cached_size = None
+            else:
+                self._cached_size = (frame_w, frame_h)
+                self._cached_pixmap = pixmap
         self.update()   # 触发 paintEvent
 
     def paintEvent(self, event):

@@ -45,10 +45,10 @@ def creat_zyz_win(event, parent_frame, zyz):
 
     zyz_win_frame = creat_Toplevel(zyz.name, 600, 840, 230, 110)
     set_window_icon(zyz_win_frame, zyz.logo_path)
-    win_open_manage(zyz_win_frame, __name__)
 
     zyz_image_viewer = ImageViewerWithScrollbar(zyz_win_frame, 600, 840, zyz.guide_path)
 
+    win_open_manage(zyz_win_frame, __name__)
     zyz_win_frame.mousePressEvent = lambda ev: win_set_top(zyz_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(zyz_win_frame, __name__, zyz_image_viewer)

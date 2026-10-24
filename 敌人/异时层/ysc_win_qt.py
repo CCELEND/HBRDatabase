@@ -45,10 +45,10 @@ def creat_ysc_win(event, parent_frame, ysc):
 
     ysc_win_frame = creat_Toplevel(ysc.name, 600, 840, 230, 110)
     set_window_icon(ysc_win_frame, ysc.logo_path)
-    win_open_manage(ysc_win_frame, __name__)
 
     ysc_image_viewer = ImageViewerWithScrollbar(ysc_win_frame, 600, 840, ysc.guide_path)
 
+    win_open_manage(ysc_win_frame, __name__)
     ysc_win_frame.mousePressEvent = lambda ev: win_set_top(ysc_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(ysc_win_frame, __name__, ysc_image_viewer)

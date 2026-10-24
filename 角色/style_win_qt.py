@@ -8,7 +8,7 @@ from PyQt5.QtCore import Qt
 from canvas_events_qt import VideoPlayerWithScrollbar
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top, PreviewWindow
-from window_qt import install_no_wheel
+from window_qt import install_no_wheel, apply_context_menu_style
 from scrollbar_frame_qt import ScrollbarFrameWin
 from tools import replace_file_extension
 
@@ -112,8 +112,6 @@ def creat_style_skill_win(event, parent_frame, team, style):
     bg_image_path = artwork_path if os.path.exists(artwork_path) else None
     scrollbar_frame_obj = ScrollbarFrameWin(style_win_frame, columnspan=2, bg_image_path=bg_image_path, bg_opacity="50%")
 
-    win_open_manage(style_win_frame, __name__)
-
     def on_close(self, event):
         win_close_manage(style_win_frame, __name__)
         event.accept()
@@ -128,11 +126,14 @@ def creat_style_skill_win(event, parent_frame, team, style):
         style_win_frame.setUpdatesEnabled(True)
         style_win_frame.update()
 
+    # 内容构建成功后再注册；中途异常时窗口不会被 open_wins 强引用
+    win_open_manage(style_win_frame, __name__)
+
     return "break"
 
 
 def creat_style_right_menu(event, parent_frame, team, style):
-    right_click_menu = QMenu(parent_frame)
+    right_click_menu = apply_context_menu_style(QMenu(parent_frame))
     right_click_menu.addAction("动画", lambda: show_style_animation(parent_frame, team, style))
     right_click_menu.addAction("立绘", lambda: show_style_artwork(parent_frame, team, style))
     right_click_menu.addAction("3D立绘", lambda: show_style_artwork_3d(parent_frame, team, style))
@@ -157,9 +158,11 @@ def show_style_animation(parent_frame, team, style):
 
     style_animation_win_frame = creat_Toplevel(open_style_win, 1362, 767, x=300, y=120)
     set_window_icon(style_animation_win_frame, team.logo_path)
-    win_open_manage(style_animation_win_frame, __name__)
 
+    # 视频打不开（缺解码器等）时不注册，避免留下关不掉的空窗口
     player = VideoPlayerWithScrollbar(style_animation_win_frame, 1362, 767, animation_path)
+
+    win_open_manage(style_animation_win_frame, __name__)
 
     def on_close(self, event):
         win_close_manage(style_animation_win_frame, __name__, player)
@@ -235,10 +238,11 @@ def show_style_artwork_3d(parent_frame, team, style):
 
     style_artwork_3d_win_frame = creat_Toplevel(open_style_win, x=770, y=150)
     set_window_icon(style_artwork_3d_win_frame, team.logo_path)
-    win_open_manage(style_artwork_3d_win_frame, __name__)
 
     from canvas_events_qt import ArtworkDisplayerHeight
     displayer = ArtworkDisplayerHeight(style_artwork_3d_win_frame, artwork_3d_path, 710, 0)
+
+    win_open_manage(style_artwork_3d_win_frame, __name__)
 
     def on_close(self, event):
         win_close_manage(style_artwork_3d_win_frame, __name__, displayer)

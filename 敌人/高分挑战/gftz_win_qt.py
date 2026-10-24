@@ -53,10 +53,10 @@ def creat_gftz_win(event, parent_frame, gftz):
     else:
         gftz_win_frame = creat_Toplevel(gftz.name, 1280, 715, 180, 140)
     set_window_icon(gftz_win_frame, gftz.logo_path)
-    win_open_manage(gftz_win_frame, __name__)
 
     gftz_image_viewer = ImageViewerWithScrollbar(gftz_win_frame, 1280, 715, gftz.guide_path)
 
+    win_open_manage(gftz_win_frame, __name__)
     gftz_win_frame.mousePressEvent = lambda ev: win_set_top(gftz_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(gftz_win_frame, __name__, gftz_image_viewer)

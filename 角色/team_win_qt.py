@@ -8,7 +8,7 @@ from canvas_events_qt import bind_canvas_events, get_pixmap, create_image_label,
 from canvas_events_qt import mouse_bind_canvas_events2, right_click_bind_canvas_events, set_tooltip
 from canvas_events_qt import ArtworkDisplayerHeight
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel, MONO_FONT
-from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
+from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top, apply_context_menu_style
 from scrollbar_frame_qt import ScrollbarFrameWin
 
 from 角色.team_info import get_team_obj, get_all_team_obj, Team, Role
@@ -39,7 +39,7 @@ def get_team_bg_path(team_name) -> str:
     return None
 
 def creat_role_right_menu(event, parent_frame, role: Role, team: Team):
-    right_click_menu = QMenu(parent_frame)
+    right_click_menu = apply_context_menu_style(QMenu(parent_frame))
     right_click_menu.addAction("全身画", lambda: show_role_full_img(event, parent_frame, role, team))
     right_click_menu.exec_(event.globalPos())
 
@@ -51,10 +51,12 @@ def show_role_full_img(event, parent_frame, role: Role, team: Team):
 
     role_full_img_frame = creat_Toplevel(open_role_win, x=770, y=100)
     set_window_icon(role_full_img_frame, team.logo_path)
-    win_open_manage(role_full_img_frame, __name__)
 
     role_full_path = role.img_path.replace("Profile", "")
+    # 图片加载失败时不注册窗口，避免 open_wins 里留下永远关不掉的项
     displayer = ArtworkDisplayerHeight(role_full_img_frame, role_full_path, 840, padding=100)
+
+    win_open_manage(role_full_img_frame, __name__)
 
     def on_close(self, event):
         win_close_manage(role_full_img_frame, __name__, displayer)
@@ -72,9 +74,16 @@ def show_role_img(event, parent_frame, role: Role, team: Team):
 
     role_img_frame = creat_Toplevel(open_role_win, 444, 508, 600, 200)
     set_window_icon(role_img_frame, team.logo_path)
-    win_open_manage(role_img_frame, __name__)
 
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
+
+    win_open_manage(role_img_frame, __name__)
+
+    def on_close(self, event):
+        win_close_manage(role_img_frame, __name__, displayer)
+        event.accept()
+
+    role_img_frame.closeEvent = types.MethodType(on_close, role_img_frame)
 
     return "break"
 

@@ -17,8 +17,22 @@ from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 import threading
+import atexit
 global chrome_driver
 chrome_driver = None
+
+
+def _quit_chrome_at_exit():
+    """主程序退出时兜底关闭 Chrome，避免残留 chromedriver 进程。"""
+    driver = chrome_driver
+    if driver is not None:
+        try:
+            driver.quit()
+        except Exception:
+            pass
+
+
+atexit.register(_quit_chrome_at_exit)
 
 def list_newline(you_list: list, how_projects_newline: int):
     for i in range(0, len(you_list), how_projects_newline):
@@ -289,7 +303,15 @@ def run_browser_in_thread():
     except Exception as e:
         logger.error(str(e))
         print(f"[-] {e}")
-        chrome_driver.quit()
+    finally:
+        # 无论正常结束、异常还是用户提前关闭浏览器，都确保释放 WebDriver
+        driver = chrome_driver
+        if driver is not None:
+            try:
+                driver.quit()
+            except Exception as e:
+                logger.warning("关闭 Chrome 失败: %s", e)
+        chrome_driver = None
 
 
 def get_hbr_brochure():

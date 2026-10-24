@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
     QFrame, QLabel, QPushButton, QTextEdit, QGridLayout,
     QMessageBox
 )
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot
 from openpyxl.styles import PatternFill
 from openpyxl.utils import get_column_letter
 
@@ -29,6 +29,73 @@ index_equipments = {}
 index_equipments_lock = threading.Lock()
 
 output_text = None
+_bridge = None
+_thread_local = threading.local()
+_entries_worker_running = False
+
+
+def _widget_alive(widget):
+    if widget is None:
+        return False
+    try:
+        from PyQt5 import sip
+        return not sip.isdeleted(widget)
+    except Exception:
+        return True
+
+
+class _EntriesBridge(QObject):
+    """把后台线程的 UI 更新排队到主线程执行。
+
+    后台线程只 emit 信号，真正操作 QTextEdit / QPushButton 的
+    是绑定在主线程的槽函数。
+    """
+
+    text_ready = pyqtSignal(str)
+    error_ready = pyqtSignal(str)
+    busy_changed = pyqtSignal(bool)
+
+    def __init__(self, text_widget, buttons):
+        super().__init__()
+        self._text_widget = text_widget
+        self._buttons = list(buttons)
+        self.text_ready.connect(self._on_text)
+        self.error_ready.connect(self._on_error)
+        self.busy_changed.connect(self._on_busy)
+
+    @pyqtSlot(str)
+    def _on_text(self, text):
+        if _widget_alive(self._text_widget):
+            edit_text(self._text_widget, text)
+
+    @pyqtSlot(str)
+    def _on_error(self, text):
+        if _widget_alive(self._text_widget):
+            QMessageBox.critical(None, "错误", text)
+
+    @pyqtSlot(bool)
+    def _on_busy(self, busy):
+        for button in self._buttons:
+            if _widget_alive(button):
+                button.setEnabled(not busy)
+
+
+def _current_bridge():
+    """后台线程用线程本地桥；主线程/未启动线程时回退到当前窗口。"""
+    return getattr(_thread_local, "bridge", None) or _bridge
+
+
+def _notify_error(message):
+    logger.error(str(message))
+    bridge = _current_bridge()
+    if bridge is not None and _widget_alive(bridge):
+        try:
+            bridge.error_ready.emit(str(message))
+            return
+        except RuntimeError:
+            pass
+    if threading.current_thread() is threading.main_thread():
+        QMessageBox.critical(None, "错误", str(message))
 
 
 def copy_text(event, text_widget):
@@ -88,7 +155,16 @@ def print_dir(dir_data):
     data = ""
     for key, value in dir_data.items():
         data += f"{key}: {value}\n"
-    edit_text(output_text, data)
+    bridge = _current_bridge()
+    if bridge is not None and _widget_alive(bridge):
+        try:
+            bridge.text_ready.emit(data)
+            return
+        except RuntimeError:
+            pass
+    # 没有窗口/桥时只允许主线程直接更新
+    if threading.current_thread() is threading.main_thread():
+        edit_text(output_text, data)
 
 
 def check_wash_entries(ChangeAbility_seed, ChangeAbility_index, DataCount):
@@ -102,8 +178,7 @@ def check_wash_entries(ChangeAbility_seed, ChangeAbility_index, DataCount):
 
     empty_variables_message = "以下变量为空: " + ", ".join(empty_variables) + "\n请修改配置文件 ./工具/GetEntriesGUILocal/config.ini"
     if empty_variables:
-        logger.error(str(empty_variables_message))
-        QMessageBox.critical(None, "错误", empty_variables_message)
+        _notify_error(empty_variables_message)
         return True
     return False
 
@@ -119,8 +194,7 @@ def check_equipments(RandomMainAbility_seed, RandomMainAbility_index, DataCount)
 
     empty_variables_message = "以下变量为空: " + ", ".join(empty_variables) + "\n请修改配置文件 ./工具/GetEntriesGUILocal/config.ini"
     if empty_variables:
-        logger.error(str(empty_variables_message))
-        QMessageBox.critical(None, "错误", empty_variables_message)
+        _notify_error(empty_variables_message)
         return True
     return False
 
@@ -129,8 +203,7 @@ def get_index_wash_entries():
     global index_wash_entries
 
     if not os.path.exists("./工具/GetEntriesGUILocal/config.ini"):
-        logger.error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
-        QMessageBox.critical(None, "错误", "配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
+        _notify_error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
         return
 
     config = configparser.ConfigParser()
@@ -172,8 +245,7 @@ def get_index_equipments():
     global index_equipments
 
     if not os.path.exists("./工具/GetEntriesGUILocal/config.ini"):
-        logger.error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
-        QMessageBox.critical(None, "错误", "配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
+        _notify_error("配置文件 ./工具/GetEntriesGUILocal/config.ini 不存在！")
         return
 
     config = configparser.ConfigParser()
@@ -318,7 +390,7 @@ def ini_config():
 
 
 def creat_ct_win():
-    global output_text
+    global output_text, _bridge
 
     if is_win_open('词条获取', __name__):
         win_set_top('词条获取', __name__)
@@ -358,15 +430,29 @@ def creat_ct_win():
     get_entries_frame.layout().addWidget(buttons_frame, 0, 3)
 
     def run_in_thread(func):
-        get_wash_entries_button.setEnabled(False)
-        get_index_equipments_button.setEnabled(False)
+        global _entries_worker_running
+        if _entries_worker_running:
+            return
+        _entries_worker_running = True
+        bridge = _bridge
+        if bridge is not None:
+            bridge.busy_changed.emit(True)
 
         def wrapper():
+            global _entries_worker_running
+            # 线程本地记录本次任务对应的窗口桥：
+            # 即使窗口先关掉再打开，旧任务也不会把内容写进新窗口
+            _thread_local.bridge = bridge
             try:
                 func()
             finally:
-                QTimer.singleShot(0, lambda: get_wash_entries_button.setEnabled(True))
-                QTimer.singleShot(0, lambda: get_index_equipments_button.setEnabled(True))
+                _thread_local.bridge = None
+                _entries_worker_running = False
+                if bridge is not None and _widget_alive(bridge):
+                    try:
+                        bridge.busy_changed.emit(False)
+                    except RuntimeError:
+                        pass    # 窗口已经销毁
 
         thread = threading.Thread(target=wrapper, daemon=True)
         thread.start()
@@ -387,8 +473,26 @@ def creat_ct_win():
     save_file_button.clicked.connect(save_to_file)
     buttons_frame.layout().addWidget(save_file_button, 3, 0)
 
+    # 后台线程只发信号，槽函数在主线程更新控件
+    # 桥不挂到窗口下：窗口关闭时后台线程可能还在 emit，
+    # 让桥由线程本地引用持有到任务结束，避免访问已销毁的 C++ 对象。
+    bridge = _EntriesBridge(
+        output_text,
+        (get_wash_entries_button, get_index_equipments_button))
+    _bridge = bridge
+
     win_open_manage(ct_win_frame, __name__)
-    ct_win_frame.closeEvent = lambda ev: win_close_manage(ct_win_frame, __name__)
+
+    def on_close(event):
+        global _bridge, output_text
+        # 先断开全局引用；仍在运行的后台线程会通过线程本地桥发信号，
+        # 而旧桥的槽会检查控件是否已销毁，不会写进之后重新打开的窗口。
+        _bridge = None
+        output_text = None
+        win_close_manage(ct_win_frame, __name__)
+        event.accept()
+
+    ct_win_frame.closeEvent = on_close
 
     return "break"
 

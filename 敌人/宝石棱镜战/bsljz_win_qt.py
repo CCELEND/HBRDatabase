@@ -45,10 +45,10 @@ def creat_bsljz_win(event, parent_frame, bsljz):
 
     bsljz_win_frame = creat_Toplevel(bsljz.name, 600, 840, 230, 110)
     set_window_icon(bsljz_win_frame, bsljz.logo_path)
-    win_open_manage(bsljz_win_frame, __name__)
 
     bsljz_image_viewer = ImageViewerWithScrollbar(bsljz_win_frame, 600, 840, bsljz.guide_path)
 
+    win_open_manage(bsljz_win_frame, __name__)
     bsljz_win_frame.mousePressEvent = lambda ev: win_set_top(bsljz_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(bsljz_win_frame, __name__, bsljz_image_viewer)

@@ -36,10 +36,10 @@ def creat_hxz_win(event, parent_frame, hxz):
     else:
         hxz_win_frame = creat_Toplevel(hxz.name, 1280, 720, 180, 140)
     set_window_icon(hxz_win_frame, hxz.logo_path)
-    win_open_manage(hxz_win_frame, __name__)
 
     hxz_image_viewer = ImageViewerWithScrollbar(hxz_win_frame, 1280, 720, hxz.guide_path)
 
+    win_open_manage(hxz_win_frame, __name__)
     hxz_win_frame.mousePressEvent = lambda ev: win_set_top(hxz_win_frame, __name__)
     def on_close(self, event):
         win_close_manage(hxz_win_frame, __name__, hxz_image_viewer)

@@ -116,7 +116,6 @@ def creat_szt_win(event, parent_frame, szt):
 
     szt_win_frame = creat_Toplevel(szt.name, x=200, y=250)
     set_window_icon(szt_win_frame, szt.logo_path)
-    win_open_manage(szt_win_frame, __name__)
 
     up_photo = get_pixmap("./战斗系统/状态/IconUp.webp", (20, 20))
     down_photo = get_pixmap("./战斗系统/状态/IconDown.webp", (20, 20))
@@ -197,8 +196,8 @@ def creat_szt_win(event, parent_frame, szt):
         row_layout.addWidget(info_frame, 0, 1)
         layout.addWidget(row_frame, i, 0, 1, 4)
 
+    win_open_manage(szt_win_frame, __name__)
     szt_win_frame.mousePressEvent = lambda ev: win_set_top(szt_win_frame, __name__)
-    szt_win_frame.closeEvent = lambda ev: (win_close_manage(szt_win_frame, __name__), ev.accept())
 
     def on_close(self, event):
         win_close_manage(szt_win_frame, __name__)

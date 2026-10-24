@@ -3,7 +3,6 @@ import os
 import cv2
 import numpy as np
 import tempfile
-import types
 
 from PyQt5.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox,
@@ -162,6 +161,35 @@ class LineArtGUI2:
 
         cv2.imencode('.png', result)[1].tofile(output_path)
 
+    def _destroy_preview(self):
+        """关闭并释放预览窗口（不删除临时文件）。"""
+        preview = self.preview_window
+        self.preview_window = None
+        if preview is not None:
+            try:
+                preview.close()
+            except RuntimeError:
+                pass
+        # 预览窗口的 closeEvent 正常会销毁 viewer；这里兜底
+        viewer = self.viewer
+        self.viewer = None
+        if viewer is not None:
+            try:
+                viewer.destroy()
+            except RuntimeError:
+                pass
+
+    def cleanup(self):
+        """主窗口关闭时释放预览窗口和临时预览文件。"""
+        self._destroy_preview()
+        path = self.temp_preview_path
+        self.temp_preview_path = None
+        if path:
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+
     def preview_lineart(self):
         input_path = self.input_path
         if input_path == "未选择图片":
@@ -228,12 +256,14 @@ class LineArtGUI2:
             self.preview_window = preview_win
             self.viewer = viewer
 
-            def on_close(self, event):
-                self.viewer.destroy()
-                self.preview_window = None
-                self.viewer = None
+            def on_close(event):
+                try:
+                    viewer.destroy()
+                finally:
+                    self.preview_window = None
+                    self.viewer = None
                 event.accept()
-            preview_win.closeEvent = types.MethodType(on_close, preview_win)
+            preview_win.closeEvent = on_close
 
         except Exception as e:
             logger.error(str(e))
@@ -295,5 +325,11 @@ def creat_line_art_win2():
     gui = LineArtGUI2(line_art_win_frame)
 
     win_open_manage(line_art_win_frame, __name__)
-    line_art_win_frame.closeEvent = lambda ev: (win_close_manage(line_art_win_frame, __name__), ev.accept())
+
+    def on_close(ev):
+        gui.cleanup()
+        win_close_manage(line_art_win_frame, __name__)
+        ev.accept()
+
+    line_art_win_frame.closeEvent = on_close
 

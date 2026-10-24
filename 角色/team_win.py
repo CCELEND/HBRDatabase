@@ -61,9 +61,15 @@ def show_role_img(event, parent_frame, role: Role, team: Team):
 
     role_img_frame = creat_Toplevel(open_role_win, 444, 508, 600, 200)
     set_window_icon(role_img_frame, team.logo_path)
-    win_open_manage(role_img_frame, __name__)
 
     displayer = ArtworkDisplayerHeight(role_img_frame, role.img_path, 508)
+
+    win_open_manage(role_img_frame, __name__)
+
+    # 窗口关闭时注销并清理图片资源
+    role_img_frame.protocol("WM_DELETE_WINDOW",
+        lambda: win_close_manage(role_img_frame, __name__, displayer)
+    )
 
     return "break"  # 阻止事件冒泡
 
