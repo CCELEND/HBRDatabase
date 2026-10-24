@@ -92,7 +92,8 @@ def load_json(json_path: str) -> dict:
     try:
         if is_file_empty(json_path): return {}
 
-        with open(json_path, 'r', encoding='utf-8') as file:
+        # utf-8-sig 兼容记事本等编辑器写入的 BOM
+        with open(json_path, 'r', encoding='utf-8-sig') as file:
             json_dir = json.load(file)
             return json_dir
     except Exception as e:

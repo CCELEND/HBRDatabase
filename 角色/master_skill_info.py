@@ -1,4 +1,7 @@
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # 大师技能效果类
 class MasterSkillEffect:
     def __init__(self, effect_type = None, value = None, 
@@ -128,15 +131,31 @@ class MasterSkill:
 # 获取大师技能对象
 def get_master_skill_obj(skill_info) -> MasterSkill:
 
-    if skill_info == None:
+    if skill_info is None:
+        return None
+    if not isinstance(skill_info, list) or len(skill_info) < 4:
+        logger.warning("大师技能数据格式错误，已跳过：%r", skill_info)
         return None
 
+    effects_data = skill_info[4] if len(skill_info) > 4 else []
+    if not isinstance(effects_data, (list, tuple)):
+        logger.warning("大师技能效果不是列表，已忽略：%r",
+                       type(effects_data).__name__)
+        effects_data = []
+
     effects = []
-    for effect in skill_info[4]:
-        if effect[0] in ["斩","突","打"]:
-            effect_obj = MasterAttackSkill.from_list(effect)
-        else:
-            effect_obj = MasterSkillEffect.from_list(effect)
+    for effect in effects_data:
+        if not isinstance(effect, (list, tuple)) or not effect:
+            logger.warning("大师技能效果条目格式错误，已跳过：%r", effect)
+            continue
+        try:
+            if effect[0] in ["斩","突","打"]:
+                effect_obj = MasterAttackSkill.from_list(effect)
+            else:
+                effect_obj = MasterSkillEffect.from_list(effect)
+        except Exception as e:
+            logger.warning("解析大师技能效果失败，已跳过：%r（%s）", effect, e)
+            continue
 
         effects.append(effect_obj)
 
@@ -146,7 +165,7 @@ def get_master_skill_obj(skill_info) -> MasterSkill:
         skill_info[2],
         skill_info[3],
         effects,
-        skill_info[5]
+        skill_info[5] if len(skill_info) > 5 else None
     )
 
     return Master_skill

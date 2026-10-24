@@ -1,4 +1,6 @@
 
+from threading import Lock
+
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
@@ -270,6 +272,7 @@ style_categories = {
 # 不能用风格名单独做键：不同角色可能有同名风格（如 Angel Beats! 的
 # 芳冈由依 / 岩泽雅美 都有「Stir Soul Song」）。
 style_obj_cache = {}
+_style_cache_lock = Lock()
 
 # 根据风格对象的稀有度、武器属性和元素属性分类存储样式
 def set_style_category(style):
@@ -334,6 +337,11 @@ def create_style(data) -> Style:
     style_info_data = {}
     for i, field in enumerate(style_fields):
         style_info_data[field] = style_info[i] if i < len(style_info) else ''
+
+    # 风格名为空时不能入库：否则多个坏风格会写到同一个 key
+    style_name = style_info_data.get('name')
+    if not isinstance(style_name, str) or not style_name.strip():
+        raise ValueError("style_info[3] 的风格名无效")
 
     # 主动技能列表
     activeskills = []
@@ -464,12 +472,12 @@ def get_style_obj(data) -> Style:
     # 判断风格对象是否在缓存中，在就复用，不在就生成。
     # 键必须带上角色名，避免不同角色的同名风格互相串用。
     cache_key = (role_name, style_name)
-    if cache_key in style_obj_cache:
-        style = style_obj_cache[cache_key]
-    else:
-        style = create_style(data)
-        set_style_category(style)
-        style_obj_cache[cache_key] = style
+    with _style_cache_lock:
+        style = style_obj_cache.get(cache_key)
+        if style is None:
+            style = create_style(data)
+            set_style_category(style)
+            style_obj_cache[cache_key] = style
 
     return style
 
@@ -482,12 +490,23 @@ def is_skill_effect(skill) -> bool:
         return False
 
 def get_en_by_id(style_id) -> str:
+    # 不存在时保留 KeyError（调用方可据此提示「缺失映射」），
+    # 但避免 id_en 为空时抛 StopIteration
     style = style_categories['id'][style_id]
-    return next(iter(style.id_en.values()))
+    id_en = style.id_en
+    value = id_en.get(style_id) if isinstance(id_en, dict) else None
+    if not isinstance(value, str) or not value:
+        raise KeyError(style_id)
+    return value
 
 def get_id_by_en(style_en) -> str:
     style = style_categories['en'][style_en]
-    return next(iter(style.id_en.keys()))
+    id_en = style.id_en
+    if isinstance(id_en, dict):
+        for style_id, en in id_en.items():
+            if en == style_en:
+                return str(style_id)
+    raise KeyError(style_en)
 
 
 def is_id_in_style_categories(style_id) -> bool:

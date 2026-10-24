@@ -2,7 +2,7 @@
 import os
 from 角色.style_info import get_style_obj
 from 角色.master_skill_info import get_master_skill_obj
-from tools import load_json, get_dir_values_list
+from tools import load_json
 
 import 日志.error_queue_proc
 from 日志.advanced_logger import AdvancedLogger
@@ -94,6 +94,11 @@ def get_styles(role_path, style_rarity) -> list:
     styles_dir = load_json(file_path)
     if not styles_dir:
         return []
+    if not isinstance(styles_dir, dict):
+        report_data_error(
+            "风格文件格式错误（根节点应为 JSON 对象），已跳过：\n文件：%s"
+            % file_path.replace("\\", "/"))
+        return []
     # 逐个风格解析：某个风格的数据缺字段时只跳过它并提示，不影响其它风格
     styles = []
     for style_name, style_dir in styles_dir.items():
@@ -113,11 +118,17 @@ all_roles = {}
 
 def creat_role_obj(role_path) -> Role:
 
-    role_json = load_json(role_path + "/role.json")
-    role_name = role_json.get('name')
-    if not role_name:
+    role_file = role_path + "/role.json"
+    role_json = load_json(role_file)
+    if not isinstance(role_json, dict):
         report_data_error(
-            "角色数据缺少 name 字段，已跳过该角色：\n文件：%s/role.json"
+            "角色文件格式错误（根节点应为 JSON 对象），已用空数据继续：\n文件：%s"
+            % role_file.replace("\\", "/"))
+        role_json = {}
+    role_name = role_json.get('name')
+    if not isinstance(role_name, str) or not role_name.strip():
+        report_data_error(
+            "角色数据缺少有效的 name 字段，已使用目录名：\n文件：%s/role.json"
             % role_path.replace("\\", "/"))
         role_name = os.path.basename(str(role_path)) or "?"
         role_json["name"] = role_name      # 让 Role 对象也有可用的名字

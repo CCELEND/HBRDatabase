@@ -306,7 +306,8 @@ def _load_json(path):
     if not os.path.isfile(path):
         return None
     try:
-        with open(path, "r", encoding="utf-8") as f:
+        # utf-8-sig 兼容带 BOM 的 JSON
+        with open(path, "r", encoding="utf-8-sig") as f:
             return json.load(f)
     except Exception as e:
         logger.warning("读取 %s 失败: %s", path, e)
@@ -449,16 +450,24 @@ def _build_orb_generic_skills():
     不影响 OD 与 SP，保留 SP 消耗即可。
     """
     data = _load_json(_ORB_JSON) or {}
+    if not isinstance(data, dict):
+        logger.warning("%s 的根节点不是 JSON 对象，已忽略", _ORB_JSON)
+        return []
     skills = []
     for orb_name, orb in data.items():
         if orb_name in _EXCLUSIVE_ORBS or not isinstance(orb, dict):
             continue
         info = orb.get("skill") or []
+        if not isinstance(info, (list, tuple)):
+            continue
         if len(info) < 3 or not info[0]:
             continue
+        effects = info[4] if len(info) > 4 and info[4] else []
+        if not isinstance(effects, (list, tuple)):
+            effects = []
         kwargs = {}
-        for effect in (info[4] if len(info) > 4 and info[4] else []):
-            if not effect:
+        for effect in effects:
+            if not isinstance(effect, (list, tuple)) or not effect:
                 continue
             kind = effect[0]
             value = effect[1] if len(effect) > 1 else None
@@ -1648,10 +1657,28 @@ class HBRDataSource:
         data = _load_json(self._teams_path())
         if not data:
             return self._roles
+        if not isinstance(data, dict):
+            logger.warning("teams.json 根节点不是 JSON 对象，已忽略")
+            return self._roles
         for team_name, team_info in data.items():
-            for role_name, role_dir in (team_info.get("roles") or {}).items():
+            if not isinstance(team_info, dict):
+                logger.warning("队伍 %s 的数据不是 JSON 对象，已跳过", team_name)
+                continue
+            roles_data = team_info.get("roles")
+            if not isinstance(roles_data, dict):
+                if roles_data:
+                    logger.warning("队伍 %s 的 roles 不是 JSON 对象，已忽略",
+                                   team_name)
+                continue
+            for role_name, role_dir in roles_data.items():
+                if not isinstance(role_dir, dict):
+                    logger.warning("队伍 %s / %s 的角色数据不是 JSON 对象，已跳过",
+                                   team_name, role_name)
+                    continue
                 role_path = role_dir.get("path")
                 if not role_path:
+                    logger.warning("队伍 %s / %s 缺少 path，已跳过",
+                                   team_name, role_name)
                     continue
                 self._roles.append((team_name, role_name, role_path))
                 self._role_by_name.setdefault(role_name, role_path)
@@ -1684,6 +1711,9 @@ class HBRDataSource:
                                 "role.json")
             data = _load_json(path)
             if not data:
+                continue
+            if not isinstance(data, dict):
+                logger.warning("%s 的 role.json 不是 JSON 对象，已跳过", role_name)
                 continue
             self._role_team[role_name] = data.get("team") or ""
             ms = data.get("master_skill")
@@ -1748,6 +1778,9 @@ class HBRDataSource:
             data = _load_json(path)
             if not data:
                 continue
+            if not isinstance(data, dict):
+                logger.warning("%s 的根节点不是 JSON 对象，已跳过", path)
+                continue
             for style_name, style_data in data.items():
                 if style_name in seen:
                     continue
@@ -1785,6 +1818,16 @@ class HBRDataSource:
         style_info = style_data.get("style_info")
         if not isinstance(style_info, list):
             raise ValueError("style_info 缺失或不是列表")
+        # 深层字段不是列表时统一按空列表处理，
+        # 避免后续代码把它当作字典/字符串迭代出垃圾数据
+        style_data = dict(style_data)
+        for field in ("ActiveSkills", "PassiveSkills"):
+            value = style_data.get(field)
+            if not isinstance(value, (list, tuple)):
+                if value:
+                    logger.warning("风格 %s 的 %s 不是列表，已忽略",
+                                   style_name, field)
+                style_data[field] = []
         rarity = style_info[6] if len(style_info) > 6 else None
         element = style_info[9] if len(style_info) > 9 else None
         # 通常攻击为所有风格共有，置于技能列表最前

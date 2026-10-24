@@ -1,5 +1,5 @@
-from tools import load_json, get_dir_values_list
-from 角色.role_info import creat_role_obj, Role
+from tools import load_json
+from 角色.role_info import creat_role_obj, Role, report_data_error
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -28,7 +28,12 @@ def load_teams_json():
     if teams_json:
         return
 
-    teams_json = load_json("./角色/teams.json")
+    data = load_json("./角色/teams.json")
+    if not isinstance(data, dict):
+        report_data_error(
+            "队伍文件格式错误（根节点应为 JSON 对象），已忽略：./角色/teams.json")
+        data = {}
+    teams_json = data
 
 # 每个线程只写入不同的键，则无需额外加锁
 # 队伍对象字典 键：队伍名，值：队伍对象
@@ -37,9 +42,19 @@ teams = {}
 # 根据字典 创建并返回队伍对象
 def creat_team(team_info, roles) -> Team:
 
-    logo_path = team_info['logo_path']
-    name = team_info['name']
-    description = team_info['description']
+    if not isinstance(team_info, dict):
+        report_data_error("队伍数据格式错误（应为 JSON 对象），已用空值代替")
+        team_info = {}
+    missing = [k for k in ("logo_path", "name", "description")
+               if k not in team_info]
+    if missing:
+        report_data_error(
+            "队伍数据缺少字段：%s（已用空值代替，队伍：%s）"
+            % ("、".join(missing), team_info.get("name") or "?"))
+
+    logo_path = team_info.get('logo_path')
+    name = team_info.get('name')
+    description = team_info.get('description')
 
     team = Team(
         logo_path,
@@ -66,19 +81,34 @@ def get_team_obj(team_name) -> Team:
 
     else:
 
-        team_info = teams_json[team_name]
+        team_info = teams_json.get(team_name)
+        if not isinstance(team_info, dict):
+            report_data_error(
+                "队伍数据格式错误（应为 JSON 对象），已跳过：%s" % team_name)
+            team_info = {}
 
-        team_info_roles = team_info['roles']
-        roles_dir_list = get_dir_values_list(team_info_roles)
+        team_info_roles = team_info.get('roles')
+        if not isinstance(team_info_roles, dict):
+            if team_info_roles:
+                report_data_error(
+                    "队伍「%s」的 roles 不是 JSON 对象，已忽略" % team_name)
+            team_info_roles = {}
 
-        # 队伍的角色对象列表
+        # 队伍的角色对象列表；单个角色坏数据只跳过它自己
         roles = []
-        # 遍历队伍字典列表
-        for role_dir in roles_dir_list:
-            # 获取角色资源的路径
-            role_path = role_dir['path']
-
-            role = creat_role_obj(role_path)
+        for role_key, role_dir in team_info_roles.items():
+            if not isinstance(role_dir, dict) or not role_dir.get('path'):
+                report_data_error(
+                    "角色数据格式错误或缺少 path，已跳过：队伍「%s」/ %s"
+                    % (team_name, role_key))
+                continue
+            try:
+                role = creat_role_obj(role_dir['path'])
+            except Exception as e:
+                report_data_error(
+                    "加载角色失败，已跳过：队伍「%s」/ %s\n%s: %s"
+                    % (team_name, role_key, type(e).__name__, e))
+                continue
             roles.append(role)
 
         # 生成 team 队伍对象
