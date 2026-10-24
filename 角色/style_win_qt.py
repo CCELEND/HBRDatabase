@@ -156,11 +156,18 @@ def show_style_animation(parent_frame, team, style):
         win_set_top(open_style_win, __name__)
         return "break"
 
-    style_animation_win_frame = creat_Toplevel(open_style_win, 1362, 767, x=300, y=120)
+    # 先不显示：等第一帧解码完成再 show，避免出现短暂黑屏
+    style_animation_win_frame = creat_Toplevel(
+        open_style_win, 1362, 767, x=300, y=120, show=False)
     set_window_icon(style_animation_win_frame, team.logo_path)
 
     # 视频打不开（缺解码器等）时不注册，避免留下关不掉的空窗口
     player = VideoPlayerWithScrollbar(style_animation_win_frame, 1362, 767, animation_path)
+
+    # 先同步渲染第一帧，再显示窗口
+    style_animation_win_frame.grid_layout.activate()
+    player.update_frame()
+    style_animation_win_frame.show()
 
     win_open_manage(style_animation_win_frame, __name__)
 

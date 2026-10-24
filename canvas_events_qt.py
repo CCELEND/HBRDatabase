@@ -704,8 +704,12 @@ class VideoPlayerWithScrollbar:
             return
         viewport = self.scroll_area.viewport()
         available = viewport.size()
-        if available.width() <= 0 or available.height() <= 0:
-            return
+        if (not self.scroll_area.isVisible()
+                or available.width() < 2 or available.height() < 2):
+            # 窗口还没显示时视口还是布局前的默认小尺寸，
+            # 先用目标窗口尺寸渲染第一帧，避免显示瞬间出现黑屏/小图。
+            available = QSize(max(1, self.parent_width),
+                              max(1, self.parent_height))
         h, w, ch = self.current_frame.shape
         qimg = QImage(self.current_frame.data, w, h, ch * w, QImage.Format_RGB888)
         pixmap = QPixmap.fromImage(qimg.copy())

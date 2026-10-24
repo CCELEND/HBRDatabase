@@ -182,7 +182,8 @@ def creat_window(title: str, wide=None, high=None, x=None, y=None) -> QMainWindo
     return new_window
 
 
-def creat_Toplevel(title: str, width=None, height=None, x=None, y=None) -> QMainWindow:
+def creat_Toplevel(title: str, width=None, height=None, x=None, y=None,
+                   show: bool = True) -> QMainWindow:
     if not isinstance(title, str):
         raise TypeError("title参数必须是字符串类型")
     for param, name in [(width, "width"), (height, "height"), (x, "x"), (y, "y")]:
@@ -201,7 +202,8 @@ def creat_Toplevel(title: str, width=None, height=None, x=None, y=None) -> QMain
     new_window.grid_layout = QGridLayout(central)
     new_window.grid_layout.setContentsMargins(0, 0, 0, 0)
     new_window.grid_layout.setSpacing(0)
-    new_window.show()
+    if show:
+        new_window.show()
     return new_window
 
 
