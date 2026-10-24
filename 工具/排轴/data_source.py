@@ -1752,470 +1752,13 @@ class HBRDataSource:
                 if style_name in seen:
                     continue
                 seen.add(style_name)
-                # style_info 结构：[path, team, role, name, nicknames,
-                #                    description, rarity, career, ...]
-                style_info = style_data.get("style_info") or []
-                rarity = style_info[6] if len(style_info) > 6 else None
-                element = style_info[9] if len(style_info) > 9 else None
-                # 通常攻击为所有风格共有，置于技能列表最前
-                skills = [SkillInfo(NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
-                                    None, True)]
-                for gi, group in enumerate(style_data.get("ActiveSkills") or []):
-                    flag = _group_exclusive(group)
-                    for sk in _extract_skills(group):
-                        sk.source_group = gi
-                        sk.exclusive_flag = flag
-                        skills.append(sk)
-                # 特殊被动里的攻击（如 魔界骑兵启动）也可作为行动使用
-                for passive in (style_data.get("PassiveSkills") or []):
-                    action = _passive_action_skill(passive)
-                    if action is None:
-                        continue
-                    if rarity in ("SSR", "SS"):
-                        action.is_exclusive = True   # 该风格专属
-                    skills.append(action)
-                style_id = None
-                if len(style_info) > 10 and isinstance(style_info[10], dict):
-                    try:
-                        style_id = int(next(iter(style_info[10].keys())))
-                    except Exception:
-                        style_id = None
-                    style_label = next(iter(style_info[10].values()), None)
-                else:
-                    style_label = None
-                def _passive_lb(passive):
-                    # 同 _passive_lb：>4 的解锁需求按最高突破 4 处理
-                    try:
-                        value = int(str(passive[2]).strip() or 0)
-                    except Exception:
-                        return 0
-                    return 4 if value > 4 else value
-
-                # 解析「击破敌人时回复SP」类被动
-                break_sp = []
-                for passive in (style_data.get("PassiveSkills") or []):
-                    try:
-                        pname = str(passive[0])
-                        pdesc = str(passive[1])
-                        ptype = str(passive[3]) if len(passive) > 3 else ""
-                        pvalue = passive[4] if len(passive) > 4 else None
-                        ptarget = passive[7] if len(passive) > 7 else None
-                    except Exception:
-                        continue
-                    text = pname + pdesc
-                    if ptype != "回复SP" or ("击破" not in text and "破盾" not in text):
-                        continue
-                    try:
-                        amount = int(str(pvalue).strip())
-                    except Exception:
-                        amount = 0
-                    scope_info = _sp_recover_scope(ptarget)
-                    if amount > 0 and scope_info:
-                        break_sp.append({
-                            "amount": amount,
-                            "scope": scope_info[0],
-                            "first_only": "首次" in text,
-                            "lb": _passive_lb(passive),
-                        })
-                # 「OD条上升」类被动（如 V字回复）：回合开始时增加 OD 槽。
-                # 解析触发时机（回合开始/战斗开始）、位置（前锋/后卫）、
-                # 阈值（超频条不足N%）、是否出击中1次；无法判定的条件跳过。
-                turn_start_od = []
-                break_od = []
-                # 仍无法判定的条件（干劲已支持，见下方 condition_min）
-                skip_od_keywords = ("解除", "EX技能",
-                                    "SP提升", "仆人", "DP", "领域")
-                for passive in (style_data.get("PassiveSkills") or []):
-                    try:
-                        pname = str(passive[0])
-                        pdesc = str(passive[1])
-                        ptype = str(passive[3]) if len(passive) > 3 else ""
-                        pvalue = passive[4] if len(passive) > 4 else None
-                    except Exception:
-                        continue
-                    if ptype != "OD条上升":
-                        continue
-                    num = re.search(r'(\d+(?:\.\d+)?)', str(pvalue))
-                    if not num:
-                        continue
-                    amount = float(num.group(1))
-                    # 「击破敌人时」增加 OD 槽（如 托付给你了 / 势如破竹）
-                    if "击破" in pdesc or "破盾" in pdesc:
-                        break_od.append({
-                            "name": pname,
-                            "amount": amount,
-                            "first_only": "首次" in pdesc,
-                            "lb": _passive_lb(passive),
-                        })
-                        continue
-                    # 「处于X状态的友方为N名或以上 → 超频条+X%」
-                    # （如 山胁「魔王军的大攻势！」/ 丰后「开始征服世界了的说！」）
-                    m_cnt = re.search(r'处于(.+?)状态的友方为(\d+)名或以上',
-                                      pdesc, re.S)
-                    if m_cnt:
-                        state = STATE_EFFECTS.get(
-                            re.sub(r'\s+', '', m_cnt.group(1)))
-                        if state:
-                            turn_start_od.append({
-                                "name": pname,
-                                "amount": amount,
-                                "threshold": None,
-                                "position": None,
-                                "timing": "turn",
-                                "once": "1次" in pdesc,
-                                "lb": _passive_lb(passive),
-                                "state_count": [state, int(m_cnt.group(2))],
-                            })
-                            continue
-                    # 「若自身干劲为良好或以上」（如 小笠原「球界头脑」→ 超频条+10%）
-                    cond_min, cond_exact = _condition_requirement(pdesc)
-                    if cond_min is not None:
-                        turn_start_od.append({
-                            "name": pname,
-                            "amount": amount,
-                            "threshold": None,
-                            "position": None,
-                            "timing": "turn",
-                            "once": False,
-                            "lb": _passive_lb(passive),
-                            "condition_min": cond_min,
-                            "condition_exact": cond_exact,
-                            "condition_on": "self",
-                        })
-                        continue
-                    if any(k in pdesc for k in skip_od_keywords):
-                        continue
-                    threshold = None
-                    m = re.search(r'不足(\d+(?:\.\d+)?)%', pdesc)
-                    if m:
-                        threshold = float(m.group(1))
-                    position = None
-                    if "位于前锋" in pdesc:
-                        position = "front"
-                    elif "位于后卫" in pdesc:
-                        position = "back"
-                    timing = "battle" if "战斗开始时" in pdesc else "turn"
-                    turn_start_od.append({
-                        "name": pname,
-                        "amount": amount,
-                        "threshold": threshold,
-                        "position": position,
-                        "timing": timing,
-                        "once": ("1次" in pdesc) or timing == "battle",
-                        "lb": _passive_lb(passive),
-                    })
-                # 「（被动技能）」条目里的「战斗/回合开始时 超频条+X%」
-                # （如 东城司「微风」的 背阴处的小憩：战斗开始时位于前锋 超频条+10%，仅首回合）
-                for group in (style_data.get("ActiveSkills") or []):
-                    try:
-                        gname = str(group[0][0])
-                        gdesc = str(group[0][1])
-                    except Exception:
-                        continue
-                    if ("（被动技能）" not in gname
-                            and "(被动技能)" not in gname):
-                        continue
-                    if "超频条" not in gdesc:
-                        continue
-                    gm = re.search(r'超频条\+(\d+(?:\.\d+)?)%', gdesc)
-                    if not gm:
-                        continue
-                    position = None
-                    if "位于前锋" in gdesc:
-                        position = "front"
-                    elif "位于后卫" in gdesc:
-                        position = "back"
-                    timing = ("battle" if ("战斗开始时" in gdesc
-                                           or "初战开始时" in gdesc) else "turn")
-                    turn_start_od.append({
-                        "name": gname,
-                        "amount": float(gm.group(1)),
-                        "threshold": None,
-                        "position": position,
-                        "timing": timing,
-                        "once": ("1次" in gdesc) or timing == "battle",
-                        "lb": 0,
-                        "requires": gname,
-                    })
-                # 「回合开始时 / 战斗开始时」回复友方 SP 的被动（如 与伙伴一起）：
-                # 「位于前锋 + 自身」类归入 front_sp_passives，其余按作用范围结算。
-                turn_start_sp = []
-                for passive in (style_data.get("PassiveSkills") or []):
-                    try:
-                        pname = str(passive[0])
-                        pdesc = str(passive[1])
-                        ptype = str(passive[3]) if len(passive) > 3 else ""
-                        pvalue = passive[4] if len(passive) > 4 else None
-                        ptarget = passive[7] if len(passive) > 7 else None
-                    except Exception:
-                        continue
-                    if ptype != "回复SP":
-                        continue
-                    # 「追加回合开始时」只在该回合开始时结算（如 战场之花）
-                    extra_only = "追加回合开始时" in pdesc
-                    if not extra_only and ("回合开始时" not in pdesc
-                                           and "战斗开始时" not in pdesc
-                                           and "初战开始时" not in pdesc):
-                        continue
-                    if str(ptarget) == "自身" and "位于前锋" in pdesc:
-                        continue          # 已由 front_sp_passives 处理
-                    # 敌人处于倒地/被击破状态的回合开始时条件（如 算法）
-                    downed_cond = "被击破的敌人" in pdesc
-                    # 「若回合开始时自身处于X状态」（如 共鸣：歌姬之加护→前锋SP+2）
-                    state_cond = _state_condition(pdesc)
-                    # 「处于X状态的友方SP+N」：目标 = **拥有该状态**的队员
-                    # （如 山胁「开始进军！」/ 丰后「帮忙毁灭世界的说！」）
-                    ts = re.search(r'处于(.+?)状态的友方', pdesc, re.S)
-                    target_state = (STATE_EFFECTS.get(re.sub(r'\s+', '', ts.group(1)))
-                                    if ts else None)
-                    # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
-                    sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
-                    # 「若回合开始时存在破坏率为N%或以上的敌人」类（如 山胁「最终手段」）：
-                    # 破坏率在回合行手动设置，所以这类条件也判定得了
-                    destruction_min = _sp_destruction_min(pdesc)
-                    # 「干劲为极佳 / 良好或以上」类条件（如 干劲极佳的少女 / 怪童）
-                    cond_min, cond_exact = _condition_requirement(pdesc)
-                    cond_on = ("self" if "自身干劲" in pdesc
-                               else ("target" if cond_min is not None else None))
-                    if sig is None:
-                        if not (downed_cond or extra_only or state_cond
-                                or destruction_min or cond_min is not None) \
-                                and not _sp_condition_ok(pdesc):
-                            continue
-                        if (not (downed_cond or state_cond)
-                                and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
-                            continue
-                    # 回复量优先取描述里的「SP+N」（个别条目 pvalue 不是回复量）
-                    num = (re.search(r'SP\+(\d+)', pdesc)
-                           or re.search(r'(\d+)', str(pvalue)))
-                    scope_info = _sp_recover_scope(ptarget)
-                    if not num or not scope_info:
-                        continue
-                    position = None
-                    if "位于前锋" in pdesc:
-                        position = "front"
-                    elif "位于后卫" in pdesc:
-                        position = "back"
-                    family, enhanced = _passive_family(pname)
-                    turn_start_sp.append({
-                        "name": pname,
-                        "amount": int(num.group(1)),
-                        "scope": scope_info[0],
-                        "element": scope_info[1],
-                        "position": position,
-                        "battle_start": ("战斗开始时" in pdesc
-                                         or "初战开始时" in pdesc),
-                        "sp_below": _sp_below(pdesc),
-                        "od_below": (lambda m: int(m.group(1)) if m else None)(
-                            re.search(r'超频条不足(\d+)%', pdesc)),
-                        "downed": downed_cond,
-                        "extra": extra_only,
-                        "destruction_min": destruction_min,
-                        "state": None if target_state else state_cond,
-                        "target_state": target_state,
-                        "condition_min": cond_min,
-                        "condition_exact": cond_exact,
-                        "condition_on": cond_on,
-                        "once": "1次" in pdesc,
-                        "sigil_element": sig.group(1) if sig else None,
-                        "sigil_min_level": int(sig.group(2)) if sig else None,
-                        "lb": _passive_lb(passive),
-                        "family": family,
-                        "enhanced": enhanced,
-                    })
-                # 检测「高阶增幅状态」的启用被动（如 红宝石香水（被动技能））；
-                # 只有存在该被动时，高阶增强的 SP+2 / SP上限+10 才生效。
-                enables_boost = False
-                boost_enabler = None
-                sp_limit_override = None
-                # 「（被动技能）」条目：可在队伍配置里选择携带（默认全选）。
-                # 其中标了 {"exclusive":1} 的是**该风格专属**，不能给同角色其它风格选。
-                passive_options = []
-                private_passive_options = []
-                for group in (style_data.get("ActiveSkills") or []):
-                    try:
-                        gname = str(group[0][0])
-                        gtext = gname + str(group[0][1])
-                    except Exception:
-                        continue
-                    if "（被动技能）" in gname or "(被动技能)" in gname:
-                        passive_options.append(gname)
-                        if _group_exclusive(group):
-                            private_passive_options.append(gname)
-                        if "高阶增幅状态" in gtext:
-                            enables_boost = True
-                            boost_enabler = gname
-                            m = re.search(r'SP上限变为(\d+)', gtext)
-                            if m:
-                                sp_limit_override = max(
-                                    sp_limit_override or 0, int(m.group(1)))
-                # 大师技能也可作为被动携带（默认携带）
-                master_name = self.master_skill_name(role_name)
-                if master_name and master_name not in passive_options:
-                    passive_options.append(master_name)
-
-                # 解析影响 SP 消耗的效果（降低/增加 SP 消耗；含「高阶增强」）
-                sp_cost_mods = []
-                added = set()
-
-                def add_cost_mod(mod_name, amount, target, requires=None, lb=0,
-                                 downed=False, extra=False, state=None):
-                    if not amount:
-                        return
-                    scope_info = _sp_recover_scope(target)
-                    if not scope_info:
-                        return
-                    key = (mod_name, amount, scope_info[0], state)
-                    if key in added:
-                        return
-                    added.add(key)
-                    sp_cost_mods.append({
-                        "name": mod_name,
-                        "amount": amount,
-                        "scope": scope_info[0],
-                        "element": scope_info[1],
-                        "requires": requires,   # 需携带的「（被动技能）」名
-                        "lb": lb,               # 需要的突破数
-                        "downed": downed,       # 需敌人处于倒地/被击破状态
-                        "extra": extra,         # 需处于追加回合（或特殊回合）
-                        "state": state,         # 需自身处于该状态（如 歌姬）
-                    })
-
-                for passive in (style_data.get("PassiveSkills") or []):
-                    try:
-                        pname = str(passive[0])
-                        pdesc = str(passive[1])
-                        ptype = str(passive[3]) if len(passive) > 3 else ""
-                        pvalue = passive[4] if len(passive) > 4 else None
-                        ptarget = passive[7] if len(passive) > 7 else None
-                    except Exception:
-                        continue
-                    if "SP" not in ptype or ("消耗" not in ptype and "消费" not in ptype):
-                        continue
-                    # 敌人处于倒地/被击破状态的条件（如 最佳位置）
-                    downed_cond = ("倒地" in pdesc or "倒下" in pdesc
-                                   or "被击破的敌人" in pdesc)
-                    # 追加回合内的 SP 消耗增减（如 优美的剑技：追加回合中 自身消耗SP-2）
-                    extra_cond = "追加回合" in pdesc
-                    # 「若自身处于X状态」（如 绝唱：歌姬之加护 → 自身消耗SP-2）
-                    state_cond = _state_condition(pdesc)
-                    if not (downed_cond or extra_cond or state_cond) \
-                            and not _sp_condition_ok(pdesc):
-                        continue
-                    if any(k in ptype for k in ("降低", "减少", "下降")):
-                        sign = -1
-                    elif any(k in ptype for k in ("增加", "上升", "提高", "增")):
-                        sign = 1
-                    else:
-                        continue
-                    num = re.search(r'\d+', str(pvalue))
-                    if num:
-                        add_cost_mod(pname, sign * int(num.group()), ptarget,
-                                     lb=_passive_lb(passive),
-                                     downed=downed_cond, extra=extra_cond,
-                                     state=state_cond)
-
-                # 主动技能条目里也可能带效果（如「高阶增强」：SP消耗量增加N）
-                for group in (style_data.get("ActiveSkills") or []):
-                    effects = (group[1] if len(group) > 1
-                               and isinstance(group[1], list) else [])
-                    for eff in effects:
-                        if not isinstance(eff, list) or not eff:
-                            continue
-                        etype = str(eff[0])
-                        evalue = str(eff[1]) if len(eff) > 1 else ""
-                        etarget = eff[6] if len(eff) > 6 else None
-                        if enables_boost and ("高阶增强" in etype
-                                              or "SP消耗量增加" in evalue):
-                            num = re.search(r'SP消耗量增加(\d+)', evalue)
-                            if num:
-                                add_cost_mod("高阶增强", int(num.group(1)),
-                                             etarget, requires=boost_enabler)
-                # 「回合开始时位于前锋则自身 SP+X」的被动（闪光/佳音/机敏/俊敏…）
-                front_sp_passives = []
-                for passive in (style_data.get("PassiveSkills") or []):
-                    try:
-                        ptype = str(passive[3]) if len(passive) > 3 else ""
-                        pvalue = passive[4] if len(passive) > 4 else None
-                        ptarget = str(passive[7]) if len(passive) > 7 else ""
-                        pdesc = str(passive[1])
-                    except Exception:
-                        continue
-                    if ptype != "回复SP" or ptarget != "自身":
-                        continue
-                    if "位于前锋" not in pdesc:
-                        continue
-                    if not _sp_condition_ok(pdesc):
-                        continue
-                    num = re.search(r'\d+', str(pvalue))
-                    if num:
-                        ob = re.search(r'超频条不足(\d+)%', pdesc)
-                        front_sp_passives.append({
-                            "amount": int(num.group()),
-                            "battle_start": ("战斗开始时" in pdesc
-                                             or "初战开始时" in pdesc),
-                            "sp_below": _sp_below(pdesc),
-                            "od_below": int(ob.group(1)) if ob else None,
-                            "lb": _passive_lb(passive),
-                        })
-                styles.append(StyleInfo(style_name, skills, rarity, element,
-                                        break_sp, style_id, sp_cost_mods,
-                                        sp_limit_override, passive_options,
-                                        boost_enabler, front_sp_passives,
-                                        turn_start_od, turn_start_sp,
-                                        style_label, break_od))
-                # 「追击」相关（温泉巡游 / 嫩绿摇曳 / 温泉通行木牌）
-                fu, fu_sp, fu_sw = _parse_follow_up(style_data, skills)
-                styles[-1].follow_up = fu
-                styles[-1].follow_up_sp = fu_sp
-                styles[-1].follow_up_switch = fu_sw
-                # 「指挥行动」取代普通攻击：该风格不能使用通常攻击
-                styles[-1].no_normal_attack = any(
-                    sk.name == "指挥行动" or "取代普通攻击" in (sk.desc or "")
-                    or "取代通常攻击" in (sk.desc or "")
-                    for sk in skills)
-                # 「X之印记」（雷之印 / 冰之印…）
-                styles[-1].sigil = _parse_sigil(style_data)
-                # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
-                styles[-1].battle_states = _parse_battle_states(style_data)
-                # 「指定SP消耗」类（如 速攻◯）
-                styles[-1].sp_cost_pins = _parse_sp_cost_pins(style_data)
-                # 是否给全队赋予「干劲」（没有这类风格时全队都没有干劲）
-                styles[-1].grants_condition = _parse_condition_grant(style_data)
-                # 所属队伍（如 31D）
-                styles[-1].team = (str(style_info[1])
-                                   if len(style_info) > 1 and style_info[1]
-                                   else None)
-                # 该风格专属的「（被动技能）」条目（标了 exclusive 的）
-                styles[-1].private_passive_options = tuple(
-                    private_passive_options)
-                # 职业（如 指挥者）
-                styles[-1].career = (str(style_info[7])
-                                     if len(style_info) > 7 and style_info[7]
-                                     else None)
-                # 缩略图（轴图用）：style_info[0] 是相对仓库根目录的路径
-                styles[-1].icon_path = (str(style_info[0])
-                                        if style_info and style_info[0]
-                                        else None)
-                # 「X之律动」（超越条）
-                styles[-1].rhythm = _parse_rhythm(style_data)
-                # 「自身使用EX技能后 …」的回复 SP 被动
-                styles[-1].ex_sp = _parse_ex_sp(style_data)
-                # 「自身使用EX技能后 超频条+X%」的项
-                styles[-1].ex_od = _parse_ex_od(style_data)
-                # 被动里的「连击数上升」项（如 梅雨）
-                styles[-1].passive_combo = _parse_passive_combo(style_data)
-                # 「分享」类：友方主动技能使自身SP提升时 额外全体SP+N
-                styles[-1].share_sp = _parse_share_sp(style_data)
-                # 「共鸣天赋」（如 神圣恩典）
-                res = style_data.get("resonance")
-                if isinstance(res, dict) and res.get("name"):
-                    styles[-1].resonance = {
-                        "name": str(res.get("name")),
-                        "type": list(res.get("type") or []),
-                        "levels": {str(k): str(res.get(str(k)) or "")
-                                   for k in range(5)},
-                    }
+                try:
+                    styles.append(
+                        self._build_style(style_name, style_data, role_name))
+                except Exception as e:
+                    logger.warning(
+                        "解析风格失败，已跳过：%s / %s（%s: %s）",
+                        role_name, style_name, type(e).__name__, e)
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
@@ -2230,6 +1773,480 @@ class HBRDataSource:
             st.passive_options = _dedupe(list(shared_options) + own)
         self._style_cache[role_path] = styles
         return styles
+
+
+    def _build_style(self, style_name, style_data, role_name):
+        """解析单个风格；异常由 styles() 捕获，避免一条坏数据拖垮整个角色。"""
+        if not isinstance(style_data, dict):
+            raise ValueError("风格数据不是 JSON 对象：%r"
+                             % type(style_data).__name__)
+        # style_info 结构：[path, team, role, name, nicknames,
+        #                    description, rarity, career, ...]
+        style_info = style_data.get("style_info")
+        if not isinstance(style_info, list):
+            raise ValueError("style_info 缺失或不是列表")
+        rarity = style_info[6] if len(style_info) > 6 else None
+        element = style_info[9] if len(style_info) > 9 else None
+        # 通常攻击为所有风格共有，置于技能列表最前
+        skills = [SkillInfo(NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
+                            None, True)]
+        for gi, group in enumerate(style_data.get("ActiveSkills") or []):
+            flag = _group_exclusive(group)
+            for sk in _extract_skills(group):
+                sk.source_group = gi
+                sk.exclusive_flag = flag
+                skills.append(sk)
+        # 特殊被动里的攻击（如 魔界骑兵启动）也可作为行动使用
+        for passive in (style_data.get("PassiveSkills") or []):
+            action = _passive_action_skill(passive)
+            if action is None:
+                continue
+            if rarity in ("SSR", "SS"):
+                action.is_exclusive = True   # 该风格专属
+            skills.append(action)
+        style_id = None
+        if len(style_info) > 10 and isinstance(style_info[10], dict):
+            try:
+                style_id = int(next(iter(style_info[10].keys())))
+            except Exception:
+                style_id = None
+            style_label = next(iter(style_info[10].values()), None)
+        else:
+            style_label = None
+        def _passive_lb(passive):
+            # 同 _passive_lb：>4 的解锁需求按最高突破 4 处理
+            try:
+                value = int(str(passive[2]).strip() or 0)
+            except Exception:
+                return 0
+            return 4 if value > 4 else value
+
+        # 解析「击破敌人时回复SP」类被动
+        break_sp = []
+        for passive in (style_data.get("PassiveSkills") or []):
+            try:
+                pname = str(passive[0])
+                pdesc = str(passive[1])
+                ptype = str(passive[3]) if len(passive) > 3 else ""
+                pvalue = passive[4] if len(passive) > 4 else None
+                ptarget = passive[7] if len(passive) > 7 else None
+            except Exception:
+                continue
+            text = pname + pdesc
+            if ptype != "回复SP" or ("击破" not in text and "破盾" not in text):
+                continue
+            try:
+                amount = int(str(pvalue).strip())
+            except Exception:
+                amount = 0
+            scope_info = _sp_recover_scope(ptarget)
+            if amount > 0 and scope_info:
+                break_sp.append({
+                    "amount": amount,
+                    "scope": scope_info[0],
+                    "first_only": "首次" in text,
+                    "lb": _passive_lb(passive),
+                })
+        # 「OD条上升」类被动（如 V字回复）：回合开始时增加 OD 槽。
+        # 解析触发时机（回合开始/战斗开始）、位置（前锋/后卫）、
+        # 阈值（超频条不足N%）、是否出击中1次；无法判定的条件跳过。
+        turn_start_od = []
+        break_od = []
+        # 仍无法判定的条件（干劲已支持，见下方 condition_min）
+        skip_od_keywords = ("解除", "EX技能",
+                            "SP提升", "仆人", "DP", "领域")
+        for passive in (style_data.get("PassiveSkills") or []):
+            try:
+                pname = str(passive[0])
+                pdesc = str(passive[1])
+                ptype = str(passive[3]) if len(passive) > 3 else ""
+                pvalue = passive[4] if len(passive) > 4 else None
+            except Exception:
+                continue
+            if ptype != "OD条上升":
+                continue
+            num = re.search(r'(\d+(?:\.\d+)?)', str(pvalue))
+            if not num:
+                continue
+            amount = float(num.group(1))
+            # 「击破敌人时」增加 OD 槽（如 托付给你了 / 势如破竹）
+            if "击破" in pdesc or "破盾" in pdesc:
+                break_od.append({
+                    "name": pname,
+                    "amount": amount,
+                    "first_only": "首次" in pdesc,
+                    "lb": _passive_lb(passive),
+                })
+                continue
+            # 「处于X状态的友方为N名或以上 → 超频条+X%」
+            # （如 山胁「魔王军的大攻势！」/ 丰后「开始征服世界了的说！」）
+            m_cnt = re.search(r'处于(.+?)状态的友方为(\d+)名或以上',
+                              pdesc, re.S)
+            if m_cnt:
+                state = STATE_EFFECTS.get(
+                    re.sub(r'\s+', '', m_cnt.group(1)))
+                if state:
+                    turn_start_od.append({
+                        "name": pname,
+                        "amount": amount,
+                        "threshold": None,
+                        "position": None,
+                        "timing": "turn",
+                        "once": "1次" in pdesc,
+                        "lb": _passive_lb(passive),
+                        "state_count": [state, int(m_cnt.group(2))],
+                    })
+                    continue
+            # 「若自身干劲为良好或以上」（如 小笠原「球界头脑」→ 超频条+10%）
+            cond_min, cond_exact = _condition_requirement(pdesc)
+            if cond_min is not None:
+                turn_start_od.append({
+                    "name": pname,
+                    "amount": amount,
+                    "threshold": None,
+                    "position": None,
+                    "timing": "turn",
+                    "once": False,
+                    "lb": _passive_lb(passive),
+                    "condition_min": cond_min,
+                    "condition_exact": cond_exact,
+                    "condition_on": "self",
+                })
+                continue
+            if any(k in pdesc for k in skip_od_keywords):
+                continue
+            threshold = None
+            m = re.search(r'不足(\d+(?:\.\d+)?)%', pdesc)
+            if m:
+                threshold = float(m.group(1))
+            position = None
+            if "位于前锋" in pdesc:
+                position = "front"
+            elif "位于后卫" in pdesc:
+                position = "back"
+            timing = "battle" if "战斗开始时" in pdesc else "turn"
+            turn_start_od.append({
+                "name": pname,
+                "amount": amount,
+                "threshold": threshold,
+                "position": position,
+                "timing": timing,
+                "once": ("1次" in pdesc) or timing == "battle",
+                "lb": _passive_lb(passive),
+            })
+        # 「（被动技能）」条目里的「战斗/回合开始时 超频条+X%」
+        # （如 东城司「微风」的 背阴处的小憩：战斗开始时位于前锋 超频条+10%，仅首回合）
+        for group in (style_data.get("ActiveSkills") or []):
+            try:
+                gname = str(group[0][0])
+                gdesc = str(group[0][1])
+            except Exception:
+                continue
+            if ("（被动技能）" not in gname
+                    and "(被动技能)" not in gname):
+                continue
+            if "超频条" not in gdesc:
+                continue
+            gm = re.search(r'超频条\+(\d+(?:\.\d+)?)%', gdesc)
+            if not gm:
+                continue
+            position = None
+            if "位于前锋" in gdesc:
+                position = "front"
+            elif "位于后卫" in gdesc:
+                position = "back"
+            timing = ("battle" if ("战斗开始时" in gdesc
+                                   or "初战开始时" in gdesc) else "turn")
+            turn_start_od.append({
+                "name": gname,
+                "amount": float(gm.group(1)),
+                "threshold": None,
+                "position": position,
+                "timing": timing,
+                "once": ("1次" in gdesc) or timing == "battle",
+                "lb": 0,
+                "requires": gname,
+            })
+        # 「回合开始时 / 战斗开始时」回复友方 SP 的被动（如 与伙伴一起）：
+        # 「位于前锋 + 自身」类归入 front_sp_passives，其余按作用范围结算。
+        turn_start_sp = []
+        for passive in (style_data.get("PassiveSkills") or []):
+            try:
+                pname = str(passive[0])
+                pdesc = str(passive[1])
+                ptype = str(passive[3]) if len(passive) > 3 else ""
+                pvalue = passive[4] if len(passive) > 4 else None
+                ptarget = passive[7] if len(passive) > 7 else None
+            except Exception:
+                continue
+            if ptype != "回复SP":
+                continue
+            # 「追加回合开始时」只在该回合开始时结算（如 战场之花）
+            extra_only = "追加回合开始时" in pdesc
+            if not extra_only and ("回合开始时" not in pdesc
+                                   and "战斗开始时" not in pdesc
+                                   and "初战开始时" not in pdesc):
+                continue
+            if str(ptarget) == "自身" and "位于前锋" in pdesc:
+                continue          # 已由 front_sp_passives 处理
+            # 敌人处于倒地/被击破状态的回合开始时条件（如 算法）
+            downed_cond = "被击破的敌人" in pdesc
+            # 「若回合开始时自身处于X状态」（如 共鸣：歌姬之加护→前锋SP+2）
+            state_cond = _state_condition(pdesc)
+            # 「处于X状态的友方SP+N」：目标 = **拥有该状态**的队员
+            # （如 山胁「开始进军！」/ 丰后「帮忙毁灭世界的说！」）
+            ts = re.search(r'处于(.+?)状态的友方', pdesc, re.S)
+            target_state = (STATE_EFFECTS.get(re.sub(r'\s+', '', ts.group(1)))
+                            if ts else None)
+            # 「若回合开始时 X之印 等级为 N 或以上」类（如 冰岚之进击）
+            sig = re.search(r'(\S)之印等级为(\d+)或以上', pdesc)
+            # 「若回合开始时存在破坏率为N%或以上的敌人」类（如 山胁「最终手段」）：
+            # 破坏率在回合行手动设置，所以这类条件也判定得了
+            destruction_min = _sp_destruction_min(pdesc)
+            # 「干劲为极佳 / 良好或以上」类条件（如 干劲极佳的少女 / 怪童）
+            cond_min, cond_exact = _condition_requirement(pdesc)
+            cond_on = ("self" if "自身干劲" in pdesc
+                       else ("target" if cond_min is not None else None))
+            if sig is None:
+                if not (downed_cond or extra_only or state_cond
+                        or destruction_min or cond_min is not None) \
+                        and not _sp_condition_ok(pdesc):
+                    continue
+                if (not (downed_cond or state_cond)
+                        and ("击破" in pdesc or "破盾" in pdesc or "击败" in pdesc)):
+                    continue
+            # 回复量优先取描述里的「SP+N」（个别条目 pvalue 不是回复量）
+            num = (re.search(r'SP\+(\d+)', pdesc)
+                   or re.search(r'(\d+)', str(pvalue)))
+            scope_info = _sp_recover_scope(ptarget)
+            if not num or not scope_info:
+                continue
+            position = None
+            if "位于前锋" in pdesc:
+                position = "front"
+            elif "位于后卫" in pdesc:
+                position = "back"
+            family, enhanced = _passive_family(pname)
+            turn_start_sp.append({
+                "name": pname,
+                "amount": int(num.group(1)),
+                "scope": scope_info[0],
+                "element": scope_info[1],
+                "position": position,
+                "battle_start": ("战斗开始时" in pdesc
+                                 or "初战开始时" in pdesc),
+                "sp_below": _sp_below(pdesc),
+                "od_below": (lambda m: int(m.group(1)) if m else None)(
+                    re.search(r'超频条不足(\d+)%', pdesc)),
+                "downed": downed_cond,
+                "extra": extra_only,
+                "destruction_min": destruction_min,
+                "state": None if target_state else state_cond,
+                "target_state": target_state,
+                "condition_min": cond_min,
+                "condition_exact": cond_exact,
+                "condition_on": cond_on,
+                "once": "1次" in pdesc,
+                "sigil_element": sig.group(1) if sig else None,
+                "sigil_min_level": int(sig.group(2)) if sig else None,
+                "lb": _passive_lb(passive),
+                "family": family,
+                "enhanced": enhanced,
+            })
+        # 检测「高阶增幅状态」的启用被动（如 红宝石香水（被动技能））；
+        # 只有存在该被动时，高阶增强的 SP+2 / SP上限+10 才生效。
+        enables_boost = False
+        boost_enabler = None
+        sp_limit_override = None
+        # 「（被动技能）」条目：可在队伍配置里选择携带（默认全选）。
+        # 其中标了 {"exclusive":1} 的是**该风格专属**，不能给同角色其它风格选。
+        passive_options = []
+        private_passive_options = []
+        for group in (style_data.get("ActiveSkills") or []):
+            try:
+                gname = str(group[0][0])
+                gtext = gname + str(group[0][1])
+            except Exception:
+                continue
+            if "（被动技能）" in gname or "(被动技能)" in gname:
+                passive_options.append(gname)
+                if _group_exclusive(group):
+                    private_passive_options.append(gname)
+                if "高阶增幅状态" in gtext:
+                    enables_boost = True
+                    boost_enabler = gname
+                    m = re.search(r'SP上限变为(\d+)', gtext)
+                    if m:
+                        sp_limit_override = max(
+                            sp_limit_override or 0, int(m.group(1)))
+        # 大师技能也可作为被动携带（默认携带）
+        master_name = self.master_skill_name(role_name)
+        if master_name and master_name not in passive_options:
+            passive_options.append(master_name)
+
+        # 解析影响 SP 消耗的效果（降低/增加 SP 消耗；含「高阶增强」）
+        sp_cost_mods = []
+        added = set()
+
+        def add_cost_mod(mod_name, amount, target, requires=None, lb=0,
+                         downed=False, extra=False, state=None):
+            if not amount:
+                return
+            scope_info = _sp_recover_scope(target)
+            if not scope_info:
+                return
+            key = (mod_name, amount, scope_info[0], state)
+            if key in added:
+                return
+            added.add(key)
+            sp_cost_mods.append({
+                "name": mod_name,
+                "amount": amount,
+                "scope": scope_info[0],
+                "element": scope_info[1],
+                "requires": requires,   # 需携带的「（被动技能）」名
+                "lb": lb,               # 需要的突破数
+                "downed": downed,       # 需敌人处于倒地/被击破状态
+                "extra": extra,         # 需处于追加回合（或特殊回合）
+                "state": state,         # 需自身处于该状态（如 歌姬）
+            })
+
+        for passive in (style_data.get("PassiveSkills") or []):
+            try:
+                pname = str(passive[0])
+                pdesc = str(passive[1])
+                ptype = str(passive[3]) if len(passive) > 3 else ""
+                pvalue = passive[4] if len(passive) > 4 else None
+                ptarget = passive[7] if len(passive) > 7 else None
+            except Exception:
+                continue
+            if "SP" not in ptype or ("消耗" not in ptype and "消费" not in ptype):
+                continue
+            # 敌人处于倒地/被击破状态的条件（如 最佳位置）
+            downed_cond = ("倒地" in pdesc or "倒下" in pdesc
+                           or "被击破的敌人" in pdesc)
+            # 追加回合内的 SP 消耗增减（如 优美的剑技：追加回合中 自身消耗SP-2）
+            extra_cond = "追加回合" in pdesc
+            # 「若自身处于X状态」（如 绝唱：歌姬之加护 → 自身消耗SP-2）
+            state_cond = _state_condition(pdesc)
+            if not (downed_cond or extra_cond or state_cond) \
+                    and not _sp_condition_ok(pdesc):
+                continue
+            if any(k in ptype for k in ("降低", "减少", "下降")):
+                sign = -1
+            elif any(k in ptype for k in ("增加", "上升", "提高", "增")):
+                sign = 1
+            else:
+                continue
+            num = re.search(r'\d+', str(pvalue))
+            if num:
+                add_cost_mod(pname, sign * int(num.group()), ptarget,
+                             lb=_passive_lb(passive),
+                             downed=downed_cond, extra=extra_cond,
+                             state=state_cond)
+
+        # 主动技能条目里也可能带效果（如「高阶增强」：SP消耗量增加N）
+        for group in (style_data.get("ActiveSkills") or []):
+            effects = (group[1] if len(group) > 1
+                       and isinstance(group[1], list) else [])
+            for eff in effects:
+                if not isinstance(eff, list) or not eff:
+                    continue
+                etype = str(eff[0])
+                evalue = str(eff[1]) if len(eff) > 1 else ""
+                etarget = eff[6] if len(eff) > 6 else None
+                if enables_boost and ("高阶增强" in etype
+                                      or "SP消耗量增加" in evalue):
+                    num = re.search(r'SP消耗量增加(\d+)', evalue)
+                    if num:
+                        add_cost_mod("高阶增强", int(num.group(1)),
+                                     etarget, requires=boost_enabler)
+        # 「回合开始时位于前锋则自身 SP+X」的被动（闪光/佳音/机敏/俊敏…）
+        front_sp_passives = []
+        for passive in (style_data.get("PassiveSkills") or []):
+            try:
+                ptype = str(passive[3]) if len(passive) > 3 else ""
+                pvalue = passive[4] if len(passive) > 4 else None
+                ptarget = str(passive[7]) if len(passive) > 7 else ""
+                pdesc = str(passive[1])
+            except Exception:
+                continue
+            if ptype != "回复SP" or ptarget != "自身":
+                continue
+            if "位于前锋" not in pdesc:
+                continue
+            if not _sp_condition_ok(pdesc):
+                continue
+            num = re.search(r'\d+', str(pvalue))
+            if num:
+                ob = re.search(r'超频条不足(\d+)%', pdesc)
+                front_sp_passives.append({
+                    "amount": int(num.group()),
+                    "battle_start": ("战斗开始时" in pdesc
+                                     or "初战开始时" in pdesc),
+                    "sp_below": _sp_below(pdesc),
+                    "od_below": int(ob.group(1)) if ob else None,
+                    "lb": _passive_lb(passive),
+                })
+        style = StyleInfo(style_name, skills, rarity, element,
+                          break_sp, style_id, sp_cost_mods,
+                          sp_limit_override, passive_options,
+                          boost_enabler, front_sp_passives,
+                          turn_start_od, turn_start_sp,
+                          style_label, break_od)
+        # 「追击」相关（温泉巡游 / 嫩绿摇曳 / 温泉通行木牌）
+        fu, fu_sp, fu_sw = _parse_follow_up(style_data, skills)
+        style.follow_up = fu
+        style.follow_up_sp = fu_sp
+        style.follow_up_switch = fu_sw
+        # 「指挥行动」取代普通攻击：该风格不能使用通常攻击
+        style.no_normal_attack = any(
+            sk.name == "指挥行动" or "取代普通攻击" in (sk.desc or "")
+            or "取代通常攻击" in (sk.desc or "")
+            for sk in skills)
+        # 「X之印记」（雷之印 / 冰之印…）
+        style.sigil = _parse_sigil(style_data)
+        # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
+        style.battle_states = _parse_battle_states(style_data)
+        # 「指定SP消耗」类（如 速攻◯）
+        style.sp_cost_pins = _parse_sp_cost_pins(style_data)
+        # 是否给全队赋予「干劲」（没有这类风格时全队都没有干劲）
+        style.grants_condition = _parse_condition_grant(style_data)
+        # 所属队伍（如 31D）
+        style.team = (str(style_info[1])
+                      if len(style_info) > 1 and style_info[1]
+                      else None)
+        # 该风格专属的「（被动技能）」条目（标了 exclusive 的）
+        style.private_passive_options = tuple(
+            private_passive_options)
+        # 职业（如 指挥者）
+        style.career = (str(style_info[7])
+                        if len(style_info) > 7 and style_info[7]
+                        else None)
+        # 缩略图（轴图用）：style_info[0] 是相对仓库根目录的路径
+        style.icon_path = (str(style_info[0])
+                           if style_info and style_info[0]
+                           else None)
+        # 「X之律动」（超越条）
+        style.rhythm = _parse_rhythm(style_data)
+        # 「自身使用EX技能后 …」的回复 SP 被动
+        style.ex_sp = _parse_ex_sp(style_data)
+        # 「自身使用EX技能后 超频条+X%」的项
+        style.ex_od = _parse_ex_od(style_data)
+        # 被动里的「连击数上升」项（如 梅雨）
+        style.passive_combo = _parse_passive_combo(style_data)
+        # 「分享」类：友方主动技能使自身SP提升时 额外全体SP+N
+        style.share_sp = _parse_share_sp(style_data)
+        # 「共鸣天赋」（如 神圣恩典）
+        res = style_data.get("resonance")
+        if isinstance(res, dict) and res.get("name"):
+            style.resonance = {
+                "name": str(res.get("name")),
+                "type": list(res.get("type") or []),
+                "levels": {str(k): str(res.get(str(k)) or "")
+                           for k in range(5)},
+            }
+        return style
 
     def styles_names(self, role_name):
         try:

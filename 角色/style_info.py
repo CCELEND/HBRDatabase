@@ -1,4 +1,7 @@
 
+from 日志.advanced_logger import AdvancedLogger
+logger = AdvancedLogger.get_logger(__name__)
+
 # 技能效果
 class SkillEffect:
     def __init__(self, effect_type = None, value = None, 
@@ -263,6 +266,11 @@ style_categories = {
     "all":{}
 }
 
+# 风格对象缓存：(角色名, 风格名) -> Style
+# 不能用风格名单独做键：不同角色可能有同名风格（如 Angel Beats! 的
+# 芳冈由依 / 岩泽雅美 都有「Stir Soul Song」）。
+style_obj_cache = {}
+
 # 根据风格对象的稀有度、武器属性和元素属性分类存储样式
 def set_style_category(style):
 
@@ -284,11 +292,19 @@ def set_style_category(style):
     else:
         style_categories["element_attribute"]["无"][style.name] = style
 
-    if style.id_en:
-        style_id = next(iter(style.id_en.keys()))
-        style_en = next(iter(style.id_en.values()))
-        style_categories["id"][style_id]  = style
-        style_categories["en"][style_en] = style
+    id_en = style.id_en
+    if isinstance(id_en, dict) and id_en:
+        style_id, style_en = next(iter(id_en.items()))
+        if (isinstance(style_id, str) and style_id
+                and isinstance(style_en, str) and style_en):
+            style_categories["id"][style_id] = style
+            style_categories["en"][style_en] = style
+        else:
+            logger.warning("风格的 id_en 不是字符串键值，已跳过 id/en 索引：%r",
+                           id_en)
+    elif id_en:
+        logger.warning("风格的 id_en 不是字典，已跳过 id/en 索引：%r",
+                       type(id_en).__name__)
 
     style_categories["all"][style.name]  = style
 
@@ -296,7 +312,11 @@ def set_style_category(style):
 # 根据字典 创建并返回风格对象
 def create_style(data) -> Style:
 
-    style_info = data['style_info']
+    if not isinstance(data, dict):
+        raise ValueError("风格数据不是 JSON 对象")
+    style_info = data.get('style_info')
+    if not isinstance(style_info, list):
+        raise ValueError("style_info 缺失或不是列表")
     style_fields = [
         'path',               # 路径
         'team_name',          # 队伍名称
@@ -317,10 +337,20 @@ def create_style(data) -> Style:
 
     # 主动技能列表
     activeskills = []
-    for active_skill_list in (data.get('ActiveSkills') or []):
+    active_data = data.get('ActiveSkills')
+    if active_data and not isinstance(active_data, (list, tuple)):
+        logger.warning("ActiveSkills 不是列表，已忽略：%r",
+                       type(active_data).__name__)
+    for active_skill_list in (active_data if isinstance(active_data, (list, tuple))
+                              else []):
+        if not isinstance(active_skill_list, (list, tuple)):
+            logger.warning("主动技能条目不是列表，已跳过：%r", active_skill_list)
+            continue
         first = active_skill_list[0] if active_skill_list else None
         if not isinstance(first, (list, tuple)) or len(first) < 3:
-            raise ValueError("主动技能条目缺少 [名称, 描述, 消耗] 中的字段")
+            logger.warning("主动技能条目缺少 [名称, 描述, 消耗]，已跳过：%r",
+                           active_skill_list[:1])
+            continue
         name = first[0]
         description = first[1] if len(first) > 1 else ""
         sp_cost = first[2] if len(first) > 2 else None
@@ -332,10 +362,14 @@ def create_style(data) -> Style:
                        and isinstance(active_skill_list[1], list) else []):
             if not isinstance(effect, (list, tuple)) or not effect:
                 continue
-            if effect[0] in ["斩", "突", "打"]:
-                effect_obj = AttackSkill.from_list(effect)
-            else:
-                effect_obj = SkillEffect.from_list(effect)
+            try:
+                if effect[0] in ["斩", "突", "打"]:
+                    effect_obj = AttackSkill.from_list(effect)
+                else:
+                    effect_obj = SkillEffect.from_list(effect)
+            except Exception as e:
+                logger.warning("解析技能效果失败，已跳过：%r（%s）", effect, e)
+                continue
 
             effects.append(effect_obj)
 
@@ -355,7 +389,7 @@ def create_style(data) -> Style:
         ActiveSkill_obj = ActiveSkill(
             name, description, sp_cost, max_uses,
             effects,
-            active_skill_list[2],
+            active_skill_list[2] if len(active_skill_list) > 2 else [],
             level_max,
             switch,
             exclusive
@@ -365,8 +399,20 @@ def create_style(data) -> Style:
 
     # 被动技能
     passiveskills = []
-    for passive_skill in (data.get('PassiveSkills') or []):
-        PassiveSkill_obj = PassiveSkill.from_list(passive_skill)
+    passive_data = data.get('PassiveSkills')
+    if passive_data and not isinstance(passive_data, (list, tuple)):
+        logger.warning("PassiveSkills 不是列表，已忽略：%r",
+                       type(passive_data).__name__)
+    for passive_skill in (passive_data if isinstance(passive_data, (list, tuple))
+                          else []):
+        if not isinstance(passive_skill, (list, tuple)):
+            logger.warning("被动技能条目不是列表，已跳过：%r", passive_skill)
+            continue
+        try:
+            PassiveSkill_obj = PassiveSkill.from_list(passive_skill)
+        except Exception as e:
+            logger.warning("解析被动技能失败，已跳过：%r（%s）", passive_skill, e)
+            continue
         passiveskills.append(PassiveSkill_obj)
 
 
@@ -402,17 +448,28 @@ def create_style(data) -> Style:
 # 获取风格对象
 def get_style_obj(data) -> Style:
 
+    if not isinstance(data, dict):
+        raise ValueError("风格数据不是 JSON 对象")
     style_info = data.get('style_info')
-    if not isinstance(style_info, list) or len(style_info) < 2:
-        raise ValueError("style_info 缺失或不完整（至少需要 [路径, 队伍] 两项）")
-    style_name = style_info[1]
+    if not isinstance(style_info, list) or len(style_info) < 4:
+        raise ValueError(
+            "style_info 缺失或不完整（至少需要 [路径, 队伍, 角色, 风格名] 四项）")
+    # style_info[3] 才是风格名；[1] 是队伍名（用作缓存键会导致永不命中）
+    style_name = style_info[3]
+    if not isinstance(style_name, str) or not style_name.strip():
+        raise ValueError("style_info[3] 的风格名无效")
+    style_name = style_name.strip()
+    role_name = style_info[2] if isinstance(style_info[2], str) else ""
 
-    # 判断风格对象是否在字典中，在就复用，不在就生成
-    if style_name in style_categories["all"]:
-        style = style_categories["all"][style_name]
+    # 判断风格对象是否在缓存中，在就复用，不在就生成。
+    # 键必须带上角色名，避免不同角色的同名风格互相串用。
+    cache_key = (role_name, style_name)
+    if cache_key in style_obj_cache:
+        style = style_obj_cache[cache_key]
     else:
         style = create_style(data)
         set_style_category(style)
+        style_obj_cache[cache_key] = style
 
     return style
 
