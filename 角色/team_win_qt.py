@@ -369,7 +369,7 @@ def creat_team_win(parent_frame, team_name):
     bg_image_path = get_team_bg_path(team.name or team_name)
     scrollbar_frame_obj = ScrollbarFrameWin(
         team_win_frame, columnspan=2,
-        bg_image_path=bg_image_path, bg_opacity="60%")
+        bg_image_path=bg_image_path, bg_opacity="50%")
     win_open_manage(team_win_frame, __name__)
 
     def on_close(self, event):
