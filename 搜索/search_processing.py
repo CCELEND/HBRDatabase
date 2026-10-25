@@ -115,18 +115,29 @@ def check_keywords_in_skills(style, keyword_list, filter_dict):
 
     return False
 
+def _style_variants(style):
+    """当前风格 + 它的其它形态。"""
+    forms = getattr(style, "forms", None) or []
+    return [style] + [form for form in forms if form is not style]
+
+
 # 检查风格是否符合筛选条件
 def filter_judge(filter_dict, keyword_list, role, style):
-    if check_filter(style, filter_dict):
+    # 合并后的多形态风格：任一形态满足筛选/关键词都保留这条风格
+    for candidate in _style_variants(style):
+        if not check_filter(candidate, filter_dict):
+            continue
 
         if filter_dict.get("技能、天赋") == ["共鸣天赋"]:
-            if check_resonance(role, style, keyword_list): return True
+            if check_resonance(role, candidate, keyword_list):
+                return True
         else:
-            if should_include(role, style, keyword_list):
+            if should_include(role, candidate, keyword_list):
                 return True
 
-            if check_keywords_in_skills(style, keyword_list, filter_dict):
+            if check_keywords_in_skills(candidate, keyword_list, filter_dict):
                 return True
+    return False
 
 # 根据筛选条件和关键词列表获取风格对象列表
 def get_filtered_styles(filter_dict, keyword_list):

@@ -130,7 +130,8 @@ def _group_style_forms(styles):
     return result
 
 
-def bind_style_canvas(parent_frame, team: Team, style, x, y, forms=None):
+def bind_style_canvas(parent_frame, team: Team, style, x, y, forms=None,
+                      on_switch=None):
     forms = list(forms) if forms else [style]
     outer_frame = QWidget(parent_frame)
     outer_frame.setFixedSize(140, 134)
@@ -157,6 +158,8 @@ def bind_style_canvas(parent_frame, team: Team, style, x, y, forms=None):
         new_style = current_style()
         canvas.setPixmap(get_pixmap(new_style.path, (90, 90)))
         set_tooltip(canvas, new_style.name)
+        if on_switch is not None:
+            on_switch(new_style)
 
     def open_menu(event):
         creat_style_right_menu(

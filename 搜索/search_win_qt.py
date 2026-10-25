@@ -146,7 +146,15 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
         frame_layout = QGridLayout(style_frame)
         frame_layout.setContentsMargins(5, 5, 5, 5)
         frame_layout.setSpacing(5)
-        bind_style_canvas(style_frame, team, style, 0, 0)
+
+        # 同一风格的多形态：搜索卡片也支持右键「切换」，标题跟着当前形态更新
+        style_forms = [style] + list(getattr(style, "forms", None) or [])
+
+        def on_switch(new_style, frame=style_frame):
+            frame.setTitle(new_style.name)
+
+        bind_style_canvas(style_frame, team, style, 0, 0,
+                          forms=style_forms, on_switch=on_switch)
 
         row = i // 5
         column = i % 5
