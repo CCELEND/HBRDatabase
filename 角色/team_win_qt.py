@@ -87,7 +87,51 @@ def show_role_img(event, parent_frame, role: Role, team: Team):
 
     return "break"
 
-def bind_style_canvas(parent_frame, team: Team, style, x, y):
+def _style_en(style) -> str:
+    """风格的英文标识（id_en 的值）。"""
+    id_en = getattr(style, "id_en", None)
+    if isinstance(id_en, dict) and id_en:
+        value = next(iter(id_en.values()))
+        if isinstance(value, str):
+            return value
+    return ""
+
+
+def _group_style_forms(styles):
+    """把同一风格的不同形态合在一起。
+
+    合并后的 JSON 用 ``forms`` 保存其它形态；旧数据则可能是两条独立记录
+    （英文标识 KAsakuraTwins_R3 / KAsakuraTwinsAnother_R3），
+    这里按去掉 ``Another`` 后的标识归组，返回 [(主形态, [形态...]), ...]。
+    """
+    groups = {}
+    order = []
+    for style in styles:
+        en = _style_en(style)
+        base = en.replace("Another", "") if "Another" in en else en
+        key = base or getattr(style, "name", "")
+        if key not in groups:
+            groups[key] = []
+            order.append(key)
+        groups[key].append(style)
+
+    result = []
+    for key in order:
+        forms = groups[key]
+        primary = next(
+            (s for s in forms if "Another" not in _style_en(s)), forms[0])
+        # 合并后的 JSON 会把其它形态放在 primary.forms 里
+        nested_forms = getattr(primary, "forms", None)
+        if nested_forms:
+            ordered = [primary] + list(nested_forms)
+        else:
+            ordered = [primary] + [s for s in forms if s is not primary]
+        result.append((primary, ordered))
+    return result
+
+
+def bind_style_canvas(parent_frame, team: Team, style, x, y, forms=None):
+    forms = list(forms) if forms else [style]
     outer_frame = QWidget(parent_frame)
     outer_frame.setFixedSize(140, 134)
 
@@ -100,10 +144,27 @@ def bind_style_canvas(parent_frame, team: Team, style, x, y):
     set_tooltip(canvas, style.name)
     mouse_bind_canvas_events2(canvas)
 
-    bind_canvas_events(canvas,
-        creat_style_skill_win, parent_frame=parent_frame, team=team, style=style)
-    right_click_bind_canvas_events(canvas,
-        creat_style_right_menu, parent_frame=parent_frame, team=team, style=style)
+    state = {"index": 0}
+
+    def current_style():
+        return forms[state["index"]]
+
+    def open_style(event):
+        creat_style_skill_win(event, parent_frame, team, current_style())
+
+    def switch_style():
+        state["index"] = (state["index"] + 1) % len(forms)
+        new_style = current_style()
+        canvas.setPixmap(get_pixmap(new_style.path, (90, 90)))
+        set_tooltip(canvas, new_style.name)
+
+    def open_menu(event):
+        creat_style_right_menu(
+            event, parent_frame, team, current_style(),
+            switch_callback=switch_style if len(forms) > 1 else None)
+
+    bind_canvas_events(canvas, open_style)
+    right_click_bind_canvas_events(canvas, open_menu)
 
     outer_layout.addWidget(canvas, 0, 0, alignment=Qt.AlignCenter)
 
@@ -112,6 +173,15 @@ def bind_style_canvas(parent_frame, team: Team, style, x, y):
         parent_layout.addWidget(outer_frame, x, y, alignment=Qt.AlignCenter)
 
     return outer_frame
+
+
+def _bind_style_row(parent_frame, team, styles):
+    """按「同一风格的不同形态合并」后绑定一排头像，返回显示数量。"""
+    groups = _group_style_forms(styles)
+    for index, (style, forms) in enumerate(groups):
+        bind_style_canvas(parent_frame, team, style, 0, index + 1, forms)
+    return len(groups)
+
 
 def bind_master_skill_canvas(parent_frame, role: Role, x, y):
     photo_path = get_role_master_img(role)
@@ -173,9 +243,8 @@ def show_rarity(frame, role: Role, team: Team, row=2):
         pixmapRarityA = get_pixmap("./角色/IconRarityA.png", (130, 130))
         canvasRarityA = create_image_label(RarityAframe, pixmapRarityA, 134, 134)
         rarity_layout.addWidget(canvasRarityA, 0, 0, alignment=Qt.AlignCenter)
-        for a, Astyle in enumerate(role.Astyles):
-            bind_style_canvas(RarityAframe, team, Astyle, 0, a + 1)
-        rarity_layout.setColumnStretch(len(role.Astyles) + 1, 1)
+        count = _bind_style_row(RarityAframe, team, role.Astyles)
+        rarity_layout.setColumnStretch(count + 1, 1)
 
         row += 1
 
@@ -189,9 +258,8 @@ def show_rarity(frame, role: Role, team: Team, row=2):
         pixmapRarityS = get_pixmap("./角色/IconRarityS.png", (130, 130))
         canvasRarityS = create_image_label(RaritySframe, pixmapRarityS, 134, 134)
         rarity_layout.addWidget(canvasRarityS, 0, 0, alignment=Qt.AlignCenter)
-        for s, Sstyle in enumerate(role.Sstyles):
-            bind_style_canvas(RaritySframe, team, Sstyle, 0, s + 1)
-        rarity_layout.setColumnStretch(len(role.Sstyles) + 1, 1)
+        count = _bind_style_row(RaritySframe, team, role.Sstyles)
+        rarity_layout.setColumnStretch(count + 1, 1)
 
         row += 1
 
@@ -205,9 +273,8 @@ def show_rarity(frame, role: Role, team: Team, row=2):
         pixmapRaritySS = get_pixmap("./角色/IconRaritySS.png", (130, 130))
         canvasRaritySS = create_image_label(RaritySSframe, pixmapRaritySS, 134, 134)
         rarity_layout.addWidget(canvasRaritySS, 0, 0, alignment=Qt.AlignCenter)
-        for ss, SSstyle in enumerate(role.SSstyles):
-            bind_style_canvas(RaritySSframe, team, SSstyle, 0, ss + 1)
-        rarity_layout.setColumnStretch(len(role.SSstyles) + 1, 1)
+        count = _bind_style_row(RaritySSframe, team, role.SSstyles)
+        rarity_layout.setColumnStretch(count + 1, 1)
 
         row += 1
 
@@ -221,9 +288,8 @@ def show_rarity(frame, role: Role, team: Team, row=2):
         pixmapRaritySSR = get_pixmap("./角色/IconRaritySSR.png", (130, 130))
         canvasRaritySSR = create_image_label(RaritySSRframe, pixmapRaritySSR, 134, 134)
         rarity_layout.addWidget(canvasRaritySSR, 0, 0, alignment=Qt.AlignCenter)
-        for ssr, SSRstyle in enumerate(role.SSRstyles):
-            bind_style_canvas(RaritySSRframe, team, SSRstyle, 0, ssr + 1)
-        rarity_layout.setColumnStretch(len(role.SSRstyles) + 1, 1)
+        count = _bind_style_row(RaritySSRframe, team, role.SSRstyles)
+        rarity_layout.setColumnStretch(count + 1, 1)
 
     return row
 

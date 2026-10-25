@@ -132,11 +132,15 @@ def creat_style_skill_win(event, parent_frame, team, style):
     return "break"
 
 
-def creat_style_right_menu(event, parent_frame, team, style):
+def creat_style_right_menu(event, parent_frame, team, style,
+                           switch_callback=None):
     right_click_menu = apply_context_menu_style(QMenu(parent_frame))
     right_click_menu.addAction("动画", lambda: show_style_animation(parent_frame, team, style))
     right_click_menu.addAction("立绘", lambda: show_style_artwork(parent_frame, team, style))
     right_click_menu.addAction("3D立绘", lambda: show_style_artwork_3d(parent_frame, team, style))
+    if switch_callback is not None:
+        right_click_menu.addSeparator()
+        right_click_menu.addAction("切换", switch_callback)
     right_click_menu.exec_(event.globalPos())
 
 

@@ -210,7 +210,8 @@ class Style:
         weapon_attribute = None, element_attribute = None,
         id_en = None,
         active_skills = None, passive_skills = None, 
-        growth_ability = None, status_growth = None, resonance = None):
+        growth_ability = None, status_growth = None, resonance = None,
+        forms = None):
         self.path = path                        # 风格头像路径
         self.team_name = team_name              # 所属队伍名
         self.role_name = role_name              # 所属角色名
@@ -228,6 +229,8 @@ class Style:
         self.growth_ability = growth_ability    # 成长能力
         self.status_growth = status_growth      # 成长状态值
         self.resonance = resonance              # 共鸣天赋
+        # 同一风格的其他形态（如 CODE:Virtual Killer2）；不含当前风格本身
+        self.forms = forms or []
 
     def __str__(self):
         return f"风格：{self.name}，所属角色：{self.role_name}，稀有度：{self.rarity}，职业：{self.career}，武器属性：{self.weapon_attribute}，元素属性：{self.element_attribute}，主动技能数量：{len(self.active_skills)}，被动技能数量：{len(self.passive_skills)}"
@@ -450,6 +453,25 @@ def create_style(data) -> Style:
         resonance
     )
 
+    # 同一风格的不同形态（JSON 里的 "forms" 列表，不含主形态本身）
+    form_data_list = data.get("forms")
+    if form_data_list:
+        if not isinstance(form_data_list, (list, tuple)):
+            logger.warning("风格的 forms 不是列表，已忽略：%r", type(form_data_list).__name__)
+        else:
+            form_styles = []
+            for index, form_data in enumerate(form_data_list):
+                if not isinstance(form_data, dict):
+                    logger.warning("风格 %s 的第 %d 个形态不是对象，已跳过",
+                                   style_info_data.get('name'), index + 2)
+                    continue
+                try:
+                    form_styles.append(create_style(form_data))
+                except Exception as e:
+                    logger.warning("解析风格 %s 的第 %d 个形态失败，已跳过：%s",
+                                   style_info_data.get('name'), index + 2, e)
+            if form_styles:
+                style.forms = form_styles
 
     return style
 

@@ -1792,6 +1792,34 @@ class HBRDataSource:
                     logger.warning(
                         "解析风格失败，已跳过：%s / %s（%s: %s）",
                         role_name, style_name, type(e).__name__, e)
+                    continue
+
+                # 合并后的 JSON：同一风格的其他形态放在 forms 里。
+                # 排轴仍按独立 StyleInfo 解析，后续 _share_style_forms 会合并技能。
+                form_data_list = (style_data.get("forms")
+                                  if isinstance(style_data, dict) else None)
+                if isinstance(form_data_list, (list, tuple)):
+                    for index, form_data in enumerate(form_data_list):
+                        if not isinstance(form_data, dict):
+                            logger.warning(
+                                "风格 %s 的第 %d 个形态不是 JSON 对象，已跳过",
+                                style_name, index + 2)
+                            continue
+                        form_info = form_data.get("style_info")
+                        if (isinstance(form_info, list) and len(form_info) > 3
+                                and isinstance(form_info[3], str)):
+                            form_name = form_info[3]
+                        else:
+                            form_name = "%s#%d" % (style_name, index + 2)
+                        try:
+                            styles.append(
+                                self._build_style(form_name, form_data, role_name))
+                        except Exception as e:
+                            logger.warning(
+                                "解析风格形态失败，已跳过：%s / %s（%s: %s）",
+                                role_name, form_name, type(e).__name__, e)
+                elif form_data_list:
+                    logger.warning("风格 %s 的 forms 不是列表，已忽略", style_name)
 
         _apply_exclusive(styles)
         _share_style_forms(styles)
