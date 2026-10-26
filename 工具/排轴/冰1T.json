@@ -4,6 +4,7 @@
     {
       "role": "苍井绘里香",
       "style": "传承·Legacy",
+      "condition": "极佳",
       "passives": [],
       "lb": 4,
       "resonance_talent": "神圣恩典",
@@ -14,6 +15,7 @@
     {
       "role": "东城司",
       "style": "哀情挽歌",
+      "condition": "极佳",
       "passives": [
         "背阴处的小憩（被动技能）"
       ],
@@ -26,9 +28,12 @@
     {
       "role": "茅森月歌",
       "style": "Glorious Blades",
-      "passives": [],
+      "condition": "极佳",
+      "passives": [
+        "交织而成的记忆"
+      ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "Fly High!",
       "resonance_level": 4,
       "earring": "破坏耳坠",
       "od_earring": 0.0
@@ -36,11 +41,12 @@
     {
       "role": "国见玉",
       "style": "欢迎参加♪梦魇游行",
+      "condition": "极佳",
       "passives": [
         "大贴特贴吧！（被动技能）"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "理毛",
       "resonance_level": 4,
       "earring": "破坏耳坠",
       "od_earring": 0.0
@@ -48,6 +54,7 @@
     {
       "role": "立华奏",
       "style": "翱翔天际之剑",
+      "condition": "极佳",
       "passives": [],
       "lb": 4,
       "resonance_talent": null,
@@ -58,6 +65,7 @@
     {
       "role": "小笠原绯雨",
       "style": "夏暮色榴石",
+      "condition": "极佳",
       "passives": [
         "友缘之剑"
       ],
@@ -86,6 +94,8 @@
       "od": "无",
       "od_timing": "前置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 0,
@@ -124,6 +134,8 @@
       "od": "无",
       "od_timing": "前置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 0,
@@ -162,6 +174,8 @@
       "od": "OD2/Bonus1",
       "od_timing": "后置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 3,
@@ -200,6 +214,8 @@
       "od": "无",
       "od_timing": "前置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 3,
@@ -238,6 +254,8 @@
       "od": "OD2/Bonus2",
       "od_timing": "后置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 1,
@@ -276,6 +294,8 @@
       "od": "无",
       "od_timing": "前置OD",
       "destruction": 0,
+      "sp_cost_up": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 1,
