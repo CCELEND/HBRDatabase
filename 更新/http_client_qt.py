@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import requests
 import threading
 from urllib.parse import quote
@@ -109,6 +110,7 @@ class DownloadThread(QThread):
 
                         total_size = int(response.headers.get('content-length', 0))
                         downloaded = 0
+                        last_emit = 0.0
                         with open(safe_path, 'wb') as f:
                             for chunk in response.iter_content(chunk_size=8192):
                                 if self._cancel.is_set():
@@ -116,10 +118,16 @@ class DownloadThread(QThread):
                                 if chunk:
                                     f.write(chunk)
                                     downloaded += len(chunk)
-                                    if total_size > 0:
+                                    # 按时间节流进度信号，避免每 8KB 都刷 UI
+                                    now = time.monotonic()
+                                    if total_size > 0 and (
+                                            now - last_emit >= 0.1
+                                            or downloaded >= total_size):
+                                        last_emit = now
                                         file_progress = int(downloaded / total_size * 100)
                                         overall = i * 100 + file_progress
-                                        self.signals.progress.emit(file_progress, int(overall / total))
+                                        self.signals.progress.emit(
+                                            file_progress, int(overall / total))
                     finally:
                         self._response = None
                 # 完成一个文件，更新整体进度

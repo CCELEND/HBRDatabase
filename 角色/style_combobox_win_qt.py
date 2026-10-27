@@ -16,98 +16,8 @@ skill_options = [
     "Skill Lv.14", "Skill Lv.15", "Skill Lv.16", "Skill Lv.17"
 ]
 
-class _ComboEvent:
-    def __init__(self, combo: QComboBox):
-        self._combo = combo
-        self.widget = self
-
-    def get(self):
-        return self._combo.currentText()
-
-def creat_lv_combo_lab(parent_frame, level_max) -> QComboBox:
-    lv_combo = QComboBox(parent_frame)
-    lv_combo.setObjectName("lv_combo")
-    lv_combo.addItems(skill_options[:level_max])
-    lv_combo.setEditable(False)
-    lv_combo.setCurrentText("Skill Lv.1")
-    lv_combo.setFont(MONO_FONT)
-    lv_combo.setCursor(Qt.PointingHandCursor)
-    # lv_combo.setStyleSheet("""
-    #     QComboBox {
-    #         padding: 6px 10px;
-    #         border: 1px solid rgba(160, 160, 160, 180);
-    #         border-radius: 6px;
-    #         background-color: rgba(245, 245, 245, 230);
-    #         color: #333333;
-    #         min-width: 110px;
-    #         max-width: 140px;
-    #     }
-    #     QComboBox:hover {
-    #         border: 1px solid #0078d7;
-    #         background-color: rgba(255, 255, 255, 240);
-    #     }
-    #     QComboBox::drop-down {
-    #         border: none;
-    #         width: 28px;
-    #     }
-    #     QComboBox::down-arrow {
-    #         image: none;
-    #         width: 0;
-    #         height: 0;
-    #         border-left: 5px solid transparent;
-    #         border-right: 5px solid transparent;
-    #         border-top: 6px solid #666666;
-    #         margin-right: 8px;
-    #     }
-    #     QComboBox::down-arrow:on {
-    #         border-top: none;
-    #         border-bottom: 6px solid #666666;
-    #     }
-    #     QComboBox QAbstractItemView {
-    #         border: 1px solid rgba(140, 140, 140, 200);
-    #         background-color: rgba(255, 255, 255, 245);
-    #         color: #333333;
-    #         selection-background-color: #0078d7;
-    #         selection-color: #ffffff;
-    #         outline: none;
-    #     }
-    #     QComboBox QAbstractItemView::item {
-    #         padding: 6px 12px;
-    #         min-height: 22px;
-    #     }
-    #     QComboBox QAbstractItemView::item:hover {
-    #         background-color: rgba(0, 120, 215, 0.18);
-    #         color: #333333;
-    #     }
-    #     QComboBox QAbstractItemView::item:selected {
-    #         background-color: #0078d7;
-    #         color: #ffffff;
-    #     }
-    #     /* 下拉列表滚动条 */
-    #     QComboBox QAbstractItemView QScrollBar:vertical {
-    #         background: rgba(240, 240, 240, 200);
-    #         width: 8px;
-    #         border-radius: 4px;
-    #     }
-    #     QComboBox QAbstractItemView QScrollBar::handle:vertical {
-    #         background: rgba(180, 180, 180, 220);
-    #         min-height: 24px;
-    #         border-radius: 4px;
-    #     }
-    #     QComboBox QAbstractItemView QScrollBar::handle:vertical:hover {
-    #         background: rgba(150, 150, 150, 240);
-    #     }
-    #     QComboBox QAbstractItemView QScrollBar::add-line:vertical,
-    #     QComboBox QAbstractItemView QScrollBar::sub-line:vertical {
-    #         height: 0px;
-    #     }
-    #     QComboBox QAbstractItemView QScrollBar::add-page:vertical,
-    #     QComboBox QAbstractItemView QScrollBar::sub-page:vertical {
-    #         background: none;
-    #     }
-    # """)
-
-    lv_combo.setStyleSheet("""
+# 模块级常量：每个技能下拉共用同一份 QSS，避免反复 setStyleSheet 解析
+LV_COMBO_QSS = """
         /* ===== 主控件 ===== */
         QComboBox {
             padding: 7px 12px;
@@ -230,7 +140,100 @@ def creat_lv_combo_lab(parent_frame, level_max) -> QComboBox:
         QComboBox QAbstractItemView QScrollBar::sub-page:vertical {
             background: none;
         }
-    """)
+"""
+
+class _ComboEvent:
+    def __init__(self, combo: QComboBox):
+        self._combo = combo
+        self.widget = self
+
+    def get(self):
+        return self._combo.currentText()
+
+def creat_lv_combo_lab(parent_frame, level_max) -> QComboBox:
+    lv_combo = QComboBox(parent_frame)
+    lv_combo.setObjectName("lv_combo")
+    lv_combo.addItems(skill_options[:level_max])
+    lv_combo.setEditable(False)
+    lv_combo.setCurrentText("Skill Lv.1")
+    lv_combo.setFont(MONO_FONT)
+    lv_combo.setCursor(Qt.PointingHandCursor)
+    # lv_combo.setStyleSheet("""
+    #     QComboBox {
+    #         padding: 6px 10px;
+    #         border: 1px solid rgba(160, 160, 160, 180);
+    #         border-radius: 6px;
+    #         background-color: rgba(245, 245, 245, 230);
+    #         color: #333333;
+    #         min-width: 110px;
+    #         max-width: 140px;
+    #     }
+    #     QComboBox:hover {
+    #         border: 1px solid #0078d7;
+    #         background-color: rgba(255, 255, 255, 240);
+    #     }
+    #     QComboBox::drop-down {
+    #         border: none;
+    #         width: 28px;
+    #     }
+    #     QComboBox::down-arrow {
+    #         image: none;
+    #         width: 0;
+    #         height: 0;
+    #         border-left: 5px solid transparent;
+    #         border-right: 5px solid transparent;
+    #         border-top: 6px solid #666666;
+    #         margin-right: 8px;
+    #     }
+    #     QComboBox::down-arrow:on {
+    #         border-top: none;
+    #         border-bottom: 6px solid #666666;
+    #     }
+    #     QComboBox QAbstractItemView {
+    #         border: 1px solid rgba(140, 140, 140, 200);
+    #         background-color: rgba(255, 255, 255, 245);
+    #         color: #333333;
+    #         selection-background-color: #0078d7;
+    #         selection-color: #ffffff;
+    #         outline: none;
+    #     }
+    #     QComboBox QAbstractItemView::item {
+    #         padding: 6px 12px;
+    #         min-height: 22px;
+    #     }
+    #     QComboBox QAbstractItemView::item:hover {
+    #         background-color: rgba(0, 120, 215, 0.18);
+    #         color: #333333;
+    #     }
+    #     QComboBox QAbstractItemView::item:selected {
+    #         background-color: #0078d7;
+    #         color: #ffffff;
+    #     }
+    #     /* 下拉列表滚动条 */
+    #     QComboBox QAbstractItemView QScrollBar:vertical {
+    #         background: rgba(240, 240, 240, 200);
+    #         width: 8px;
+    #         border-radius: 4px;
+    #     }
+    #     QComboBox QAbstractItemView QScrollBar::handle:vertical {
+    #         background: rgba(180, 180, 180, 220);
+    #         min-height: 24px;
+    #         border-radius: 4px;
+    #     }
+    #     QComboBox QAbstractItemView QScrollBar::handle:vertical:hover {
+    #         background: rgba(150, 150, 150, 240);
+    #     }
+    #     QComboBox QAbstractItemView QScrollBar::add-line:vertical,
+    #     QComboBox QAbstractItemView QScrollBar::sub-line:vertical {
+    #         height: 0px;
+    #     }
+    #     QComboBox QAbstractItemView QScrollBar::add-page:vertical,
+    #     QComboBox QAbstractItemView QScrollBar::sub-page:vertical {
+    #         background: none;
+    #     }
+    # """)
+
+    lv_combo.setStyleSheet(LV_COMBO_QSS)
 
     parent_layout = parent_frame.layout()
     if parent_layout is not None:

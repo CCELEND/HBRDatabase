@@ -98,12 +98,11 @@ def _on_close(frame, win_name):
 
 
 def creat_style_skill_win(event, parent_frame, team, style):
-    load_resources()
-
     open_style_win = get_style_win_name(style)
     if is_win_open(open_style_win, __name__):
         win_set_top(open_style_win, __name__)
         return "break"
+    load_resources()
 
     style_win_frame = creat_Toplevel(open_style_win, 812, 880, 650, 70)
     set_window_icon(style_win_frame, team.logo_path)

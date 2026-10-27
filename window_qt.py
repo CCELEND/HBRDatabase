@@ -152,9 +152,7 @@ def set_global_bg(parent: QApplication, bg="#f0f0f0"):
             padding-right: 8px;
         }}
 
-        QWidget {{
-            background-color: {bg};
-        }}
+        /* 全局 QWidget 背景会拖慢深层布局重绘；只给顶层窗口设底色 */
         QLabel {{
             background-color: transparent;
         }}
@@ -520,7 +518,8 @@ class ImageViewer(QGraphicsView):
         self.pixmap_item.setTransformationMode(Qt.SmoothTransformation)
         self.setRenderHint(QPainter.Antialiasing)
         self.setRenderHint(QPainter.SmoothPixmapTransform)
-        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+        # FullViewportUpdate 在大图拖拽/缩放时整视口重绘，代价高
+        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.setDragMode(QGraphicsView.ScrollHandDrag)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
@@ -532,6 +531,9 @@ class ImageViewer(QGraphicsView):
         self._max_zoom = 20.0
         self._image_loaded = False
         self._user_zoomed = False
+        self._resize_timer = QTimer(self)
+        self._resize_timer.setSingleShot(True)
+        self._resize_timer.timeout.connect(self._safe_fit_in_view)
 
     def _safe_fit_in_view(self):
         if not self._image_loaded:
@@ -579,7 +581,8 @@ class ImageViewer(QGraphicsView):
         if not self._image_loaded:
             return
         if not self._user_zoomed:
-            self._safe_fit_in_view()
+            # 防抖：拖拽窗口时不要每次 resize 都 fitInView + 重绘
+            self._resize_timer.start(80)
 
     def wheelEvent(self, event):
         delta = event.angleDelta().y()

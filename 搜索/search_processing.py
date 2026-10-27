@@ -183,7 +183,11 @@ def replace_zone(text):
     return text
 
 # 关键词处理
+_replacement_dict_cache = None
+
+
 def keyword_processing(key_word_str):
+    global _replacement_dict_cache
     if not key_word_str:
         return []
 
@@ -194,8 +198,10 @@ def keyword_processing(key_word_str):
     key_word_str = key_word_str.replace(',', '，')
     key_word_str = key_word_str.replace('、', '，')
 
-    # 加载替换字典
-    replacement_dict = load_json("./搜索/replace_dict.json")
+    # 加载替换字典（模块级缓存，避免每次搜索读盘）
+    if _replacement_dict_cache is None:
+        _replacement_dict_cache = load_json("./搜索/replace_dict.json")
+    replacement_dict = _replacement_dict_cache
 
     # 关键词分割并放入列表中
     keyword_list = key_word_str.split('，')

@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QObject, QTimer, QSize, QRect, pyqtSignal, QEvent
 from PyQt5.QtGui import (
-    QPixmap, QImage, QImageReader, QPainter, QCursor
+    QPixmap, QImage, QImageReader, QPainter, QCursor, QPen, QColor
 )
 
 # 说明：cv2 / numpy 只在**播放动画视频**时才需要（见文件末尾的视频播放器），
@@ -134,13 +134,22 @@ class ClickableLabel(QLabel):
 
     def enterEvent(self, event):
         self._border_visible = True
-        self.setStyleSheet("border: 2px solid #93CBE4;")
+        self.update()
         super().enterEvent(event)
 
     def leaveEvent(self, event):
         self._border_visible = False
-        self.setStyleSheet("border: none;")
+        self.update()
         super().leaveEvent(event)
+
+    def paintEvent(self, event):
+        # 悬停边框用绘制实现，避免每次 enter/leave 触发 setStyleSheet 重算样式
+        super().paintEvent(event)
+        if self._border_visible:
+            painter = QPainter(self)
+            painter.setPen(QPen(QColor("#93CBE4"), 2))
+            painter.drawRect(self.rect().adjusted(1, 1, -2, -2))
+            painter.end()
 
 
 def create_image_label(parent: QWidget, pixmap: QPixmap,
@@ -344,6 +353,24 @@ class _ResizableArtworkLabel(QLabel):
         self._resize_timer.start(80)
         super().resizeEvent(event)
 
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        if not painter.isActive():
+            return
+        rect = self.rect()
+        size = rect.size()
+        if self._cached_pixmap is None or self._cached_size != size:
+            # 拖拽中/防抖未到：用快速缩放，避免 paint 里 LANCZOS 卡 UI
+            smooth = not self._resize_timer.isActive()
+            self._cached_size = size
+            self._cached_pixmap = self._scaled_pixmap(
+                size.width(), size.height(), smooth=smooth)
+        if self._cached_pixmap and not self._cached_pixmap.isNull():
+            painter.drawPixmap(rect, self._cached_pixmap)
+        painter.end()
+        # 确保子类绘制（QLabel 默认无其他绘制，但保留）
+        super().paintEvent(event)
+
     def _delayed_update(self):
         """定时器超时时执行高度调整和重绘"""
         if self._pending_width is None:
@@ -352,30 +379,21 @@ class _ResizableArtworkLabel(QLabel):
         self._pending_width = None
         # 调整高度
         self._update_height()
-        # 清除缓存，以便 paintEvent 重新生成缩放图
-        self._cached_size = None
-        self._cached_pixmap = None
+        # 防抖结束后预生成 Smooth 缩放结果，paint 只 blit
+        size = QSize(width, max(1, self._target_height(width)))
+        if width > 0:
+            self._cached_size = size
+            self._cached_pixmap = self._scaled_pixmap(
+                size.width(), size.height(), smooth=True)
         self.update()
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        if not painter.isActive():
-            return
-        rect = self.rect()
-        size = rect.size()
-        if self._cached_pixmap is None or self._cached_size != size:
-            self._cached_size = size
-            self._cached_pixmap = self._scaled_pixmap(size.width(), size.height())
-        if self._cached_pixmap and not self._cached_pixmap.isNull():
-            painter.drawPixmap(rect, self._cached_pixmap)
-        painter.end()
-        # 确保子类绘制（QLabel 默认无其他绘制，但保留）
-        super().paintEvent(event)
-
-    def _scaled_pixmap(self, width, height):
+    def _scaled_pixmap(self, width, height, smooth=True):
         if width <= 0 or height <= 0 or self.original_image is None:
             return QPixmap()
-        resized = self.original_image.resize((width, height), Image.LANCZOS)
+        # Fast 用于拖拽中，LANCZOS 用于静止后的精修
+        resized = self.original_image.resize(
+            (width, height),
+            Image.LANCZOS if smooth else Image.BILINEAR)
         if self.opacity_value != 255:
             mask = Image.new('L', resized.size, self.opacity_value)
             resized.putalpha(mask)
@@ -445,9 +463,17 @@ class _AutoFitScrollArea(QScrollArea):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.on_resize = None
+        self._resize_debounce = QTimer(self)
+        self._resize_debounce.setSingleShot(True)
+        self._resize_debounce.timeout.connect(self._do_on_resize)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        if self.on_resize is not None:
+            # 防抖：拖拽窗口时不要每次 resize 都全量重缩放大图
+            self._resize_debounce.start(80)
+
+    def _do_on_resize(self):
         if self.on_resize is not None:
             self.on_resize()
 
@@ -537,24 +563,48 @@ class VideoPlayer:
         if parent_layout is not None:
             parent_layout.addWidget(self.label)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-        self.timer.start(25)
+        # 解码放到后台线程，GUI 线程只负责把 QImage 转成 QPixmap 上屏
+        self.frame_queue = queue.Queue(maxsize=1)
+        self._running = True
+        self.thread = threading.Thread(target=self._decode_loop, daemon=True)
+        self.thread.start()
 
-    def update_frame(self):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self._update_gui)
+        self.timer.start(33)
+
+    def _decode_loop(self):
         import cv2
-        ret, frame = self.cap.read()
-        if ret:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = cv2.resize(frame, (self.target_width, self.target_height))
-            h, w, ch = frame.shape
-            qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
-            self.label.setPixmap(QPixmap.fromImage(qimg.copy()))
-        else:
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        while self._running:
+            ret, frame = self.cap.read()
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame = cv2.resize(frame, (self.target_width, self.target_height),
+                                   interpolation=cv2.INTER_LINEAR)
+                h, w, ch = frame.shape
+                # 子线程只创建 QImage；QPixmap 必须在 GUI 线程创建
+                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888).copy()
+                try:
+                    self.frame_queue.get_nowait()
+                except queue.Empty:
+                    pass
+                self.frame_queue.put(qimg)
+            else:
+                if self._running:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            time.sleep(0.03)
+
+    def _update_gui(self):
+        try:
+            qimg = self.frame_queue.get_nowait()
+            self.label.setPixmap(QPixmap.fromImage(qimg))
+        except queue.Empty:
+            pass
 
     def release(self):
+        self._running = False
         self.timer.stop()
+        self.thread.join(timeout=1.0)
         self.cap.release()
 
 
@@ -579,7 +629,8 @@ class ThreadVideoPlayer:
         if parent_layout is not None:
             parent_layout.addWidget(self.label)
 
-        self.frame_queue = queue.Queue()
+        # 队列只保留最新一帧，避免消费慢时内存积压
+        self.frame_queue = queue.Queue(maxsize=1)
         self._running = True
 
         self.thread = threading.Thread(target=self._frame_loop, daemon=True)
@@ -587,7 +638,7 @@ class ThreadVideoPlayer:
 
         self.timer = QTimer()
         self.timer.timeout.connect(self._update_gui)
-        self.timer.start(10)
+        self.timer.start(33)
 
     def _frame_loop(self):
         import cv2
@@ -595,24 +646,33 @@ class ThreadVideoPlayer:
             ret, frame = self.cap.read()
             if ret:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = cv2.resize(frame, (self.target_width, self.target_height))
+                frame = cv2.resize(frame, (self.target_width, self.target_height),
+                                   interpolation=cv2.INTER_LINEAR)
                 h, w, ch = frame.shape
-                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888)
-                self.frame_queue.put(QPixmap.fromImage(qimg.copy()))
+                # 子线程禁止创建 QPixmap，只传 QImage
+                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888).copy()
+                try:
+                    self.frame_queue.get_nowait()
+                except queue.Empty:
+                    pass
+                self.frame_queue.put(qimg)
             else:
-                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            time.sleep(0.04)
+                if self._running:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            time.sleep(0.03)
 
     def _update_gui(self):
         try:
-            pixmap = self.frame_queue.get_nowait()
-            self.label.setPixmap(pixmap)
+            qimg = self.frame_queue.get_nowait()
+            self.label.setPixmap(QPixmap.fromImage(qimg))
         except queue.Empty:
             pass
 
     def release(self):
         self._running = False
         self.timer.stop()
+        # 先等解码线程退出，再释放 cap，避免 read/release 竞态
+        self.thread.join(timeout=1.0)
         self.cap.release()
 
 
@@ -678,26 +738,73 @@ class VideoPlayerWithScrollbar:
             else:
                 parent_layout.addWidget(self.scroll_area)
 
-        self.current_frame = None
+        self.current_frame = None      # 最新一帧 QImage（GUI 线程持有）
+        self._frame_dirty = True
+        self._scaled_size = None
         self.is_paused = False
+        self._running = True
         self.resize_filter = None
+
+        # 解码线程：只产 QImage；GUI 定时器负责 QPixmap 上屏
+        self.frame_queue = queue.Queue(maxsize=1)
+        self.thread = threading.Thread(target=self._decode_loop, daemon=True)
+        self.thread.start()
+
         self.timer = QTimer()
-        self.timer.timeout.connect(self.update_frame)
-        self.timer.start(30)
+        self.timer.timeout.connect(self._update_gui)
+        self.timer.start(33)
 
         self.resize_filter = _ResizeEventFilter(self, parent_widget)
         parent_widget.installEventFilter(self.resize_filter)
 
-    def update_frame(self):
+    def _decode_loop(self):
         import cv2
+        while self._running:
+            if self.is_paused:
+                time.sleep(0.05)
+                continue
+            ret, frame = self.cap.read()
+            if ret:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = frame.shape
+                qimg = QImage(frame.data, w, h, ch * w, QImage.Format_RGB888).copy()
+                try:
+                    self.frame_queue.get_nowait()
+                except queue.Empty:
+                    pass
+                self.frame_queue.put(qimg)
+            else:
+                if self._running:
+                    self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            time.sleep(0.03)
+
+    def _update_gui(self):
         if self.is_paused:
             return
-        ret, frame = self.cap.read()
-        if ret:
-            self.current_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            self._resize_video()
-        else:
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        try:
+            qimg = self.frame_queue.get_nowait()
+        except queue.Empty:
+            return
+        self.current_frame = qimg
+        self._frame_dirty = True
+        self._resize_video()
+
+    def update_frame(self):
+        """兼容旧接口：立刻尝试消费一帧并上屏（开窗前刷首帧）。"""
+        self._update_gui()
+        if self.current_frame is None and self._running:
+            # 解码线程刚启动时队列可能还空，短暂等待首帧，避免开窗黑屏
+            deadline = time.time() + 0.8
+            while time.time() < deadline and self.current_frame is None:
+                try:
+                    qimg = self.frame_queue.get(timeout=0.05)
+                    self.current_frame = qimg
+                    self._frame_dirty = True
+                    break
+                except queue.Empty:
+                    continue
+            if self.current_frame is not None:
+                self._resize_video()
 
     def _resize_video(self):
         if self.current_frame is None:
@@ -710,12 +817,17 @@ class VideoPlayerWithScrollbar:
             # 先用目标窗口尺寸渲染第一帧，避免显示瞬间出现黑屏/小图。
             available = QSize(max(1, self.parent_width),
                               max(1, self.parent_height))
-        h, w, ch = self.current_frame.shape
-        qimg = QImage(self.current_frame.data, w, h, ch * w, QImage.Format_RGB888)
-        pixmap = QPixmap.fromImage(qimg.copy())
-        scaled = pixmap.scaled(available.width(), available.height(),
-                               Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        w = available.width()
+        h = available.height()
+        # 同一帧同一尺寸：只在 resize 事件或新帧时重缩放
+        if (not self._frame_dirty and self._scaled_size == (w, h)):
+            return
+        # Fast 足够流畅；Smooth 每 30ms 全图插值会明显吃 CPU
+        pixmap = QPixmap.fromImage(self.current_frame)
+        scaled = pixmap.scaled(w, h, Qt.KeepAspectRatio, Qt.FastTransformation)
         self.label.setPixmap(scaled)
+        self._scaled_size = (w, h)
+        self._frame_dirty = False
 
     def pause_playback(self):
         self.is_paused = True
@@ -724,14 +836,16 @@ class VideoPlayerWithScrollbar:
     def resume_playback(self):
         if self.is_paused:
             self.is_paused = False
-            self.timer.start(20)
+            self.timer.start(33)
 
     def release(self):
+        self._running = False
         if self.resize_filter is not None:
             self.parent_widget.removeEventFilter(self.resize_filter)
             self.resize_filter.deleteLater()
             self.resize_filter = None
         self.timer.stop()
+        self.thread.join(timeout=1.0)
         self.cap.release()
 
 

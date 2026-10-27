@@ -652,14 +652,21 @@ class _AspectCanvas(QWidget):
         super().__init__(parent)
         self._src = None
         self._last = None
+        self._cached_pixmap = None
+        self._cached_size = None
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.setMinimumHeight(80)
+        self._resize_timer = QTimer(self)
+        self._resize_timer.setSingleShot(True)
+        self._resize_timer.timeout.connect(self._delayed_sync)
         if source is not None:
             self.set_source(source)
 
     # ------------------------------------------------------------ 数据
     def set_source(self, source):
         self._src = source
+        self._cached_pixmap = None
+        self._cached_size = None
         self._sync_height()
         self.update()
 
@@ -695,17 +702,31 @@ class _AspectCanvas(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        # 拖拽缩放期间只防抖同步高度/缓存，避免每次事件 Smooth 全图重缩放
+        self._resize_timer.start(50)
+
+    def _delayed_sync(self):
         self._sync_height()
+        self._cached_pixmap = None
+        self._cached_size = None
+        self.update()
 
     def paintEvent(self, event):
         if self._src is None or self._src.isNull():
             return
+        w = self.width()
         h = max(80, self.target_height())
-        pm = self._src.scaled(self.width(), h, Qt.KeepAspectRatio,
-                              Qt.SmoothTransformation)
-        self._last = pm
+        size = QSize(w, h)
+        if self._cached_pixmap is None or self._cached_size != size:
+            # 拖拽中用快速插值，静止后由防抖回调清缓存再用 Smooth 重画
+            smooth = (not self._resize_timer.isActive())
+            self._cached_size = size
+            self._cached_pixmap = self._src.scaled(
+                w, h, Qt.KeepAspectRatio,
+                Qt.SmoothTransformation if smooth else Qt.FastTransformation)
+        self._last = self._cached_pixmap
         painter = QPainter(self)
-        painter.drawPixmap(0, 0, pm)
+        painter.drawPixmap(0, 0, self._cached_pixmap)
 
 
 class _ScaledImageView(QScrollArea):
@@ -1247,6 +1268,8 @@ class ActionRow(QFrame):
         self._loading = 0
         self._earring_backup = 1.0
         self.member_index = default_member
+        self._skills_cache = None
+        self._skills_cache_key = None
         self._build_ui()
         self._populate_members()
         self._populate_skills()
@@ -1437,14 +1460,24 @@ class ActionRow(QFrame):
     def _all_skills(self):
         team = self.owner.team
         if not team:
+            self._skills_cache = []
+            self._skills_cache_key = None
             return []
         idx = min(max(self.member_index, 0), len(team) - 1)
         member = team[idx]
         # 同角色各风格技能通用；SSR/SS 的第一个主动技能为专属
         # 「指挥行动」：一个队伍只能有一个指挥者，非指挥者恢复通常攻击
-        return self.data_source.available_skills(
-            member.get("role", ""), member.get("style", ""),
-            commander=self.owner.is_commander(idx))
+        role = member.get("role", "")
+        style = member.get("style", "")
+        commander = self.owner.is_commander(idx)
+        cache_key = (role, style, commander)
+        if getattr(self, "_skills_cache_key", None) == cache_key:
+            return self._skills_cache or []
+        skills = self.data_source.available_skills(
+            role, style, commander=commander)
+        self._skills_cache_key = cache_key
+        self._skills_cache = skills
+        return skills
 
     def _find_skill(self, name=None):
         if name is None:
@@ -1456,6 +1489,8 @@ class ActionRow(QFrame):
 
     def refresh(self):
         """队伍变化后刷新成员与技能。"""
+        self._skills_cache = None
+        self._skills_cache_key = None
         self._populate_members()
         self._populate_skills()
         self._apply_skill_data()
@@ -2527,6 +2562,10 @@ class AxleODWindow(QFrame):
         self._team_updating = False
         self._recalc_suspend = 0    # 批量修改时挂起重算
         self._recalc_pending = False
+        # SpinBox/复选框连点时合并重算，避免每次 valueChanged 都全量跑两遍 SP
+        self._recalc_timer = QTimer(self)
+        self._recalc_timer.setSingleShot(True)
+        self._recalc_timer.timeout.connect(self.recalculate)
         self._build_ui()
         self._normalize_team()
         # 用队伍行实际数据同步（含突破数/携带被动等）
@@ -2840,19 +2879,19 @@ class AxleODWindow(QFrame):
         self.target_spin.setValue(1)
         self.target_spin.setFixedWidth(60)
         self.target_spin.setToolTip("目标数 / 敌人数量：仅全体攻击按此计算，单体攻击恒为 1")
-        self.target_spin.valueChanged.connect(self.recalculate)
+        self.target_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.target_spin)
 
         layout.addWidget(QLabel("其他OD增量"))
         self.other_od_spin = _make_double_spin(0.0, 100.0, 0.01, 3, 0.0)
         self.other_od_spin.setToolTip("计入总系数的额外 OD 增量")
-        self.other_od_spin.valueChanged.connect(self.recalculate)
+        self.other_od_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.other_od_spin)
 
         layout.addWidget(QLabel("敌方OD率"))
         self.enemy_od_spin = _make_double_spin(0.0, 10.0, 0.1, 2, 1.0)
         self.enemy_od_spin.setToolTip("敌方 OD 率倍率（默认 1.0）")
-        self.enemy_od_spin.valueChanged.connect(self.recalculate)
+        self.enemy_od_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.enemy_od_spin)
 
         # 初始OD：战斗开始时的 OD 槽（默认 0；也可设为 100/200/300 或 -100/-200/-300）
@@ -2865,7 +2904,7 @@ class AxleODWindow(QFrame):
         self.initial_od_combo.setToolTip(
             "战斗开始时的 OD 槽（默认 0）；之后按各回合的 OD 增减计算。\n"
             "上限 300（OD3 所需）；填负数表示开局 OD 不足 / 被扣。")
-        self.initial_od_combo.currentIndexChanged.connect(self.recalculate)
+        self.initial_od_combo.currentIndexChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.initial_od_combo)
         layout.addStretch(1)
         outer.addLayout(layout)
@@ -2898,7 +2937,7 @@ class AxleODWindow(QFrame):
 
         self.resistance_check = QCheckBox("全部（命中无效）")
         self.resistance_check.setToolTip("勾选后所有行动的 HIT OD 记 0")
-        self.resistance_check.stateChanged.connect(self.recalculate)
+        self.resistance_check.stateChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.resistance_check)
 
         layout.addWidget(QLabel("按属性："))
@@ -2906,7 +2945,7 @@ class AxleODWindow(QFrame):
         for element in ELEMENTS:
             cb = QCheckBox(element)
             cb.setToolTip("敌人对「%s」属性抗性，该属性角色的行动 HIT OD 记 0" % element)
-            cb.stateChanged.connect(self.recalculate)
+            cb.stateChanged.connect(self.schedule_recalculate)
             layout.addWidget(cb)
             self.resist_element_checks[element] = cb
 
@@ -2925,7 +2964,7 @@ class AxleODWindow(QFrame):
         self.sp_init_spin.setValue(4)
         self.sp_init_spin.setFixedWidth(56)
         self.sp_init_spin.setToolTip("全队初始 SP（默认 4）")
-        self.sp_init_spin.valueChanged.connect(self.recalculate)
+        self.sp_init_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.sp_init_spin)
 
         layout.addWidget(QLabel("前锋回复"))
@@ -2935,7 +2974,7 @@ class AxleODWindow(QFrame):
         self.sp_regen_front_spin.setFixedWidth(56)
         self.sp_regen_front_spin.setToolTip(
             "每回合开始时前锋的基础回复；风格被动的「闪光/佳音…」会额外叠加")
-        self.sp_regen_front_spin.valueChanged.connect(self.recalculate)
+        self.sp_regen_front_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.sp_regen_front_spin)
 
         layout.addWidget(QLabel("后卫回复"))
@@ -2944,7 +2983,7 @@ class AxleODWindow(QFrame):
         self.sp_regen_back_spin.setValue(2)
         self.sp_regen_back_spin.setFixedWidth(56)
         self.sp_regen_back_spin.setToolTip("每回合开始时后卫（角色4~6）回复的 SP")
-        self.sp_regen_back_spin.valueChanged.connect(self.recalculate)
+        self.sp_regen_back_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.sp_regen_back_spin)
 
         layout.addWidget(QLabel("SP上限"))
@@ -2953,7 +2992,7 @@ class AxleODWindow(QFrame):
         self.sp_limit_spin.setValue(20)
         self.sp_limit_spin.setFixedWidth(56)
         self.sp_limit_spin.setToolTip("SP 上限（参考 hbr-tool 默认 20）")
-        self.sp_limit_spin.valueChanged.connect(self.recalculate)
+        self.sp_limit_spin.valueChanged.connect(self.schedule_recalculate)
         layout.addWidget(self.sp_limit_spin)
 
         self.sp_limit_hint = QLabel("")
@@ -3239,7 +3278,7 @@ class AxleODWindow(QFrame):
     def _on_turn_changed(self, turn):
         """某回合变更时，若其前锋变化则同步到后面（未被手动编辑的）回合。"""
         self._sync_following_turns(turn)
-        self.recalculate()
+        self.schedule_recalculate()
 
     def _sync_following_turns(self, turn):
         try:
@@ -3374,11 +3413,19 @@ class AxleODWindow(QFrame):
                     self._recalc_pending = False
                     self.recalculate()
 
+    def schedule_recalculate(self, *args):
+        """防抖入口：连续调参时只在停顿后全量重算一次。"""
+        if self._recalc_suspend:
+            self._recalc_pending = True
+            return
+        self._recalc_timer.start(50)
+
     def recalculate(self):
         # 批量修改期间只登记待重算，避免反复全量计算
         if self._recalc_suspend:
             self._recalc_pending = True
             return
+        self._recalc_timer.stop()
         self._state_book = {}
         # 先结算一次 SP：「追击」及其 SP 消耗/回复会影响 OD，需要先算出来
         self._recalc_sp()

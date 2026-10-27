@@ -111,15 +111,14 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
 
     if selected_values_dir["大师技能"]:
         filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
+        # 一次建 name→role 哈希，避免每个结果线性扫全部角色（O(n²)）
+        role_by_master_skill = {}
+        for team in 角色.team_info.teams.values():
+            for r in team.roles:
+                if r.master_skill and r.master_skill.name not in role_by_master_skill:
+                    role_by_master_skill[r.master_skill.name] = r
         for i, master_skill in enumerate(filtered_master_skills):
-            role = None
-            for team in 角色.team_info.teams.values():
-                for r in team.roles:
-                    if r.master_skill and r.master_skill.name == master_skill.name:
-                        role = r
-                        break
-                if role:
-                    break
+            role = role_by_master_skill.get(master_skill.name)
 
             master_skill_frame = QGroupBox(master_skill.name)
             master_skill_frame.setFixedHeight(170)

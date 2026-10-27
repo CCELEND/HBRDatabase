@@ -128,14 +128,12 @@ def creat_master_skill_frame(scrollbar_frame_obj, master_skill):
     return row_frame
 
 def creat_master_skill_win(event, parent_frame, role):
-    load_resources()
-
     master_skill = role.master_skill
-
     open_master_win = master_skill.name + f"—{role.name}"
     if is_win_open(open_master_win, __name__):
         win_set_top(open_master_win, __name__)
         return "break"
+    load_resources()
 
     master_win_frame = creat_Toplevel(open_master_win, 812, 300, 560, 510)
     set_window_expand(master_win_frame, rowspan=1, columnspan=2)

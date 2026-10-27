@@ -67,66 +67,91 @@ TOOL_BUTTON_STYLE = """
 from 日志.error_queue_proc_qt import check_error_queue_qt
 from 更新.check_proc_qt import check_for_updates
 
-from 持有物.饰品.jewelrys_win_qt import show_jewelrys_type
-from 持有物.奖杯勋章.trophy_medals_win_qt import show_trophy_medals
-from 持有物.道具.props_win_qt import show_props
-from 持有物.主线道具.main_props_win_qt import show_main_props
-from 持有物.饰品材料.jewelry_materials_win_qt import show_jewelry_materials
-from 持有物.成长素材.growth_materials_win_qt import show_growth_materials
-from 持有物.活动奖章.medals_win_qt import show_medals
-from 持有物.强化素材.strengthen_materials_win_qt import show_strengthen_materials
-from 持有物.入场券.tickets_win_qt import show_tickets
-from 持有物.货币.currencys_win_qt import show_currencys
-from 持有物.增幅器.amplifiers_win_qt import show_amplifiers
-from 持有物.扭蛋材料.capsuletoys_win_qt import show_capsuletoys
-from 持有物.芯片.chips_win_qt import show_chips
-from 持有物.碎片.fragments_win_qt import show_fragments
 
-from 战斗系统.共鸣天赋.gmtf_win_qt import creat_gmtf_win
-from 战斗系统.基础.jc_win_qt import creat_jc_win
-from 战斗系统.OD.od_win_qt import creat_od_win
-from 战斗系统.乘区.cq_win_qt import creat_cq_win
-from 战斗系统.职业.careers_win_qt import show_career
-from 战斗系统.武器.weapons_win_qt import show_weapon
-from 战斗系统.属性.attributes_win_qt import show_attribute
-from 战斗系统.状态.status_win_qt import show_statu
+class _LazyFn:
+    """菜单回调延迟导入：首次点击时才 import 业务模块，加快冷启动。"""
 
-from 敌人.主线.zx_win_qt import show_zx_enemys
-from 敌人.时钟塔.szt_win_qt import show_szt_enemys
-from 敌人.光球BOSS.gqboss_win_qt import show_gqboss_enemys
-from 敌人.时之修炼场.szxlc_win_qt import show_szxlc_enemys
-from 敌人.棱镜战.ljz_win_qt import show_ljz_enemys
-from 敌人.宝石棱镜战.bsljz_win_qt import show_bsljz_enemys
-from 敌人.异时层.ysc_win_qt import show_ysc_enemys
-from 敌人.高分挑战.gftz_win_qt import show_gftz_enemys
-from 敌人.恒星战.hxz_win_qt import show_hxz_enemys
-from 敌人.遭遇战.zyz_win_qt import show_zyz_enemys
+    def __init__(self, module_path, attr):
+        self._module_path = module_path
+        self._attr = attr
+        self._fn = None
 
-from 搜索.search_win_qt import creat_search_win
-from 角色.team_win_qt import creat_team_win
-from 更新.http_update_processing_qt import http_update_data
-from 音乐.Load import creat_music_win
+    def __call__(self, *args, **kwargs):
+        if self._fn is None:
+            import importlib
+            self._fn = getattr(importlib.import_module(self._module_path),
+                               self._attr)
+        return self._fn(*args, **kwargs)
 
-from 工具.GetEntriesGUILocal.seed_tools.Load_qt import load_seed_tools
-from 工具.GetEntriesGUILocal.Load import creat_ct_win
-from 工具.DamageScoreCal.Load import creat_dsc_win, creat_dsc_win_v2
-from 工具.HBRbrochure.Load import get_hbr_brochure
-from 工具.HBR伤害模拟.Load import load_hbr_damage_simulation
-from 工具.AFSGTools.Load import load_AFSGTools
-from 工具.hbr_tool.Load import load_hbr_tool
-from 工具.hbr_tool_old_damage_calculator.Load import load_hbr_tool_old_damage_calculator
-from 工具.hbr_axletool.Load import load_hbr_axletool
-from 工具.排轴.Load import load_hbr_axle_od
-from 工具.wiki_hbr_hd.Load import load_wiki_hbr_hd
-from 工具.词条计算器.Load import load_entry_calculator
-from 工具.o_hbr_quest.Load import load_o_hbr_quest
-from 工具.hbr_quest.Load import load_hbr_quest
-from 工具.game8_hbr.Load import load_game8_hbr
-from 工具.gamekee_hbr.Load import load_gamekee_hbr
-from 工具.入队培训手册.Load import load_game_bilibili_com
-from 工具.LineArt.Load import load_LineArtGUI2_QT, load_video_line_art
 
-from 关于.about_win_qt import creat_about_win
+# 持有物
+show_main_props = _LazyFn("持有物.主线道具.main_props_win_qt", "show_main_props")
+show_props = _LazyFn("持有物.道具.props_win_qt", "show_props")
+show_jewelrys_type = _LazyFn("持有物.饰品.jewelrys_win_qt", "show_jewelrys_type")
+show_jewelry_materials = _LazyFn("持有物.饰品材料.jewelry_materials_win_qt", "show_jewelry_materials")
+show_medals = _LazyFn("持有物.活动奖章.medals_win_qt", "show_medals")
+show_trophy_medals = _LazyFn("持有物.奖杯勋章.trophy_medals_win_qt", "show_trophy_medals")
+show_growth_materials = _LazyFn("持有物.成长素材.growth_materials_win_qt", "show_growth_materials")
+show_strengthen_materials = _LazyFn("持有物.强化素材.strengthen_materials_win_qt", "show_strengthen_materials")
+show_amplifiers = _LazyFn("持有物.增幅器.amplifiers_win_qt", "show_amplifiers")
+show_chips = _LazyFn("持有物.芯片.chips_win_qt", "show_chips")
+show_tickets = _LazyFn("持有物.入场券.tickets_win_qt", "show_tickets")
+show_capsuletoys = _LazyFn("持有物.扭蛋材料.capsuletoys_win_qt", "show_capsuletoys")
+show_fragments = _LazyFn("持有物.碎片.fragments_win_qt", "show_fragments")
+show_currencys = _LazyFn("持有物.货币.currencys_win_qt", "show_currencys")
+
+# 战斗系统
+creat_gmtf_win = _LazyFn("战斗系统.共鸣天赋.gmtf_win_qt", "creat_gmtf_win")
+creat_jc_win = _LazyFn("战斗系统.基础.jc_win_qt", "creat_jc_win")
+creat_od_win = _LazyFn("战斗系统.OD.od_win_qt", "creat_od_win")
+creat_cq_win = _LazyFn("战斗系统.乘区.cq_win_qt", "creat_cq_win")
+show_career = _LazyFn("战斗系统.职业.careers_win_qt", "show_career")
+show_weapon = _LazyFn("战斗系统.武器.weapons_win_qt", "show_weapon")
+show_attribute = _LazyFn("战斗系统.属性.attributes_win_qt", "show_attribute")
+show_statu = _LazyFn("战斗系统.状态.status_win_qt", "show_statu")
+
+# 敌人
+show_zx_enemys = _LazyFn("敌人.主线.zx_win_qt", "show_zx_enemys")
+show_szt_enemys = _LazyFn("敌人.时钟塔.szt_win_qt", "show_szt_enemys")
+show_gqboss_enemys = _LazyFn("敌人.光球BOSS.gqboss_win_qt", "show_gqboss_enemys")
+show_szxlc_enemys = _LazyFn("敌人.时之修炼场.szxlc_win_qt", "show_szxlc_enemys")
+show_ljz_enemys = _LazyFn("敌人.棱镜战.ljz_win_qt", "show_ljz_enemys")
+show_bsljz_enemys = _LazyFn("敌人.宝石棱镜战.bsljz_win_qt", "show_bsljz_enemys")
+show_ysc_enemys = _LazyFn("敌人.异时层.ysc_win_qt", "show_ysc_enemys")
+show_gftz_enemys = _LazyFn("敌人.高分挑战.gftz_win_qt", "show_gftz_enemys")
+show_hxz_enemys = _LazyFn("敌人.恒星战.hxz_win_qt", "show_hxz_enemys")
+show_zyz_enemys = _LazyFn("敌人.遭遇战.zyz_win_qt", "show_zyz_enemys")
+
+# 搜索 / 角色 / 更新 / 音乐
+creat_search_win = _LazyFn("搜索.search_win_qt", "creat_search_win")
+creat_team_win = _LazyFn("角色.team_win_qt", "creat_team_win")
+http_update_data = _LazyFn("更新.http_update_processing_qt", "http_update_data")
+creat_music_win = _LazyFn("音乐.Load", "creat_music_win")
+
+# 工具
+load_seed_tools = _LazyFn("工具.GetEntriesGUILocal.seed_tools.Load_qt", "load_seed_tools")
+creat_ct_win = _LazyFn("工具.GetEntriesGUILocal.Load", "creat_ct_win")
+creat_dsc_win = _LazyFn("工具.DamageScoreCal.Load", "creat_dsc_win")
+creat_dsc_win_v2 = _LazyFn("工具.DamageScoreCal.Load", "creat_dsc_win_v2")
+get_hbr_brochure = _LazyFn("工具.HBRbrochure.Load", "get_hbr_brochure")
+load_hbr_damage_simulation = _LazyFn("工具.HBR伤害模拟.Load", "load_hbr_damage_simulation")
+load_AFSGTools = _LazyFn("工具.AFSGTools.Load", "load_AFSGTools")
+load_hbr_tool = _LazyFn("工具.hbr_tool.Load", "load_hbr_tool")
+load_hbr_tool_old_damage_calculator = _LazyFn(
+    "工具.hbr_tool_old_damage_calculator.Load", "load_hbr_tool_old_damage_calculator")
+load_hbr_axletool = _LazyFn("工具.hbr_axletool.Load", "load_hbr_axletool")
+load_hbr_axle_od = _LazyFn("工具.排轴.Load", "load_hbr_axle_od")
+load_wiki_hbr_hd = _LazyFn("工具.wiki_hbr_hd.Load", "load_wiki_hbr_hd")
+load_entry_calculator = _LazyFn("工具.词条计算器.Load", "load_entry_calculator")
+load_o_hbr_quest = _LazyFn("工具.o_hbr_quest.Load", "load_o_hbr_quest")
+load_hbr_quest = _LazyFn("工具.hbr_quest.Load", "load_hbr_quest")
+load_game8_hbr = _LazyFn("工具.game8_hbr.Load", "load_game8_hbr")
+load_gamekee_hbr = _LazyFn("工具.gamekee_hbr.Load", "load_gamekee_hbr")
+load_game_bilibili_com = _LazyFn("工具.入队培训手册.Load", "load_game_bilibili_com")
+load_LineArtGUI2_QT = _LazyFn("工具.LineArt.Load", "load_LineArtGUI2_QT")
+load_video_line_art = _LazyFn("工具.LineArt.Load", "load_video_line_art")
+
+creat_about_win = _LazyFn("关于.about_win_qt", "creat_about_win")
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -372,7 +397,6 @@ if __name__ == "__main__":
         else:
             root_win_name = "HBRDatabase"
 
-        delete_old_file_and_subdirs()
         set_global_bg(app)
         app.setStyleSheet(app.styleSheet() + "\n" + qss_content)
 
@@ -394,6 +418,8 @@ if __name__ == "__main__":
 
         root.show()
 
+        # 磁盘清理与更新检查都可能扫大量文件，延后到首屏绘制完成再执行
+        QTimer.singleShot(0, delete_old_file_and_subdirs)
         # 更新检查会扫描/哈希大量文件（首次约 1s+），延后到首屏绘制完成再执行
         QTimer.singleShot(1500, check_for_updates)
         

@@ -2399,6 +2399,14 @@ class HBRDataSource:
         """
         if not role_name:
             return []          # 未安排角色：没有可用技能
+        cache_key = (role_name, style_name, bool(commander))
+        cached = getattr(self, "_available_skills_cache", None)
+        if cached is None:
+            cached = {}
+            self._available_skills_cache = cached
+        hit = cached.get(cache_key)
+        if hit is not None:
+            return hit
         styles = self.styles(role_name)
         result = []
         seen = set()
@@ -2441,6 +2449,7 @@ class HBRDataSource:
         # 界面会用「通用技能」分组标题把它们和角色自身技能隔开
         for skill in get_generic_skills():
             add(skill)
+        cached[cache_key] = result
         return result
 
     def master_action_skill(self, role_name):

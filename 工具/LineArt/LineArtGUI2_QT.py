@@ -322,15 +322,16 @@ class LineArtGUI(QMainWindow):
         self.preview_btn.setEnabled(True)
         self.preview_btn.setText("预览线稿")
 
-        if self.preview_window is None or not self.preview_window.isVisible():
+        # 复用同一预览窗：hide 后再覆盖引用会泄漏整个窗口与大图 pixmap
+        if self.preview_window is None:
             self.preview_window = PreviewWindow(None)
         self.preview_window.show_image(np_array)
-        # self.preview_window.show()
-        self.preview_window.showNormal()
-
-        # 强制置顶
-        # self.preview_window.raise_()
-        # self.preview_window.activateWindow()
+        self.preview_window.show()
+        if self.preview_window.isMinimized():
+            self.preview_window.showNormal()
+        else:
+            self.preview_window.raise_()
+            self.preview_window.activateWindow()
 
     # 保存
     def generate_lineart(self):

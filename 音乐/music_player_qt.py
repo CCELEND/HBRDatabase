@@ -193,8 +193,8 @@ class FLACPlayerApp:
             self.current_file = file_path
             self.file_label.setText(os.path.basename(file_path))
 
-            sound = pygame.mixer.Sound(file_path)
-            self.duration = sound.get_length()
+            # 优先用元数据/音乐接口取时长，避免整轨 Sound 解码卡 UI
+            self.duration = self._get_duration(file_path)
             self.current_position = 0
             self.seek_position = 0
             self.position_selected = False
@@ -207,6 +207,29 @@ class FLACPlayerApp:
         except Exception as e:
             logger.error(f"无法加载文件: {e}")
             QMessageBox.critical(self.frame, "错误", f"无法加载文件: {e}")
+
+    @staticmethod
+    def _get_duration(file_path):
+        """读取音频时长：mutagen 元数据 → pygame music → Sound 兜底。"""
+        try:
+            from mutagen import File as MutagenFile
+            audio = MutagenFile(file_path)
+            if audio is not None and getattr(audio, "info", None) is not None:
+                length = float(audio.info.length or 0)
+                if length > 0:
+                    return length
+        except Exception:
+            pass
+        try:
+            length = float(pygame.mixer.music.get_length() or 0)
+            if length > 0:
+                return length
+        except Exception:
+            pass
+        sound = pygame.mixer.Sound(file_path)
+        length = float(sound.get_length())
+        sound = None  # 立刻释放解码缓冲
+        return length
 
     def toggle_loop(self):
         self.loop_enabled = not self.loop_enabled
