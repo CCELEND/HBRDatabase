@@ -672,7 +672,8 @@ class VideoLineArtGUI(QMainWindow):
         self.video_path = ""
         self.meta = None            # (fps, 总帧数, 宽, 高)
         self.ffmpeg = find_ffmpeg()
-        self.hw_encoders = list_ffmpeg_encoders(self.ffmpeg)
+        # 不在 UI 线程同步探测编码器（subprocess 最长 30s）；等 PrepareWorker 回填
+        self.hw_encoders = set()
         self.hw_usable = None       # 后台试编结果，None 表示还在检测
         # 打开窗口时就要知道「等会儿能不能用上 ffmpeg」，否则界面会先闪一下"未找到"
         self._preparing = bool(self.ffmpeg) or bundled_ffmpeg_available()

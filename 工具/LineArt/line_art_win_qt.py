@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
     QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox,
     QFileDialog, QGridLayout, QHBoxLayout, QVBoxLayout, QGroupBox
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtGui import QFont
 
 from window_qt import creat_Toplevel
@@ -18,6 +18,51 @@ logger = AdvancedLogger.get_logger(__name__)
 
 
 MONO_FONT = QFont("Microsoft YaHei", 9)
+
+# 持有 worker，避免 QThread 被 GC
+_LIVE_WORKERS = set()
+
+
+def _image_to_lineart(input_path, output_path, line_thickness,
+                      threshold1, threshold2, invert=False):
+    data = np.fromfile(input_path, dtype=np.uint8)
+    img = cv2.imdecode(data, cv2.IMREAD_COLOR)
+    if img is None:
+        raise ValueError("无法解码图片")
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    k = max(1, int(line_thickness) | 1)  # 高斯核需为正奇数
+    blurred = cv2.GaussianBlur(gray, (k, k), 0)
+    edges = cv2.Canny(blurred, threshold1=int(threshold1), threshold2=int(threshold2))
+    if not invert:
+        edges = cv2.bitwise_not(edges)
+
+    cv2.imencode('.png', edges)[1].tofile(output_path)
+
+
+class _LineArtWorker(QThread):
+    done = pyqtSignal(str)   # output_path
+    error = pyqtSignal(str)
+
+    def __init__(self, input_path, output_path, line_thickness,
+                 threshold1, threshold2, invert=False):
+        super().__init__()
+        self.input_path = input_path
+        self.output_path = output_path
+        self.line_thickness = line_thickness
+        self.threshold1 = threshold1
+        self.threshold2 = threshold2
+        self.invert = invert
+
+    def run(self):
+        try:
+            _image_to_lineart(
+                self.input_path, self.output_path,
+                self.line_thickness, self.threshold1, self.threshold2,
+                self.invert)
+            self.done.emit(self.output_path)
+        except Exception as e:
+            self.error.emit(str(e))
 
 
 def _ensure_layout(widget):
@@ -36,6 +81,7 @@ class LineArtGUI:
         self.line_thickness = 3
         self.threshold1 = 30
         self.threshold2 = 80
+        self._worker = None
         self.create_widgets()
 
     def create_widgets(self):
@@ -112,25 +158,14 @@ class LineArtGUI:
             self.path_entry.setText(path)
             self.path_entry.setToolTip(path)
 
-    def image_to_lineart(self, input_path, output_path, line_thickness, threshold1, threshold2, invert=False):
-        data = np.fromfile(input_path, dtype=np.uint8)
-        img = cv2.imdecode(data, cv2.IMREAD_COLOR)
-
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        blurred = cv2.GaussianBlur(gray, (line_thickness, line_thickness), 0)
-        edges = cv2.Canny(blurred, threshold1=threshold1, threshold2=threshold2)
-        kernel = np.ones((1, 1), np.uint8)
-        edges = cv2.dilate(edges, kernel, iterations=1)
-        if not invert:
-            edges = cv2.bitwise_not(edges)
-
-        cv2.imencode('.png', edges)[1].tofile(output_path)
-
     def generate_lineart(self):
         input_path = self.input_path
         if input_path == "未选择图片":
             QMessageBox.warning(self.root, "提示", "请先选择图片！")
             win_set_top('图片转线稿工具', __name__)
+            return
+
+        if self._worker is not None and self._worker.isRunning():
             return
 
         lt = int(self.thickness_cb.currentText())
@@ -146,26 +181,35 @@ class LineArtGUI:
         if not output_path:
             return
 
-        try:
-            self.gen_btn.setText("生成中...")
-            self.gen_btn.setEnabled(False)
+        self.gen_btn.setText("生成中...")
+        self.gen_btn.setEnabled(False)
+        worker = _LineArtWorker(input_path, output_path, lt, t1, t2, invert=False)
+        self._worker = worker
+        _LIVE_WORKERS.add(worker)
 
-            self.image_to_lineart(
-                input_path=input_path,
-                output_path=output_path,
-                line_thickness=lt,
-                threshold1=t1,
-                threshold2=t2,
-                invert=False
-            )
+        def on_done(path):
+            _LIVE_WORKERS.discard(worker)
+            worker.deleteLater()
+            if self._worker is worker:
+                self._worker = None
             win_set_top('图片转线稿工具', __name__)
-        except Exception as e:
-            logger.error(str(e))
-            QMessageBox.critical(self.root, "错误", f"生成失败：{str(e)}")
-            win_set_top('图片转线稿工具', __name__)
-        finally:
             self.gen_btn.setText("生成线稿")
             self.gen_btn.setEnabled(True)
+
+        def on_error(msg):
+            _LIVE_WORKERS.discard(worker)
+            worker.deleteLater()
+            if self._worker is worker:
+                self._worker = None
+            logger.error(msg)
+            QMessageBox.critical(self.root, "错误", f"生成失败：{msg}")
+            win_set_top('图片转线稿工具', __name__)
+            self.gen_btn.setText("生成线稿")
+            self.gen_btn.setEnabled(True)
+
+        worker.done.connect(on_done)
+        worker.error.connect(on_error)
+        worker.start()
 
 
 def creat_line_art_win():
@@ -180,9 +224,10 @@ def creat_line_art_win():
 
     # 正确关闭事件
     def on_close(ev):
+        if gui._worker is not None:
+            gui._worker.wait(2000)
         win_close_manage(line_art_win_frame, __name__)
         ev.accept()
     line_art_win_frame.closeEvent = on_close
 
     return "break"
-

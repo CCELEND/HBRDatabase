@@ -49,41 +49,47 @@ def show_holding(parent_frame, data_dir):
     parent_layout.setSpacing(5)
     parent_layout.setAlignment(Qt.AlignTop)
 
-    for i, item_name in enumerate(data_dir):
-        item = data_dir[item_name]
+    # 批量构建期间暂停重绘，避免大量 addWidget 触发多次 relayout
+    parent_frame.setUpdatesEnabled(False)
+    try:
+        for i, item_name in enumerate(data_dir):
+            item = data_dir[item_name]
 
-        row_frame = QGroupBox(item_name)
-        row_layout = QGridLayout(row_frame)
-        row_layout.setContentsMargins(10, 10, 10, 10)
-        row_layout.setSpacing(5)
-        row_layout.setColumnStretch(0, 1)
-        row_layout.setColumnStretch(1, 4)
+            row_frame = QGroupBox(item_name)
+            row_layout = QGridLayout(row_frame)
+            row_layout.setContentsMargins(10, 10, 10, 10)
+            row_layout.setSpacing(5)
+            row_layout.setColumnStretch(0, 1)
+            row_layout.setColumnStretch(1, 4)
 
-        image_widget = _create_item_image_widget(row_frame, item["path"], item_size)
-        row_layout.addWidget(image_widget, 0, 0, alignment=Qt.AlignCenter)
+            image_widget = _create_item_image_widget(row_frame, item["path"], item_size)
+            row_layout.addWidget(image_widget, 0, 0, alignment=Qt.AlignCenter)
 
-        info_frame = QWidget(row_frame)
-        info_layout = QGridLayout(info_frame)
-        info_layout.setContentsMargins(5, 5, 5, 5)
-        info_layout.setSpacing(5)
-        info_layout.setColumnStretch(0, 3)
-        info_layout.setColumnStretch(1, 1)
-        info_layout.setColumnStretch(2, 3)
+            info_frame = QWidget(row_frame)
+            info_layout = QGridLayout(info_frame)
+            info_layout.setContentsMargins(5, 5, 5, 5)
+            info_layout.setSpacing(5)
+            info_layout.setColumnStretch(0, 3)
+            info_layout.setColumnStretch(1, 1)
+            info_layout.setColumnStretch(2, 3)
 
-        desc_label = QLabel(item["description"])
-        desc_label.setWordWrap(True)
-        desc_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(desc_label, 0, 0)
+            desc_label = QLabel(item["description"])
+            desc_label.setWordWrap(True)
+            desc_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(desc_label, 0, 0)
 
-        price_label = QLabel(item["price"])
-        price_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(price_label, 0, 1)
+            price_label = QLabel(item["price"])
+            price_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(price_label, 0, 1)
 
-        location_label = QLabel(item["location"])
-        location_label.setWordWrap(True)
-        location_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(location_label, 0, 2)
+            location_label = QLabel(item["location"])
+            location_label.setWordWrap(True)
+            location_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(location_label, 0, 2)
 
-        row_layout.addWidget(info_frame, 0, 1)
-        parent_layout.addWidget(row_frame)
+            row_layout.addWidget(info_frame, 0, 1)
+            parent_layout.addWidget(row_frame)
+    finally:
+        parent_frame.setUpdatesEnabled(True)
+        parent_frame.update()
 

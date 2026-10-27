@@ -71,50 +71,56 @@ def _create_jewelry_image_widget(parent, jewelry):
 def show_jewelrys(scrollbar_frame_obj, jewelrys):
     scrollbar_frame_obj.destroy_components()
 
-    parent_layout = scrollbar_frame_obj.scrollable_frame.layout()
+    parent = scrollbar_frame_obj.scrollable_frame
+    parent_layout = parent.layout()
     if parent_layout is None:
-        parent_layout = QVBoxLayout(scrollbar_frame_obj.scrollable_frame)
+        parent_layout = QVBoxLayout(parent)
     parent_layout.setContentsMargins(10, 10, 10, 10)
     parent_layout.setSpacing(5)
     parent_layout.setAlignment(Qt.AlignTop)
 
-    for i, jewelry_name in enumerate(jewelrys):
-        jewelry = jewelrys[jewelry_name]
+    parent.setUpdatesEnabled(False)
+    try:
+        for i, jewelry_name in enumerate(jewelrys):
+            jewelry = jewelrys[jewelry_name]
 
-        row_frame = QGroupBox(jewelry.name)
-        row_layout = QGridLayout(row_frame)
-        row_layout.setContentsMargins(10, 10, 10, 10)
-        row_layout.setSpacing(5)
-        row_layout.setColumnStretch(0, 1)
-        row_layout.setColumnStretch(1, 5)
+            row_frame = QGroupBox(jewelry.name)
+            row_layout = QGridLayout(row_frame)
+            row_layout.setContentsMargins(10, 10, 10, 10)
+            row_layout.setSpacing(5)
+            row_layout.setColumnStretch(0, 1)
+            row_layout.setColumnStretch(1, 5)
 
-        image_widget = _create_jewelry_image_widget(row_frame, jewelry)
-        row_layout.addWidget(image_widget, 0, 0, alignment=Qt.AlignCenter)
+            image_widget = _create_jewelry_image_widget(row_frame, jewelry)
+            row_layout.addWidget(image_widget, 0, 0, alignment=Qt.AlignCenter)
 
-        info_frame = QWidget(row_frame)
-        info_layout = QGridLayout(info_frame)
-        info_layout.setContentsMargins(5, 5, 5, 5)
-        info_layout.setSpacing(5)
-        info_layout.setColumnStretch(0, 4)
-        info_layout.setColumnStretch(1, 1)
-        info_layout.setColumnStretch(2, 2)
+            info_frame = QWidget(row_frame)
+            info_layout = QGridLayout(info_frame)
+            info_layout.setContentsMargins(5, 5, 5, 5)
+            info_layout.setSpacing(5)
+            info_layout.setColumnStretch(0, 4)
+            info_layout.setColumnStretch(1, 1)
+            info_layout.setColumnStretch(2, 2)
 
-        desc_label = QLabel(jewelry.description)
-        desc_label.setWordWrap(True)
-        desc_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(desc_label, 0, 0)
+            desc_label = QLabel(jewelry.description)
+            desc_label.setWordWrap(True)
+            desc_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(desc_label, 0, 0)
 
-        rarity_label = QLabel(int(jewelry.rarity) * "★")
-        rarity_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(rarity_label, 0, 1)
+            rarity_label = QLabel(int(jewelry.rarity) * "★")
+            rarity_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(rarity_label, 0, 1)
 
-        location_label = QLabel(jewelry.location)
-        location_label.setWordWrap(True)
-        location_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-        info_layout.addWidget(location_label, 0, 2)
+            location_label = QLabel(jewelry.location)
+            location_label.setWordWrap(True)
+            location_label.setAlignment(Qt.AlignLeft | Qt.AlignVCenter)
+            info_layout.addWidget(location_label, 0, 2)
 
-        row_layout.addWidget(info_frame, 0, 1)
-        parent_layout.addWidget(row_frame)
+            row_layout.addWidget(info_frame, 0, 1)
+            parent_layout.addWidget(row_frame)
+    finally:
+        parent.setUpdatesEnabled(True)
+        parent.update()
 
     scrollbar_frame_obj.update_canvas()
 

@@ -33,7 +33,8 @@ except ImportError:  # 直接从本目录运行本文件时
 
 # 图像处理工作线程
 class ImageProcessWorker(QThread):
-    finished = pyqtSignal(np.ndarray)  # 返回numpy数组
+    # 不要覆盖 QThread.finished，否则线程生命周期管理会变脆
+    result_ready = pyqtSignal(np.ndarray)  # 返回numpy数组
     error = pyqtSignal(str)
 
     def __init__(self, input_path, min_radius, brightness_offset, enhance_mode,
@@ -61,7 +62,7 @@ class ImageProcessWorker(QThread):
                 gain_max=self.gain_max or CORE_DEFAULT_GAIN_MAX
             )
 
-            self.finished.emit(result)
+            self.result_ready.emit(result)
         except Exception as e:
             self.error.emit(str(e))
 
@@ -81,7 +82,7 @@ class ImageViewer(QGraphicsView):
         self.setRenderHint(QPainter.Antialiasing)
 
         self.setRenderHint(QPainter.SmoothPixmapTransform)
-        self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
+        self.setViewportUpdateMode(QGraphicsView.SmartViewportUpdate)
         self.setDragMode(QGraphicsView.ScrollHandDrag)
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
         self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
@@ -314,7 +315,7 @@ class LineArtGUI(QMainWindow):
         input_path, radius, bright, enhance, denoise, gain = self._get_params()
         self.worker = ImageProcessWorker(input_path, radius, bright, enhance,
                                          denoise=denoise, gain_max=gain)
-        self.worker.finished.connect(self._on_preview_ready)
+        self.worker.result_ready.connect(self._on_preview_ready)
         self.worker.error.connect(self._on_error)
         self.worker.start()
 
@@ -351,7 +352,7 @@ class LineArtGUI(QMainWindow):
         input_path, radius, bright, enhance, denoise, gain = self._get_params()
         self.worker = ImageProcessWorker(input_path, radius, bright, enhance,
                                          denoise=denoise, gain_max=gain)
-        self.worker.finished.connect(lambda arr: self._on_save_ready(arr, output_path))
+        self.worker.result_ready.connect(lambda arr: self._on_save_ready(arr, output_path))
         self.worker.error.connect(self._on_error)
         self.worker.start()
 

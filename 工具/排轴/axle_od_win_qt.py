@@ -37,7 +37,7 @@ from PyQt5.QtWidgets import (
     QToolButton, QMenu, QDialog, QApplication,
     QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 )
-from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal
+from PyQt5.QtCore import Qt, QSize, QTimer, QEvent, pyqtSignal, QThread
 from PyQt5.QtGui import QPainter, QPixmap
 
 from window_qt import set_window_icon, creat_Toplevel, install_no_wheel
@@ -2540,6 +2540,25 @@ class _StateTracker:
 # ======================================================================
 # 主界面
 # ======================================================================
+class _AxleImageWorker(QThread):
+    """后台渲染轴图，避免长轴时卡死 UI。"""
+
+    done = pyqtSignal(object, object)  # (QImage, error)
+
+    def __init__(self, data, ds):
+        super().__init__()
+        self._data = data
+        self._ds = ds
+
+    def run(self):
+        try:
+            from 工具.排轴.axle_image import render_axle_image
+            image = render_axle_image(self._data, ds=self._ds)
+            self.done.emit(image, None)
+        except Exception as e:
+            self.done.emit(None, e)
+
+
 class AxleODWindow(QFrame):
     """排轴 + OD 计算主界面。"""
 
@@ -2566,6 +2585,11 @@ class AxleODWindow(QFrame):
         self._recalc_timer = QTimer(self)
         self._recalc_timer.setSingleShot(True)
         self._recalc_timer.timeout.connect(self.recalculate)
+        # recalculate 内热路径缓存（开始时重建）
+        self._style_lookup = {}
+        self._sigils_cache = None
+        self._sigil_levels_cache = None
+        self._axle_image_worker = None
         self._build_ui()
         self._normalize_team()
         # 用队伍行实际数据同步（含突破数/携带被动等）
@@ -2635,8 +2659,9 @@ class AxleODWindow(QFrame):
 
     def generate_axle_image(self):
         """把当前排轴导出成轴图（PNG / JPG）。"""
-        image = self._build_axle_image()
-        if image is None:
+        data = self.to_dict()
+        if not any(turn.get("actions") for turn in data.get("turns") or []):
+            QMessageBox.information(self, "提示", "排轴为空，无法生成轴图")
             return
         default = self._default_image_path()
         path, _ = QFileDialog.getSaveFileName(
@@ -2644,35 +2669,46 @@ class AxleODWindow(QFrame):
             "PNG 图片 (*.png);;JPG 图片 (*.jpg)")
         if not path:
             return
-        try:
-            from 工具.排轴.axle_image import save_image
-            save_image(image, path)
-        except Exception as e:
-            logger.error("生成轴图失败: %s", e)
-            QMessageBox.warning(self, "错误", "生成轴图失败：%s" % e)
-            return
-        self.show_image_preview(path)
+        self._start_axle_image_job(
+            data, "generate", path)
 
     def preview_axle_image(self):
         """只预览轴图，不保存文件。"""
-        image = self._build_axle_image()
-        if image is None:
-            return
-        self.show_image_preview(QPixmap.fromImage(image), "轴图预览（未保存）")
-
-    def _build_axle_image(self):
-        """渲染当前排轴；空轴或渲染失败时提示并返回 None。"""
         data = self.to_dict()
         if not any(turn.get("actions") for turn in data.get("turns") or []):
             QMessageBox.information(self, "提示", "排轴为空，无法生成轴图")
-            return None
-        try:
-            from 工具.排轴.axle_image import render_axle_image
-            return render_axle_image(data, ds=self.data_source)
-        except Exception as e:
-            logger.error("渲染轴图失败: %s", e)
-            QMessageBox.warning(self, "错误", "渲染轴图失败：%s" % e)
-            return None
+            return
+        self._start_axle_image_job(data, "preview", None)
+
+    def _start_axle_image_job(self, data, mode, path):
+        if self._axle_image_worker is not None and self._axle_image_worker.isRunning():
+            return
+        worker = _AxleImageWorker(data, self.data_source)
+        self._axle_image_worker = worker
+
+        def on_done(image, error):
+            self._axle_image_worker = None
+            worker.deleteLater()
+            if error is not None:
+                logger.error("渲染轴图失败: %s", error)
+                QMessageBox.warning(self, "错误", "渲染轴图失败：%s" % error)
+                return
+            if image is None:
+                return
+            try:
+                if mode == "generate":
+                    from 工具.排轴.axle_image import save_image
+                    save_image(image, path)
+                    self.show_image_preview(path)
+                else:
+                    self.show_image_preview(
+                        QPixmap.fromImage(image), "轴图预览（未保存）")
+            except Exception as e:
+                logger.error("生成轴图失败: %s", e)
+                QMessageBox.warning(self, "错误", "生成轴图失败：%s" % e)
+
+        worker.done.connect(on_done)
+        worker.start()
 
     def show_image_preview(self, source, title=None):
         """弹预览窗；source 可以是图片路径，也可以直接是 QPixmap。"""
@@ -3426,6 +3462,7 @@ class AxleODWindow(QFrame):
             self._recalc_pending = True
             return
         self._recalc_timer.stop()
+        self._rebuild_calc_caches()
         self._state_book = {}
         # 先结算一次 SP：「追击」及其 SP 消耗/回复会影响 OD，需要先算出来
         self._recalc_sp()
@@ -3740,6 +3777,41 @@ class AxleODWindow(QFrame):
         self._recalc_sp()
         self._refresh_state_panel()
 
+    def _rebuild_calc_caches(self):
+        """重算开始时重建风格/印记缓存，避免回合循环里反复扫 styles。"""
+        self._style_lookup = {}
+        self._sigils_cache = None
+        self._sigil_levels_cache = None
+        for slot in range(len(self.team)):
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            if role:
+                self._find_style(role, style)
+
+    def _find_style(self, role, style_name):
+        """按 (role, style) 查风格对象，带会话内缓存。"""
+        if not role:
+            return None
+        key = (role, style_name)
+        cache = self._style_lookup
+        if key in cache:
+            return cache[key]
+        found = None
+        for st in self.data_source.styles(role):
+            if st.name == style_name:
+                found = st
+                break
+        cache[key] = found
+        return found
+
+    def _member_style_obj(self, slot):
+        try:
+            return self._find_style(
+                self.team[slot].get("role"),
+                self.team[slot].get("style"))
+        except Exception:
+            return None
+
     def _active_slots(self):
         """队伍中已安排角色的位置下标。"""
         return [i for i in range(len(self.team)) if self.team[i].get("role")]
@@ -3752,15 +3824,13 @@ class AxleODWindow(QFrame):
         """当前 SP 上限：设置值与该风格「SP上限」被动（如 30）取较大者。"""
         limit = self.sp_limit_spin.value()
         for slot in self._active_slots():
-            role = self.team[slot].get("role")
-            style = self.team[slot].get("style")
+            st = self._member_style_obj(slot)
+            if st is None or not st.sp_limit_override:
+                continue
             selected = self._selected_passives(slot)
-            for st in self.data_source.styles(role):
-                if st.name != style or not st.sp_limit_override:
-                    continue
-                if (st.boost_enabler is None or selected is None
-                        or st.boost_enabler in selected):
-                    limit = max(limit, st.sp_limit_override)
+            if (st.boost_enabler is None or selected is None
+                    or st.boost_enabler in selected):
+                limit = max(limit, st.sp_limit_override)
         return limit
 
     def _recalc_sp(self):
@@ -4115,21 +4185,13 @@ class AxleODWindow(QFrame):
 
     def _member_element(self, slot):
         """队员所装备风格的元素属性。"""
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return st.element
-        return None
+        st = self._member_style_obj(slot)
+        return getattr(st, "element", None) if st is not None else None
 
     def _style_has_command(self, slot):
         """该队员所装备风格的职业是否为「指挥者」。"""
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return getattr(st, "career", None) == "指挥者"
-        return False
+        st = self._member_style_obj(slot)
+        return bool(st is not None and getattr(st, "career", None) == "指挥者")
 
     def _commander_slot(self):
         """队伍唯一的指挥者：职业为「指挥者」的最靠前的一名队员。"""
@@ -4207,13 +4269,11 @@ class AxleODWindow(QFrame):
         """风格被动里「回合开始时位于前锋则自身 SP+X」的合计（闪光等，满足突破要求）。"""
         if getattr(self, "_passives_off", False):
             return []          # 占位回合：不触发任何被动
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
+        st = self._member_style_obj(slot)
+        if st is None:
+            return []
         lb = self._member_lb(slot)
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return [m for m in st.front_sp_passives if m.get("lb", 0) <= lb]
-        return []
+        return [m for m in st.front_sp_passives if m.get("lb", 0) <= lb]
 
     def _passive_carried(self, slot, name):
         """该队员是否携带指定的「（被动技能）」条目（None 表示默认全选）。"""
@@ -4224,15 +4284,13 @@ class AxleODWindow(QFrame):
         """该队员风格的「X之律动」（超越条）定义（满足突破要求）。"""
         if getattr(self, "_passives_off", False):
             return None        # 占位回合：不触发任何被动
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
+        st = self._member_style_obj(slot)
+        if st is None:
+            return None
         lb = self._member_lb(slot)
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                r = getattr(st, "rhythm", None)
-                if r and r.get("lb", 0) <= lb:
-                    return r
-                return None
+        r = getattr(st, "rhythm", None)
+        if r and r.get("lb", 0) <= lb:
+            return r
         return None
 
     def _team_rhythms(self):
@@ -4251,19 +4309,20 @@ class AxleODWindow(QFrame):
 
     def _team_sigils(self):
         """队伍里存在的「X之印」：{元素: sigil 定义}。"""
+        if self._sigils_cache is not None:
+            return self._sigils_cache
         found = {}
         for slot in self._active_slots():
-            role = self.team[slot].get("role")
-            style = self.team[slot].get("style")
+            st = self._member_style_obj(slot)
+            if st is None:
+                continue
             lb = self._member_lb(slot)
-            for st in self.data_source.styles(role):
-                if st.name == style:
-                    sig = getattr(st, "sigil", None)
-                    if sig and sig.get("lb", 0) <= lb:
-                        req = sig.get("requires")
-                        if req is None or self._passive_carried(slot, req):
-                            found.setdefault(sig.get("element"), sig)
-                    break
+            sig = getattr(st, "sigil", None)
+            if sig and sig.get("lb", 0) <= lb:
+                req = sig.get("requires")
+                if req is None or self._passive_carried(slot, req):
+                    found.setdefault(sig.get("element"), sig)
+        self._sigils_cache = found
         return found
 
     def _sigil_level(self, element):
@@ -4271,14 +4330,28 @@ class AxleODWindow(QFrame):
 
         双属性风格（如「冰雷」）只要含该属性就算一份，所以这里用属性包含判断。
         """
-        if element is None or element not in self._team_sigils():
+        if self._sigil_levels_cache is not None:
+            return self._sigil_levels_cache.get(element, 0)
+        levels = {}
+        sigils = self._team_sigils()
+        if sigils:
+            counts = {}
+            for slot in self._active_slots():
+                el = self._member_element(slot)
+                for sig_el in sigils:
+                    if _element_matches(el, sig_el):
+                        counts[sig_el] = counts.get(sig_el, 0) + 1
+            levels = counts
+        self._sigil_levels_cache = levels
+        if element is None:
             return 0
-        return sum(1 for slot in self._active_slots()
-                   if _element_matches(self._member_element(slot), element))
+        return levels.get(element, 0)
 
     def _team_sigil_levels(self):
         """当前队伍各「X之印」的等级：{元素: 等级}。"""
-        return {el: self._sigil_level(el) for el in self._team_sigils()}
+        if self._sigil_levels_cache is None:
+            self._sigil_level(next(iter(self._team_sigils()), None))
+        return dict(self._sigil_levels_cache or {})
 
     def _seed_battle_states(self, tracker):
         """把「战斗/初战开始时 使自身进入X状态」的被动记进状态跟踪器。

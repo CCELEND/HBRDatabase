@@ -109,55 +109,62 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     scroll_layout.setSpacing(5)
     scroll_layout.setAlignment(Qt.AlignTop)
 
-    if selected_values_dir["大师技能"]:
-        filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
-        # 一次建 name→role 哈希，避免每个结果线性扫全部角色（O(n²)）
-        role_by_master_skill = {}
-        for team in 角色.team_info.teams.values():
-            for r in team.roles:
-                if r.master_skill and r.master_skill.name not in role_by_master_skill:
-                    role_by_master_skill[r.master_skill.name] = r
-        for i, master_skill in enumerate(filtered_master_skills):
-            role = role_by_master_skill.get(master_skill.name)
+    # 批量建结果卡期间暂停重绘
+    content = scrollbar_frame_obj.scrollable_frame
+    content.setUpdatesEnabled(False)
+    try:
+        if selected_values_dir["大师技能"]:
+            filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
+            # 一次建 name→role 哈希，避免每个结果线性扫全部角色（O(n²)）
+            role_by_master_skill = {}
+            for team in 角色.team_info.teams.values():
+                for r in team.roles:
+                    if r.master_skill and r.master_skill.name not in role_by_master_skill:
+                        role_by_master_skill[r.master_skill.name] = r
+            for i, master_skill in enumerate(filtered_master_skills):
+                role = role_by_master_skill.get(master_skill.name)
 
-            master_skill_frame = QGroupBox(master_skill.name)
-            master_skill_frame.setFixedHeight(170)
-            frame_layout = QGridLayout(master_skill_frame)
+                master_skill_frame = QGroupBox(master_skill.name)
+                master_skill_frame.setFixedHeight(170)
+                frame_layout = QGridLayout(master_skill_frame)
+                frame_layout.setContentsMargins(5, 5, 5, 5)
+                frame_layout.setSpacing(5)
+                if role:
+                    bind_master_skill_canvas(master_skill_frame, role, 0, 0)
+
+                row = i // 6
+                column = i % 6
+                scroll_layout.addWidget(master_skill_frame, row, column)
+
+            scrollbar_frame_obj.update_canvas()
+            return "break"
+
+        filtered_styles = get_filtered_styles(selected_values_dir, keyword_list)
+
+        for i, style in enumerate(filtered_styles):
+            team = 角色.team_info.teams[style.team_name]
+
+            style_frame = QGroupBox(style.name)
+            style_frame.setFixedHeight(170)
+            frame_layout = QGridLayout(style_frame)
             frame_layout.setContentsMargins(5, 5, 5, 5)
             frame_layout.setSpacing(5)
-            if role:
-                bind_master_skill_canvas(master_skill_frame, role, 0, 0)
 
-            row = i // 6
-            column = i % 6
-            scroll_layout.addWidget(master_skill_frame, row, column)
+            # 同一风格的多形态：搜索卡片也支持右键「切换」，标题跟着当前形态更新
+            style_forms = [style] + list(getattr(style, "forms", None) or [])
 
-        scrollbar_frame_obj.update_canvas()
-        return "break"
+            def on_switch(new_style, frame=style_frame):
+                frame.setTitle(new_style.name)
 
-    filtered_styles = get_filtered_styles(selected_values_dir, keyword_list)
+            bind_style_canvas(style_frame, team, style, 0, 0,
+                              forms=style_forms, on_switch=on_switch)
 
-    for i, style in enumerate(filtered_styles):
-        team = 角色.team_info.teams[style.team_name]
-
-        style_frame = QGroupBox(style.name)
-        style_frame.setFixedHeight(170)
-        frame_layout = QGridLayout(style_frame)
-        frame_layout.setContentsMargins(5, 5, 5, 5)
-        frame_layout.setSpacing(5)
-
-        # 同一风格的多形态：搜索卡片也支持右键「切换」，标题跟着当前形态更新
-        style_forms = [style] + list(getattr(style, "forms", None) or [])
-
-        def on_switch(new_style, frame=style_frame):
-            frame.setTitle(new_style.name)
-
-        bind_style_canvas(style_frame, team, style, 0, 0,
-                          forms=style_forms, on_switch=on_switch)
-
-        row = i // 5
-        column = i % 5
-        scroll_layout.addWidget(style_frame, row, column)
+            row = i // 5
+            column = i % 5
+            scroll_layout.addWidget(style_frame, row, column)
+    finally:
+        content.setUpdatesEnabled(True)
+        content.update()
 
     scrollbar_frame_obj.update_canvas()
     return "break"
