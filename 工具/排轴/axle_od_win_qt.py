@@ -1062,6 +1062,9 @@ class TeamMemberRow(QFrame):
             return
         self._selected_passives = None   # 换角色后默认携带全部被动
         self._populate_styles(preserve="")
+        # 角色为「无」时 OD 耳环也必须是「无」
+        if not self.role():
+            self._clear_earring()
         self._emit_changed()
 
     def set_roles_enabled(self, used, my_index):
@@ -1227,6 +1230,21 @@ class TeamMemberRow(QFrame):
 
     def set_role(self, role):
         self.role_combo.setCurrentText(role if role else "无")
+        # 程序化清空/设置角色时，耳环同步为「无」
+        if not self.role():
+            self._clear_earring()
+
+    def _clear_earring(self):
+        """OD 耳环强制为「无（不装备）」。"""
+        pos = self.earring_combo.findData("")
+        if pos < 0:
+            pos = 0
+        if self.earring_combo.currentIndex() != pos:
+            self.earring_combo.blockSignals(True)
+            try:
+                self.earring_combo.setCurrentIndex(pos)
+            finally:
+                self.earring_combo.blockSignals(False)
 
     def role(self):
         # 分组标题不可选，这里再兜一层，避免被程序设成标题
@@ -1284,6 +1302,9 @@ class TeamMemberRow(QFrame):
             name = str(data.get("earring") or "")
             if not name and float(data.get("od_earring", 1) or 0) > 0:
                 name = OD_EARRING_NAME        # 旧存档：数值 1 = 驱动耳坠
+            # 角色为「无」时耳环强制为「无」（忽略存档里的旧值）
+            if not str(data.get("role") or ""):
+                name = ""
             _pos = self.earring_combo.findData(name)
             self.earring_combo.setCurrentIndex(_pos if _pos >= 0 else 0)
             self.talent_lb.setValue(int(data.get("resonance_level", 4) or 0))
