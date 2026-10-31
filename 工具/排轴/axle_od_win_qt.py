@@ -869,24 +869,35 @@ class TeamMemberRow(QFrame):
 
         SS / SSR 都可以选（SS 只用于轴图显示，不参与 OD 计算）；
         天赋与属性一一对应，所以只保留与该风格元素相符的那些。
+        SS 不能选「该风格自带」的天赋。
         """
         rarity = self._style_rarity()
         if rarity not in ("SSR", "SS"):
             return []
         element = self._style_element()
         pool = self.data_source.resonance_pool()
-        return sorted(name for name, entry in pool.items()
-                      if _talent_element_ok(entry.get("owners") or [], element))
+        own = self._own_resonance()
+        own_name = (own or {}).get("name") if isinstance(own, dict) else None
+        result = []
+        for name, entry in pool.items():
+            if not _talent_element_ok(entry.get("owners") or [], element):
+                continue
+            if rarity == "SS" and own_name and name == own_name:
+                continue          # SS 不能装备自身自带的共鸣天赋
+            result.append(name)
+        return sorted(result)
 
     def _populate_talents(self):
         """填充「共鸣天赋」下拉：只列**该风格可选**的天赋，外加（默认）/无。
 
         不可选的（属性不符）**不入列表**，而不是列出来置灰。
         SS 也能选，但效果只在 SSR 时计入计算（见 _member_resonance）。
+        SS 默认选「无」（不把风格自带当默认，导入存档时同样处理）。
         """
         prev = self.talent_combo.currentData() if self.talent_combo.count() else None
         pool = self.data_source.resonance_pool()
         element = self._style_element()
+        is_ss = (self._style_rarity() == "SS")
         with self._suspended():
             self.talent_combo.clear()
             self.talent_combo.addItem("（默认）", None)
@@ -897,8 +908,15 @@ class TeamMemberRow(QFrame):
                 self.talent_combo.addItem(text, name)
                 self.talent_combo.setItemData(self.talent_combo.count() - 1, tip,
                                               Qt.ToolTipRole)
-            pos = self.talent_combo.findData(prev)
-            self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
+            if is_ss:
+                # SS：「（默认）」无意义（不生效也不该当展示默认），回落到「无」
+                if prev is None:
+                    prev = ""
+                pos = self.talent_combo.findData(prev)
+                self.talent_combo.setCurrentIndex(pos if pos >= 0 else 1)
+            else:
+                pos = self.talent_combo.findData(prev)
+                self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
         self._refresh_talent_enabled()
         self._update_talent_tip()
 
@@ -1353,7 +1371,17 @@ class TeamMemberRow(QFrame):
                     self.style_combo.setCurrentIndex(pos)
             # 共鸣天赋：None = （默认）；"" = 无；否则为天赋名
             tal = data.get("resonance_talent", None)
+            # SS 风格导入时：默认/空 一律落成「无」（不把风格自带当默认）
+            if tal is None and self._style_rarity() == "SS":
+                tal = ""
+            # SS 不能装备自身自带的天赋：导入时若命中则强制「无」
+            if isinstance(tal, str) and tal and self._style_rarity() == "SS":
+                own = self._own_resonance()
+                if isinstance(own, dict) and tal == own.get("name"):
+                    tal = ""
             tpos = self.talent_combo.findData(tal)
+            if tpos < 0 and self._style_rarity() == "SS":
+                tpos = self.talent_combo.findData("")
             self.talent_combo.setCurrentIndex(tpos if tpos >= 0 else 0)
             self._populate_passives()
         self._refresh_talent_enabled()

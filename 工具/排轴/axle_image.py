@@ -462,12 +462,17 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
     res_talent_names = []
     for m in team:
         st = _member_style(ds, m)
-        # 「（默认）」时解析成风格自带天赋名，保证轴图能画出徽章
         talent_name = m.get("resonance_talent")
-        if not talent_name and st is not None:
+        rarity = getattr(st, "rarity", None) if st is not None else None
+        # 与队伍配置一致：
+        #   "" = 无 → 不画徽章
+        #   None（默认）仅 SSR 解析为风格自带；SS / 其它稀有度不画
+        if talent_name is None and rarity == "SSR":
             own = getattr(st, "resonance", None)
             if isinstance(own, dict):
                 talent_name = own.get("name")
+        elif not talent_name:
+            talent_name = None
         res_talent_names.append(talent_name)
         res_icons.append(_load_image(
             _resonance_icon(ds, talent_name,
