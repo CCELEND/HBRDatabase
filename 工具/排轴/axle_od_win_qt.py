@@ -858,6 +858,7 @@ class TeamMemberRow(QFrame):
 
         self._condition = "极佳"         # 干劲阶段（默认极佳；界面不显示）
         self._selected_passives = None   # None = 全部携带
+        self._last_role = ""             # 用于判断「从无 → 选上角色」时耳环默认驱动
 
     def _on_talent_changed(self, *args):
         self._update_talent_tip()
@@ -1060,11 +1061,16 @@ class TeamMemberRow(QFrame):
     def _on_role_changed(self, role):
         if self._loading or self._block_role_signal:
             return
+        was_empty = not self._last_role
         self._selected_passives = None   # 换角色后默认携带全部被动
         self._populate_styles(preserve="")
-        # 角色为「无」时 OD 耳环也必须是「无」
         if not self.role():
+            # 角色为「无」时 OD 耳环也必须是「无」
             self._clear_earring()
+        elif was_empty:
+            # 从「无」选上角色：耳环默认「驱动耳坠」
+            self._set_earring_default()
+        self._last_role = self.role()
         self._emit_changed()
 
     def set_roles_enabled(self, used, my_index):
@@ -1229,14 +1235,24 @@ class TeamMemberRow(QFrame):
             self.style_combo.setEnabled(self.role_combo.currentText() != "无")
 
     def set_role(self, role):
+        was_empty = not self._last_role
         self.role_combo.setCurrentText(role if role else "无")
-        # 程序化清空/设置角色时，耳环同步为「无」
         if not self.role():
             self._clear_earring()
+        elif was_empty:
+            self._set_earring_default()
+        self._last_role = self.role()
 
     def _clear_earring(self):
         """OD 耳环强制为「无（不装备）」。"""
-        pos = self.earring_combo.findData("")
+        self._apply_earring_choice("")
+
+    def _set_earring_default(self):
+        """选上角色时 OD 耳环默认为「驱动耳坠」。"""
+        self._apply_earring_choice(OD_EARRING_NAME)
+
+    def _apply_earring_choice(self, name):
+        pos = self.earring_combo.findData(name)
         if pos < 0:
             pos = 0
         if self.earring_combo.currentIndex() != pos:
@@ -1310,6 +1326,7 @@ class TeamMemberRow(QFrame):
             self.talent_lb.setValue(int(data.get("resonance_level", 4) or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
+            self._last_role = self.role()
             style = data.get("style", "")
             rarity = data.get("style_rarity")
             preserve = (style, rarity) if (style and rarity) else style
