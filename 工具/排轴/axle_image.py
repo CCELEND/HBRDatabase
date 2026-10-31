@@ -217,16 +217,26 @@ def _badge(painter, center, text, dark=True, radius=15):
 # ----------------------------------------------------------------------------
 # 数据整理
 # ----------------------------------------------------------------------------
-def _style_of(ds, role, style):
+def _style_of(ds, role, style, rarity=None):
     if not role:
         return None
     try:
-        for st in ds.styles(role):
-            if st.name == style:
-                return st
+        styles = ds.styles(role)
     except Exception:
         return None
+    if rarity is not None:
+        for st in styles:
+            if st.name == style and st.rarity == rarity:
+                return st
+    for st in styles:
+        if st.name == style:
+            return st
     return None
+
+
+def _member_style(ds, m):
+    return _style_of(ds, m.get("role"), m.get("style"),
+                     m.get("style_rarity"))
 
 
 def _icon_path(ds, role, style):
@@ -449,10 +459,18 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
     # 共鸣天赋「所属风格」的小缩略图（画在共鸣等级徽章左边）
     # 按该队员风格的属性挑来源（如 SSR·无 的 Excelsior! 取「绚烂华美琉璃色」的图）
     res_icons = []
+    res_talent_names = []
     for m in team:
-        st = _style_of(ds, m.get("role"), m.get("style"))
+        st = _member_style(ds, m)
+        # 「（默认）」时解析成风格自带天赋名，保证轴图能画出徽章
+        talent_name = m.get("resonance_talent")
+        if not talent_name and st is not None:
+            own = getattr(st, "resonance", None)
+            if isinstance(own, dict):
+                talent_name = own.get("name")
+        res_talent_names.append(talent_name)
         res_icons.append(_load_image(
-            _resonance_icon(ds, m.get("resonance_talent"),
+            _resonance_icon(ds, talent_name,
                             getattr(st, "element", None)),
             RESONANCE_ICON_D * scale))
     action_images = {}
@@ -523,7 +541,8 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
                                   es, es),
                         earring_icons[i], radius=7 * scale)
         res_lv = m.get("resonance_level")
-        if m.get("resonance_talent") and res_lv is not None:
+        talent_name = res_talent_names[i] if i < len(res_talent_names) else None
+        if talent_name and res_lv is not None:
             by = rect.center().y() + d * 0.34
             bx = rect.center().x() - d * 0.24
             bw, _bh = _badge_metrics(str(int(res_lv)), 13 * scale)

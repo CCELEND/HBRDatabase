@@ -47,7 +47,7 @@ from 工具.排轴.od_calc import ODSkill, ODBattle, calc_od
 from 工具.排轴.data_source import (
     get_data_source, NORMAL_ATTACK_NAME, NORMAL_ATTACK_HITS,
     resonance_od_effect, generic_skill_names, talent_element_ok,
-    CONDITION_TIERS)
+    CONDITION_TIERS, DUAL_SS_SSR_STYLE_NAMES)
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
@@ -218,8 +218,12 @@ HELP_TEXT = """排轴OD计算 使用说明
   猛火进击（火之印≥6 → 全体友方 SP+5，出击中限1次）、
   暮色中升腾绽放的幻影（火之印≥4 → SP消耗减半 16→8）。
 - 「共鸣天赋」（相当于角色的装备，也就是队伍配置里的这一项，对应计算表的 **B19 31X共鸣**）：
-  **只有 SSR 风格才能配置**；每个位置可选（默认 = 风格自带、或无），**等级可自由选择（0~4）**。
-  列表里**只列该风格可选的共鸣天赋**（非 SSR、或属性不符的天赋不会出现在列表里）。
+  **SSR / SS 风格都能配置**；每个位置可选（默认 = 风格自带、或无），**等级可自由选择（0~4）**。
+  列表里**只列该风格可选的共鸣天赋**（属性不符的天赋不会出现在列表里）。
+  **仅 SSR 身份的共鸣天赋参与 OD 计算**；SS 选的天赋只显示在轴图上，不计入效果。
+  部分风格可在队伍配置中选 **SS / SSR 两种身份**（同技能，SSR 时共鸣才生效）：
+  逢川惠 心跃欣舞Fuel、朝仓可怜 Twinkle Eclosion、苍井绘里香 响彻·Battlecry、
+  桐生美也 丰饶喜乐神秘莫测、小笠原绯雨 夏暮色榴石、瑞原蓝娜 冲锋！突刺！金枪鱼！。
   标签标明**所属队伍·属性·提供该天赋的风格**（如 `Excelsior!（31X·无·绚烂华美琉璃色 等 3 个风格）`）。
   **属性按当前风格显示**：同一个天赋在不同属性上由不同风格提供，不会把属性堆在一起
   （不会出现「31X·无/暗/火」这种写法）；把鼠标停在选项上能看到该天赋的**全部来源**
@@ -835,7 +839,7 @@ class TeamMemberRow(QFrame):
         self.talent_lb.setRange(0, 4)
         self.talent_lb.setValue(4)
         self.talent_lb.setFixedWidth(46)
-        self.talent_lb.setToolTip("共鸣天赋等级（0~4，可自由选择）")
+        self.talent_lb.setToolTip("共鸣天赋等级（0~4，可自由选择；SS 选的天赋只显示在轴图，不计入计算）")
         self.talent_lb.valueChanged.connect(self._on_talent_changed)
         layout.addWidget(self.talent_lb)
 
@@ -860,11 +864,13 @@ class TeamMemberRow(QFrame):
         self._emit_changed()
 
     def _talent_candidates(self):
-        """当前风格**可选**的共鸣天赋名（属性匹配；非 SSR 或没选风格时为空）。
+        """当前风格**可选**的共鸣天赋名（属性匹配）。
 
-        天赋与属性一一对应，所以这里只保留与该风格元素相符的那些。
+        SS / SSR 都可以选（SS 只用于轴图显示，不参与 OD 计算）；
+        天赋与属性一一对应，所以只保留与该风格元素相符的那些。
         """
-        if self._style_rarity() != "SSR":
+        rarity = self._style_rarity()
+        if rarity not in ("SSR", "SS"):
             return []
         element = self._style_element()
         pool = self.data_source.resonance_pool()
@@ -874,7 +880,8 @@ class TeamMemberRow(QFrame):
     def _populate_talents(self):
         """填充「共鸣天赋」下拉：只列**该风格可选**的天赋，外加（默认）/无。
 
-        不可选的（属性不符、非 SSR）**不入列表**，而不是列出来置灰。
+        不可选的（属性不符）**不入列表**，而不是列出来置灰。
+        SS 也能选，但效果只在 SSR 时计入计算（见 _member_resonance）。
         """
         prev = self.talent_combo.currentData() if self.talent_combo.count() else None
         pool = self.data_source.resonance_pool()
@@ -896,37 +903,25 @@ class TeamMemberRow(QFrame):
 
     def _style_element(self):
         """当前风格的元素属性（火/冰/雷/光/暗/无…）。"""
-        role = self.role()
-        style = self.style()
-        if not role:
-            return None
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return st.element
-        return None
+        st = self._style_info()
+        return getattr(st, "element", None) if st is not None else None
 
     def _style_rarity(self):
         """当前风格的稀有度（SSR/SS/S/A）。"""
-        role = self.role()
-        style = self.style()
-        if not role:
-            return None
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return st.rarity
-        return None
+        st = self._style_info()
+        return getattr(st, "rarity", None) if st is not None else None
 
     def _refresh_talent_enabled(self):
-        """只有 SSR 风格才能配置共鸣天赋；下拉里只会有「该风格可选」的天赋。
+        """SS / SSR 风格都能配置共鸣天赋；下拉里只会有「该风格可选」的天赋。
 
-        （列表本身由 _populate_talents 按当前风格重建，这里只负责
-        整体可用性和标签/tooltip 的兜底刷新。）
+        SS 选的天赋只用于轴图显示，不计入 OD 计算（见 _member_resonance）。
         """
         if self.talent_combo.count() == 0:
             return
-        is_ssr = (self._style_rarity() == "SSR")
-        self.talent_combo.setEnabled(is_ssr)
-        self.talent_lb.setEnabled(is_ssr)
+        rarity = self._style_rarity()
+        can_equip = rarity in ("SSR", "SS")
+        self.talent_combo.setEnabled(can_equip)
+        self.talent_lb.setEnabled(can_equip)
         element = self._style_element()
         pool = self.data_source.resonance_pool()
         model = self.talent_combo.model()
@@ -936,12 +931,14 @@ class TeamMemberRow(QFrame):
             if item is None:
                 continue
             if name is None or name == "":
-                item.setEnabled(is_ssr)
+                item.setEnabled(can_equip)
                 continue
             entry = pool.get(name) or {}
-            ok = is_ssr and _talent_element_ok(entry.get("owners") or [], element)
+            ok = can_equip and _talent_element_ok(entry.get("owners") or [], element)
             item.setEnabled(ok)
             text, tip = _talent_display(name, entry, element, ok)
+            if rarity == "SS" and ok:
+                tip = "（SS 风格：仅显示在轴图，不参与 OD 计算）\n" + tip
             if self.talent_combo.itemText(i) != text:
                 self.talent_combo.setItemText(i, text)
             self.talent_combo.setItemData(i, tip, Qt.ToolTipRole)
@@ -1025,29 +1022,32 @@ class TeamMemberRow(QFrame):
         else:
             res = pool.get(name)
         if not res:
-            self.talent_combo.setToolTip(
-                "共鸣天赋（相当于装备）：只有 SSR 风格才能配置；等级可自由选择（0~4）"
-                if self._style_rarity() != "SSR" else
-                "共鸣天赋（相当于装备）；等级可自由选择（0~4）")
+            rarity = self._style_rarity()
+            if rarity in ("SSR", "SS"):
+                self.talent_combo.setToolTip(
+                    "共鸣天赋（相当于装备）；等级可自由选择（0~4）。\n"
+                    "SS / SSR 都能选；SS 选的天赋只显示在轴图上，不计入 OD 计算。")
+            else:
+                self.talent_combo.setToolTip(
+                    "共鸣天赋（相当于装备）：只有 SSR / SS 风格才能配置；"
+                    "等级可自由选择（0~4）")
             return
         entry = pool.get(res.get("name")) or {}
         text = res.get("levels", {}).get(str(level), "")
+        rarity = self._style_rarity()
+        effect_note = ("\n注意：当前为 SS 身份，该天赋仅显示在轴图，不参与计算。"
+                       if rarity == "SS" else "")
         self.talent_combo.setToolTip(
-            "共鸣天赋：%s（%s）\n所属队伍：%s\n属性：%s\nLv%d：%s" % (
+            "共鸣天赋：%s（%s）\n所属队伍：%s\n属性：%s\nLv%d：%s%s" % (
                 res.get("name", name), name if name else "（默认）",
                 entry.get("team") or "—",
-                "/".join(entry.get("owners") or []) or "—", level, text))
+                "/".join(entry.get("owners") or []) or "—", level, text,
+                effect_note))
 
     def _own_resonance(self):
         """当前风格的共鸣天赋（无则 None）。"""
-        role = self.role()
-        style = self.style()
-        if not role:
-            return None
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                return getattr(st, "resonance", None)
-        return None
+        st = self._style_info()
+        return getattr(st, "resonance", None) if st is not None else None
 
     @contextmanager
     def _suspended(self):
@@ -1096,10 +1096,25 @@ class TeamMemberRow(QFrame):
         self._emit_changed()
 
     def _style_info(self):
+        """按当前下拉项找 StyleInfo；双稀有度风格按 (name, rarity) 匹配。"""
         role = self.role()
-        style = self.style()
-        for st in self.data_source.styles(role):
-            if st.name == style:
+        if not role:
+            return None
+        data = self.style_combo.currentData()
+        styles = self.data_source.styles(role)
+        if isinstance(data, tuple):
+            name, rarity = data
+            for st in styles:
+                if st.name == name and st.rarity == rarity:
+                    return st
+            # 克隆失败时退回按名字找
+            for st in styles:
+                if st.name == name:
+                    return st
+            return None
+        name = data if data else self.style_combo.currentText()
+        for st in styles:
+            if st.name == name:
                 return st
         return None
 
@@ -1153,14 +1168,40 @@ class TeamMemberRow(QFrame):
             self._populate_talents()      # 没风格 -> 只留（默认）/无
             return
         self.style_combo.setEnabled(True)
-        current = preserve if preserve is not None else self.style()
+        # preserve 可以是纯风格名，也可以是 (name, rarity)
+        if isinstance(preserve, tuple):
+            preserve_name, preserve_rarity = preserve
+        else:
+            preserve_name, preserve_rarity = preserve, None
         styles = self.data_source.styles(self.role_combo.currentText())
         with self._suspended():
             self.style_combo.clear()
             for style in styles:
                 # 显示「风格名-稀有度-元素」，实际值仍保存纯风格名
-                self.style_combo.addItem(style.display_name(), style.name)
-            pos = self.style_combo.findData(current)
+                # 双稀有度风格存 (name, rarity)，便于区分 SS / SSR 两项
+                if (style.name in DUAL_SS_SSR_STYLE_NAMES
+                        and style.rarity in ("SS", "SSR")):
+                    self.style_combo.addItem(
+                        style.display_name(), (style.name, style.rarity))
+                else:
+                    self.style_combo.addItem(style.display_name(), style.name)
+            pos = -1
+            if preserve_name:
+                if preserve_rarity is not None:
+                    for i in range(self.style_combo.count()):
+                        d = self.style_combo.itemData(i)
+                        if (isinstance(d, tuple)
+                                and d[0] == preserve_name
+                                and d[1] == preserve_rarity):
+                            pos = i
+                            break
+                if pos < 0:
+                    for i in range(self.style_combo.count()):
+                        d = self.style_combo.itemData(i)
+                        if d == preserve_name or (
+                                isinstance(d, tuple) and d[0] == preserve_name):
+                            pos = i
+                            break
             if pos >= 0:
                 self.style_combo.setCurrentIndex(pos)
             elif styles:
@@ -1195,9 +1236,18 @@ class TeamMemberRow(QFrame):
         return "" if text == "无" else text
 
     def style(self):
-        # 下拉显示带稀有度，实际值取 itemData（纯风格名）
+        # 下拉显示带稀有度，实际值取 itemData（纯风格名；双稀有度为元组）
         data = self.style_combo.currentData()
+        if isinstance(data, tuple):
+            return data[0]
         return data if data else self.style_combo.currentText()
+
+    def style_rarity_selected(self):
+        """双稀有度风格选中的稀有度；普通风格返回 None。"""
+        data = self.style_combo.currentData()
+        if isinstance(data, tuple):
+            return data[1]
+        return None
 
     def condition(self):
         """该队员的「干劲」阶段（默认极佳；界面上不显示）。"""
@@ -1209,7 +1259,7 @@ class TeamMemberRow(QFrame):
         self._condition = name if name in CONDITION_TIERS else "极佳"
 
     def to_data(self):
-        return {"role": self.role(), "style": self.style(),
+        data = {"role": self.role(), "style": self.style(),
                 "condition": self.condition(),
                 "passives": self.selected_passives(),
                 "lb": self.lb_spin.value(),
@@ -1217,6 +1267,10 @@ class TeamMemberRow(QFrame):
                 "resonance_level": self.talent_level(),
                 "earring": self.earring(),
                 "od_earring": 1.0 if self.earring() == OD_EARRING_NAME else 0.0}
+        rarity = self.style_rarity_selected()
+        if rarity:
+            data["style_rarity"] = rarity
+        return data
 
     def set_data(self, data):
         with self._suspended():
@@ -1235,11 +1289,30 @@ class TeamMemberRow(QFrame):
             self.talent_lb.setValue(int(data.get("resonance_level", 4) or 0))
             role = data.get("role", "")
             self.role_combo.setCurrentText(role if role else "无")
-            self._populate_styles(preserve=data.get("style", ""))
             style = data.get("style", "")
-            pos = self.style_combo.findData(style) if style else -1
-            if pos >= 0:
-                self.style_combo.setCurrentIndex(pos)
+            rarity = data.get("style_rarity")
+            preserve = (style, rarity) if (style and rarity) else style
+            self._populate_styles(preserve=preserve)
+            if style:
+                pos = -1
+                if rarity:
+                    for i in range(self.style_combo.count()):
+                        d = self.style_combo.itemData(i)
+                        if (isinstance(d, tuple)
+                                and d[0] == style and d[1] == rarity):
+                            pos = i
+                            break
+                if pos < 0:
+                    pos = self.style_combo.findData(style)
+                if pos < 0:
+                    for i in range(self.style_combo.count()):
+                        d = self.style_combo.itemData(i)
+                        if d == style or (
+                                isinstance(d, tuple) and d[0] == style):
+                            pos = i
+                            break
+                if pos >= 0:
+                    self.style_combo.setCurrentIndex(pos)
             # 共鸣天赋：None = （默认）；"" = 无；否则为天赋名
             tal = data.get("resonance_talent", None)
             tpos = self.talent_combo.findData(tal)
@@ -3783,32 +3856,47 @@ class AxleODWindow(QFrame):
         self._sigils_cache = None
         self._sigil_levels_cache = None
         for slot in range(len(self.team)):
-            role = self.team[slot].get("role")
-            style = self.team[slot].get("style")
+            info = self.team[slot]
+            role = info.get("role")
             if role:
-                self._find_style(role, style)
+                self._find_style(role, info.get("style"),
+                                 info.get("style_rarity"))
 
-    def _find_style(self, role, style_name):
-        """按 (role, style) 查风格对象，带会话内缓存。"""
+    def _find_style(self, role, style_name, rarity=None):
+        """按 (role, style[, rarity]) 查风格对象，带会话内缓存。
+
+        rarity 仅用于双稀有度风格区分 SS / SSR 身份。
+        """
         if not role:
             return None
-        key = (role, style_name)
+        key = (role, style_name, rarity)
         cache = self._style_lookup
         if key in cache:
             return cache[key]
         found = None
         for st in self.data_source.styles(role):
-            if st.name == style_name:
-                found = st
-                break
+            if st.name != style_name:
+                continue
+            if rarity is not None and st.rarity != rarity:
+                continue
+            found = st
+            break
+        if found is None and rarity is not None:
+            # 指定稀有度没找到时退回同名任意稀有度
+            for st in self.data_source.styles(role):
+                if st.name == style_name:
+                    found = st
+                    break
         cache[key] = found
         return found
 
     def _member_style_obj(self, slot):
         try:
+            info = self.team[slot]
             return self._find_style(
-                self.team[slot].get("role"),
-                self.team[slot].get("style"))
+                info.get("role"),
+                info.get("style"),
+                info.get("style_rarity"))
         except Exception:
             return None
 
@@ -4636,22 +4724,17 @@ class AxleODWindow(QFrame):
         return 0.0
 
     def _member_resonance(self, slot):
-        """该队员当前生效的「共鸣天赋」（含等级）。
+        """该队员**参与计算**的「共鸣天赋」（含等级）。
 
-        只有 **SSR** 风格才能配置；选择「（默认）」时用风格自带的，否则用所选天赋。
+        选择逻辑上 SS / SSR 都能配置（见 TeamMemberRow）；
+        但**只有 SSR 身份才生效**——SS 选的天赋只显示在轴图，不进 OD 计算。
         返回 {"name","type","levels","level","text"} 或 None。
         """
         if getattr(self, "_passives_off", False):
             return None        # 占位回合：不触发任何被动
-        role = self.team[slot].get("role")
-        style = self.team[slot].get("style")
-        style_info = None
-        for st in self.data_source.styles(role):
-            if st.name == style:
-                style_info = st
-                break
+        style_info = self._member_style_obj(slot)
         if style_info is None or style_info.rarity != "SSR":
-            return None          # 只有 SSR 风格才能配置共鸣天赋
+            return None          # 仅 SSR 身份的共鸣天赋参与计算
         choice = self.team[slot].get("resonance_talent", None)
         if choice == "":
             return None
@@ -4659,6 +4742,34 @@ class AxleODWindow(QFrame):
         if res is not None and not _talent_element_ok(res.get("owners") or [],
                                                      style_info.element):
             return None          # 属性不符，不能配置
+        if res is None:
+            res = getattr(style_info, "resonance", None)
+        if not res:
+            return None
+        level = int(self.team[slot].get("resonance_level", 4) or 0)
+        level = max(0, min(4, level))
+        levels = dict(res.get("levels") or {})
+        return {"name": res.get("name"), "type": list(res.get("type") or []),
+                "levels": levels, "level": level,
+                "text": levels.get(str(level), "")}
+
+    def _member_resonance_display(self, slot):
+        """轴图/展示用：SS / SSR 选中的共鸣天赋（不判断是否生效）。
+
+        与 _member_resonance 的差别：SS 身份也返回所选天赋，供 axle_image 显示。
+        """
+        style_info = self._member_style_obj(slot)
+        if style_info is None:
+            return None
+        if style_info.rarity not in ("SSR", "SS"):
+            return None
+        choice = self.team[slot].get("resonance_talent", None)
+        if choice == "":
+            return None
+        res = self.data_source.resonance_pool().get(choice) if choice else None
+        if res is not None and not _talent_element_ok(res.get("owners") or [],
+                                                     style_info.element):
+            return None
         if res is None:
             res = getattr(style_info, "resonance", None)
         if not res:

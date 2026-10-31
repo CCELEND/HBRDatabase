@@ -14,12 +14,26 @@
 import os
 import re
 import json
+import copy
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 ATTACK_ATTRS = ("斩", "突", "打")
 RARITY_FILES = ("SSRstyles.json", "SSstyles.json", "Sstyles.json", "Astyles.json")
+
+# 这些风格可在队伍配置中选 SS / SSR 两种身份（SSR 时共鸣天赋才生效）。
+# 名称与风格 JSON 的 key 完全一致。
+DUAL_SS_SSR_STYLE_NAMES = frozenset({
+    "心跃欣舞Fuel",
+    "Twinkle Eclosion",
+    "响彻·Battlecry",
+    "响彻Battlecry",
+    "丰饶喜乐神秘莫测",
+    "夏暮色榴石",
+    "夏暮色的石榴石",
+    "冲锋！突刺！金枪鱼！",
+})
 
 # 通常攻击：所有风格都拥有，默认 3 Hit，不享受 OD 耳环加成
 NORMAL_ATTACK_NAME = "通常攻击"
@@ -1786,8 +1800,15 @@ class HBRDataSource:
                     continue
                 seen.add(style_name)
                 try:
-                    styles.append(
-                        self._build_style(style_name, style_data, role_name))
+                    style = self._build_style(style_name, style_data, role_name)
+                    styles.append(style)
+                    # 特殊风格：额外提供 SSR 身份（同技能，仅稀有度不同）
+                    # 用于「共鸣天赋以 SSR 生效」的队伍配置
+                    if (style.rarity == "SS"
+                            and style_name in DUAL_SS_SSR_STYLE_NAMES):
+                        ssr = copy.copy(style)
+                        ssr.rarity = "SSR"
+                        styles.append(ssr)
                 except Exception as e:
                     logger.warning(
                         "解析风格失败，已跳过：%s / %s（%s: %s）",
