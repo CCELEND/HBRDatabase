@@ -274,11 +274,12 @@ def _split_od(text):
     return level, bonus
 
 
-def _resonance_icon(ds, talent_name, element=None):
+def _resonance_icon(ds, talent_name, element=None, style=None):
     """共鸣天赋「所属风格」的缩略图路径（找不到返回 None）。
 
-    同名天赋可能有多个来源风格（不同属性），优先取**属性与 element 相符**的那一个
-    （和下拉标签的取法一致），例如 SSR·无 的 Excelsior! 取「绚烂华美琉璃色」。
+    同名天赋可能有多个来源风格（不同属性）：
+      1) 优先取**队伍配置里选中的那个来源风格**（style）；
+      2) 没记录时退回**属性与 element 相符**的第一个来源。
     """
     if not talent_name:
         return None
@@ -288,11 +289,17 @@ def _resonance_icon(ds, talent_name, element=None):
         return None
     sources = entry.get("sources") or []
     picked = None
-    for src in sources:
-        # element=None 表示「无」属性，交给同一个匹配规则判断
-        if talent_element_ok([src.get("element") or "无"], element):
-            picked = src
-            break
+    if style:
+        for src in sources:
+            if src.get("style") == style:
+                picked = src
+                break
+    if picked is None:
+        for src in sources:
+            # element=None 表示「无」属性，交给同一个匹配规则判断
+            if talent_element_ok([src.get("element") or "无"], element):
+                picked = src
+                break
     if picked is None and sources:
         picked = sources[0]
     icon = (picked or {}).get("icon_path") or entry.get("icon_path")
@@ -476,7 +483,8 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
         res_talent_names.append(talent_name)
         res_icons.append(_load_image(
             _resonance_icon(ds, talent_name,
-                            getattr(st, "element", None)),
+                            getattr(st, "element", None),
+                            m.get("resonance_talent_style")),
             RESONANCE_ICON_D * scale))
     action_images = {}
 

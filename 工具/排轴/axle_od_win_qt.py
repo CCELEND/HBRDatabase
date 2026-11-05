@@ -618,34 +618,40 @@ def _fmt_sp(value, width=3):
     return "%*g" % (int(width), f)
 
 
-def _talent_display(name, entry, element, ok):
+# 共鸣天赋下拉项里保存「来源风格」的 data role（UserRole 已被天赋名占用）
+TALENT_SOURCE_ROLE = Qt.UserRole + 1
+
+
+def _talent_display(name, entry, element, ok, source=None):
     """共鸣天赋下拉项的文字 + tooltip。
 
     可装备时只列**与该风格元素相符**的来源，例如
     ``Excelsior!（31X·无·绚烂华美琉璃色）``；不可装备时标注「属性不符」，
     并把该天赋的全部来源（队伍·属性·风格）放进 tooltip。
     """
-    team = entry.get("team")
     sources = list(entry.get("sources") or [])
-    match = [s for s in sources
-             if _talent_element_ok([s.get("element") or "无"], element)]
     tip_lines = ["   %s·%s·%s" % (s.get("team") or "—", s.get("element") or "无",
                                   s.get("style") or "—")
                  for s in sources]
     tip = "可装备该天赋的风格（队伍·属性·风格）：\n" + \
           ("\n".join(tip_lines) if tip_lines else "   —")
-    if ok and match:
-        first = match[0]
-        part = "%s·%s" % (first.get("element") or "无",
-                          first.get("style") or "—")
-        if len(match) > 1:
-            part += " 等 %d 个风格" % len(match)
+    if not ok:
+        team = entry.get("team")
+        return "%s（%s）" % (name, "·".join(x for x in (team, "属性不符") if x)), tip
+    if source is None:
+        # 没指定来源时，退回「第一个属性相符的来源」（兼容旧调用）
+        match = [s for s in sources
+                 if _talent_element_ok([s.get("element") or "无"], element)]
+        source = match[0] if match else None
+    if source is not None:
+        team = source.get("team") or entry.get("team")
+        part = "%s·%s" % (source.get("element") or "无",
+                          source.get("style") or "—")
         text = "%s（%s）" % (name, "·".join(x for x in (team, part) if x))
-    elif ok:                      # 兼容没有 sources 的旧数据
+    else:                         # 兼容没有 sources 的旧数据
         attrs = "/".join(entry.get("owners") or [])
-        text = "%s（%s）" % (name, "·".join(x for x in (team, attrs) if x))
-    else:
-        text = "%s（%s）" % (name, "·".join(x for x in (team, "属性不符") if x))
+        text = "%s（%s）" % (name, "·".join(
+            x for x in (entry.get("team"), attrs) if x))
     return text, tip
 
 
@@ -832,7 +838,7 @@ class TeamMemberRow(QFrame):
         res_label = QLabel("共鸣天赋")
         layout.addWidget(res_label)
         self.talent_combo = QComboBox()
-        self.talent_combo.setFixedWidth(170)
+        self.talent_combo.setFixedWidth(190)
         self.talent_combo.currentIndexChanged.connect(self._on_talent_changed)
         layout.addWidget(self.talent_combo)
         self.talent_lb = QSpinBox()
@@ -884,8 +890,26 @@ class TeamMemberRow(QFrame):
                 continue
             if rarity == "SS" and own_name and name == own_name:
                 continue          # SS 不能装备自身自带的共鸣天赋
-            result.append(name)
-        return sorted(result)
+            srcs = [s for s in (entry.get("sources") or [])
+                    if _talent_element_ok([s.get("element") or "无"], element)]
+            if srcs:
+                # 每个属性相符的**来源风格**各占一条（完整显示，不汇总）；
+                # 同名风格（不同形态）只列一次，避免出现两条一模一样的文字
+                seen = set()
+                for src in srcs:
+                    key = (src.get("team"), src.get("element"),
+                           src.get("style"))
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    result.append((name, src))
+            else:
+                result.append((name, None))
+        result.sort(key=lambda item: (
+            str(item[0]),
+            str((item[1] or {}).get("team") or ""),
+            str((item[1] or {}).get("style") or "")))
+        return result
 
     def _populate_talents(self):
         """填充「共鸣天赋」下拉：只列**该风格可选**的天赋，外加（默认）/无。
@@ -895,6 +919,10 @@ class TeamMemberRow(QFrame):
         SS 默认选「无」（不把风格自带当默认，导入存档时同样处理）。
         """
         prev = self.talent_combo.currentData() if self.talent_combo.count() else None
+        _prev_src = (self.talent_combo.currentData(TALENT_SOURCE_ROLE)
+                     if self.talent_combo.count() else None)
+        prev_style = (_prev_src.get("style")
+                      if isinstance(_prev_src, dict) else None)
         pool = self.data_source.resonance_pool()
         element = self._style_element()
         is_ss = (self._style_rarity() == "SS")
@@ -902,23 +930,50 @@ class TeamMemberRow(QFrame):
             self.talent_combo.clear()
             self.talent_combo.addItem("（默认）", None)
             self.talent_combo.addItem("无", "")
-            for name in self._talent_candidates():
+            for name, src in self._talent_candidates():
                 entry = pool.get(name) or {}
-                text, tip = _talent_display(name, entry, element, True)
+                text, tip = _talent_display(name, entry, element, True, src)
                 self.talent_combo.addItem(text, name)
-                self.talent_combo.setItemData(self.talent_combo.count() - 1, tip,
-                                              Qt.ToolTipRole)
+                idx = self.talent_combo.count() - 1
+                self.talent_combo.setItemData(idx, tip, Qt.ToolTipRole)
+                self.talent_combo.setItemData(idx, src, TALENT_SOURCE_ROLE)
+            # 弹出列表按**最长条目**加宽：完整显示「队伍·属性·风格」，不省略
+            self._fit_talent_popup()
             if is_ss:
                 # SS：「（默认）」无意义（不生效也不该当展示默认），回落到「无」
                 if prev is None:
                     prev = ""
-                pos = self.talent_combo.findData(prev)
+                    prev_style = None
+            # 优先还原「同一天赋 + 同一来源风格」
+            pos = -1
+            first = -1
+            for i in range(self.talent_combo.count()):
+                if self.talent_combo.itemData(i) != prev:
+                    continue
+                if first < 0:
+                    first = i
+                src = self.talent_combo.itemData(i, TALENT_SOURCE_ROLE)
+                if (prev_style and isinstance(src, dict)
+                        and src.get("style") == prev_style):
+                    pos = i
+                    break
+            if pos < 0:
+                pos = first
+            if is_ss:
                 self.talent_combo.setCurrentIndex(pos if pos >= 0 else 1)
             else:
-                pos = self.talent_combo.findData(prev)
                 self.talent_combo.setCurrentIndex(pos if pos >= 0 else 0)
         self._refresh_talent_enabled()
         self._update_talent_tip()
+
+    def _fit_talent_popup(self):
+        """让共鸣天赋的弹出列表足够宽，完整显示每条文字。"""
+        view = self.talent_combo.view()
+        if view is None:
+            return
+        view.setTextElideMode(Qt.ElideNone)
+        hint = view.sizeHintForColumn(0) + 36
+        view.setMinimumWidth(max(self.talent_combo.width(), hint))
 
     def _style_element(self):
         """当前风格的元素属性（火/冰/雷/光/暗/无…）。"""
@@ -953,9 +1008,10 @@ class TeamMemberRow(QFrame):
                 item.setEnabled(can_equip)
                 continue
             entry = pool.get(name) or {}
+            src = self.talent_combo.itemData(i, TALENT_SOURCE_ROLE)
             ok = can_equip and _talent_element_ok(entry.get("owners") or [], element)
             item.setEnabled(ok)
-            text, tip = _talent_display(name, entry, element, ok)
+            text, tip = _talent_display(name, entry, element, ok, src)
             if rarity == "SS" and ok:
                 tip = "（SS 风格：仅显示在轴图，不参与 OD 计算）\n" + tip
             if self.talent_combo.itemText(i) != text:
@@ -975,6 +1031,16 @@ class TeamMemberRow(QFrame):
         if self.talent_combo.count() == 0:
             return None
         return self.talent_combo.currentData()
+
+    def talent_style(self):
+        """所选共鸣天赋的「来源风格名」（（默认）/无 → None）。
+
+        同名天赋可以从多个风格取得，轴图据此画对应风格的缩略图。
+        """
+        if self.talent_combo.count() == 0:
+            return None
+        src = self.talent_combo.currentData(TALENT_SOURCE_ROLE)
+        return src.get("style") if isinstance(src, dict) else None
 
     def _style_career_at(self, index):
         """风格下拉第 index 项对应风格的职业。"""
@@ -1316,6 +1382,7 @@ class TeamMemberRow(QFrame):
                 "passives": self.selected_passives(),
                 "lb": self.lb_spin.value(),
                 "resonance_talent": self.talent(),
+                "resonance_talent_style": self.talent_style(),
                 "resonance_level": self.talent_level(),
                 "earring": self.earring(),
                 "od_earring": 1.0 if self.earring() == OD_EARRING_NAME else 0.0}
@@ -1382,6 +1449,15 @@ class TeamMemberRow(QFrame):
             tpos = self.talent_combo.findData(tal)
             if tpos < 0 and self._style_rarity() == "SS":
                 tpos = self.talent_combo.findData("")
+            saved_style = data.get("resonance_talent_style")
+            if saved_style:
+                for i in range(self.talent_combo.count()):
+                    if self.talent_combo.itemData(i) != tal:
+                        continue
+                    src = self.talent_combo.itemData(i, TALENT_SOURCE_ROLE)
+                    if isinstance(src, dict) and src.get("style") == saved_style:
+                        tpos = i
+                        break
             self.talent_combo.setCurrentIndex(tpos if tpos >= 0 else 0)
             self._populate_passives()
         self._refresh_talent_enabled()
