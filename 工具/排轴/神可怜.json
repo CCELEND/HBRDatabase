@@ -4,12 +4,13 @@
     {
       "role": "柳美音",
       "style": "夜晚的香气，蔷薇的韵律",
+      "condition": "极佳",
       "passives": [
         "柳眉倒竖",
         "红宝石香水（被动技能）"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "We Live Better",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -17,12 +18,13 @@
     {
       "role": "大岛一千子",
       "style": "指引的光辉",
+      "condition": "极佳",
       "passives": [
         "彩凤连理",
         "晨间的必做事项（被动技能）"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "Get it together!",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -30,6 +32,7 @@
     {
       "role": "朝仓可怜",
       "style": "CODE:Virtual Killer",
+      "condition": "极佳",
       "passives": [],
       "lb": 4,
       "resonance_talent": "Excelsior!",
@@ -40,11 +43,12 @@
     {
       "role": "大岛五十铃",
       "style": "出浴后的朦胧天地",
+      "condition": "极佳",
       "passives": [
         "打开你的心扉吧"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -52,11 +56,12 @@
     {
       "role": "茅森月歌",
       "style": "月华歌姬",
+      "condition": "极佳",
       "passives": [
         "交织而成的记忆"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -64,12 +69,13 @@
     {
       "role": "和泉由希",
       "style": "随侍公主",
+      "condition": "极佳",
       "passives": [
         "遥拜之人（被动技能）",
         "BeatDown();"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "Faith",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -94,7 +100,7 @@
       "od_timing": "前置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 5,
@@ -134,7 +140,7 @@
       "od_timing": "前置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 5,
@@ -174,7 +180,7 @@
       "od_timing": "后置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 1,
@@ -214,7 +220,7 @@
       "od_timing": "前置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 1,
@@ -254,7 +260,7 @@
       "od_timing": "后置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 4,
@@ -294,7 +300,7 @@
       "od_timing": "前置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 4,
@@ -334,7 +340,7 @@
       "od_timing": "前置OD",
       "destruction": 0,
       "sp_cost_up": 0,
-      "od_adjust": 0,
+      "od_adjust": 0.0,
       "actions": [
         {
           "member": 0,
