@@ -418,6 +418,9 @@ if __name__ == "__main__":
 
         root.show()
 
+        from PyQt5.QtWidgets import QMessageBox
+        QMessageBox.information(None, "提示", "  由于作者退坑等原因，本数据库客户端、服务端将于2026.12.1停止更新及维护。感谢大家一直以来的支持！\n  作者：不吃花椒的汪汪队")
+
         # 磁盘清理与更新检查都可能扫大量文件，延后到首屏绘制完成再执行
         QTimer.singleShot(0, delete_old_file_and_subdirs)
         # 更新检查会扫描/哈希大量文件（首次约 1s+），延后到首屏绘制完成再执行
