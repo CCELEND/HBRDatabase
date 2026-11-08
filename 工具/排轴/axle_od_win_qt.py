@@ -104,7 +104,8 @@ HELP_TEXT = """排轴OD计算 使用说明
   这些条目按**角色通用**（任一风格解锁后，该角色所有风格都能携带并生效），
   但条目里标了 **`{"exclusive":1}`（风格专属）** 的只在该风格可选 ——
   例如茅森月歌「怪物般的球威（被动技能）」属于「激烈！带来胜利的全力一球！」，她的其它风格不会出现它。
-- 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）共享技能与被动，可自由选择。
+- 同一风格的不同形态（如 CODE:Virtual Killer / CODE:Virtual Killer2）各自拥有独立的技能/被动。
+  队伍配置里合并为一条（默认主形态）；每个**行动行**可以单独用「切换」按钮切换本次行动使用的形态。
 - 特殊被动里的攻击（如 山胁·冯·伊瓦尔「魔界骑兵启动！」，斩属性 6 连击）也可作为行动使用，
   且该攻击不吃 OD 耳环（不受友方 BUFF 影响）。
 - 「追击」（如 大岛四叶草「悠然摇曳温泉之乐」）：该风格位于**后卫**时，友方每使用一次
@@ -774,6 +775,9 @@ class TeamMemberRow(QFrame):
         self.data_source = data_source
         self._loading = 0
         self._block_role_signal = False
+        # 风格下拉里每一项对应的形态列表（主形态 + forms）
+        self._combo_forms = []
+        self._combo_form_datas = []
         self._build_ui()
         self._populate_styles()
         self._populate_talents()
@@ -1252,10 +1256,53 @@ class TeamMemberRow(QFrame):
             "已携带：%s（点击选择）" % "、".join(self.selected_passives()))
         self.changed.emit()
 
+    @staticmethod
+    def _group_style_infos(styles):
+        """把同一风格的主形态和 forms 合成一组，返回 [[主形态, ...], ...]。"""
+        groups = []
+        grouped_ids = set()
+        for style in styles:
+            if id(style) in grouped_ids:
+                continue
+            forms = [style] + [f for f in (getattr(style, "forms", None) or [])
+                               if f is not style]
+            for form in forms:
+                grouped_ids.add(id(form))
+            groups.append(forms)
+        return groups
+
+    @staticmethod
+    def _form_item_datas(forms):
+        """下拉项的实际值：双稀有度风格保留 (name, rarity)，其余为纯风格名。"""
+        result = []
+        for style in forms:
+            if (style.name in DUAL_SS_SSR_STYLE_NAMES
+                    and style.rarity in ("SS", "SSR")):
+                result.append((style.name, style.rarity))
+            else:
+                result.append(style.name)
+        return result
+
+    def _apply_combo_form(self, index, form_index):
+        """把下拉第 index 项切换为组内第 form_index 个形态。"""
+        if index < 0 or index >= len(self._combo_forms):
+            return
+        forms = self._combo_forms[index]
+        if not forms:
+            return
+        form_index %= len(forms)
+        style = forms[form_index]
+        datas = self._combo_form_datas[index]
+        # 先改 itemData，再改文字：currentTextChanged 的槽会读到新形态
+        self.style_combo.setItemData(index, datas[form_index])
+        self.style_combo.setItemText(index, style.display_name())
+
     def _populate_styles(self, preserve=None):
         if self.role_combo.currentText() == "无":
             with self._suspended():
                 self.style_combo.clear()
+                self._combo_forms = []
+                self._combo_form_datas = []
                 self.style_combo.setEnabled(False)
                 self.style_combo.setToolTip("")
             self._populate_talents()      # 没风格 -> 只留（默认）/无
@@ -1267,39 +1314,48 @@ class TeamMemberRow(QFrame):
         else:
             preserve_name, preserve_rarity = preserve, None
         styles = self.data_source.styles(self.role_combo.currentText())
+        groups = self._group_style_infos(styles)
+
+        target_index = 0
+        target_form = 0
+        found = False
         with self._suspended():
             self.style_combo.clear()
-            for style in styles:
-                # 显示「风格名-稀有度-元素」，实际值仍保存纯风格名
-                # 双稀有度风格存 (name, rarity)，便于区分 SS / SSR 两项
-                if (style.name in DUAL_SS_SSR_STYLE_NAMES
-                        and style.rarity in ("SS", "SSR")):
-                    self.style_combo.addItem(
-                        style.display_name(), (style.name, style.rarity))
-                else:
-                    self.style_combo.addItem(style.display_name(), style.name)
-            pos = -1
+            self._combo_forms = []
+            self._combo_form_datas = []
+            for group in groups:
+                datas = self._form_item_datas(group)
+                self.style_combo.addItem(group[0].display_name(), datas[0])
+                self._combo_forms.append(group)
+                self._combo_form_datas.append(datas)
+
             if preserve_name:
+                # 先精确匹配 (name, rarity)，再退回纯风格名
                 if preserve_rarity is not None:
-                    for i in range(self.style_combo.count()):
-                        d = self.style_combo.itemData(i)
-                        if (isinstance(d, tuple)
-                                and d[0] == preserve_name
-                                and d[1] == preserve_rarity):
-                            pos = i
+                    for gi, group in enumerate(groups):
+                        for fi, style in enumerate(group):
+                            if (style.name == preserve_name
+                                    and style.rarity == preserve_rarity):
+                                target_index, target_form = gi, fi
+                                found = True
+                                break
+                        if found:
                             break
-                if pos < 0:
-                    for i in range(self.style_combo.count()):
-                        d = self.style_combo.itemData(i)
-                        if d == preserve_name or (
-                                isinstance(d, tuple) and d[0] == preserve_name):
-                            pos = i
+                if not found:
+                    for gi, group in enumerate(groups):
+                        for fi, style in enumerate(group):
+                            if style.name == preserve_name:
+                                target_index, target_form = gi, fi
+                                found = True
+                                break
+                        if found:
                             break
-            if pos >= 0:
-                self.style_combo.setCurrentIndex(pos)
-            elif styles:
-                self.style_combo.setCurrentIndex(0)
-            self.style_combo.setToolTip(self.style_combo.currentText())
+
+            if groups:
+                self.style_combo.setCurrentIndex(target_index)
+                self._apply_combo_form(target_index, target_form)
+                self.style_combo.setToolTip(self.style_combo.currentText())
+
         self._populate_passives()
         self._populate_talents()          # 风格变了 -> 重建「可选天赋」列表
 
@@ -1483,6 +1539,10 @@ class ActionRow(QFrame):
         self._loading = 0
         self._earring_backup = 1.0
         self.member_index = default_member
+        # 只影响本次行动后续的风格形态（None = 跟随队伍配置）
+        self.style_override = None
+        # True = 用户在这一行主动切换（下一次切换的边界）
+        self.style_switch = False
         self._skills_cache = None
         self._skills_cache_key = None
         self._build_ui()
@@ -1493,6 +1553,7 @@ class ActionRow(QFrame):
         self._populate_targets()
         if data:
             self.set_data(data)
+        self._update_form_button()
         install_no_wheel(self)      # 滚轮不修改下拉框 / 数值框
 
     def _build_ui(self):
@@ -1504,6 +1565,15 @@ class ActionRow(QFrame):
         self.member_combo.setFixedWidth(MEMBER_W)
         self.member_combo.currentIndexChanged.connect(self._on_member_changed)
         layout.addWidget(self.member_combo)
+
+        # 同一风格的多形态：只影响**本行动行**，不改变队伍配置
+        self.form_button = QToolButton()
+        self.form_button.setText("切换")
+        self.form_button.setFixedWidth(46)
+        self.form_button.setToolTip("切换本次行动使用的风格形态")
+        self.form_button.clicked.connect(self._switch_action_form)
+        self.form_button.setVisible(False)
+        layout.addWidget(self.form_button)
 
         self.skill_combo = QComboBox()
         self.skill_combo.setFixedWidth(SKILL_W)
@@ -1584,6 +1654,83 @@ class ActionRow(QFrame):
             yield
         finally:
             self._loading -= 1
+
+    @contextmanager
+    def _action_style_ctx(self):
+        if self.owner is None:
+            yield
+            return
+        with self.owner._action_style_ctx(self):
+            yield
+
+    def _style_group(self):
+        """当前行动队员的风格形态列表和当前形态名。"""
+        team = self.owner.team
+        if not team:
+            return [], None
+        idx = min(max(self.member_index, 0), len(team) - 1)
+        member = team[idx]
+        role = member.get("role", "")
+        if not role:
+            return [], None
+        style_name = self.style_override or member.get("style", "")
+        for style in self.data_source.styles(role):
+            forms = [style] + [f for f in (getattr(style, "forms", None) or [])
+                               if f is not style]
+            if any(form.name == style_name for form in forms):
+                return forms, style_name
+        return [], style_name
+
+    def _current_style_name(self):
+        forms, style_name = self._style_group()
+        if style_name:
+            return style_name
+        team = self.owner.team
+        if not team:
+            return ""
+        idx = min(max(self.member_index, 0), len(team) - 1)
+        return team[idx].get("style", "")
+
+    def _update_form_button(self):
+        forms, current = self._style_group()
+        has_forms = len(forms) > 1
+        self.form_button.setVisible(has_forms)
+        self.form_button.setEnabled(has_forms and self.member_combo.isEnabled())
+        if has_forms:
+            names = [form.name for form in forms]
+            i = names.index(current) if current in names else 0
+            nxt = forms[(i + 1) % len(forms)]
+            self.form_button.setToolTip(
+                "切换本次行动的形态：%s → %s"
+                % (forms[i].display_name(), nxt.display_name()))
+
+    def set_style_override(self, style_name, emit=False, mark=False):
+        """设置本行动的形态，并刷新技能等界面（不负责传播）。"""
+        if style_name == self.style_override and not mark:
+            return
+        with self._suspended():
+            self.style_override = style_name
+            self.style_switch = bool(mark and style_name)
+            self._update_form_button()
+            self._populate_skills(preserve=self._current_skill_name())
+            self._apply_skill_data()
+        self._sync_fixed_od()
+        self._populate_targets()
+        if emit:
+            self._emit_changed()
+
+    def _switch_action_form(self):
+        forms, current = self._style_group()
+        if len(forms) < 2:
+            return
+        names = [form.name for form in forms]
+        i = names.index(current) if current in names else 0
+        new_style = forms[(i + 1) % len(forms)].name
+        self.set_style_override(new_style, mark=True)
+        # 形态一直保持到下一次切换：同步同一队员后续的所有行动
+        if self.owner is not None:
+            self.owner.propagate_action_style(self, new_style)
+        self._emit_changed()
 
     # ---------------------------------------------------------- population
     def _populate_members(self):
@@ -1683,7 +1830,7 @@ class ActionRow(QFrame):
         # 同角色各风格技能通用；SSR/SS 的第一个主动技能为专属
         # 「指挥行动」：一个队伍只能有一个指挥者，非指挥者恢复通常攻击
         role = member.get("role", "")
-        style = member.get("style", "")
+        style = self._current_style_name()
         commander = self.owner.is_commander(idx)
         cache_key = (role, style, commander)
         if getattr(self, "_skills_cache_key", None) == cache_key:
@@ -1706,11 +1853,18 @@ class ActionRow(QFrame):
         """队伍变化后刷新成员与技能。"""
         self._skills_cache = None
         self._skills_cache_key = None
+        # 队伍配置改了以后，若原先选的形态已不存在则回到配置形态
+        forms, current = self._style_group()
+        if self.style_override and not any(f.name == self.style_override
+                                           for f in forms):
+            self.style_override = None
+            self.style_switch = False
         self._populate_members()
         self._populate_skills()
         self._apply_skill_data()
         self._sync_fixed_od()
         self._populate_targets()
+        self._update_form_button()
         self._emit_changed()
 
     # ------------------------------------------------------------- signals
@@ -1726,6 +1880,11 @@ class ActionRow(QFrame):
         if member is None:
             return
         self.member_index = member
+        self.style_override = None
+        self.style_switch = False
+        self._update_form_button()
+        if self.owner is not None:
+            self.owner.reset_action_style_from(self)
         self._populate_skills(preserve="")
         self._apply_skill_data()
         self._sync_fixed_od()
@@ -1741,9 +1900,14 @@ class ActionRow(QFrame):
             return
         with self._suspended():
             self.member_index = member
+            self.style_override = None
+            self.style_switch = False
             pos = self.member_combo.findData(member)
             if pos >= 0:
                 self.member_combo.setCurrentIndex(pos)
+            self._update_form_button()
+            if self.owner is not None:
+                self.owner.reset_action_style_from(self)
             self._populate_skills(preserve=self._current_skill_name())
             self._apply_skill_data()
         self._sync_fixed_od()
@@ -1804,12 +1968,16 @@ class ActionRow(QFrame):
             # 手动连击 + 本次实际生效的连击（buff 最多 2 层）
             combo = (getattr(self, "_manual_combo", 0.0)
                      + self.get_effective_combo())
+        resonance_31x = 0.0
+        if self.is_break() and self.owner is not None:
+            with self._action_style_ctx():
+                resonance_31x = self.owner._member_resonance_break(
+                    self.member_index)
         return ODSkill(
             base_hits=self.base_hits_spin.value(),
             combo_count=combo,
             fixed_od=self.fixed_od_spin.value(),
-            resonance_31x=(self.owner._member_resonance_break(self.member_index)
-                           if self.is_break() else 0.0),
+            resonance_31x=resonance_31x,
             od_earring=earring,
         )
 
@@ -1939,7 +2107,9 @@ class ActionRow(QFrame):
         total = 0.0
         if (self.owner is not None and self.get_skill_is_ex()
                 and not self._od_up_uses_earring()):
-            total += self.owner._member_ex_od_fraction(self.member_index) * 100.0
+            with self._action_style_ctx():
+                total += self.owner._member_ex_od_fraction(
+                    self.member_index) * 100.0
         return total
 
     def _auto_fixed_od(self):
@@ -1952,11 +2122,12 @@ class ActionRow(QFrame):
         total = 0.0
         if self.owner is None:
             return total
-        if self._is_attack() and self.is_break():
-            total += self.owner._member_break_od_fraction(self.member_index)
-        # 「自身使用EX技能后 超频条+X%」：EX 技能为**攻击技能**时吃 OD 耳环（按固定OD结算）
-        if self.get_skill_is_ex() and self._od_up_uses_earring():
-            total += self.owner._member_ex_od_fraction(self.member_index)
+        with self._action_style_ctx():
+            if self._is_attack() and self.is_break():
+                total += self.owner._member_break_od_fraction(self.member_index)
+            # 「自身使用EX技能后 超频条+X%」：EX 技能为**攻击技能**时吃 OD 耳环（按固定OD结算）
+            if self.get_skill_is_ex() and self._od_up_uses_earring():
+                total += self.owner._member_ex_od_fraction(self.member_index)
         skill = self._find_skill()
         # 技能自带的「OD条上升 X%」**一律**按固定OD结算（吃 OD 耳环），
         # 包括非攻击技能（驱动增益 / 连结未来的苍之意志 等）。
@@ -2075,7 +2246,7 @@ class ActionRow(QFrame):
             else "SP 不足：红色负数为缺口（还差多少），实际 SP 不变")
 
     def to_data(self):
-        return {
+        data = {
             "member": self.member_index,
             "skill": self._current_skill_name(),
             "base_hits": self.base_hits_spin.value(),
@@ -2087,11 +2258,23 @@ class ActionRow(QFrame):
             "trigger": self.trigger(),
             "sp_target": self.get_sp_target(),
         }
+        if self.style_override:
+            data["style_override"] = self.style_override
+        if self.style_switch:
+            data["style_switch"] = True
+        return data
 
     def set_data(self, data):
         with self._suspended():
             self.member_index = int(data.get("member", 0) or 0)
+            self.style_override = data.get("style_override") or None
+            self.style_switch = bool(data.get("style_switch", False))
             self._populate_members()
+            forms, _current = self._style_group()
+            if self.style_override and not any(
+                    form.name == self.style_override for form in forms):
+                self.style_override = None
+            self._update_form_button()
             self._populate_skills(preserve=data.get("skill", ""))
 
             skill = data.get("skill", "")
@@ -2417,6 +2600,9 @@ class TurnCard(QFrame):
         action.member_edited.connect(self._on_member_edited)
         self.actions.append(action)
         self.actions_layout.addWidget(action)
+        if not action.style_override:
+            # 同一队员的形态一直保持到下一次切换（含新建行动/新回合）
+            self.owner.inherit_action_style(action)
         if data is None:
             self.refresh_member_options(except_action=action)
         self._update_controls()
@@ -3908,17 +4094,19 @@ class AxleODWindow(QFrame):
                                   OD_GAUGE_MAX))
             turn_actions = 0.0
             for action in turn.actions:
-                element = action.get_attack_element()
-                resist = blanket or bool(element and element in resisted)
-                # 目标数：全体攻击按「敌人数量」，单体攻击恒为 1
-                battle = self._battle_params(resist, action.get_target_count())
-                value = calc_od(action.get_od_skill(), battle).total_od
-                # 「OD条下降」：固定扣减（如 50% → −50）
-                value -= action.get_od_down_fixed()
-                # 非攻击技能的「OD条上升 X%」：直接增加超频条（不吃 OD 耳环）
-                value += action.get_od_up_flat()
-                action.set_result(value)
-                turn_actions += value
+                with self._action_style_ctx(action):
+                    element = action.get_attack_element()
+                    resist = blanket or bool(element and element in resisted)
+                    # 目标数：全体攻击按「敌人数量」，单体攻击恒为 1
+                    battle = self._battle_params(
+                        resist, action.get_target_count())
+                    value = calc_od(action.get_od_skill(), battle).total_od
+                    # 「OD条下降」：固定扣减（如 50% → −50）
+                    value -= action.get_od_down_fixed()
+                    # 非攻击技能的「OD条上升 X%」：直接增加超频条（不吃 OD 耳环）
+                    value += action.get_od_up_flat()
+                    action.set_result(value)
+                    turn_actions += value
 
             # 「追击」（由 SP 侧算出）：按固定OD参数（原始Hit=追击Hit、连击0）计入本回合OD。
             # 实测：追击（含替换后的「猫咪喷射打靶」）均**不吃 OD 耳环**；追击均为单体 → 目标数 1。
@@ -4031,6 +4219,71 @@ class AxleODWindow(QFrame):
                     break
         cache[key] = found
         return found
+
+    @contextmanager
+    def _action_style_ctx(self, action):
+        """在本行动计算期间，让该队员临时使用行动行选择的形态。
+
+        只临时改 ``self.team[slot]["style"]``，不影响队伍配置 UI；
+        形态差异（技能、被动、击破 OD 等）都会按当前行动形态结算。
+        """
+        slot = getattr(action, "member_index", None)
+        style = getattr(action, "style_override", None)
+        if (style is None or slot is None
+                or not (0 <= slot < len(self.team))):
+            yield
+            return
+        member = self.team[slot]
+        old_style = member.get("style")
+        if old_style == style:
+            yield
+            return
+        member["style"] = style
+        try:
+            yield
+        finally:
+            member["style"] = old_style
+
+    def _ordered_actions(self):
+        """按界面顺序展开全部行动行。"""
+        return [action for turn in self.turns
+                for action in getattr(turn, "actions", [])]
+
+    def propagate_action_style(self, source_action, style_name):
+        """形态切换后，让同一队员后续行动一直沿用，直到下一次切换。"""
+        started = False
+        for action in self._ordered_actions():
+            if action is source_action:
+                started = True
+                continue
+            if not started or action.member_index != source_action.member_index:
+                continue
+            # 遇到该队员后面的主动切换就停下，后面的切换优先
+            if action.style_switch and action.style_override:
+                break
+            action.set_style_override(style_name)
+
+    def inherit_action_style(self, action):
+        """新建行动行时继承该队员之前最后一次选择的形态。"""
+        style_name = None
+        for previous in self._ordered_actions():
+            if previous is action:
+                break
+            if previous.member_index == action.member_index:
+                if previous.style_override:
+                    style_name = previous.style_override
+        if style_name:
+            action.set_style_override(style_name)
+
+    def reset_action_style_from(self, source_action):
+        """队员改变后，清除该位置后续行动继承的旧形态。"""
+        started = False
+        for action in self._ordered_actions():
+            if action is source_action:
+                started = True
+                continue
+            if started and action.member_index == source_action.member_index:
+                action.set_style_override(None)
 
     def _member_style_obj(self, slot):
         try:

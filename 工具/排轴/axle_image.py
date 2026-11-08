@@ -394,9 +394,12 @@ def collect_turn_rows(data):
             target = act.get("sp_target", None)
             if not isinstance(target, int) or isinstance(target, bool):
                 target = None
+            style_override = act.get("style_override")
             actions.append({"member": int(act.get("member", 0) or 0),
                             "skill": skill,
-                            "target": target})
+                            "target": target,
+                            "style": (str(style_override)
+                                      if style_override else None)})
         rows.append({"line1": line1, "line2": line2, "type": ttype,
                      "actions": actions})
     return rows
@@ -488,13 +491,14 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
             RESONANCE_ICON_D * scale))
     action_images = {}
 
-    def action_pixmap(member):
-        if member not in action_images:
-            action_images[member] = _load_image(
-                _icon_path(ds, team[member].get("role"),
-                           team[member].get("style")),
+    def action_pixmap(member, style=None):
+        style = style or team[member].get("style")
+        key = (member, style)
+        if key not in action_images:
+            action_images[key] = _load_image(
+                _icon_path(ds, team[member].get("role"), style),
                 ACTION_PORTRAIT_D * scale)
-        return action_images[member]
+        return action_images[key]
 
     # ---- 预先量一遍，算出总高度 ----
     f_passive = _font(19 * scale, True)
@@ -641,7 +645,8 @@ def render_axle_image(data, ds=None, width=BASE_WIDTH):
             d = ACTION_PORTRAIT_D * scale
             cx = x0 + 18 * scale + d / 2.0
             rect = QRectF(cx - d / 2.0, top + (row_h - d) / 2.0, d, d)
-            _draw_round(p, rect, action_pixmap(act["member"]), border_alpha=30)
+            _draw_round(p, rect, action_pixmap(act["member"], act.get("style")),
+                        border_alpha=30)
             p.setFont(f_row)
             p.setPen(_color(ROW_TEXT))
             text_w = col_w - d - 40 * scale

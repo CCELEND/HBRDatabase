@@ -532,6 +532,8 @@ class StyleInfo:
                  turn_start_sp=None, style_label=None, break_od=None):
         self.name = name
         self.skills = skills
+        # 同一风格的其他形态（排轴里仍按独立 StyleInfo 计算）
+        self.forms = []
         self.rarity = rarity
         self.element = element    # 元素属性（火/冰/雷/光/暗/无…）
         # 击破敌人时回复 SP 的被动：[{amount, scope, first_only}, ...]
@@ -1816,9 +1818,10 @@ class HBRDataSource:
                     continue
 
                 # 合并后的 JSON：同一风格的其他形态放在 forms 里。
-                # 排轴仍按独立 StyleInfo 解析，后续 _share_style_forms 会合并技能。
+                # 每个形态各自保留自己的技能/被动，按行动行选择使用。
                 form_data_list = (style_data.get("forms")
                                   if isinstance(style_data, dict) else None)
+                form_infos = []
                 if isinstance(form_data_list, (list, tuple)):
                     for index, form_data in enumerate(form_data_list):
                         if not isinstance(form_data, dict):
@@ -1833,17 +1836,21 @@ class HBRDataSource:
                         else:
                             form_name = "%s#%d" % (style_name, index + 2)
                         try:
-                            styles.append(
-                                self._build_style(form_name, form_data, role_name))
+                            form_info_obj = self._build_style(
+                                form_name, form_data, role_name)
+                            styles.append(form_info_obj)
+                            form_infos.append(form_info_obj)
                         except Exception as e:
                             logger.warning(
                                 "解析风格形态失败，已跳过：%s / %s（%s: %s）",
                                 role_name, form_name, type(e).__name__, e)
                 elif form_data_list:
                     logger.warning("风格 %s 的 forms 不是列表，已忽略", style_name)
+                if form_infos:
+                    style.forms = form_infos
 
         _apply_exclusive(styles)
-        _share_style_forms(styles)
+        # 不同形态有各自的技能/被动，不在这里做并集合并
         # 「（被动技能）」条目按**角色**通用（任一风格解锁后该角色所有风格都能携带），
         # 但标了 {"exclusive":1} 的只属于那个风格，不进公共列表。
         shared_options = _dedupe(
