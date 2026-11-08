@@ -28,6 +28,8 @@ class TurnCard(QFrame):
         self.owner = owner
         self.actions = []
         self.manual_front = False      # 用户是否手动改过本回合的前锋队员
+        # 同一 OD 组的后续 Bonus 回合：OD/时机由组内第一回合统一决定
+        self._od_group_locked = False
         self.last_front_sig = None     # 上次同步的前锋签名（用于向上传播）
         self._loading = 0
         self._build_ui()
@@ -375,7 +377,8 @@ class TurnCard(QFrame):
         with self._suspended():
             self.od_combo.setEnabled(not no_od)
             self.od_timing_combo.setEnabled(
-                not no_od and self.od_combo.currentText() != "无")
+                not no_od and not self._od_group_locked
+                and self.od_combo.currentText() != "无")
             if no_od:
                 self.od_combo.setCurrentText("无")
         self._sync_turn_type()
@@ -387,11 +390,38 @@ class TurnCard(QFrame):
         self.changed.emit()
 
     def _on_od_changed(self, text):
-        self.od_timing_combo.setEnabled(self.od_combo.currentText() != "无")
+        if self._loading:
+            return
+        self.od_timing_combo.setEnabled(
+            not self._od_group_locked
+            and self.od_combo.currentText() != "无")
         self._sync_turn_type()
         self._apply_style()
         self.owner._reindex()   # 后置OD 沿用上一回合号
         self.changed.emit()
+
+    def set_od_group_state(self, od_text=None, timing=None, locked=False):
+        """统一同一 OD 组：后续 Bonus 回合沿用第一回合的时机并锁定。"""
+        self._od_group_locked = bool(locked)
+        with self._suspended():
+            if od_text is not None and self.od_combo.currentText() != od_text:
+                self.od_combo.setCurrentText(od_text)
+            if timing is not None and self.od_timing_combo.currentText() != timing:
+                self.od_timing_combo.setCurrentText(timing)
+            no_od = self.turn_type() in UNTIMED_TURN_TYPES
+            self.od_combo.setEnabled(not no_od)
+            self.od_timing_combo.setEnabled(
+                not no_od and not locked
+                and self.od_combo.currentText() != "无")
+            self.od_combo.setToolTip(
+                "该回合发动的 OD 等级；发动后 OD 槽 -等级×100")
+            if locked:
+                self.od_timing_combo.setToolTip(
+                    "同一 OD 组的后续回合，时机由组内第一个回合统一决定")
+            else:
+                self.od_timing_combo.setToolTip(
+                    "前置OD=当前回合直接发动；后置OD=当前回合结束马上发动"
+                    "（OD回合都是当前回合的）")
 
     def _on_destruction_changed(self, value):
         """破坏率变化：重算（影响「破坏率≥N%」类 SP 被动）。"""

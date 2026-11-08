@@ -888,21 +888,35 @@ class AxleODWindow(AxleCalcMixin, QFrame):
         """
         number = 0
         prev_level = 0
+        group_first = None
         for turn in self.turns:
             is_additional = turn.turn_type() in UNTIMED_TURN_TYPES
             level = turn.od_level()
             if is_additional:
+                turn.set_od_group_state(locked=False)
                 turn.set_index(number, additional=True)
                 continue
-            is_post_od = (level > 0 and turn.od_timing() == "后置OD")
-            if level > 0 and level == prev_level:
-                # 同一次 OD 发动的后续超频回合：沿用同一个回合号
-                turn.set_index(number, post_od=is_post_od)
-            elif is_post_od:
-                turn.set_index(number, post_od=True)
+
+            if level > 0 and level == prev_level and group_first is not None:
+                # 同一次 OD 发动的后续超频回合：OD 等级/时机由组内第一回合统一
+                post_od = (group_first.od_timing() == "后置OD")
+                turn.set_od_group_state(
+                    timing=group_first.od_timing(), locked=True)
+                turn.set_index(number, post_od=post_od)
             else:
-                number += 1
-                turn.set_index(number)
+                if level > 0:
+                    group_first = turn
+                    turn.set_od_group_state(locked=False)
+                    if turn.od_timing() == "后置OD":
+                        turn.set_index(number, post_od=True)
+                    else:
+                        number += 1
+                        turn.set_index(number)
+                else:
+                    group_first = None
+                    turn.set_od_group_state(locked=False)
+                    number += 1
+                    turn.set_index(number)
             prev_level = level
 
     # --------------------------------------------------------- calculation
