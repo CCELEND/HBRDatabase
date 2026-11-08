@@ -1,6 +1,7 @@
 __pycache__/
 chrome_user_data/
 .vscode/
+.mimocode/
 .vs
 .idea/
 venv/
