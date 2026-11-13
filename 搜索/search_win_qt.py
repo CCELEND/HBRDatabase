@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import (
     QLabel, QWidget, QGroupBox, QGridLayout, QVBoxLayout, 
     QPushButton, QCheckBox, QTextEdit, QMessageBox
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 
 from window_qt import set_window_expand, set_window_icon, creat_Toplevel
 from window_qt import win_open_manage, win_close_manage, is_win_open, win_set_top
@@ -93,7 +93,15 @@ def creat_select_frame(label_content, options, selected_values, parent_frame, ro
     return label_frame
 
 
+_SEARCH_GENERATION = 0
+_SEARCH_BATCH_SIZE = 24
+
+
 def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_values_dir):
+    global _SEARCH_GENERATION
+    _SEARCH_GENERATION += 1
+    generation = _SEARCH_GENERATION
+
     win_set_top(search_win_frame, __name__)
     key_word_str = key_word_text.toPlainText().strip()
     keyword_list = keyword_processing(key_word_str)
@@ -109,64 +117,69 @@ def show_search(scrollbar_frame_obj, search_win_frame, key_word_text, selected_v
     scroll_layout.setSpacing(5)
     scroll_layout.setAlignment(Qt.AlignTop)
 
-    # 批量建结果卡期间暂停重绘
-    content = scrollbar_frame_obj.scrollable_frame
-    content.setUpdatesEnabled(False)
-    try:
-        if selected_values_dir["大师技能"]:
-            filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
-            # 一次建 name→role 哈希，避免每个结果线性扫全部角色（O(n²)）
-            role_by_master_skill = {}
-            for team in 角色.team_info.teams.values():
-                for r in team.roles:
-                    if r.master_skill and r.master_skill.name not in role_by_master_skill:
-                        role_by_master_skill[r.master_skill.name] = r
-            for i, master_skill in enumerate(filtered_master_skills):
-                role = role_by_master_skill.get(master_skill.name)
+    if selected_values_dir["大师技能"]:
+        filtered_master_skills = get_filtered_master_skills(selected_values_dir, keyword_list)
+        # 一次建 name→role 哈希，避免每个结果线性扫全部角色（O(n²)）
+        role_by_master_skill = {}
+        for team in 角色.team_info.teams.values():
+            for r in team.roles:
+                if r.master_skill and r.master_skill.name not in role_by_master_skill:
+                    role_by_master_skill[r.master_skill.name] = r
+        for i, master_skill in enumerate(filtered_master_skills):
+            role = role_by_master_skill.get(master_skill.name)
 
-                master_skill_frame = QGroupBox(master_skill.name)
-                master_skill_frame.setFixedHeight(170)
-                frame_layout = QGridLayout(master_skill_frame)
-                frame_layout.setContentsMargins(5, 5, 5, 5)
-                frame_layout.setSpacing(5)
-                if role:
-                    bind_master_skill_canvas(master_skill_frame, role, 0, 0)
-
-                row = i // 6
-                column = i % 6
-                scroll_layout.addWidget(master_skill_frame, row, column)
-
-            scrollbar_frame_obj.update_canvas()
-            return "break"
-
-        filtered_styles = get_filtered_styles(selected_values_dir, keyword_list)
-
-        for i, style in enumerate(filtered_styles):
-            team = 角色.team_info.teams[style.team_name]
-
-            style_frame = QGroupBox(style.name)
-            style_frame.setFixedHeight(170)
-            frame_layout = QGridLayout(style_frame)
+            master_skill_frame = QGroupBox(master_skill.name)
+            master_skill_frame.setFixedHeight(170)
+            frame_layout = QGridLayout(master_skill_frame)
             frame_layout.setContentsMargins(5, 5, 5, 5)
             frame_layout.setSpacing(5)
+            if role:
+                bind_master_skill_canvas(master_skill_frame, role, 0, 0)
 
-            # 同一风格的多形态：搜索卡片也支持右键「切换」，标题跟着当前形态更新
-            style_forms = [style] + list(getattr(style, "forms", None) or [])
+            row = i // 6
+            column = i % 6
+            scroll_layout.addWidget(master_skill_frame, row, column)
 
-            def on_switch(new_style, frame=style_frame):
-                frame.setTitle(new_style.name)
+        scrollbar_frame_obj.update_canvas()
+        return "break"
 
-            bind_style_canvas(style_frame, team, style, 0, 0,
-                              forms=style_forms, on_switch=on_switch)
+    filtered_styles = get_filtered_styles(selected_values_dir, keyword_list)
 
-            row = i // 5
-            column = i % 5
-            scroll_layout.addWidget(style_frame, row, column)
-    finally:
-        content.setUpdatesEnabled(True)
-        content.update()
+    def render_batch(start=0):
+        """分批创建结果卡片，避免一次构建几百个 QWidget 卡住 UI。"""
+        if generation != _SEARCH_GENERATION:
+            return
+        try:
+            end = min(start + _SEARCH_BATCH_SIZE, len(filtered_styles))
+            for i in range(start, end):
+                style = filtered_styles[i]
+                team = 角色.team_info.teams[style.team_name]
 
-    scrollbar_frame_obj.update_canvas()
+                style_frame = QGroupBox(style.name)
+                style_frame.setFixedHeight(170)
+                frame_layout = QGridLayout(style_frame)
+                frame_layout.setContentsMargins(5, 5, 5, 5)
+                frame_layout.setSpacing(5)
+
+                # 同一风格的多形态：搜索卡片也支持右键「切换」，标题跟着当前形态更新
+                style_forms = [style] + list(getattr(style, "forms", None) or [])
+
+                def on_switch(new_style, frame=style_frame):
+                    frame.setTitle(new_style.name)
+
+                bind_style_canvas(style_frame, team, style, 0, 0,
+                                  forms=style_forms, on_switch=on_switch)
+
+                scroll_layout.addWidget(style_frame, i // 5, i % 5)
+
+            scrollbar_frame_obj.update_canvas()
+            if end < len(filtered_styles):
+                QTimer.singleShot(0, lambda: render_batch(end))
+        except RuntimeError:
+            # 搜索窗口已在分批渲染期间关闭
+            return
+
+    render_batch(0)
     return "break"
 
 

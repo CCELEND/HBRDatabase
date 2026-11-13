@@ -1,7 +1,6 @@
 import json
 import os
 import time
-import requests
 import threading
 from urllib.parse import quote
 from PyQt5.QtWidgets import (QDialog, QProgressBar, QLabel, QVBoxLayout,
@@ -82,6 +81,7 @@ class DownloadThread(QThread):
             self._current_path = None
 
     def run(self):
+        import requests   # 仅下载线程需要，避免主界面启动时加载 requests/urllib3
         total = len(self.files_to_download)
         for i, file_name in enumerate(self.files_to_download):
             if self._cancel.is_set():
@@ -259,6 +259,7 @@ class UpdateProgressDialog(QDialog):
 
 # ---------- 对外接口 ----------
 def send_hashes_to_server(server_url, client_file_hashes, oper="update", sys="windows"):
+    import requests
     headers = {'Content-Type': 'application/json'}
     payload = {"ver": "PyQT5", "oper": oper, "sys": sys, "hashes": client_file_hashes}
     response = requests.post(server_url, data=json.dumps(payload), headers=headers,

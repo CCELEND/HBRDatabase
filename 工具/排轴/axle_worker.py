@@ -3,6 +3,15 @@
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
+# 持有运行中的 worker：窗口先关闭时不能让它被 Python 回收
+_LIVE_WORKERS = set()
+
+
+def keep_axle_worker(worker):
+    _LIVE_WORKERS.add(worker)
+    worker.finished.connect(lambda: _LIVE_WORKERS.discard(worker))
+
+
 class _AxleImageWorker(QThread):
     """后台渲染轴图，避免长轴时卡死 UI。"""
 

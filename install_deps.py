@@ -3,6 +3,7 @@ import os
 import subprocess
 import platform
 import venv
+from importlib import metadata
 from tkinter import messagebox
 
 # 虚拟环境自动管理
@@ -55,27 +56,34 @@ def ensure_venv(venv_dir="venv"):
     sys.exit(0)
 
 
-def check_ttkbootstrap_version():
+def _installed_version(package_name):
+    """读取已安装版本；未安装返回 None（不启动 pip 子进程）。"""
     try:
-        result = subprocess.run(
-            [sys.executable, "-c", "import pkg_resources; print(pkg_resources.get_distribution('ttkbootstrap').version)"],
-            capture_output=True,
-            text=True,
-            check=True
-        )
-        current_version = result.stdout.strip()
-        if current_version == "1.12.0":
-            print(f"[+] ttkbootstrap 版本正确: {current_version}")
-            return True, current_version
-        else:
-            print(f"[!] ttkbootstrap 版本不匹配: 当前{current_version}, 需要1.12.0")
-            return False, current_version
-    except subprocess.CalledProcessError:
+        return metadata.version(package_name.replace("_", "-"))
+    except (metadata.PackageNotFoundError, ValueError):
+        return None
+    except Exception:
+        return None
+
+
+def _needs_install(requirement):
+    """requirement 形如 package 或 package==version。"""
+    if "==" in requirement:
+        name, wanted = requirement.split("==", 1)
+        return _installed_version(name) != wanted
+    return _installed_version(requirement) is None
+
+
+def check_ttkbootstrap_version():
+    current_version = _installed_version("ttkbootstrap")
+    if current_version is None:
         print("[-] ttkbootstrap 未安装")
         return None, None
-    except Exception as e:
-        print(f"[-] 检查版本时出错: {e}")
-        return None, None
+    if current_version == "1.12.0":
+        print(f"[+] ttkbootstrap 版本正确: {current_version}")
+        return True, current_version
+    print(f"[!] ttkbootstrap 版本不匹配: 当前{current_version}, 需要1.12.0")
+    return False, current_version
 
 def uninstall_ttkbootstrap():
 
@@ -116,6 +124,9 @@ def install_modules():
         print(f"[!] ttkbootstrap 版本不正确: {current_version}，需要卸载后重新安装")
         if not uninstall_ttkbootstrap():
             messagebox.showwarning("警告", "ttkbootstrap 卸载失败，将继续尝试安装正确版本")
+
+    # 只安装缺失/版本不符的包；全部满足时不再访问镜像源
+    packages = [pkg for pkg in packages if _needs_install(pkg)]
     
     if not packages:
         messagebox.showinfo("提示", "所有依赖模块已安装且版本正确")

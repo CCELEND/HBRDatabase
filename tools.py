@@ -3,19 +3,92 @@ import ctypes
 import os
 import pathlib
 from PIL import Image
-from tkinter import messagebox
 import json
 import hashlib
 import binascii
 import re
 import shutil
 import zipfile
+import threading
+import subprocess
 from pathlib import Path
 
 from 日志.advanced_logger import AdvancedLogger
 logger = AdvancedLogger.get_logger(__name__)
 
 import 日志.error_queue_proc
+
+
+class _MessageBoxCompat:
+    """Qt 优先的消息框兼容层。
+
+    * Qt 应用主线程：使用 QMessageBox；
+    * Tk 应用主线程：使用 tkinter.messagebox；
+    * 后台线程：只写日志，不在非 GUI 线程创建任何窗口。
+    """
+
+    @staticmethod
+    def _qt_app():
+        try:
+            from PyQt5.QtWidgets import QApplication
+            return QApplication.instance()
+        except Exception:
+            return None
+
+    @staticmethod
+    def _main_thread():
+        return threading.current_thread() is threading.main_thread()
+
+    def _show(self, kind, title, message):
+        if not self._main_thread():
+            logger.warning("%s: %s", title, message)
+            return
+        app = self._qt_app()
+        if app is not None:
+            try:
+                from PyQt5.QtWidgets import QMessageBox
+                getattr(QMessageBox, kind)(None, title, str(message))
+                return
+            except Exception:
+                pass
+        try:
+            from tkinter import messagebox as tk_messagebox
+            getattr(tk_messagebox, kind)(title, str(message))
+        except Exception as e:
+            logger.warning("显示消息框失败：%s", e)
+
+    def showerror(self, title, message, **kwargs):
+        self._show("critical", title, message)
+
+    def showwarning(self, title, message, **kwargs):
+        self._show("warning", title, message)
+
+    def showinfo(self, title, message, **kwargs):
+        self._show("information", title, message)
+
+    def askyesno(self, title, message, **kwargs):
+        if not self._main_thread():
+            logger.warning("%s: %s（后台线程，默认否）", title, message)
+            return False
+        app = self._qt_app()
+        if app is not None:
+            try:
+                from PyQt5.QtWidgets import QMessageBox
+                return QMessageBox.question(
+                    None, title, str(message),
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.No) == QMessageBox.Yes
+            except Exception:
+                pass
+        try:
+            from tkinter import messagebox as tk_messagebox
+            return bool(tk_messagebox.askyesno(title, str(message)))
+        except Exception as e:
+            logger.warning("显示询问框失败：%s", e)
+            return False
+
+
+messagebox = _MessageBoxCompat()
 
 def get_version() -> str:
     version = read_txt_file("./关于/version.txt", "text")
@@ -246,6 +319,9 @@ def delete_files_if_alternative_exists(
         alternative_suffix = '.' + alternative_suffix
 
     # 目录合法性检查
+    if not _is_inside_app_dir(directory):
+        logger.error("拒绝扫描程序目录外的路径：%s", directory)
+        return
     if not os.path.exists(directory) or not os.path.isdir(directory):
         logger.warning(f"目录 {directory} 不存在或不是有效目录，跳过删除操作")
         return
@@ -280,7 +356,21 @@ def delete_webp_files(directory: str) -> None:
 def delete_mp3_files(directory: str) -> None:
     delete_files_if_alternative_exists(directory, "mp3", "flac")
 
+def _is_inside_app_dir(path: str) -> bool:
+    """删除操作只允许落在程序目录内（防止被篡改的清单删除外部文件）。"""
+    base = os.path.abspath(".")
+    target = os.path.abspath(path)
+    return target == base or target.startswith(base + os.sep)
+
+
 def delete_all_files_and_subdirs(directory: str) -> bool:
+    if not _is_inside_app_dir(directory):
+        logger.error("拒绝删除程序目录外的路径：%s", directory)
+        return False
+    # 永远不允许删除程序根目录本身
+    if os.path.abspath(directory) == os.path.abspath("."):
+        logger.error("拒绝删除程序根目录：%s", directory)
+        return False
     if not os.path.isdir(directory):
         return False
     try:
@@ -312,6 +402,9 @@ def delete_old_file_and_subdirs():
     print("[+] 旧文件清理完成")
 
 def delete_file(file: str) -> bool:
+    if not _is_inside_app_dir(file):
+        logger.error("拒绝删除程序目录外的文件：%s", file)
+        return False
     if not os.path.isfile(file):
         return False
     try:
@@ -547,17 +640,31 @@ def is_admin() -> bool:
         messagebox.showerror("错误", f"权限判断出错: {str(e)}")
         return False
 
-def run_admin():
-    if is_admin(): return
-    
+def run_admin(target=None):
+    """以管理员权限运行指定程序（不指定时重新启动当前程序）。
+
+    优先只提升需要管理员权限的目标程序；整个应用不默认以管理员运行。
+    """
+    if is_admin():
+        return
+
     try:
         if sys.platform.startswith('win'):
+            if target:
+                # 只启动目标程序，不再把整个应用提权
+                ctypes.windll.shell32.ShellExecuteW(
+                    None, "runas", str(target), "", 
+                    os.path.dirname(os.path.abspath(str(target))) or None, 1
+                )
+                return
+            # 兼容旧调用：重新启动当前程序（参数需要正确引用）
+            params = subprocess.list2cmdline(sys.argv[1:])
             ctypes.windll.shell32.ShellExecuteW(
-                None, "runas", sys.executable, " ".join(sys.argv), None, 1
+                None, "runas", sys.executable, params, None, 1
             )
         elif sys.platform.startswith('linux'):
             import subprocess
-            cmd = ['sudo', sys.executable] + sys.argv
+            cmd = ['sudo', str(target)] if target else (['sudo', sys.executable] + sys.argv)
             subprocess.call(cmd)
         else:
             logger.error(f"暂不支持 {sys.platform} 系统的提权运行")
@@ -567,7 +674,9 @@ def run_admin():
         logger.error(f"提权运行失败: {str(e)}")
         messagebox.showerror("错误", f"提权运行失败: {str(e)}")
     finally:
-        sys.exit()
+        # 只有「重启当前程序」才退出当前进程；启动目标程序后应用继续运行
+        if not target:
+            sys.exit()
 
 
 def format_hex_dump(hex_string: str, bytes_per_line=16):
@@ -618,6 +727,40 @@ def replace_file_extension(file_path: str, new_extension: str) -> str:
     return new_file_path
 
 
+# ZIP 解压限制：防止 Zip Bomb 和路径越界
+_ZIP_MAX_FILES = 100000
+_ZIP_MAX_BYTES = 5 * 1024 * 1024 * 1024   # 5GB 解压后上限
+
+
+def _safe_extract_zip(zip_ref, extract_to):
+    """安全解压：拒绝越界路径，并限制文件数量/解压大小。"""
+    base = os.path.abspath(extract_to)
+    members = zip_ref.infolist()
+    if len(members) > _ZIP_MAX_FILES:
+        raise ValueError("ZIP 文件数量超过限制：%d" % len(members))
+
+    total_size = 0
+    for member in members:
+        total_size += max(0, int(member.file_size))
+        if total_size > _ZIP_MAX_BYTES:
+            raise ValueError("ZIP 解压后大小超过限制")
+
+        # 兼容两种分隔符；绝对路径/../ 统一在 abspath 后校验
+        name = member.filename.replace("\\", os.sep).replace("/", os.sep)
+        target = os.path.abspath(os.path.join(base, name))
+        if target != base and not target.startswith(base + os.sep):
+            raise ValueError("ZIP 条目路径越界：%s" % member.filename)
+
+        if member.is_dir():
+            os.makedirs(target, exist_ok=True)
+            continue
+        parent = os.path.dirname(target)
+        if parent:
+            os.makedirs(parent, exist_ok=True)
+        with zip_ref.open(member) as src, open(target, "wb") as dst:
+            shutil.copyfileobj(src, dst, length=1024 * 1024)
+
+
 # 解压 ZIP 文件到指定目录
 def unzip_file(zip_path, extract_to):
 
@@ -633,8 +776,8 @@ def unzip_file(zip_path, extract_to):
     try:
         # 以只读模式打开 ZIP 文件
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            # 解压所有文件
-            zip_ref.extractall(extract_to)
+            # 解压所有文件（带路径越界和大小限制）
+            _safe_extract_zip(zip_ref, extract_to)
             # print(f"解压成功！文件已保存到：{os.path.abspath(extract_to)}")
     except zipfile.BadZipFile:
         logger.error(f"{zip_path} 不是有效的 ZIP 文件，可能已损坏")
@@ -719,7 +862,7 @@ def merge_and_extract_chrome_zip(
     try:
         with zipfile.ZipFile(output_zip_path, "r") as zip_f:
             # 支持中文路径，设置编码（如需要）
-            zip_f.extractall(extract_dir)
+            _safe_extract_zip(zip_f, extract_dir)
         # print("解压完成！")
     except zipfile.BadZipFile:
         logger.error(f"解压失败！可能是分卷文件缺失/损坏，或合并顺序错误")

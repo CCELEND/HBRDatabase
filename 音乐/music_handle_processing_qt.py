@@ -3,10 +3,10 @@ import requests
 from urllib.parse import quote
 
 from PyQt5.QtWidgets import QLabel, QMessageBox
-from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtCore import Qt, QTimer, QThread, pyqtSignal
 from PyQt5.QtGui import QPixmap
 
-from tools import creat_directory
+from tools import safe_relative_path
 from canvas_events_qt import get_pixmap
 import music_player_qt
 from window_qt import win_set_top
@@ -19,34 +19,100 @@ logger = AdvancedLogger.get_logger(__name__)
 server_url = music_url()
 
 
-def download_music_files_from_server(file_path_album, music_win_name):
-    file_path_all = "./音乐/下载/" + file_path_album
-    creat_directory(file_path_all)
+_MAX_MUSIC_BYTES = 1024 * 1024 * 1024   # 单文件 1GB 上限
 
+
+def _download_music_core(file_path_album):
+    """在后台线程执行下载；异常直接抛给 worker，由主线程显示提示。"""
+    # 音乐 JSON 里的路径同样限制在 ./音乐/下载 内，防止 ../ 写到程序其它位置
+    file_path_all = safe_relative_path(
+        file_path_album, base_dir="./音乐/下载")
+    os.makedirs(os.path.dirname(file_path_all), exist_ok=True)
     encoded_name = quote(file_path_album)
     try:
-        response = requests.get(f"{server_url}/music_download/{encoded_name}",
-                                timeout=10, **_tls_kwargs())
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
+        with requests.get(
+                f"{server_url}/music_download/{encoded_name}",
+                timeout=10, stream=True, **_tls_kwargs()) as response:
+            response.raise_for_status()
+            content_type = (response.headers.get("Content-Type") or "").lower()
+            if content_type.startswith("application/json"):
+                raise ValueError("服务器返回错误：%s" % response.text[:2000])
+
+            try:
+                content_length = int(response.headers.get("Content-Length", 0))
+            except (TypeError, ValueError):
+                content_length = 0
+            if content_length > _MAX_MUSIC_BYTES:
+                raise ValueError("文件超过 1GB 下载上限")
+
+            downloaded = 0
+            with open(file_path_all, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if not chunk:
+                        continue
+                    downloaded += len(chunk)
+                    if downloaded > _MAX_MUSIC_BYTES:
+                        raise ValueError("文件超过 1GB 下载上限")
+                    f.write(chunk)
+    except Exception:
+        try:
+            if os.path.exists(file_path_all):
+                os.remove(file_path_all)
+        except OSError:
+            pass
+        raise
+    return file_path_all
+
+
+class _MusicDownloadWorker(QThread):
+    done = pyqtSignal(object, object)   # (file_path, error)
+
+    def __init__(self, file_path_album):
+        super().__init__()
+        self.file_path_album = file_path_album
+
+    def run(self):
+        try:
+            path = _download_music_core(self.file_path_album)
+            self.done.emit(path, None)
+        except Exception as e:
+            self.done.emit(None, e)
+
+
+_DOWNLOAD_WORKERS = set()
+
+
+def download_music_files_from_server(file_path_album, music_win_name):
+    """同步兼容接口（旧调用方使用）。"""
+    try:
+        path = _download_music_core(file_path_album)
+    except Exception as e:
         logger.error(f"文件 '{file_path_album}' 下载失败：{str(e)}")
-        QMessageBox.critical(None, "错误", f"文件 '{file_path_album}' 下载失败\n请检查网络连接后重试\n{str(e)}")
+        QMessageBox.critical(
+            None, "错误",
+            f"文件 '{file_path_album}' 下载失败\n请检查网络连接后重试\n{str(e)}")
         win_set_top("音乐", music_win_name)
         return False
-
-    if response.content.startswith(b'{"error"'):
-        err_info = response.content.decode('utf-8')
-        logger.error(f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
-        QMessageBox.critical(None, "错误", f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
-        win_set_top("音乐", music_win_name)
-        return False
-
-    with open(file_path_all, 'wb') as f:
-        f.write(response.content)
-
     QMessageBox.information(None, "信息", f"文件 '{file_path_album}' 下载成功")
     win_set_top("音乐", music_win_name)
-    return True
+    return bool(path)
+
+
+def _play_music_file(file_path_all, music_win_name):
+    safe_stop()
+
+    def _load_and_play():
+        if music_player_qt.PlayerApp is None:
+            logger.error("PlayerApp 为 None，无法加载音乐")
+            QMessageBox.critical(None, "错误", "播放器未初始化，请重新打开音乐窗口")
+            return
+        try:
+            music_player_qt.PlayerApp.load_file(file_path_all)
+        except Exception as e:
+            logger.error(f"加载或播放失败：{e}")
+            QMessageBox.critical(None, "错误", f"加载音乐失败：{e}")
+    QTimer.singleShot(0, _load_and_play)
+    win_set_top("音乐", music_win_name)
 
 
 album_cover_paths = {
@@ -128,22 +194,35 @@ def music_handle(all_albun_name, disc_name, file_name, music_win_name):
     _set_cover(album_cover_path, all_albun_name)
 
     file_path_album = all_albun_name + "/" + disc_name + "/" + file_name
-    file_path_all = "./音乐/下载/" + file_path_album
-    if not os.path.exists(file_path_all):
-        if not download_music_files_from_server(file_path_album, music_win_name):
+    try:
+        file_path_all = safe_relative_path(
+            file_path_album, base_dir="./音乐/下载")
+    except ValueError as e:
+        QMessageBox.critical(None, "错误", "音乐文件路径非法：\n%s" % e)
+        safe_stop()
+        return
+
+    if os.path.exists(file_path_all):
+        _play_music_file(file_path_all, music_win_name)
+        return
+
+    # 网络下载放到后台线程，避免音乐窗口/主界面卡住 10 秒
+    worker = _MusicDownloadWorker(file_path_album)
+    _DOWNLOAD_WORKERS.add(worker)
+
+    def on_done(path, error):
+        _DOWNLOAD_WORKERS.discard(worker)
+        worker.deleteLater()
+        if error is not None:
+            logger.error("文件 '%s' 下载失败：%s", file_path_album, error)
+            QMessageBox.critical(
+                None, "错误",
+                "文件 '%s' 下载失败\n请检查网络连接后重试\n%s"
+                % (file_path_album, error))
             safe_stop()
             return
+        _play_music_file(path, music_win_name)
 
-    safe_stop()
-    def _load_and_play():
-        if music_player_qt.PlayerApp is None:
-            logger.error("PlayerApp 为 None，无法加载音乐")
-            QMessageBox.critical(None, "错误", "播放器未初始化，请重新打开音乐窗口")
-            return
-        try:
-            music_player_qt.PlayerApp.load_file(file_path_all)
-            # music_player_qt.PlayerApp.play()
-        except Exception as e:
-            logger.error(f"加载或播放失败：{e}")
-            raise
-    QTimer.singleShot(0, _load_and_play)
+    worker.done.connect(on_done)
+    worker.start()
+    win_set_top("音乐", music_win_name)

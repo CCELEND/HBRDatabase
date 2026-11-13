@@ -40,7 +40,7 @@ from 工具.排轴.axle_turn_card import TurnCard
 from 工具.排轴.axle_state import (
     _StateTracker, STATE_DISPLAY, STATE_EFFECT_TEXT,
 )
-from 工具.排轴.axle_worker import _AxleImageWorker
+from 工具.排轴.axle_worker import _AxleImageWorker, keep_axle_worker
 from 工具.排轴.axle_calc import AxleCalcMixin
 
 # 窗口管理使用的模块名保持为入口模块（与拆分前一致）
@@ -171,6 +171,7 @@ class AxleODWindow(AxleCalcMixin, QFrame):
         if self._axle_image_worker is not None and self._axle_image_worker.isRunning():
             return
         worker = _AxleImageWorker(data, self.data_source)
+        keep_axle_worker(worker)
         self._axle_image_worker = worker
 
         def on_done(image, error):
@@ -1028,6 +1029,18 @@ class AxleODWindow(AxleCalcMixin, QFrame):
 
     # -------------------------------------------------------------- close
     def destroy(self):
+        # 轴图后台线程还在运行时，先断开回调，避免它完成后再访问已销毁的窗口
+        worker = getattr(self, "_axle_image_worker", None)
+        if worker is not None:
+            self._axle_image_worker = None
+            try:
+                worker.done.disconnect()
+            except (TypeError, RuntimeError):
+                pass
+            if worker.isRunning():
+                worker.wait(3000)
+            worker.finished.connect(worker.deleteLater)
+
         for turn in list(self.turns):
             try:
                 turn.destroy()

@@ -4,7 +4,7 @@ import requests
 from tkinter import messagebox
 from urllib.parse import quote
 
-from tools import creat_directory
+from tools import safe_relative_path
 from canvas_events import get_photo, create_canvas_with_image
 import music_player
 from window import win_set_top
@@ -16,26 +16,61 @@ logger = AdvancedLogger.get_logger(__name__)
 # 地址与 https 配置见 更新/server_config.py（可用环境变量覆盖）
 server_url = music_url()
 
+_MAX_MUSIC_BYTES = 1024 * 1024 * 1024   # 单文件 1GB 上限
+
+
 def download_music_files_from_server(file_path_album, music_win_name):
-    file_path_all = "./音乐/下载/" + file_path_album
-    creat_directory(file_path_all)
-
-    # 编码特殊字符
-    encoded_name = quote(file_path_album)
-    # 服务器响应
-    response = requests.get(f"{server_url}/music_download/{encoded_name}",
-                            **_tls_kwargs())
-
-    if response.content.startswith(b'{"error"'):
-        err_info = response.content.decode('utf-8')
-        logger.error(f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
-        messagebox.showerror("错误", f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
+    try:
+        file_path_all = safe_relative_path(
+            file_path_album, base_dir="./音乐/下载")
+    except ValueError as e:
+        logger.error("音乐文件路径非法：%s", e)
+        messagebox.showerror("错误", "音乐文件路径非法：\n%s" % e)
         win_set_top("音乐", music_win_name)
         return False
 
-    # 保存文件
-    with open(file_path_all, 'wb') as f:
-        f.write(response.content)
+    os.makedirs(os.path.dirname(file_path_all), exist_ok=True)
+    encoded_name = quote(file_path_album)
+    try:
+        with requests.get(
+                f"{server_url}/music_download/{encoded_name}",
+                timeout=10, stream=True, **_tls_kwargs()) as response:
+            response.raise_for_status()
+            content_type = (response.headers.get("Content-Type") or "").lower()
+            if content_type.startswith("application/json"):
+                err_info = response.text[:2000]
+                logger.error(f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
+                messagebox.showerror(
+                    "错误", f"文件 '{file_path_album}' 下载失败\n请重试 {err_info}")
+                win_set_top("音乐", music_win_name)
+                return False
+
+            try:
+                content_length = int(response.headers.get("Content-Length", 0))
+            except (TypeError, ValueError):
+                content_length = 0
+            if content_length > _MAX_MUSIC_BYTES:
+                raise ValueError("文件超过 1GB 下载上限")
+
+            downloaded = 0
+            with open(file_path_all, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024 * 1024):
+                    if not chunk:
+                        continue
+                    downloaded += len(chunk)
+                    if downloaded > _MAX_MUSIC_BYTES:
+                        raise ValueError("文件超过 1GB 下载上限")
+                    f.write(chunk)
+    except Exception as e:
+        logger.error(f"文件 '{file_path_album}' 下载失败：{str(e)}")
+        try:
+            if os.path.exists(file_path_all):
+                os.remove(file_path_all)
+        except OSError:
+            pass
+        messagebox.showerror("错误", f"文件 '{file_path_album}' 下载失败\n{str(e)}")
+        win_set_top("音乐", music_win_name)
+        return False
 
     messagebox.showinfo("信息", f"文件 '{file_path_album}' 下载成功")
     win_set_top("音乐", music_win_name)

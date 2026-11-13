@@ -1,5 +1,5 @@
 
-import threading
+from concurrent.futures import ThreadPoolExecutor
 from threading import Lock
 from tools import load_json
 
@@ -147,15 +147,17 @@ def get_all_statu_obj():
     if len(status) == len(status_json):
         return
 
-    threads = []
-    for statu_name in status_json:
-        thread = threading.Thread(target=get_statu_obj, args=(status_json[statu_name],))
-        threads.append(thread)
-        thread.start()
+    # 限制并发数，避免为每个状态创建一个线程（171 个状态时线程开销很大）
+    names = list(status_json)
 
-    # 等待所有线程完成
-    for thread in threads:
-        thread.join()
+    def _load_one(name):
+        try:
+            return get_statu_obj(status_json[name])
+        except Exception as e:
+            print("[-] 解析状态 %s 失败: %s" % (name, e))
+
+    with ThreadPoolExecutor(max_workers=min(8, max(1, len(names)))) as pool:
+        list(pool.map(_load_one, names))
 
 
 

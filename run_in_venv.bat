@@ -1,11 +1,6 @@
 @echo off
-:: 自动请求管理员权限
-net session >nul 2>&1
-if %errorlevel% neq 0 (
-    echo Requesting administrator privileges...
-    powershell -Command "Start-Process '%~f0' -Verb RunAs"
-    exit /b
-)
+:: 普通权限运行。只有 seed_tools.exe 等明确需要管理员权限的操作，
+:: 由程序内部单独询问并提权，避免整个应用长期以管理员身份运行。
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 

@@ -919,6 +919,9 @@ class BackgroundFrame(QWidget):
         self._pending_size = None          # 记录最新尺寸
         self._cached_pixmap = None
         self._cached_size = None
+        # 只缓存一张 1920 长边的源图，供窗口缩放时快速重采样；
+        # 不保留 4K 原图（内存约 8MB，而不是 33MB）。
+        self._source_pixmap = None
 
         self.setStyleSheet("""
             BackgroundFrame {
@@ -926,42 +929,47 @@ class BackgroundFrame(QWidget):
             }
         """)
 
-    def _load_scaled(self, frame_w, frame_h):
-        """按窗口尺寸解码并裁成 frame_w×frame_h，避免保留原图。
+    _SOURCE_MAX_DIM = 1920
 
-        使用 QImageReader.setScaledSize 让解码器直接读小图（JPEG 等格式
-        可以少分配内存），最后再居中裁剪到目标尺寸。
-        """
-        if not self._image_path:
-            return None
+    def _load_source(self):
+        """加载一张长边不超过 1920 的源图；之后缩放只做内存重采样。"""
+        if self._source_pixmap is not None or not self._image_path:
+            return
 
         reader = QImageReader(self._image_path)
         reader.setAutoTransform(True)
         src_size = reader.size()
         if src_size.isValid() and src_size.width() > 0 and src_size.height() > 0:
             sw, sh = src_size.width(), src_size.height()
-            # KeepAspectRatioByExpanding：先缩放到刚好铺满窗口的尺寸
-            scale = max(frame_w / sw, frame_h / sh)
-            w = max(1, min(sw, int(sw * scale + 0.5)))
-            h = max(1, min(sh, int(sh * scale + 0.5)))
+            scale = min(1.0, self._SOURCE_MAX_DIM / max(sw, sh))
+            w = max(1, int(sw * scale + 0.5))
+            h = max(1, int(sh * scale + 0.5))
             reader.setScaledSize(QSize(w, h))
 
         image = reader.read()
         if image.isNull():
-            # 少数 Qt 图片插件不支持 scaled read，退回普通加载
             pixmap = QPixmap(self._image_path)
             if pixmap.isNull():
-                return None
-            scaled = pixmap.scaled(
-                frame_w, frame_h,
-                Qt.KeepAspectRatioByExpanding,
-                Qt.SmoothTransformation)
+                return
+            if max(pixmap.width(), pixmap.height()) > self._SOURCE_MAX_DIM:
+                pixmap = pixmap.scaled(
+                    self._SOURCE_MAX_DIM, self._SOURCE_MAX_DIM,
+                    Qt.KeepAspectRatio, Qt.SmoothTransformation)
+            self._source_pixmap = pixmap
         else:
-            pixmap = QPixmap.fromImage(image)
-            scaled = pixmap.scaled(
-                frame_w, frame_h,
-                Qt.KeepAspectRatioByExpanding,
-                Qt.SmoothTransformation)
+            self._source_pixmap = QPixmap.fromImage(image)
+
+    def _load_scaled(self, frame_w, frame_h):
+        """从缓存的源图缩放并裁成 frame_w×frame_h。"""
+        self._load_source()
+        source = self._source_pixmap
+        if source is None or source.isNull():
+            return None
+
+        scaled = source.scaled(
+            frame_w, frame_h,
+            Qt.KeepAspectRatioByExpanding,
+            Qt.SmoothTransformation)
 
         # 裁剪到窗口大小：缓存里只留一张视口大小的图
         if scaled.width() != frame_w or scaled.height() != frame_h:

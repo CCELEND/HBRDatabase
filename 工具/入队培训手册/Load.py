@@ -7,8 +7,21 @@ logger = AdvancedLogger.get_logger(__name__)
 import pathlib
 
 import threading
+import atexit
 global chrome_driver
 chrome_driver = None
+
+
+def _quit_chrome_at_exit():
+    driver = chrome_driver
+    if driver is not None:
+        try:
+            driver.quit()
+        except Exception:
+            pass
+
+
+atexit.register(_quit_chrome_at_exit)
 
 def run_browser_in_thread():
     global chrome_driver

@@ -15,6 +15,9 @@ from 工具.排轴.axle_common import (
 )
 from 工具.排轴.axle_action_row import ActionRow
 
+_TURN_STYLE_CACHE = {}
+
+
 class TurnCard(QFrame):
     """一个回合：回合信息 + 最多 3 次行动。"""
 
@@ -540,7 +543,12 @@ class TurnCard(QFrame):
                     accent = color
                     bg = _color_with_alpha(color)
                     break
-        self.setStyleSheet(TURN_CARD_STYLE % {"bg": bg, "accent": accent})
+        key = (bg, accent)
+        style = _TURN_STYLE_CACHE.get(key)
+        if style is None:
+            style = TURN_CARD_STYLE % {"bg": bg, "accent": accent}
+            _TURN_STYLE_CACHE[key] = style
+        self.setStyleSheet(style)
 
     def to_data(self):
         return {

@@ -25,7 +25,9 @@ def load_seed_tools():
                 logger.warning("用户拒绝提升权限，seed_tools.exe 启动中止！")
                 return
             else:
-                run_admin()
+                # 只提升 seed_tools.exe，不让整个主程序以管理员运行
+                run_admin(seed_tools_path)
+                return
 
         # subprocess.run(seed_tools_path)
         subprocess.Popen(
