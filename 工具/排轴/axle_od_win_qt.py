@@ -673,8 +673,24 @@ class AxleODWindow(AxleCalcMixin, QFrame):
         idx = self.turns.index(turn)
         rows = []
         tips = []
+        # 本回合行动的角色排在前面（按行动顺序），其余按角色位排序
+        entries = list(self._state_book.get(idx, []))
+        actors = []
+        for action in turn.actions:
+            member = action.member_index
+            if member is not None and member not in actors:
+                actors.append(member)
+        order = {slot: i for i, slot in enumerate(actors)}
+
+        def _row_order(entry):
+            slot = entry.get("slot")
+            if slot in order:
+                return (0, order[slot])
+            return (1, slot)
+
+        entries.sort(key=_row_order)
         # 一个风格（队员）一行：状态 / 效果 / 剩余 / 来源 用多行对齐
-        for entry in self._state_book.get(idx, []):
+        for entry in entries:
             who = "角色%d %s" % (entry["slot"] + 1, entry["role"])
             summary, tip = self._state_summary(entry)
             names, effects, lefts, sources = [], [], [], []
