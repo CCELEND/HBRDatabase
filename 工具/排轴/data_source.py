@@ -372,6 +372,9 @@ class SkillInfo:
         # 技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护）：
         # [{"state","duration","scope","element"}, ...]
         self.state_grants = []
+        # 技能里的「增益类」效果（如 胜利之弧：攻击上升 / 心眼，5 己方回合）：
+        # [{"name","value","scope","element","turns","unit"}, ...]（只用于状态总览展示）
+        self.buff_effects = []
         # 被动里的「连击数上升」项（如 山胁「梅雨」）：
         # [{"name","amount","count","kind","position","timing","target","lb"}, ...]
         self.passive_combo = []
@@ -546,6 +549,9 @@ class StyleInfo:
         # 「指定SP消耗」类（如 速攻◯：指定EX技能在开局 N 回合内消耗固定为 X）：
         # [{"passive","skill","cost","turns","unit"}, ...]
         self.sp_cost_pins = []
+        # 被动里的「增益类」效果（如 冰之波动：全体友方 冰攻击上升 10% 持续）：
+        # [{"name","value","scope","element","turns","unit","source","passive"}, ...]
+        self.buff_passives = []
         # 该风格是否在战斗开始时给全体友方「干劲」（如 比赛开始）：
         # 没有这类风格时，全队都没有干劲，干劲相关的被动不生效
         self.grants_condition = False
@@ -974,6 +980,79 @@ def _parse_battle_states(style_data):
     return out
 
 
+_BUFF_TYPE_EXCLUDE = ("OD条", "连击数", "SP", "DP", "印记", "领域")
+
+
+def _is_buff_type(text):
+    """是否是「增益类」效果类型（用于状态总览展示，不参与 OD/SP 计算）。"""
+    name = str(text or "").strip()
+    if not name:
+        return False
+    if "上升" not in name and "提升" not in name and name != "心眼":
+        return False
+    if any(key in name for key in _BUFF_TYPE_EXCLUDE):
+        return False
+    return True
+
+
+def _parse_buff_effects(group):
+    """技能里的「增益类」效果（只收目标为友方的）。"""
+    effects = (group[1] if len(group) > 1 and isinstance(group[1], list) else [])
+    out = []
+    for eff in effects:
+        if not isinstance(eff, list) or len(eff) < 2:
+            continue
+        etype = str(eff[0] or "")
+        if not _is_buff_type(etype):
+            continue
+        target = eff[6] if len(eff) > 6 else None
+        scope_info = _sp_recover_scope(target)
+        if not scope_info:
+            continue
+        turns = None
+        if len(eff) > 4 and eff[4] not in (None, ""):
+            try:
+                turns = int(float(str(eff[4])))
+            except Exception:
+                turns = None
+        unit = str(eff[5]) if len(eff) > 5 and eff[5] else ""
+        out.append({"name": etype, "value": str(eff[1] or ""),
+                    "scope": scope_info[0], "element": scope_info[1],
+                    "turns": turns, "unit": unit or "持续"})
+    return out
+
+
+def _parse_buff_passives(style_data):
+    """被动里的「增益类」效果（如 冰之波动 / 冰之鸣动）。"""
+    out = []
+    for passive in (style_data.get("PassiveSkills") or []):
+        try:
+            pname = str(passive[0])
+            ptype = str(passive[3]) if len(passive) > 3 else ""
+            pvalue = passive[4] if len(passive) > 4 else None
+            duration = passive[5] if len(passive) > 5 else None
+            unit = str(passive[6]) if len(passive) > 6 and passive[6] else ""
+            target = passive[7] if len(passive) > 7 else None
+        except Exception:
+            continue
+        if not _is_buff_type(ptype):
+            continue
+        scope_info = _sp_recover_scope(target)
+        if not scope_info:
+            continue
+        turns = None
+        if duration not in (None, ""):
+            try:
+                turns = int(float(str(duration)))
+            except Exception:
+                turns = None
+        out.append({"name": ptype, "value": str(pvalue or ""),
+                    "scope": scope_info[0], "element": scope_info[1],
+                    "turns": turns, "unit": unit or "持续",
+                    "source": pname, "passive": True})
+    return out
+
+
 def _parse_state_grants(group):
     """解析技能赋予的「状态」（如 若向流星歌唱 → 全体友方 歌姬之加护）。
 
@@ -1142,6 +1221,10 @@ def _extract_skill(group):
         pass
     try:
         skill.state_grants = _parse_state_grants(group)
+    except Exception:
+        pass
+    try:
+        skill.buff_effects = _parse_buff_effects(group)
     except Exception:
         pass
     skill.name = _fix_skill_name(skill.name)
@@ -2309,6 +2392,8 @@ class HBRDataSource:
         style.battle_states = _parse_battle_states(style_data)
         # 「指定SP消耗」类（如 速攻◯）
         style.sp_cost_pins = _parse_sp_cost_pins(style_data)
+        # 被动里的「增益类」效果（如 冰之波动 / 冰之鸣动）
+        style.buff_passives = _parse_buff_passives(style_data)
         # 是否给全队赋予「干劲」（没有这类风格时全队都没有干劲）
         style.grants_condition = _parse_condition_grant(style_data)
         # 所属队伍（如 31D）

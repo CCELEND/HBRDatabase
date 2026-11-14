@@ -537,9 +537,9 @@ class AxleODWindow(AxleCalcMixin, QFrame):
         self.state_box = box
         layout = box.body
 
-        table = QTableWidget(0, 6)
+        table = QTableWidget(0, 7)
         table.setHorizontalHeaderLabels(
-            ["角色", "风格", "状态", "效果", "剩余", "来源"])
+            ["角色", "风格", "状态", "效果", "剩余", "来源", "全部状态"])
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setSelectionMode(QAbstractItemView.NoSelection)
         table.setWordWrap(True)
@@ -552,19 +552,24 @@ class AxleODWindow(AxleCalcMixin, QFrame):
                           (2, QHeaderView.ResizeToContents),
                           (3, QHeaderView.Stretch),
                           (4, QHeaderView.ResizeToContents),
-                          (5, QHeaderView.ResizeToContents)):
+                          (5, QHeaderView.ResizeToContents),
+                          (6, QHeaderView.Interactive)):
             header.setSectionResizeMode(col, mode)
+        table.setColumnWidth(6, 210)      # 「全部状态」：悬停可看完整明细
         self.state_table = table
         layout.addWidget(table)
 
-        hint = QLabel("「剩余」按己方回合计（含当前回合）；永久状态显示「永久」。"
-                      "只列出参与 OD / SP 计算的状态与 buff。")
+        hint = QLabel("「剩余」按己方回合计（含当前回合）；持续/永久状态分别显示。"
+                      "状态与连击 buff 参与 OD / SP 计算；"
+                      "攻击上升、心眼、暴击率上升等增益类效果**仅用于展示**。"
+                      "「全部状态」列：鼠标悬停可看该风格身上的所有状态。")
         hint.setStyleSheet("color: #888888;")
         layout.addWidget(hint)
         return box
 
-    def _snapshot_turn_states(self, turn_idx, tracker, combo_buffs):
-        """记录该回合**开始时**每名队员的状态 / 连击 buff。"""
+    def _snapshot_turn_states(self, turn_idx, tracker, combo_buffs,
+                              buff_state=None):
+        """记录该回合**开始时**每名队员的状态 / 连击 buff / 增益类效果。"""
         entries = []
         for slot in self._active_slots():
             role = self.team[slot].get("role") or ""
@@ -598,10 +603,57 @@ class AxleODWindow(AxleCalcMixin, QFrame):
                     "source": entry.get("source") or "",
                     "source_role": entry.get("source_role") or "",
                 })
-            if states or combos:
+            buffs = []
+            for b in (buff_state or {}).get(slot, []):
+                left = b.get("left")
+                buffs.append({
+                    "name": b.get("name") or "",
+                    "value": b.get("value") or "",
+                    "left": left,
+                    "unit": b.get("unit") or "",
+                    "source": b.get("source") or "",
+                })
+            if states or combos or buffs:
                 entries.append({"slot": slot, "role": role, "style": style,
-                                "states": states, "combos": combos})
+                                "states": states, "combos": combos,
+                                "buffs": buffs})
         return entries
+
+    def _buff_left_text(self, buff):
+        """增益类效果的「剩余」文字（持续 / 永久 / N 回合 / N 次）。"""
+        left = buff.get("left")
+        unit = buff.get("unit") or ""
+        if left is None:
+            return "持续" if "持续" in unit else "永久"
+        return _left_text(left, "use" if "次" in unit else None)
+
+    def _state_summary(self, entry):
+        """「全部状态」列：该风格身上所有状态 / 连击 buff 的摘要 + 悬停明细。"""
+        names = []
+        lines = []
+        for st in entry.get("states", []):
+            names.append(st["name"])
+            lines.append("%s：%s（%s）" % (
+                st["name"], st.get("effect") or "—",
+                _left_text(st.get("left"))))
+        for cb in entry.get("combos", []):
+            label = "连击 +%g" % cb["amount"]
+            names.append(label)
+            lines.append("%s：%s" % (
+                label, _left_text(cb["left"], cb.get("kind"))))
+        for bf in entry.get("buffs", []):
+            label = bf["name"]
+            if bf.get("gained"):
+                label += "（本回合获得）"
+            names.append(label)
+            lines.append("%s：%s（%s）" % (
+                label, bf.get("value") or "—", self._buff_left_text(bf)))
+        if not names:
+            return "—", ""
+        tip = "「%s」全部状态（%d 项）：\n%s" % (
+            entry.get("style") or "—", len(names),
+            "\n".join("  · " + line for line in lines))
+        return "、".join(names), tip
 
     def _refresh_state_panel(self):
         """按「选中的回合」刷新状态总览（没选中则显示最后一个回合）。"""
@@ -620,26 +672,49 @@ class AxleODWindow(AxleCalcMixin, QFrame):
 
         idx = self.turns.index(turn)
         rows = []
+        tips = []
+        # 一个风格（队员）一行：状态 / 效果 / 剩余 / 来源 用多行对齐
         for entry in self._state_book.get(idx, []):
             who = "角色%d %s" % (entry["slot"] + 1, entry["role"])
+            summary, tip = self._state_summary(entry)
+            names, effects, lefts, sources = [], [], [], []
             for st in entry["states"]:
-                rows.append((who, entry["style"], st["name"],
-                             st.get("effect", ""), _left_text(st.get("left")),
-                             st.get("source", "")))
+                names.append(st["name"])
+                effects.append(st.get("effect", ""))
+                lefts.append(_left_text(st.get("left")))
+                sources.append(st.get("source", ""))
             for cb in entry["combos"]:
                 src = cb.get("source") or ""
                 if cb.get("source_role"):
-                    src = "%s（%s）" % (src, cb["source_role"]) if src else cb["source_role"]
-                rows.append((who, entry["style"],
-                             "连击数上升 +%g" % cb["amount"],
-                             "连击 +%g" % cb["amount"],
-                             _left_text(cb["left"], cb.get("kind")),
-                             src))
+                    src = ("%s（%s）" % (src, cb["source_role"])
+                           if src else cb["source_role"])
+                names.append("连击数上升 +%g" % cb["amount"])
+                effects.append("连击 +%g" % cb["amount"])
+                lefts.append(_left_text(cb["left"], cb.get("kind")))
+                sources.append(src)
+            for bf in entry.get("buffs", []):
+                names.append(bf["name"])
+                effects.append(bf.get("value", ""))
+                lefts.append(self._buff_left_text(bf))
+                src = bf.get("source", "")
+                if bf.get("gained"):
+                    src = "%s（本回合获得）" % src if src else "本回合获得"
+                sources.append(src)
+            if not names:
+                names = ["—"]
+                effects = [""]
+                lefts = [""]
+                sources = [""]
+            rows.append((who, entry["style"],
+                         "\n".join(names), "\n".join(effects),
+                         "\n".join(lefts), "\n".join(sources), summary))
+            tips.append(tip)
         if not rows:
-            rows = [("—", "", "（本回合开始时没有状态）", "", "", "")]
+            rows = [("—", "", "（本回合开始时没有状态）", "", "", "", "")]
+            tips = [""]
 
         title = "状态总览 · %s（回合开始时）" % turn.index_label.text()
-        sig = (title, tuple(rows))
+        sig = (title, tuple(rows), tuple(tips))
         if sig == self._state_sig:
             return
         self._state_sig = sig
@@ -650,6 +725,8 @@ class AxleODWindow(AxleCalcMixin, QFrame):
                 item = QTableWidgetItem(str(text))
                 if c == 3:
                     item.setToolTip(str(text))
+                if c == 6 and tips[r]:
+                    item.setToolTip(tips[r])
                 table.setItem(r, c, item)
         table.resizeRowsToContents()
 

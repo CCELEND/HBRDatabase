@@ -85,6 +85,12 @@ class AxleCalcMixin:
         state_tracker = _StateTracker(self)
         # 「战斗/初战开始时 使自身进入X状态」（如 山胁大人的仆人/万岁）
         self._seed_battle_states(state_tracker)
+        # 技能 / 被动赋予的「增益类」效果（攻击上升、心眼、冰暴击率上升…）：
+        # 只用于「状态总览」展示，不参与 OD / SP 计算
+        buff_state = {}   # {slot: [{"name","value","left","unit","source"}]}
+        self._seed_battle_buffs(buff_state)
+        enemy_counts = self._enemy_turn_counts()
+        prev_enemy = 0
         initial_front = self._initial_front()
         turn_states = {}      # {回合下标: {slot: 状态集合}}（回合**开始时**的快照）
         for turn_idx, turn in enumerate(self.turns):
@@ -93,13 +99,19 @@ class AxleCalcMixin:
                       if a.member_index is not None]
             turn_front = set(actors) or start_front
             state_tracker.begin_turn(turn_idx)
+            # 「敌方回合」类 buff：本回合开始前敌方行动了几次就减几次
+            delta = enemy_counts[turn_idx] - prev_enemy
+            if delta:
+                self._tick_enemy_buffs(buff_state, delta)
+                prev_enemy = enemy_counts[turn_idx]
             # 记录本回合**开始时**的状态持有者（供 OD 的「仆人≥N名」条件）
             turn_states[turn_idx] = {
                 slot: set(state_tracker.states(slot) or ())
                 for slot in self._active_slots()}
-            # 「状态总览」：记录该回合**开始时**的状态 / 连击 buff
+            # 「状态总览」：记录该回合**开始时**的状态 / 连击 buff / 增益
             self._state_book[turn_idx] = self._snapshot_turn_states(
-                turn_idx, state_tracker, combo_buffs)
+                turn_idx, state_tracker, combo_buffs, buff_state)
+            gained_buffs = []   # 本回合行动中获得、但回合开始时还没有的增益
             # 1) 被动类连击（如 山胁「梅雨」：战斗开始时位于前锋 连击+5（1次））
             for slot in self._active_slots():
                 for mod in self._member_passive_combo(slot):
@@ -133,6 +145,9 @@ class AxleCalcMixin:
                 # 本行动结算完再赋予状态（同回合之后的行动即可见；
                 # 施放该技能本身不享受它赋予的状态）
                 state_tracker.apply(action, turn_idx, turn_front)
+                # 技能里的「增益类」效果（攻击上升 / 心眼 / 冰暴击率上升…）
+                gained_buffs.extend(self._apply_skill_buffs(
+                    buff_state, action, turn_idx, turn_front))
                 if not buff or not buff.get("amount") or not buff.get("duration"):
                     continue
                 # 连击框提示：本技能给「对象」的连击数（带状态变体时标注）
@@ -206,6 +221,23 @@ class AxleCalcMixin:
                 for e in combo_buffs.get(slot, []):
                     if e["left"] > 0 and e.get("kind") != "use":
                         e["left"] -= 1
+            # 本回合获得的增益并入本回合的快照（回合开始列表 + 本回合获得）
+            if gained_buffs:
+                self._merge_gained_buffs(turn_idx, gained_buffs)
+            # 「增益类」buff：按「己方回合」递减（通常/超频所有人，追加/特殊只有出手者）
+            if turn.turn_type() in PLACEHOLDER_TURN_TYPES:
+                buff_tick_slots = set()
+            elif turn.turn_type() in EXTRA_TURN_TYPES:
+                buff_tick_slots = set(actors)
+            else:
+                buff_tick_slots = set(buff_state)
+            for slot in buff_tick_slots:
+                for b in buff_state.get(slot, []):
+                    if b.get("left") is not None and "己方回合" in (
+                            b.get("unit") or ""):
+                        b["left"] -= 1
+                buff_state[slot] = [b for b in buff_state.get(slot, [])
+                                    if b.get("left") is None or b["left"] > 0]
         for turn_idx, turn in enumerate(self.turns):
             # 「敌方回合」数（两个通常回合之间的敌方行动）：供速攻◯等使用
             turn.set_enemy_turns(self._enemy_turns_before(turn_idx))
@@ -1026,6 +1058,97 @@ class AxleCalcMixin:
         if self._sigil_levels_cache is None:
             self._sigil_level(next(iter(self._team_sigils()), None))
         return dict(self._sigil_levels_cache or {})
+
+    def _buff_add(self, buff_state, slot, entry):
+        """登记一条增益；同名同来源只保留一条（刷新持续时间）。"""
+        entries = buff_state.setdefault(slot, [])
+        entries[:] = [e for e in entries
+                      if not (e.get("name") == entry.get("name")
+                              and e.get("source") == entry.get("source"))]
+        entries.append(entry)
+
+    def _buff_targets(self, scope, element, actor, action, turn_front):
+        """增益的目标队员（单名友方取行动里的「对象」）。"""
+        active = self._active_slots()
+        if scope in ("one_any", "one_other"):
+            tgt = action.get_sp_target() if action is not None else None
+            if tgt is None:
+                return []
+            if scope == "one_other" and tgt == actor:
+                return []
+            return [tgt]
+        return self._scope_targets(scope, element, actor, active, turn_front)
+
+    def _seed_battle_buffs(self, buff_state):
+        """战斗开始时，把被动里的增益（如 冰之波动 / 冰之鸣动）登记到队员身上。"""
+        front = self._initial_front()
+        for slot in self._active_slots():
+            role = self.team[slot].get("role")
+            style = self.team[slot].get("style")
+            for st in self.data_source.styles(role):
+                if st.name != style:
+                    continue
+                for eff in (getattr(st, "buff_passives", None) or []):
+                    targets = self._scope_targets(
+                        eff.get("scope"), eff.get("element"), slot,
+                        self._active_slots(), set(front))
+                    for tgt in targets:
+                        self._buff_add(buff_state, tgt, {
+                            "name": eff.get("name", ""),
+                            "value": eff.get("value", ""),
+                            "left": eff.get("turns"),
+                            "unit": eff.get("unit", "持续"),
+                            "source": eff.get("source", ""),
+                        })
+
+    def _apply_skill_buffs(self, buff_state, action, turn_idx, turn_front):
+        """该行动技能赋予的增益；返回 [(目标, 条目)]（供「本回合获得」展示）。"""
+        skill = action._find_skill()
+        effects = getattr(skill, "buff_effects", None) or []
+        gained = []
+        if not effects or action.member_index is None:
+            return gained
+        slot = action.member_index
+        for eff in effects:
+            for tgt in self._buff_targets(eff.get("scope"), eff.get("element"),
+                                          slot, action, turn_front):
+                entry = {
+                    "name": eff.get("name", ""),
+                    "value": eff.get("value", ""),
+                    "left": eff.get("turns"),
+                    "unit": eff.get("unit", ""),
+                    "source": getattr(skill, "name", "") or "技能",
+                }
+                self._buff_add(buff_state, tgt, entry)
+                gained.append((tgt, entry))
+        return gained
+
+    def _merge_gained_buffs(self, turn_idx, gained):
+        """把「本回合获得」的增益并入该回合的状态快照（只用于展示）。"""
+        entries = self._state_book.get(turn_idx) or []
+        by_slot = {e["slot"]: e for e in entries}
+        for slot, buff in gained:
+            entry = by_slot.get(slot)
+            if entry is None:
+                entry = {"slot": slot,
+                         "role": self.team[slot].get("role") or "",
+                         "style": self.team[slot].get("style") or "",
+                         "states": [], "combos": [], "buffs": []}
+                entries.append(entry)
+                by_slot[slot] = entry
+            entry.setdefault("buffs", []).append(dict(buff, gained=True))
+        # 按角色位排序，保证显示顺序稳定
+        entries.sort(key=lambda e: e["slot"])
+        self._state_book[turn_idx] = entries
+
+    def _tick_enemy_buffs(self, buff_state, delta):
+        """「敌方回合」类 buff：敌方行动 delta 次后递减。"""
+        for slot in list(buff_state):
+            for b in buff_state[slot]:
+                if b.get("left") is not None and "敌方回合" in (b.get("unit") or ""):
+                    b["left"] -= delta
+            buff_state[slot] = [b for b in buff_state[slot]
+                                if b.get("left") is None or b["left"] > 0]
 
     def _seed_battle_states(self, tracker):
         """把「战斗/初战开始时 使自身进入X状态」的被动记进状态跟踪器。
