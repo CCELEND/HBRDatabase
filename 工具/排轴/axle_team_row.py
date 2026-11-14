@@ -153,40 +153,45 @@ class TeamMemberRow(QFrame):
         self._emit_changed()
 
     def _talent_candidates(self):
-        """当前风格**可选**的共鸣天赋名（属性匹配）。
+        """当前风格**可选**的共鸣天赋（属性匹配）。
 
         SS / SSR 都可以选（SS 只用于轴图显示，不参与 OD 计算）；
         天赋与属性一一对应，所以只保留与该风格元素相符的那些。
-        SS 不能选「该风格自带」的天赋。
+
+        只排除**当前风格自己**提供的来源（不能从自己身上继承）；
+        同一天赋若由**其它风格**提供，仍然可以选
+        （例如 月华歌姬 可以选 薄暮时分·追忆 提供的同名天赋）。
         """
         rarity = self._style_rarity()
         if rarity not in ("SSR", "SS"):
             return []
         element = self._style_element()
         pool = self.data_source.resonance_pool()
-        own = self._own_resonance()
-        own_name = (own or {}).get("name") if isinstance(own, dict) else None
+        own_style = self.style()
         result = []
         for name, entry in pool.items():
             if not _talent_element_ok(entry.get("owners") or [], element):
                 continue
-            if rarity == "SS" and own_name and name == own_name:
-                continue          # SS 不能装备自身自带的共鸣天赋
-            srcs = [s for s in (entry.get("sources") or [])
-                    if _talent_element_ok([s.get("element") or "无"], element)]
-            if srcs:
-                # 每个属性相符的**来源风格**各占一条（完整显示，不汇总）；
-                # 同名风格（不同形态）只列一次，避免出现两条一模一样的文字
-                seen = set()
-                for src in srcs:
-                    key = (src.get("team"), src.get("element"),
-                           src.get("style"))
-                    if key in seen:
-                        continue
-                    seen.add(key)
-                    result.append((name, src))
-            else:
+            all_srcs = list(entry.get("sources") or [])
+            if not all_srcs:          # 兼容没有 sources 的旧数据
                 result.append((name, None))
+                continue
+            # 属性相符、且**不是当前风格自己**提供的来源
+            srcs = [s for s in all_srcs
+                    if _talent_element_ok([s.get("element") or "无"], element)
+                    and s.get("style") != own_style]
+            if not srcs:
+                continue              # 只有自己提供 → 不能选
+            # 每个来源风格各占一条（完整显示，不汇总）；
+            # 同名风格（不同形态）只列一次，避免重复
+            seen = set()
+            for src in srcs:
+                key = (src.get("team"), src.get("element"),
+                       src.get("style"))
+                if key in seen:
+                    continue
+                seen.add(key)
+                result.append((name, src))
         result.sort(key=lambda item: (
             str(item[0]),
             str((item[1] or {}).get("team") or ""),
@@ -831,11 +836,8 @@ class TeamMemberRow(QFrame):
             # SS 风格导入时：默认/空 一律落成「无」（不把风格自带当默认）
             if tal is None and self._style_rarity() == "SS":
                 tal = ""
-            # SS 不能装备自身自带的天赋：导入时若命中则强制「无」
-            if isinstance(tal, str) and tal and self._style_rarity() == "SS":
-                own = self._own_resonance()
-                if isinstance(own, dict) and tal == own.get("name"):
-                    tal = ""
+            # （SS 也可以选「自身同名天赋」，只要来源是**其它风格**；
+            #   列表里已经排除了当前风格自己的来源，这里不再强制改成「无」）
             tpos = self.talent_combo.findData(tal)
             if tpos < 0 and self._style_rarity() == "SS":
                 tpos = self.talent_combo.findData("")
