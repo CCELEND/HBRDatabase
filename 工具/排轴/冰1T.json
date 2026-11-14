@@ -8,6 +8,7 @@
       "passives": [],
       "lb": 4,
       "resonance_talent": "神圣恩典",
+      "resonance_talent_style": "Holiday Star Night",
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -20,7 +21,8 @@
         "背阴处的小憩（被动技能）"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "",
+      "resonance_talent_style": null,
       "resonance_level": 4,
       "earring": "驱动耳坠",
       "od_earring": 1.0
@@ -34,6 +36,7 @@
       ],
       "lb": 4,
       "resonance_talent": "Fly High!",
+      "resonance_talent_style": "Holiday Ring a Bell",
       "resonance_level": 4,
       "earring": "破坏耳坠",
       "od_earring": 0.0
@@ -47,6 +50,7 @@
       ],
       "lb": 4,
       "resonance_talent": "理毛",
+      "resonance_talent_style": "山胁大人的手下：喵喵法师",
       "resonance_level": 4,
       "earring": "破坏耳坠",
       "od_earring": 0.0
@@ -57,7 +61,8 @@
       "condition": "极佳",
       "passives": [],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "",
+      "resonance_talent_style": null,
       "resonance_level": 4,
       "earring": "攻击耳坠",
       "od_earring": 0.0
@@ -70,10 +75,12 @@
         "友缘之剑"
       ],
       "lb": 4,
-      "resonance_talent": null,
+      "resonance_talent": "Faith",
+      "resonance_talent_style": "顷刻，一夜梦火",
       "resonance_level": 4,
       "earring": "破坏耳坠",
-      "od_earring": 0.0
+      "od_earring": 0.0,
+      "style_rarity": "SSR"
     }
   ],
   "battle": {

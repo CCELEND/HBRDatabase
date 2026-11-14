@@ -542,7 +542,7 @@ class AxleODWindow(AxleCalcMixin, QFrame):
             ["角色", "风格", "状态", "效果", "剩余", "来源", "全部状态"])
         table.setEditTriggers(QAbstractItemView.NoEditTriggers)
         table.setSelectionMode(QAbstractItemView.NoSelection)
-        table.setWordWrap(True)
+        table.setWordWrap(False)   # 多行靠换行符对齐，避免长文本把行撑高
         table.verticalHeader().setVisible(False)
         table.setMinimumHeight(62)
         table.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
@@ -564,6 +564,7 @@ class AxleODWindow(AxleCalcMixin, QFrame):
                       "攻击上升、心眼、暴击率上升等增益类效果**仅用于展示**。"
                       "「全部状态」列：鼠标悬停可看该风格身上的所有状态。")
         hint.setStyleSheet("color: #888888;")
+        hint.setWordWrap(True)      # 长说明自动换行，窗口不会被撑得过宽
         layout.addWidget(hint)
         return box
 
@@ -1190,7 +1191,16 @@ def _open_state_window(view):
     frame = getattr(view, "state_frame", None)
     if frame is not None:
         return frame
-    frame = creat_Toplevel(STATE_TITLE, 980, 460, 75, 520)
+    frame = creat_Toplevel(STATE_TITLE, 1200, 860, 60, 80)
+    # 尽量占满可用高度（小屏幕不至于超出屏幕）
+    try:
+        _screen = QApplication.primaryScreen()
+        if _screen is not None:
+            _geo = _screen.availableGeometry()
+            frame.resize(min(1200, _geo.width() - 40),
+                         min(860, _geo.height() - 100))
+    except Exception:
+        pass
     set_window_icon(frame, "./工具/help.png")
     frame.grid_layout.addWidget(view.state_box, 0, 0)
     frame.grid_layout.setRowStretch(0, 1)
