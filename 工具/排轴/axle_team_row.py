@@ -3,12 +3,40 @@
 
 from contextlib import contextmanager
 from PyQt5.QtWidgets import (
-    QComboBox, QFrame, QHBoxLayout, QLabel, QMenu, QSpinBox, QToolButton
+    QComboBox, QFrame, QHBoxLayout, QLabel, QMenu, QSpinBox, QToolButton,
+    QToolTip
 )
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, QObject, QEvent, pyqtSignal
 
 from 工具.排轴.axle_common import *
 from 工具.排轴.axle_common import _talent_display, _talent_element_ok
+
+class _TalentItemTip(QObject):
+    """共鸣天赋弹出列表：鼠标停在某一项上时，用小提示窗口显示该天赋效果。
+
+    QComboBox 的弹出列表默认不一定显示 item 的 ToolTipRole，
+    这里直接在 view 的 viewport 上拦截 ToolTip 事件，保证能弹出来。
+    """
+
+    def __init__(self, row):
+        super().__init__(row)
+        self.row = row
+
+    def eventFilter(self, obj, event):
+        etype = event.type()
+        if etype == QEvent.ToolTip:
+            view = self.row.talent_combo.view()
+            if view is not None:
+                index = view.indexAt(event.pos())
+                if index.isValid():
+                    tip = index.data(Qt.ToolTipRole)
+                    if tip:
+                        QToolTip.showText(event.globalPos(), str(tip), obj)
+                        return True
+        elif etype == QEvent.Leave:
+            QToolTip.hideText()
+        return False
+
 
 class TeamMemberRow(QFrame):
     """队伍中的一个位置：角色 + 风格。"""
@@ -25,6 +53,10 @@ class TeamMemberRow(QFrame):
         self._combo_forms = []
         self._combo_form_datas = []
         self._build_ui()
+        # 共鸣天赋列表：悬停显示天赋效果
+        self._talent_tip_filter = _TalentItemTip(self)
+        self.talent_combo.view().viewport().installEventFilter(
+            self._talent_tip_filter)
         self._populate_styles()
         self._populate_talents()
 
@@ -185,7 +217,9 @@ class TeamMemberRow(QFrame):
                 text, tip = _talent_display(name, entry, element, True, src)
                 self.talent_combo.addItem(text, name)
                 idx = self.talent_combo.count() - 1
-                self.talent_combo.setItemData(idx, tip, Qt.ToolTipRole)
+                self.talent_combo.setItemData(
+                    idx, self._talent_item_tip(name, entry, src),
+                    Qt.ToolTipRole)
                 self.talent_combo.setItemData(idx, src, TALENT_SOURCE_ROLE)
             # 弹出列表按**最长条目**加宽：完整显示「队伍·属性·风格」，不省略
             self._fit_talent_popup()
@@ -366,6 +400,7 @@ class TeamMemberRow(QFrame):
                 self.talent_combo.setToolTip(
                     "共鸣天赋（相当于装备）：只有 SSR / SS 风格才能配置；"
                     "等级可自由选择（0~4）")
+            self._refresh_talent_item_tips()
             return
         entry = pool.get(res.get("name")) or {}
         text = res.get("levels", {}).get(str(level), "")
@@ -378,6 +413,59 @@ class TeamMemberRow(QFrame):
                 entry.get("team") or "—",
                 "/".join(entry.get("owners") or []) or "—", level, text,
                 effect_note))
+        # 下拉列表里每一项的小提示也按当前等级刷新
+        self._refresh_talent_item_tips()
+
+    def _talent_effect_text(self, name):
+        """天赋在**当前等级**下的效果文字；返回 (天赋名, 效果)。"""
+        level = self.talent_level()
+        if name is None:                 # （默认）→ 风格自带
+            own = self._own_resonance()
+            if not isinstance(own, dict):
+                return None, ""
+            entry = own
+        elif name == "":                 # 无
+            return None, ""
+        else:
+            entry = self.data_source.resonance_pool().get(name) or {}
+        levels = entry.get("levels") or {}
+        text = levels.get(str(level), "")
+        if not text:                     # 该等级没写就取最近的更低等级
+            for lv in range(int(level), -1, -1):
+                if str(lv) in levels:
+                    text = levels[str(lv)]
+                    break
+        return entry.get("name") or name, text
+
+    def _talent_item_tip(self, name, entry, src=None):
+        """共鸣天赋下拉项的悬停提示：天赋效果（当前等级）+ 来源。"""
+        if name == "":
+            return "无：不装备共鸣天赋"
+        level = self.talent_level()
+        real_name, text = self._talent_effect_text(name)
+        if name is None:
+            if not real_name:
+                return "（默认）：使用风格自带的共鸣天赋（当前风格没有）"
+            return "共鸣天赋：%s（风格自带）\nLv%d：%s" % (
+                real_name, level, text or "—")
+        lines = ["共鸣天赋：%s" % (entry.get("name") or name),
+                 "Lv%d：%s" % (level, text or "—"),
+                 "（等级用右侧的「共鸣天赋等级」调整）"]
+        if isinstance(src, dict) and src.get("style"):
+            lines.append("来源：%s·%s·%s" % (
+                src.get("team") or "—", src.get("element") or "无",
+                src.get("style") or "—"))
+        return "\n".join(lines)
+
+    def _refresh_talent_item_tips(self):
+        """按当前等级刷新每个下拉项的悬停提示。"""
+        pool = self.data_source.resonance_pool()
+        for i in range(self.talent_combo.count()):
+            name = self.talent_combo.itemData(i)
+            entry = pool.get(name) or {}
+            src = self.talent_combo.itemData(i, TALENT_SOURCE_ROLE)
+            self.talent_combo.setItemData(
+                i, self._talent_item_tip(name, entry, src), Qt.ToolTipRole)
 
     def _own_resonance(self):
         """当前风格的共鸣天赋（无则 None）。"""
