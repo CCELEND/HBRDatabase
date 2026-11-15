@@ -17,10 +17,13 @@ HTTPS 在 65434 / 65432；因此这里默认走 https + 新端口。
 
 证书校验策略：
 1. 若 ``HBR_SERVER_CA`` 指向的证书文件存在 → 用它校验（可防中间人攻击）；
-2. 否则退回 **不校验**（传输仍然是加密的，但无法验证服务器身份），并给出一次警告。
+2. 若使用 HTTPS 但找不到证书 → **直接拒绝请求**，不再静默关闭校验。
 
 把服务端证书（自签名证书本身或签发它的 CA）保存为 ``./关于/server_ca.crt``
 即可启用校验；服务端使用 ``SSL_CERT``/``SSL_KEY`` 指定的就是这张证书。
+
+如果需要临时连接没有配置证书的开发服务器，必须显式地把 scheme 改为
+``http``，而不是让 HTTPS 退化为“不校验证书”。
 """
 
 import os
@@ -42,7 +45,8 @@ SERVER_PORT = int(os.getenv("HBR_SERVER_PORT", str(_DEFAULT_SERVER_PORT)))
 MUSIC_PORT = int(os.getenv("HBR_MUSIC_PORT", str(_DEFAULT_MUSIC_PORT)))
 CA_FILE = os.getenv("HBR_SERVER_CA", _DEFAULT_CA_FILE)
 
-_warned = False
+class TLSConfigurationError(RuntimeError):
+    """HTTPS 已启用，但客户端没有可用的服务器证书。"""
 
 
 def server_url(port=None):
@@ -56,32 +60,23 @@ def music_url(port=None):
 
 
 def verify():
-    """requests 的 verify 参数：证书路径 / True / False。"""
+    """requests 的 verify 参数：HTTP 为 True，HTTPS 为 CA 路径。
+
+    HTTPS 但 CA 文件缺失时抛错，绝不回退到 ``verify=False``。
+    """
     if SCHEME != "https":
         return True
     if CA_FILE and os.path.isfile(CA_FILE):
         return CA_FILE
-    return False
+    raise TLSConfigurationError(
+        "HTTPS 已启用，但找不到服务器证书文件：%s\n"
+        "请把证书放到该路径，或显式设置 HBR_SERVER_SCHEME=http 使用明文开发服务器。"
+        % (CA_FILE or "<未配置>"))
 
 
 def requests_kwargs():
-    """所有 https 请求都应带上的参数（证书校验 + 关闭不安全告警）。"""
-    target = verify()
-    kwargs = {"verify": target}
-    if target is False:
-        try:
-            import urllib3
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        except Exception:
-            pass
-        global _warned
-        if not _warned:
-            _warned = True
-            try:
-                from 日志.advanced_logger import AdvancedLogger
-                AdvancedLogger.get_logger(__name__).warning(
-                    "未找到服务端证书 %s，HTTPS 暂不校验服务器身份；"
-                    "把服务端证书放到该路径即可启用校验。", CA_FILE)
-            except Exception:
-                pass
-    return kwargs
+    """所有 HTTPS 请求都应带上的参数。
+
+    不再关闭证书校验；证书缺失会在请求发出前直接失败。
+    """
+    return {"verify": verify()}

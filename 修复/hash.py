@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 
 from 日志.advanced_logger import AdvancedLogger
+from 更新.local_policy import HASH_SKIP_DIRS, is_local_only_path
 logger = AdvancedLogger.get_logger(__name__)
 
 """
@@ -68,17 +69,8 @@ def calculate_file_hash_block(filepath, key):
     return key, sha256_hash.hexdigest()
 
 
-HASH_SKIP_DIRS = frozenset({
-    "venv", ".venv", ".git", ".vs", ".vscode", "__pycache__",
-    "node_modules", "chrome_user_data",
-})
-
-
 def calculate_file_hashes(directory):
     file_hashes = {}
-    skip_items = ["__pycache__", ".mp3", ".flac", 
-                  "chrome_user_data", ".log", "client_file_hashes.json", "GetEntriesGUILocal/config.ini",
-                  "./工具/HBR伤害模拟/1.7.0_0/", "./.git/", "./工具/chrome/chrome-win64/"]  # 要跳过的目录或文件名列表
 
     # 遍历目录，收集所有需要计算哈希的文件路径
     file_tasks = []
@@ -94,17 +86,8 @@ def calculate_file_hashes(directory):
             if '\\' in key:
                 key = key.replace('\\', '/')
 
-            # 跳过不需要的文件
-            skip = False
-            for item in skip_items:
-                if item in key:
-                    # 特殊处理：如果是目录路径，确保只跳过目录本身，不跳过同名的.zip文件
-                    if item.endswith('/') and key == item.rstrip('/') + '.zip':
-                        continue  # 不跳过同名的.zip文件
-                    skip = True
-                    break
-            
-            if skip:
+            # 与更新使用同一套本机文件规则，避免修复时反复下载 config.ini 等文件。
+            if is_local_only_path(key):
                 continue
 
             # 将任务添加到任务列表

@@ -3,6 +3,8 @@ from 更新.hash import calculate_file_hashes, save_hashes_to_json
 import threading
 
 from 更新.http_client_qt import send_hashes_to_server
+from 更新.local_policy import (
+    filter_local_only_files, filter_local_only_hashes)
 from 更新.server_config import server_url as get_server_url
 from tools import sort_dict_by_key, get_database_version, get_os_info
 
@@ -66,13 +68,17 @@ def check_for_updates_proc(messenger):
 
     # 下载服务器返回的需要更新的文件
     if response and 'files_to_download' in response:
-        if response['files_to_download']:
+        # 服务器可能仍把本机配置/缓存列为差异；先过滤，避免无意义更新提示。
+        files_to_download = filter_local_only_files(
+            response.get('files_to_download') or [])
+        if files_to_download:
             server_file_datetime = response.get('server_file_datetime', None)
             print(f"[!] 检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
             # 通过信号让主线程显示对话框
             messenger.show_info.emit("提示", f"检测到资源冲突或存在新版本，请更新！\n版本时间戳：{server_file_datetime}")
 
-        server_file_hashes = response.get('server_file_hashes', None)
+        server_file_hashes = filter_local_only_hashes(
+            response.get('server_file_hashes', None))
         if server_file_hashes:
             server_file_hashes = sort_dict_by_key(server_file_hashes)
             save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")

@@ -1,16 +1,16 @@
 import json
-import os
-import time
 import threading
-from urllib.parse import quote
 from PyQt5.QtWidgets import (QDialog, QProgressBar, QLabel, QVBoxLayout,
                              QMessageBox, QApplication)
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtGui import QIcon
 
-from tools import (creat_directory, confirm_restart_qt, sort_dict_by_key,
-                   safe_relative_path)
+from tools import confirm_restart_qt, sort_dict_by_key
+from 更新.download_utils import (
+    DownloadCancelled, download_file, expected_hash_for)
 from 更新.hash import save_hashes_to_json
+from 更新.local_policy import (
+    filter_local_only_files, filter_local_only_hashes)
 from 更新.server_config import requests_kwargs as _tls_kwargs
 from 日志.advanced_logger import AdvancedLogger
 
@@ -46,10 +46,6 @@ def _keep_thread(thread):
     thread.finished.connect(lambda: _LIVE_THREADS.discard(thread))
 
 
-class _DownloadCancelled(Exception):
-    """用户取消下载。"""
-
-# ---------- 下载线程 ----------
 class DownloadThread(QThread):
     def __init__(self, server_url, files_to_download, server_file_hashes):
         super().__init__()
@@ -59,7 +55,6 @@ class DownloadThread(QThread):
         self.signals = DownloadSignals()
         self._cancel = threading.Event()
         self._response = None
-        self._current_path = None
 
     def cancel(self):
         """协作式取消：不再调用 QThread.terminate()。"""
@@ -71,75 +66,43 @@ class DownloadThread(QThread):
             except Exception:
                 pass
 
-    def _remove_current(self):
-        if self._current_path:
-            try:
-                if os.path.exists(self._current_path):
-                    os.remove(self._current_path)
-            except OSError:
-                pass
-            self._current_path = None
+    def _set_response(self, response):
+        self._response = response
 
     def run(self):
-        import requests   # 仅下载线程需要，避免主界面启动时加载 requests/urllib3
         total = len(self.files_to_download)
         for i, file_name in enumerate(self.files_to_download):
             if self._cancel.is_set():
-                self._remove_current()
                 self.signals.cancelled.emit()
                 return
             try:
                 self.signals.file_status.emit(f"下载更新：'{file_name}' ({i+1}/{total})")
-                # 服务器给的路径只允许落在程序目录内
-                safe_path = safe_relative_path(file_name)
-                creat_directory(file_name)
-                self._current_path = safe_path
+                expected = expected_hash_for(self.server_file_hashes, file_name)
 
-                encoded_name = quote(file_name)
-                url = f"{self.server_url}/download/{encoded_name}"
-                with requests.get(url, stream=True, timeout=30,
-                                  **_tls_kwargs()) as response:
-                    self._response = response
-                    try:
-                        response.raise_for_status()
-                        if response.status_code != 200:
-                            err_info = response.json()
-                            error_msg = err_info.get('error', '未知错误')
-                            self.signals.error.emit(error_msg)
-                            return
+                def progress(downloaded, total_size):
+                    if total_size <= 0:
+                        return
+                    file_progress = int(downloaded / total_size * 100)
+                    overall = i * 100 + file_progress
+                    self.signals.progress.emit(file_progress, int(overall / total))
 
-                        total_size = int(response.headers.get('content-length', 0))
-                        downloaded = 0
-                        last_emit = 0.0
-                        with open(safe_path, 'wb') as f:
-                            for chunk in response.iter_content(chunk_size=8192):
-                                if self._cancel.is_set():
-                                    raise _DownloadCancelled()
-                                if chunk:
-                                    f.write(chunk)
-                                    downloaded += len(chunk)
-                                    # 按时间节流进度信号，避免每 8KB 都刷 UI
-                                    now = time.monotonic()
-                                    if total_size > 0 and (
-                                            now - last_emit >= 0.1
-                                            or downloaded >= total_size):
-                                        last_emit = now
-                                        file_progress = int(downloaded / total_size * 100)
-                                        overall = i * 100 + file_progress
-                                        self.signals.progress.emit(
-                                            file_progress, int(overall / total))
-                    finally:
-                        self._response = None
+                # 先写临时文件，校验 SHA-256 后再原子替换旧文件。
+                download_file(
+                    self.server_url,
+                    file_name,
+                    expected_hash=expected,
+                    require_hash=bool(self.server_file_hashes),
+                    cancel_check=self._cancel.is_set,
+                    progress_hook=progress,
+                    response_hook=self._set_response,
+                )
                 # 完成一个文件，更新整体进度
-                self._current_path = None
                 overall = (i + 1) * 100 // total
                 self.signals.progress.emit(100, overall)  # 文件100% 整体进度
-            except _DownloadCancelled:
-                self._remove_current()
+            except DownloadCancelled:
                 self.signals.cancelled.emit()
                 return
             except Exception as e:
-                self._remove_current()
                 if self._cancel.is_set():
                     self.signals.cancelled.emit()
                 else:
@@ -270,6 +233,11 @@ def send_hashes_to_server(server_url, client_file_hashes, oper="update", sys="wi
 def download_files_from_server(parent, server_url, files_to_download, server_file_hashes):
     if is_updating():
         return
+
+    # 服务器清单可能来自旧版本或被误配置；本机配置文件绝不能参与下载。
+    files_to_download = filter_local_only_files(files_to_download or [])
+    server_file_hashes = filter_local_only_hashes(server_file_hashes)
+
     if files_to_download:
         set_updating(True)
         dialog = UpdateProgressDialog(parent, server_url, files_to_download, server_file_hashes)

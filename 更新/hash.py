@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 
 from 日志.advanced_logger import AdvancedLogger
+from 更新.local_policy import HASH_SKIP_DIRS, is_local_only_path
 logger = AdvancedLogger.get_logger(__name__)
 
 """
@@ -66,13 +67,6 @@ def calculate_file_hash_block(filepath, key):
             sha256_hash.update(chunk)
     return key, sha256_hash.hexdigest()
 
-# 哈希/修复时跳过整棵子树：这些目录是机器本地或版本控制内容，
-# 不属于分发包，哈希它们既慢（venv 约 1.3 万个文件）又会被上传给服务器。
-HASH_SKIP_DIRS = frozenset({
-    "venv", ".venv", ".git", ".vs", ".vscode", "__pycache__",
-    "node_modules", "chrome_user_data",
-})
-
 # 本地哈希缓存：记录每个文件的 mtime/size/hash，没变的文件直接复用，
 # 避免每次启动都把整套资源（约 1.5GB）重新 SHA-256 一遍。
 # 文件名已在 skip_items 里，不会被当成待哈希文件。
@@ -101,10 +95,6 @@ def _save_hash_cache(cache):
 
 def calculate_file_hashes(directory, use_cache=True):
     file_hashes = {}
-    skip_items = ["__pycache__", ".mp3", ".flac", 
-                  "chrome_user_data", ".log", "client_file_hashes.json", "GetEntriesGUILocal/config.ini",
-                  "./工具/HBR伤害模拟/1.7.0_0/", "./.git/", "./工具/chrome/chrome-win64/"]  # 要跳过的目录或文件名列表
-
     cache = _load_hash_cache() if use_cache else {}
     new_cache = {}
     reused = 0
@@ -123,17 +113,8 @@ def calculate_file_hashes(directory, use_cache=True):
             if '\\' in key:
                 key = key.replace('\\', '/')
 
-            # 跳过不需要的文件
-            skip = False
-            for item in skip_items:
-                if item in key:
-                    # 特殊处理：如果是目录路径，确保只跳过目录本身，不跳过同名的.zip文件
-                    if item.endswith('/') and key == item.rstrip('/') + '.zip':
-                        continue  # 不跳过同名的.zip文件
-                    skip = True
-                    break
-            
-            if skip:
+            # 本地配置、日志、下载资源、运行时解压目录等不参与哈希。
+            if is_local_only_path(key):
                 continue
 
             try:

@@ -5,11 +5,13 @@ from tkinter import messagebox
 import tkinter as tk
 from tkinter import ttk
 from threading import Thread
-from urllib.parse import quote
 
 from window import set_window_icon, creat_window
-from tools import (creat_directory, sort_dict_by_key, safe_relative_path)
+from tools import sort_dict_by_key
 from 修复.hash import save_hashes_to_json
+from 更新.download_utils import download_file, expected_hash_for
+from 更新.local_policy import (
+    filter_local_only_files, filter_local_only_hashes)
 from 更新.server_config import requests_kwargs as _tls_kwargs
 
 from 日志.advanced_logger import AdvancedLogger
@@ -69,55 +71,33 @@ def handle_download_completion(progress_window, progress, status_var):
             progress_window, progress, status_var
         ))
 
-def download_single_file(file_name, i, total_files, server_url, 
-                          progress, percent_var, file_var, progress_window):
+def download_single_file(file_name, i, total_files, server_url,
+                          server_file_hashes, progress, percent_var, file_var,
+                          progress_window):
     # 下载单个文件
     try:
         file_var.set(f"下载修复资源：'{file_name}' ({i+1}/{total_files})")
         progress_window.update()
-        
-        # 创建目录（路径只允许落在程序目录内）
-        safe_path = safe_relative_path(file_name)
-        creat_directory(file_name)
-        
-        # 编码特殊字符并下载
-        encoded_name = quote(file_name)
-        url = f"{server_url}/download/{encoded_name}"
-        
-        perform_download(safe_path, url, i, total_files, 
-                         progress, percent_var, progress_window)
+
+        expected = expected_hash_for(server_file_hashes, file_name)
+
+        def on_progress(downloaded, total_size):
+            update_progress(i, total_files, downloaded, total_size,
+                            progress, percent_var, progress_window)
+
+        # 先写临时文件，校验 SHA-256 后再原子替换旧文件。
+        download_file(
+            server_url,
+            file_name,
+            expected_hash=expected,
+            require_hash=bool(server_file_hashes),
+            progress_hook=on_progress,
+        )
         return True
-        
+
     except Exception as e:
         handle_download_error(file_name, e)
         return False
-
-def perform_download(file_name, url, file_index, total_files, 
-                     progress, percent_var, progress_window):
-    # 执行文件下载
-    with requests.get(url, stream=True, **_tls_kwargs()) as response:
-        response.raise_for_status()
-        
-        # 检查是否是错误响应
-        if response.status_code != 200:
-            err_info = response.json()
-            logger.error(f"{err_info.get('error', '未知错误')}")
-            messagebox.showerror("错误", f"{err_info.get('error', '未知错误')}")
-            global is_updating
-            is_updating = False
-            return
-        
-        total_size = int(response.headers.get('content-length', 0))
-        downloaded = 0
-        
-        # 保存文件
-        with open(file_name, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=8192):
-                if chunk:  # 过滤掉保持连接的空白块
-                    f.write(chunk)
-                    downloaded += len(chunk)
-                    update_progress(file_index, total_files, downloaded, 
-                        total_size, progress, percent_var, progress_window)
 
 def update_progress(file_index, total_files, downloaded, total_size,
                     progress, percent_var, progress_window):
@@ -136,52 +116,60 @@ def handle_download_error(file_name, error):
     global is_updating
     is_updating = False
 
-def download_thread(files_to_download, server_url, progress_window, 
-                    progress, status_var, percent_var, file_var):
+def download_thread(files_to_download, server_url, server_file_hashes,
+                    progress_window, progress, status_var, percent_var, file_var):
     # 下载线程
     total_files = len(files_to_download)
     progress['maximum'] = total_files * 100  # 每个文件100单位
-    
+
     for i, file_name in enumerate(files_to_download):
-        success = download_single_file(file_name, i, total_files, server_url,
-                                progress, percent_var, file_var, progress_window)
-        
+        success = download_single_file(
+            file_name, i, total_files, server_url, server_file_hashes,
+            progress, percent_var, file_var, progress_window)
+
         if not success:
             progress_window.destroy()
             return
-        
+
         # 完成一个文件，增加进度
         progress['value'] = (i + 1) * 100
         percent_var.set(f"{int((i + 1) / total_files * 100)}%")
         progress_window.update()
-    
+
+    # 全部文件成功后才更新本地服务器清单。
+    if server_file_hashes:
+        sorted_hashes = sort_dict_by_key(server_file_hashes)
+        save_hashes_to_json(sorted_hashes, "./关于/server_file_hashes.json")
+
     # 下载完成后检查状态
     handle_download_completion(progress_window, progress, status_var)
 
-def download_files_with_progress(files_to_download, server_url):
+def download_files_with_progress(files_to_download, server_url,
+                                 server_file_hashes=None):
     global is_updating
     is_updating = True
-    
+
     # 创建进度窗口
     progress_window, progress, status_var, percent_var, file_var = create_progress_window()
-    
+
     # 在新线程中执行下载
     Thread(target=download_thread, args=(
-        files_to_download, server_url, progress_window,
+        files_to_download, server_url, server_file_hashes, progress_window,
         progress, status_var, percent_var, file_var
     ), daemon=True).start()
-    
+
     progress_window.mainloop()
 
 # 从服务器下载文件
 def download_files_from_server(server_url, files_to_download, server_file_hashes):
 
-    if server_file_hashes:
-        server_file_hashes = sort_dict_by_key(server_file_hashes)
-        save_hashes_to_json(server_file_hashes, "./关于/server_file_hashes.json")
+    # 服务器清单可能来自旧版本或被误配置；本机配置文件绝不能参与下载。
+    files_to_download = filter_local_only_files(files_to_download or [])
+    server_file_hashes = filter_local_only_hashes(server_file_hashes)
 
     if not files_to_download:
         messagebox.showinfo("提示", "未发现资源完整性冲突")
         return
-    
-    download_files_with_progress(files_to_download, server_url)
+
+    download_files_with_progress(
+        files_to_download, server_url, server_file_hashes)

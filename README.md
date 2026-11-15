@@ -33,7 +33,8 @@
 
 * 推荐运行 PyQt5 版本：`HBRDatabaseGUI_QT.py`
 >无控制台窗口运行（**推荐**）：`HBRDatabaseGUI_QT.pyw`
-* Tkinter 版本（旧版，保留兼容）：`HBRDatabaseGUI.py` / `HBRDatabaseGUI.pyw`
+* Tkinter 版本（旧版，**冻结维护**）：`HBRDatabaseGUI.py` / `HBRDatabaseGUI.pyw`
+>新功能只维护 PyQt5 版本；Tkinter 版本仅修复启动/兼容性问题，避免两套 UI 重复实现。
 * 强烈建议使用 `venv` 虚拟环境运行，直接运行 `run_in_venv.bat` 即可一键安装依赖以及运行
 
 ## 功能模块
@@ -167,11 +168,36 @@ Web 版全能红烧天堂计算工具箱，支持伤害计算、白值计算、O
 
 * 点击更新菜单栏，更新数据和版本
 >更新失败的话多更新几次。更新后如果启动失败，需要运行一下 `install_module.py`
-* 更新走 HTTPS（服务端证书固定校验），只下载**内容有变化**的文件，不会重复下载
+* 更新走 HTTPS，只下载**内容有变化**的文件，不会重复下载
+* 下载先写入临时文件，校验服务器提供的 **SHA-256** 后再原子替换；校验失败不会覆盖旧文件
+* HTTPS 必须能找到 `关于/server_ca.crt`，找不到时直接报错，**不会静默关闭证书校验**
+> 发布新版本前请确认客户端分发包里包含该证书；旧客户端升级时也应先补齐证书，否则会按设计拒绝连接。
+* `GetEntriesGUILocal/config.ini`、日志、音乐下载、运行时解压目录等属于本机文件，不参与更新
 
 ### 修复
 
 * 当主窗口无法成功运行时，运行 `repair.pyw` 修复缺失文件
+* 修复下载同样使用临时文件 + SHA-256 校验 + 原子替换
+
+### 开发与部署
+
+* 运行单元测试：
+
+```bash
+python -m pytest -q tests
+```
+
+* 部署源码/数据到更新服务器时，先预览，再实际同步：
+
+```bash
+python scripts/deploy_sync.py --host <server-ip> --dry-run
+python scripts/deploy_sync.py --host <server-ip>
+```
+
+部署脚本会：
+* 自动跳过本机配置、日志、`venv`、`chrome`、音乐下载和运行时解压目录；
+* 先上传到服务器临时目录，再逐文件 `os.replace` 到目标目录，避免半写入文件；
+* 默认只同步源码/数据文本，确实需要同步图片资源时加 `--include-assets`。
 
 ## 常见问题
 
@@ -202,11 +228,15 @@ HBRDatabase/
 ├─ repair.pyw                 ← 主窗口起不来时的修复工具
 ├─ install_module.py          ← 安装依赖
 ├─ run_in_venv.bat            ← 一键建 venv + 装依赖 + 运行
+├─ scripts/deploy_sync.py     ← 分阶段、逐文件原子部署到更新服务器
+├─ tests/                     ← pytest 单元测试
 ├─ 角色/                      ← 角色、风格、技能数据（核心数据）
 ├─ 工具/                      ← 各子工具（排轴 / 线稿 / 伤害计算 …）
 │   └─ LineArt/ffmpeg/        ← 视频转线稿自带的 ffmpeg（压缩存放）
 ├─ 敌人/ 持有物/ 战斗系统/ 搜索/ 音乐/
 └─ 更新/ 修复/ 关于/ 日志/
+    └─ local_policy.py        ← 本机文件与可分发文件的统一边界
+    └─ download_utils.py      ← 临时文件 + SHA-256 + 原子替换下载
 ```
 
 ## 免责声明
