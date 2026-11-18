@@ -798,6 +798,14 @@
         "type":"减益",
         "series":"状态值下降" 
     },
+    "祸":{
+        "name":"祸",
+        "path":"./战斗系统/状态/Disaster.webp",
+        "effect":"每级祸降低全状态值7","description":"每级祸降低全状态值7",
+        "stack":"-",
+        "type":"减益",
+        "series":"状态值下降" 
+    },
     "攻击状态值下降":{
         "name":"攻击状态值下降",
         "path":"./战斗系统/状态/AttackDown.webp",
